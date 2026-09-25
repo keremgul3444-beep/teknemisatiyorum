@@ -96,7 +96,8 @@
     "favAdded": "Favorilere eklendi",
     "favRemoved": "Favorilerden çıkarıldı",
     "safety": "Güvenlik: kapora ya da ödemeyi platform dışında, görmediğin tekne için yapma.",
-    "pending": "Bu ilan onay bekliyor; yayına alınınca herkes görebilecek."
+    "pending": "Bu ilan onay bekliyor; yayına alınınca herkes görebilecek.",
+    "share": "Paylaş"
   },
   "usta": {
     "freeSurvey": "Keşif ücretsiz",

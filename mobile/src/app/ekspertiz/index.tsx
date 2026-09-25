@@ -26,6 +26,7 @@ export default function Ekspertiz() {
   if (done && dateIdx !== null) {
     return (
       <Screen>
+        <Header title="" />
         <SuccessView title={t('expertise.doneTitle')} body={t('expertise.doneBody', { date: fmt.format(dates[dateIdx]), slot: t(`expertise.${slot}`) })} actions={[
           { title: t('expertise.sampleReport'), onPress: () => router.push('/ekspertiz/rapor') },
           { title: t('common.done'), onPress: () => router.dismissTo('/hizmetler'), variant: 'ghost' },

@@ -29,6 +29,7 @@ export default function Identity() {
   if (phase === 'done') {
     return (
       <Screen>
+        <Header title="" />
         <SuccessView title={t('verify.successTitle')} body={t('verify.successBody')} actions={[{ title: t('common.continue'), onPress: goBack }]} />
       </Screen>
     );

@@ -25,6 +25,7 @@ export default function Professional() {
   if (done) {
     return (
       <Screen>
+        <Header title="" />
         <SuccessView title={t('verify.proDoneTitle')} body={t('verify.proDoneBody')}
           actions={[{ title: t('common.done'), onPress: () => router.dismissTo('/profil') }]} />
       </Screen>

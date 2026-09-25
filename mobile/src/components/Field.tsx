@@ -10,7 +10,7 @@ export function Field({ label, value, onChangeText, placeholder, multiline, keyb
     <View style={{ gap: space(1.5) }}>
       {label ? <T variant="label" color={colors.muted}>{label.toLocaleUpperCase('tr-TR')}</T> : null}
       <TextInput value={value} onChangeText={onChangeText} placeholder={placeholder} placeholderTextColor={colors.muted}
-        multiline={multiline} keyboardType={keyboardType} maxLength={maxLength}
+        multiline={multiline} keyboardType={keyboardType} maxLength={maxLength} accessibilityLabel={label}
         style={{
           backgroundColor: colors.card, borderWidth: 1, borderColor: colors.line, borderRadius: radius.button,
           padding: space(3), fontFamily: fonts.body, fontSize: 15, color: colors.text,

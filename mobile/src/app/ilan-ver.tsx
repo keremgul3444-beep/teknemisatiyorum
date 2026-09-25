@@ -47,6 +47,7 @@ export default function IlanVer() {
   if (done) {
     return (
       <Screen>
+        <Header title="" />
         <SuccessView title={t('wizard.doneTitle')} body={t('wizard.doneBody')} actions={[
           { title: t('wizard.goMine'), onPress: () => router.replace('/profil/ilanlarim') },
           { title: t('wizard.goHome'), onPress: () => router.dismissTo('/kesfet'), variant: 'ghost' },

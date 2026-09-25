@@ -45,10 +45,10 @@ export default function IlanDetay() {
             onScroll={(e) => setPage(Math.round(e.nativeEvent.contentOffset.x / galleryW))} scrollEventThrottle={32}
             style={{ width: galleryW }} renderItem={({ item }) => <View style={{ width: galleryW }}><BoatImage seed={l.photoSeed + item} height={280} /></View>} />
           <View style={{ position: 'absolute', top: space(3), left: space(4), right: space(4), flexDirection: 'row', justifyContent: 'space-between' }}>
-            <RoundBtn icon="back" onPress={goBack} />
+            <RoundBtn icon="back" label="back" onPress={goBack} />
             <View style={{ flexDirection: 'row', gap: space(2) }}>
-              <RoundBtn icon="share" onPress={() => showDemoToast(t('demo.linkCopied'))} />
-              <RoundBtn icon="heart" filled={fav} onPress={toggleFav} />
+              <RoundBtn icon="share" label={t('listing.share')} onPress={() => showDemoToast(t('demo.linkCopied'))} />
+              <RoundBtn icon="heart" label={t('profile.favorites')} filled={fav} onPress={toggleFav} />
             </View>
           </View>
           <View style={{ position: 'absolute', bottom: space(3), right: space(4), backgroundColor: colors.overlay, borderRadius: radius.sm, paddingHorizontal: space(2), paddingVertical: space(0.5) }}>
@@ -129,9 +129,9 @@ export default function IlanDetay() {
   );
 }
 
-function RoundBtn({ icon, onPress, filled }: { icon: string; onPress: () => void; filled?: boolean }) {
+function RoundBtn({ icon, onPress, filled, label }: { icon: string; onPress: () => void; filled?: boolean; label: string }) {
   return (
-    <Pressable onPress={onPress} hitSlop={8} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center' }}>
+    <Pressable onPress={onPress} hitSlop={8} accessibilityLabel={label} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center' }}>
       <Icon name={icon} size={20} color={filled ? colors.danger : colors.text} filled={filled} />
     </Pressable>
   );
