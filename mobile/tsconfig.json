@@ -1,4 +1,4 @@
 {
   "extends": "expo/tsconfig.base",
-  "compilerOptions": { "strict": true, "baseUrl": ".", "paths": { "@/*": ["src/*"] }, "resolveJsonModule": true }
+  "compilerOptions": { "strict": true, "paths": { "@/*": ["./src/*"] }, "resolveJsonModule": true, "types": ["jest", "node"] }
 }
