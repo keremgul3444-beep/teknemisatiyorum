@@ -126,7 +126,50 @@
     "requestQuote": "Request a quote"
   },
   "expertise": {
-    "surveyor": "Marine surveyor"
+    "surveyor": "Marine surveyor",
+    "title": "Survey",
+    "subtitle": "With independent, certified surveyors",
+    "forListing": "Boat to be surveyed",
+    "packages": "Choose a package",
+    "popular": "Most popular",
+    "date": "Choose a date",
+    "slot": "Time slot",
+    "morning": "Morning 09–12",
+    "noon": "Midday 12–15",
+    "afternoon": "Afternoon 15–18",
+    "book": "Book appointment",
+    "doneTitle": "Appointment booked",
+    "doneBody": "{{date}} · {{slot}} — the surveyor will message you.",
+    "sampleReport": "View sample report",
+    "reportTitle": "Survey report (sample)",
+    "reportBoat": "Jeanneau Sun Odyssey 349 · 2019",
+    "reportMeta": "{{date}} · Surveyor Ahmet Yalçın",
+    "score": "Overall score",
+    "good": "Good",
+    "attention": "Attention",
+    "defect": "Defect",
+    "sections": {
+      "hull": "Hull",
+      "engine": "Engine",
+      "electric": "Electrical",
+      "deck": "Deck",
+      "docs": "Documents"
+    },
+    "items": {
+      "hull1": "No osmosis found, moisture readings normal.",
+      "hull2": "Minor paint lifting at the keel joint.",
+      "engine1": "Compression within manufacturer range.",
+      "engine2": "Impeller replacement recommended within 2 seasons.",
+      "electric1": "Battery bank healthy, charging system working.",
+      "electric2": "One unlabelled extra line in the switchboard wiring.",
+      "deck1": "Winches and cleats in working order.",
+      "deck2": "Foredeck teak seams need renewal.",
+      "docs1": "Registration details are consistent.",
+      "docs2": "Insurance policy should be renewed within 3 months."
+    },
+    "photo": "Photo",
+    "pdf": "Download PDF",
+    "addedToLogbook": "This report was added to the boat's logbook."
   },
   "onboarding": {
     "s1t": "Buy and sell with confidence",
@@ -438,5 +481,57 @@
     "g3": "Only then is it released to the provider",
     "pay": "Pay {{amount}}",
     "success": "Payment received and protected"
+  },
+  "captain": {
+    "title": "Hire a captain",
+    "subtitle": "Captains with verified certificates",
+    "dates": "Dates",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "pickHint": "Tap a start and an end day.",
+    "selected": "{{start}} · {{count}} days",
+    "region": "Region",
+    "list": "Available captains ({{count}})",
+    "languages": "Languages",
+    "areas": "Knows the waters of",
+    "booking": "Booking",
+    "total": "Total",
+    "weekRate": "Weekly rate applied",
+    "note": "Captain's meals and travel are stated separately in the offer.",
+    "reserve": "Book and pay"
+  },
+  "broker": {
+    "title": "Sell my boat for me",
+    "subtitle": "End-to-end broker service",
+    "steps": {
+      "s0": "Valuation",
+      "s1": "Professional shoot",
+      "s2": "Listing & marketing",
+      "s3": "Offer management",
+      "s4": "Handover"
+    },
+    "stepBody": {
+      "s0": "Our surveyor inspects the boat and suggests a price from market data.",
+      "s1": "Photos, video and drone footage are produced.",
+      "s2": "The listing is featured and promoted to local and international buyers.",
+      "s3": "We run buyer meetings and negotiation.",
+      "s4": "Notary, registration and logbook transfer are completed step by step."
+    },
+    "commission": "Commission: X% of the sale price (draft)",
+    "boat": "Which boat?",
+    "asking": "Asking price (€)",
+    "note": "Note",
+    "apply": "Apply",
+    "cases": "My broker files",
+    "caseTitle": "Broker file",
+    "status": {
+      "done": "Completed",
+      "now": "In progress",
+      "next": "Up next"
+    },
+    "assigned": "Assigned broker",
+    "brokerName": "Aslı Er · Mavi Koy Yachting",
+    "write": "Message broker",
+    "asked": "Asking: {{price}}"
   }
 }

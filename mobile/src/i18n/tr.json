@@ -126,7 +126,50 @@
     "requestQuote": "Bu ustadan teklif iste"
   },
   "expertise": {
-    "surveyor": "Tekne eksperi"
+    "surveyor": "Tekne eksperi",
+    "title": "Ekspertiz",
+    "subtitle": "Bağımsız, belgeli eksperlerle",
+    "forListing": "Ekspertiz yapılacak tekne",
+    "packages": "Paket seç",
+    "popular": "En çok tercih edilen",
+    "date": "Tarih seç",
+    "slot": "Saat dilimi",
+    "morning": "Sabah 09–12",
+    "noon": "Öğle 12–15",
+    "afternoon": "İkindi 15–18",
+    "book": "Randevu al",
+    "doneTitle": "Randevun oluşturuldu",
+    "doneBody": "{{date}} · {{slot}} — eksper seninle mesajla iletişime geçecek.",
+    "sampleReport": "Örnek raporu gör",
+    "reportTitle": "Ekspertiz raporu (örnek)",
+    "reportBoat": "Jeanneau Sun Odyssey 349 · 2019",
+    "reportMeta": "{{date}} · Eksper Ahmet Yalçın",
+    "score": "Genel skor",
+    "good": "İyi",
+    "attention": "Dikkat",
+    "defect": "Kusur",
+    "sections": {
+      "hull": "Gövde",
+      "engine": "Motor",
+      "electric": "Elektrik",
+      "deck": "Güverte",
+      "docs": "Belgeler"
+    },
+    "items": {
+      "hull1": "Osmoz bulgusu yok, nem ölçümü normal.",
+      "hull2": "Omurga bağlantısında hafif boya kalkması.",
+      "engine1": "Kompresyon değerleri üretici aralığında.",
+      "engine2": "Impeller değişimi 2 sezon içinde önerilir.",
+      "electric1": "Akü grubu sağlıklı, şarj sistemi çalışıyor.",
+      "electric2": "Pano kablolamasında bir etiketsiz ek hat.",
+      "deck1": "Winch ve kilitler çalışır durumda.",
+      "deck2": "Baş taraf tik derzlerinde yenileme gerekli.",
+      "docs1": "Ruhsat ve bağlama kütüğü bilgileri uyumlu.",
+      "docs2": "Sigorta poliçesi 3 ay içinde yenilenmeli."
+    },
+    "photo": "Fotoğraf",
+    "pdf": "PDF indir",
+    "addedToLogbook": "Bu rapor teknenin karnesine eklendi."
   },
   "onboarding": {
     "s1t": "Al, sat, güvenle",
@@ -438,5 +481,57 @@
     "g3": "Ancak o zaman karşı tarafa aktarılır",
     "pay": "{{amount}} öde",
     "success": "Ödeme alındı, güvencede"
+  },
+  "captain": {
+    "title": "Kaptan kiralama",
+    "subtitle": "Belgeleri doğrulanmış kaptanlar",
+    "dates": "Tarihler",
+    "daily": "Günlük",
+    "weekly": "Haftalık",
+    "pickHint": "Başlangıç ve bitiş gününe dokun.",
+    "selected": "{{start}} · {{count}} gün",
+    "region": "Bölge",
+    "list": "Müsait kaptanlar ({{count}})",
+    "languages": "Diller",
+    "areas": "Bildiği bölgeler",
+    "booking": "Rezervasyon",
+    "total": "Toplam",
+    "weekRate": "Haftalık ücret uygulandı",
+    "note": "Kaptanın yemeği ve ulaşımı teklifte ayrıca belirtilir.",
+    "reserve": "Rezerve et ve öde"
+  },
+  "broker": {
+    "title": "Teknemi siz satın",
+    "subtitle": "Uçtan uca broker hizmeti",
+    "steps": {
+      "s0": "Değerleme",
+      "s1": "Profesyonel çekim",
+      "s2": "Yayın ve pazarlama",
+      "s3": "Teklif yönetimi",
+      "s4": "Devir"
+    },
+    "stepBody": {
+      "s0": "Eksperimiz tekneyi görür, piyasa verisiyle fiyat önerir.",
+      "s1": "Fotoğraf, video ve drone çekimi yapılır.",
+      "s2": "İlan öne çıkarılır, yurt içi ve yurt dışı alıcılara duyurulur.",
+      "s3": "Alıcı görüşmelerini ve pazarlığı biz yürütürüz.",
+      "s4": "Noter, ruhsat ve karne devri adım adım tamamlanır."
+    },
+    "commission": "Komisyon: satış bedelinin %X'i (taslak)",
+    "boat": "Hangi tekne?",
+    "asking": "Beklenen fiyat (€)",
+    "note": "Not",
+    "apply": "Başvur",
+    "cases": "Broker dosyalarım",
+    "caseTitle": "Broker dosyası",
+    "status": {
+      "done": "Tamamlandı",
+      "now": "Devam ediyor",
+      "next": "Sırada"
+    },
+    "assigned": "Atanan broker",
+    "brokerName": "Aslı Er · Mavi Koy Yatçılık",
+    "write": "Broker'a yaz",
+    "asked": "Beklenen: {{price}}"
   }
 }

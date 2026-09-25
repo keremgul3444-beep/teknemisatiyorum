@@ -37,7 +37,7 @@ export interface Boat { id: string; name: string; brand: string; model: string; 
 export type BoatInput = Pick<Boat, 'name' | 'brand' | 'model' | 'year' | 'lengthM'>;
 
 export interface Message { id: string; from: 'me' | 'them' | 'system'; text: string; at: string }
-export type SubjectKind = 'ilan' | 'is' | 'kaptan';
+export type SubjectKind = 'ilan' | 'is' | 'kaptan' | 'broker';
 export interface Conversation {
   id: string; withName: string; subject: { kind: SubjectKind; id: string; title: string };
   phoneShared: boolean; unread: boolean; messages: Message[];
