@@ -299,5 +299,56 @@
     "requestPlaceholder": "E.g. 10–13 m sailboat, after 2016, up to €150,000",
     "create": "Save request",
     "empty": "You have no saved searches yet"
+  },
+  "add": {
+    "title": "What would you like to do?",
+    "listing": "Post a listing",
+    "listingBody": "Sell your boat with a free listing. Identity verification required.",
+    "job": "Request a service",
+    "jobBody": "Collect quotes for technicians, service or repairs.",
+    "boat": "Add a boat",
+    "boatBody": "Start the Boat Logbook and keep its service history."
+  },
+  "wizard": {
+    "title": "Post a listing",
+    "steps": {
+      "photos": "Photos",
+      "basics": "Details",
+      "equipment": "Equipment",
+      "price": "Price",
+      "docs": "Document"
+    },
+    "photosHint": "Add at least 1 photo. The first one becomes the cover.",
+    "addPhoto": "Add",
+    "brand": "Brand",
+    "model": "Model",
+    "year": "Model year",
+    "length": "Length (m)",
+    "type": "Boat type",
+    "cabins": "Cabins",
+    "engine": "Engine",
+    "equipmentHint": "Select the equipment on board.",
+    "description": "Description",
+    "descriptionPh": "Service history, winter storage, notable features…",
+    "price": "Price",
+    "currency": "Currency",
+    "location": "Where is the boat?",
+    "broker": "Let us sell it (broker service)",
+    "brokerHint": "We handle valuation, professional photos and buyer meetings.",
+    "docsTitle": "Proof of ownership",
+    "docsHint": "Upload the registration certificate so your listing earns the \"Ownership verified\" badge.",
+    "docLabel": "Registration certificate",
+    "preview": "Preview",
+    "publish": "Publish",
+    "doneTitle": "Your listing was submitted for review",
+    "doneBody": "Usually reviewed within 2 hours. Everyone can see it once approved.",
+    "goMine": "Go to my listings",
+    "goHome": "Back to Explore"
+  },
+  "boatAdd": {
+    "title": "Add a boat",
+    "name": "Boat name",
+    "namePh": "E.g. Sea Breeze",
+    "save": "Save and start logbook"
   }
 }

@@ -299,5 +299,56 @@
     "requestPlaceholder": "Örn. 10–13 m yelkenli, 2016 sonrası, €150.000'e kadar",
     "create": "Talebi kaydet",
     "empty": "Henüz kayıtlı araman yok"
+  },
+  "add": {
+    "title": "Ne yapmak istersin?",
+    "listing": "İlan ver",
+    "listingBody": "Tekneni ücretsiz ilanla sat. Kimlik doğrulaması gerekir.",
+    "job": "Hizmet talebi aç",
+    "jobBody": "Usta, servis ya da onarım için teklif topla.",
+    "boat": "Tekne ekle",
+    "boatBody": "Tekne Karnesi'ni başlat, bakım geçmişini tut."
+  },
+  "wizard": {
+    "title": "İlan ver",
+    "steps": {
+      "photos": "Fotoğraf",
+      "basics": "Bilgiler",
+      "equipment": "Donanım",
+      "price": "Fiyat",
+      "docs": "Belge"
+    },
+    "photosHint": "En az 1 fotoğraf ekle. İlk fotoğraf kapak olur.",
+    "addPhoto": "Ekle",
+    "brand": "Marka",
+    "model": "Model",
+    "year": "Model yılı",
+    "length": "Boy (m)",
+    "type": "Tekne tipi",
+    "cabins": "Kabin sayısı",
+    "engine": "Motor",
+    "equipmentHint": "Teknede bulunan donanımları seç.",
+    "description": "Açıklama",
+    "descriptionPh": "Bakım geçmişi, kışlama yeri, dikkat çeken özellikler…",
+    "price": "Fiyat",
+    "currency": "Para birimi",
+    "location": "Tekne nerede?",
+    "broker": "Satışı bize bırak (broker hizmeti)",
+    "brokerHint": "Değerleme, profesyonel çekim ve alıcı görüşmelerini biz yürütürüz.",
+    "docsTitle": "Sahiplik belgesi",
+    "docsHint": "Ruhsat ya da bağlama kütüğü yükle; ilanın \"Sahipliği doğrulandı\" rozeti alsın.",
+    "docLabel": "Ruhsat / bağlama kütüğü",
+    "preview": "Önizleme",
+    "publish": "Yayınla",
+    "doneTitle": "İlanın onaya gönderildi",
+    "doneBody": "Genelde 2 saat içinde incelenir. Onaylanınca herkes görebilir.",
+    "goMine": "İlanlarıma git",
+    "goHome": "Keşfet'e dön"
+  },
+  "boatAdd": {
+    "title": "Tekne ekle",
+    "name": "Tekne adı",
+    "namePh": "Örn. Deniz Kızı",
+    "save": "Kaydet ve karneyi başlat"
   }
 }
