@@ -73,8 +73,14 @@ export function parseQuery(input: string): ParsedQuery {
     text = blank(text, pm.index, ctxEnd);
   }
 
-  // 2) Yıl
-  const ym = /(^|[^\d])(19[5-9]\d|20[0-4]\d)(?!\d)/.exec(text);
+  // 2) Yıl — önce "2010-2015" gibi aralık
+  const yr = /(19[5-9]\d|20[0-4]\d)\s*[-–]\s*(19[5-9]\d|20[0-4]\d)(?!\d)/.exec(text);
+  if (yr) {
+    q.minYear = Number(yr[1]);
+    q.maxYear = Number(yr[2]);
+    text = blank(text, yr.index, yr.index + yr[0].length);
+  }
+  const ym = yr ? null : /(^|[^\d])(19[5-9]\d|20[0-4]\d)(?!\d)/.exec(text);
   if (ym) {
     const year = Number(ym[2]);
     const start = ym.index + ym[1].length;
@@ -95,8 +101,14 @@ export function parseQuery(input: string): ParsedQuery {
     text = blank(text, start, ctxEnd);
   }
 
-  // 3) Boy
-  const lm = /(\d+(?:[.,]\d+)?)\s*(m(?![a-zçğıöşü])|mt(?![a-z])|metre\S*|meter\S*)/.exec(text);
+  // 3) Boy — önce "10-14 metre" gibi aralık
+  const lr = /(\d+(?:[.,]\d+)?)\s*[-–]\s*(\d+(?:[.,]\d+)?)\s*(m(?![a-zçğıöşü])|mt(?![a-z])|metre\S*|meter\S*)/.exec(text);
+  if (lr) {
+    q.minLength = toNumber(lr[1]);
+    q.maxLength = toNumber(lr[2]);
+    text = blank(text, lr.index, lr.index + lr[0].length);
+  }
+  const lm = lr ? null : /(\d+(?:[.,]\d+)?)\s*(m(?![a-zçğıöşü])|mt(?![a-z])|metre\S*|meter\S*)/.exec(text);
   if (lm) {
     const n = toNumber(lm[1]);
     const end = lm.index + lm[0].length;

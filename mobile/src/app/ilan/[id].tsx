@@ -45,7 +45,7 @@ export default function IlanDetay() {
             onScroll={(e) => setPage(Math.round(e.nativeEvent.contentOffset.x / galleryW))} scrollEventThrottle={32}
             style={{ width: galleryW }} renderItem={({ item }) => <View style={{ width: galleryW }}><BoatImage seed={l.photoSeed + item} height={280} /></View>} />
           <View style={{ position: 'absolute', top: space(3), left: space(4), right: space(4), flexDirection: 'row', justifyContent: 'space-between' }}>
-            <RoundBtn icon="back" label="back" onPress={goBack} />
+            <RoundBtn icon="back" label={t('common.back')} onPress={goBack} />
             <View style={{ flexDirection: 'row', gap: space(2) }}>
               <RoundBtn icon="share" label={t('listing.share')} onPress={() => showDemoToast(t('demo.linkCopied'))} />
               <RoundBtn icon="heart" label={t('profile.favorites')} filled={fav} onPress={toggleFav} />

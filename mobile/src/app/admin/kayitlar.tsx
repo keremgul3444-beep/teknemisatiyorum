@@ -19,7 +19,7 @@ export default function AdminKayitlar() {
           <View key={a.id} style={{ flexDirection: 'row', padding: space(3), borderTopWidth: 1, borderColor: colors.line }}>
             <T variant="caption" style={{ flex: 1.2 }}>{a.at}</T>
             <T variant="caption" style={{ flex: 1.2 }} numberOfLines={1}>{a.who}</T>
-            <T variant="caption" style={{ flex: 2.5 }}>{a.action}</T>
+            <T variant="caption" style={{ flex: 2.5 }}>{t(a.key, a.params)}</T>
           </View>
         ))}
       </Card>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import {
 } from '@/components';
 import { actions, type BoatType, type Currency, type Equipment, type Listing } from '@/services';
 import { LOCATIONS } from '@/features/assistant/parse';
+import { requireLevel } from '@/session/role';
 
 const TYPES: BoatType[] = ['motoryat', 'yelkenli', 'katamaran', 'gulet', 'surat', 'balikci'];
 const EQUIP: Equipment[] = ['jenerator', 'branda', 'klima', 'radar', 'otopilot', 'bowThruster', 'teak', 'tender'];
@@ -27,6 +28,8 @@ export default function IlanVer() {
   const [doc, setDoc] = useState(false);
   const [preview, setPreview] = useState(false);
   const [done, setDone] = useState(false);
+  // Değerleme, karne ya da ilanlarım gibi her giriş noktasında aynı kimlik kapısı geçerli.
+  useEffect(() => { requireLevel(2); }, []);
   const set = (k: keyof typeof f) => (v: string) => setF((s) => ({ ...s, [k]: v }));
   const num = (s: string) => Number(s.replace(',', '.'));
 
@@ -62,6 +65,7 @@ export default function IlanVer() {
         <View style={{ flexDirection: 'row', gap: space(3) }}>
           <View style={{ flex: 1 }}><Button variant="ghost" title={t('common.back')} onPress={() => setPreview(false)} /></View>
           <View style={{ flex: 2 }}><Button title={t('wizard.publish')} onPress={() => {
+            if (!requireLevel(2)) return;
             actions.createListing(draft);
             if (broker) actions.applyBroker({ boatName: `${f.brand} ${f.model}`, askingEUR: currency === 'EUR' ? draft.price : 0 });
             setDone(true);

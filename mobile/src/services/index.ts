@@ -4,6 +4,8 @@ import type { ProviderKind, UstaCategory } from './types';
 
 export * from './types';
 export * from './rates';
+// Ekranlara açılan sabit demo verisi (gerçek API'de oturum/yönetim uç noktalarından gelecek).
+export { DEMO_USER, BROKER_CONTACT, DEMO_DEVICES, ADMIN_USERS } from '@/mocks/people';
 
 // Okuma hook'ları — ekranların veriye tek erişim yolu.
 export const useListings = () => useStore((s) => s.listings);

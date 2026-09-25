@@ -3,14 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { colors, fonts, space } from '@/theme';
 import { AdminPage, Card, Icon, T } from '@/components';
 import { maskPhone } from '@/features/mask';
+import { ADMIN_USERS } from '@/services';
 
-const USERS = [
-  { name: 'Deniz Yılmaz', role: 'bireysel', level: 2, phone: '+905321234512', joined: '2026-03-02' },
-  { name: 'Mehmet Arslan', role: 'usta', level: 3, phone: '+905339876540', joined: '2025-11-19' },
-  { name: 'Kaptan Selin Er', role: 'kaptan', level: 3, phone: '+905445551203', joined: '2026-01-07' },
-  { name: 'Mavi Koy Yatçılık', role: 'kurumsal', level: 3, phone: '+902523130088', joined: '2025-08-30' },
-  { name: 'Elif S.', role: 'bireysel', level: 1, phone: '+905057778899', joined: '2026-09-21' },
-];
 
 export default function AdminKullanicilar() {
   const { t } = useTranslation();
@@ -25,7 +19,7 @@ export default function AdminKullanicilar() {
         <View style={{ flexDirection: 'row', padding: space(3), backgroundColor: colors.surface }}>
           {cols.map((c) => <T key={c} variant="caption" style={{ flex: c === 'name' ? 2 : 1, fontFamily: fonts.bodyBold }}>{t(`admin.cols.${c}`)}</T>)}
         </View>
-        {USERS.map((u) => (
+        {ADMIN_USERS.map((u) => (
           <View key={u.name} style={{ flexDirection: 'row', padding: space(3), borderTopWidth: 1, borderColor: colors.line }}>
             <T variant="caption" style={{ flex: 2 }} numberOfLines={1}>{u.name}</T>
             <T variant="caption" style={{ flex: 1 }}>{t(`profile.role.${u.role}`)}</T>

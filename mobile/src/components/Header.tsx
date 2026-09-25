@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { colors, space } from '@/theme';
 import { T } from './T';
 import { Icon } from './Icon';
@@ -11,10 +12,11 @@ export function goBack() {
 }
 
 export function Header({ title, back = true, right, subtitle }: { title: string; back?: boolean; right?: ReactNode; subtitle?: string }) {
+  const { t } = useTranslation();
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(3) }}>
       {back ? (
-        <Pressable accessibilityLabel="back" hitSlop={12} onPress={goBack}
+        <Pressable accessibilityLabel={t('common.back')} hitSlop={12} onPress={goBack}
           style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.line }}>
           <Icon name="back" size={20} />
         </Pressable>

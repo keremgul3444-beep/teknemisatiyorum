@@ -53,7 +53,7 @@ const tab = async (name) => {
   for (let i = 0; i < 6; i++) {
     const t = await top(page.getByRole('tab', { name, exact: true }), 1500).catch(() => null);
     if (t) { await t.click(); await page.waitForTimeout(400); return; }
-    const back = await top(page.locator('[aria-label="back"]'), 2500).catch(() => null);
+    const back = await top(page.locator('[aria-label="Geri"], [aria-label="Back"]'), 2500).catch(() => null);
     if (!back) break;
     await back.click();
     await page.waitForTimeout(350);
@@ -81,6 +81,13 @@ async function flow(n, title, steps, fn) {
 await page.goto(`${BASE}/onboarding`);
 await see('Başla', 30000);
 await click('Başla');
+
+await flow(11, 'Misafir kimlik kapısını atlayamaz (inceleme bulgusu)', 'Giriş yapmamış kullanıcı Değerleme → "Ücretsiz ilan ver" ile sihirbaza gitmeye çalışır; önce giriş ekranına yönlenir.', async () => {
+  await click('Teknem kaç eder?');
+  await click('Hesapla', true);
+  await click('Ücretsiz ilan ver');
+  await see('Giriş yap veya kayıt ol');
+});
 await tab('Profil');
 await click('Giriş yap / Kayıt ol');
 await fillPh('5xx', '5321234512');
@@ -241,7 +248,7 @@ await flow(9, 'Roller ve yönetim onayı', 'Demo rol değiştirici ile usta, kur
   await see('Bavaria Cruiser 41');
   await exact('Onayla').click();
   await see('Onaylandı');
-  await vis(page.locator('[aria-label="back"]')).click();
+  await vis(page.locator('[aria-label="Geri"], [aria-label="Back"]')).click();
   await page.waitForTimeout(400);
   await tab('Keşfet');
   await fillPh('Ne aradığını yaz:', 'Bodrum yelkenli');

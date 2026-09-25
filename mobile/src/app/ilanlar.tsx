@@ -1,12 +1,14 @@
 import { useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { colors, space } from '@/theme';
-import { Button, Chip, EmptyState, FilterSheet, Header, ListingCard, MapPreview, QueryChips, Screen, Segmented, T } from '@/components';
-import { toTRY, useListings } from '@/services';
+import { Button, Chip, EmptyState, FilterSheet, Header, ListingCard, MapPreview, QueryChips, Screen, Segmented, T, showDemoToast } from '@/components';
+import { actions, toTRY, useListings } from '@/services';
 import { matchListings } from '@/features/assistant/match';
 import { isEmptyQuery, type ParsedQuery } from '@/features/assistant/parse';
+import { queryToText } from '@/features/assistant/chips';
+import { requireLevel } from '@/session/role';
 
 type Sort = 'new' | 'asc' | 'desc';
 
@@ -52,7 +54,11 @@ export default function Ilanlar() {
       ) : (
         results.map((l) => <ListingCard key={l.id} listing={l} />)
       )}
-      {results.length > 0 ? <Button variant="ghost" icon="bell" title={t('assistant.save')} onPress={() => router.push('/aramalar')} /> : null}
+      {!isEmptyQuery(query) ? <Button variant="ghost" icon="bell" title={t('assistant.save')} onPress={() => {
+        if (!requireLevel(1)) return;
+        actions.saveSearch(queryToText(query));
+        showDemoToast(t('assistant.saved'));
+      }} /> : null}
 
       <FilterSheet visible={sheet} value={query} onClose={() => setSheet(false)} onApply={(q) => { setQuery(q); setSheet(false); }} />
     </Screen>

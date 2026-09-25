@@ -3,7 +3,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { colors, space } from '@/theme';
 import { Avatar, Button, Card, Header, Icon, NotFound, Screen, Section, Stepper, T } from '@/components';
-import { actions, formatPrice, useBrokerCase } from '@/services';
+import { actions, BROKER_CONTACT, formatPrice, useBrokerCase } from '@/services';
 import { currentLang } from '@/i18n';
 
 export default function BrokerCase() {
@@ -13,7 +13,7 @@ export default function BrokerCase() {
   if (!c) return <NotFound />;
   const steps = [0, 1, 2, 3, 4];
   const write = () => {
-    const conv = actions.startConversation({ kind: 'broker', id: c.id, title: `${t('broker.caseTitle')} · ${c.boatName}` }, 'Aslı Er');
+    const conv = actions.startConversation({ kind: 'broker', id: c.id, title: `${t('broker.caseTitle')} · ${c.boatName}` }, BROKER_CONTACT.name);
     router.push(`/sohbet/${conv}`);
   };
   return (
@@ -39,8 +39,8 @@ export default function BrokerCase() {
       <Section title={t('broker.assigned')}>
         <Card>
           <View style={{ flexDirection: 'row', gap: space(3), alignItems: 'center' }}>
-            <Avatar name="Aslı Er" />
-            <T variant="h3" style={{ flex: 1 }}>{t('broker.brokerName')}</T>
+            <Avatar name={BROKER_CONTACT.name} />
+            <T variant="h3" style={{ flex: 1 }}>{BROKER_CONTACT.name} · {BROKER_CONTACT.company}</T>
           </View>
           <Button variant="ghost" icon="mail" title={t('broker.write')} onPress={write} />
         </Card>

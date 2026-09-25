@@ -1,8 +1,14 @@
 # Demo akışları — doğrulama sonucu
 
-Çalıştırma: 2026-09-25 17:14 · Betik: `mobile/scripts/demo-flows.mjs` · Tarayıcı: Chrome (390×844)
+Çalıştırma: 2026-09-25 17:26 · Betik: `mobile/scripts/demo-flows.mjs` · Tarayıcı: Chrome (390×844)
 
-**Sonuç: 10/10 akış geçti.**
+**Sonuç: 11/11 akış geçti.**
+
+## ✓ 11. Misafir kimlik kapısını atlayamaz (inceleme bulgusu)
+
+Giriş yapmamış kullanıcı Değerleme → "Ücretsiz ilan ver" ile sihirbaza gitmeye çalışır; önce giriş ekranına yönlenir.
+
+![akış 11](demo-shots/akis-11.jpg)
 
 ## ✓ 1. Asistanla arama → ilan → mesaj
 

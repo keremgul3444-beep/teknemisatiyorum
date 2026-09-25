@@ -1,4 +1,21 @@
-import type { Boat, Company, Conversation, ExpertisePackage, SavedSearch, Seller } from '@/services/types';
+import type { Boat, Company, Conversation, ExpertisePackage, Role, SavedSearch, Seller } from '@/services/types';
+
+export const DEMO_USER = { name: 'Deniz Yılmaz' };
+export const BROKER_CONTACT = { name: 'Aslı Er', company: 'Mavi Koy Yatçılık' };
+
+export const DEMO_DEVICES: { id: string; name: string; city: string; ago: { unit: 'now' | 'days' | 'weeks'; n: number }; current: boolean }[] = [
+  { id: 'd1', name: 'iPhone 15 · iOS', city: 'İstanbul', ago: { unit: 'now', n: 0 }, current: true },
+  { id: 'd2', name: 'Chrome · Windows', city: 'Bodrum', ago: { unit: 'days', n: 2 }, current: false },
+  { id: 'd3', name: 'Samsung S23 · Android', city: 'Göcek', ago: { unit: 'weeks', n: 3 }, current: false },
+];
+
+export const ADMIN_USERS: { name: string; role: Role; level: number; phone: string; joined: string }[] = [
+  { name: 'Deniz Yılmaz', role: 'bireysel', level: 2, phone: '+905321234512', joined: '2026-03-02' },
+  { name: 'Mehmet Arslan', role: 'usta', level: 3, phone: '+905339876540', joined: '2025-11-19' },
+  { name: 'Kaptan Selin Er', role: 'kaptan', level: 3, phone: '+905445551203', joined: '2026-01-07' },
+  { name: 'Mavi Koy Yatçılık', role: 'kurumsal', level: 3, phone: '+902523130088', joined: '2025-08-30' },
+  { name: 'Elif S.', role: 'bireysel', level: 1, phone: '+905057778899', joined: '2026-09-21' },
+];
 
 export const makeSellers = (): Seller[] => [
   { id: 'u1', name: 'Ahmet K.', since: 2021 },

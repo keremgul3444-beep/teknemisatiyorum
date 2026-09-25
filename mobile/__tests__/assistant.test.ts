@@ -81,3 +81,8 @@ describe('detectCategory', () => {
   test('İngilizce', () => { expect(detectCategory('need new sails')).toBe('yelken'); });
   test('tanınmayan metin', () => { expect(detectCategory('merhaba')).toBeUndefined(); });
 });
+
+describe('aralıklar', () => {
+  test('boy aralığı', () => { expect(parseQuery('10-14 metre motoryat')).toEqual({ minLength: 10, maxLength: 14, type: 'motoryat', equipment: [] }); });
+  test('yıl aralığı', () => { expect(parseQuery('2010–2015 yelkenli')).toEqual({ minYear: 2010, maxYear: 2015, type: 'yelkenli', equipment: [] }); });
+});

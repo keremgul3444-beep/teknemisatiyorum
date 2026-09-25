@@ -609,7 +609,9 @@
     "addService": "Hizmet talebi aç",
     "empty": "Henüz teknen yok",
     "emptyBody": "Tekne ekle, karnesini başlat.",
-    "add": "Tekne ekle"
+    "add": "Tekne ekle",
+    "boatAdded": "Tekne eklendi",
+    "owner": "Sahibi"
   },
   "transfer": {
     "title": "Devir asistanı",
@@ -672,7 +674,12 @@
     "title": "Cihazlar ve oturumlar",
     "current": "Bu cihaz",
     "signOut": "Oturumu kapat",
-    "signedOut": "Oturum kapatıldı"
+    "signedOut": "Oturum kapatıldı",
+    "ago": {
+      "now": "şimdi",
+      "days": "{{count}} gün önce",
+      "weeks": "{{count}} hafta önce"
+    }
   },
   "deleteAcc": {
     "title": "Hesabı sil",
@@ -771,6 +778,16 @@
     "refund": "İade",
     "who": "Kim",
     "what": "Ne",
-    "when": "Ne zaman"
+    "when": "Ne zaman",
+    "refundSample": "Branda dikimi (iptal)"
+  },
+  "audit": {
+    "listingApproved": "İlan onaylandı: {{title}}",
+    "listingRejected": "İlan reddedildi: {{title}}",
+    "docApproved": "Belge onaylandı: {{title}}",
+    "docRejected": "Belge reddedildi: {{title}}",
+    "brokerAdvanced": "Broker dosyası ilerletildi: {{boat}}",
+    "userViewedMasked": "Kullanıcı kaydı görüntülendi (maskeli): {{name}}",
+    "paymentReleased": "Ödeme ustaya aktarıldı: {{ref}} · {{amount}}"
   }
 }

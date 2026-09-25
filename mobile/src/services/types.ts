@@ -51,6 +51,7 @@ export interface BrokerCase { id: string; boatName: string; step: 0 | 1 | 2 | 3 
 export interface Company { id: string; name: string; kind: 'galeri' | 'broker' | 'tersane' | 'servis'; city: string; staff: string[]; listingIds: string[] }
 export type AdminStatus = 'bekliyor' | 'onaylandi' | 'reddedildi';
 export interface AdminItem { id: string; kind: 'ilan' | 'belge'; title: string; who: string; status: AdminStatus; refId?: string }
-export interface AuditEntry { id: string; at: string; who: string; action: string }
+/** İşlem kaydı dile bağlı metin değil, çeviri anahtarı + parametre taşır. */
+export interface AuditEntry { id: string; at: string; who: string; key: string; params?: Record<string, string> }
 export interface Seller { id: string; name: string; since: number; companyId?: string }
 export type Role = 'bireysel' | 'usta' | 'kaptan' | 'kurumsal' | 'yonetici';

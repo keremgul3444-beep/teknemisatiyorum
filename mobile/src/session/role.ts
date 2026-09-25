@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { router } from 'expo-router';
 import type { Role } from '@/services/types';
+import { DEMO_USER } from '@/mocks/people';
 
 export type VerifyLevel = 0 | 1 | 2 | 3;
 
@@ -10,7 +11,7 @@ interface Session {
 }
 
 export const useSession = create<Session>((set, get) => ({
-  onboarded: false, loggedIn: false, verifyLevel: 0, role: 'bireysel', name: 'Deniz Yılmaz',
+  onboarded: false, loggedIn: false, verifyLevel: 0, role: 'bireysel', name: DEMO_USER.name,
   finishOnboarding: () => set({ onboarded: true }),
   login: () => set({ loggedIn: true, verifyLevel: (Math.max(1, get().verifyLevel) as VerifyLevel) }),
   setVerifyLevel: (n) => set({ verifyLevel: n, loggedIn: n > 0 ? true : get().loggedIn }),

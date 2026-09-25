@@ -1,0 +1,30 @@
+{
+  "tr": {
+    "audit": {
+      "listingApproved": "İlan onaylandı: {{title}}",
+      "listingRejected": "İlan reddedildi: {{title}}",
+      "docApproved": "Belge onaylandı: {{title}}",
+      "docRejected": "Belge reddedildi: {{title}}",
+      "brokerAdvanced": "Broker dosyası ilerletildi: {{boat}}",
+      "userViewedMasked": "Kullanıcı kaydı görüntülendi (maskeli): {{name}}",
+      "paymentReleased": "Ödeme ustaya aktarıldı: {{ref}} · {{amount}}"
+    },
+    "logbook": { "boatAdded": "Tekne eklendi", "owner": "Sahibi" },
+    "devices": { "ago": { "now": "şimdi", "days": "{{count}} gün önce", "weeks": "{{count}} hafta önce" } },
+    "admin": { "refundSample": "Branda dikimi (iptal)" }
+  },
+  "en": {
+    "audit": {
+      "listingApproved": "Listing approved: {{title}}",
+      "listingRejected": "Listing rejected: {{title}}",
+      "docApproved": "Document approved: {{title}}",
+      "docRejected": "Document rejected: {{title}}",
+      "brokerAdvanced": "Broker file advanced: {{boat}}",
+      "userViewedMasked": "User record viewed (masked): {{name}}",
+      "paymentReleased": "Payment released to technician: {{ref}} · {{amount}}"
+    },
+    "logbook": { "boatAdded": "Boat added", "owner": "Owner" },
+    "devices": { "ago": { "now": "now", "days": "{{count}} days ago", "weeks": "{{count}} weeks ago" } },
+    "admin": { "refundSample": "Canvas sewing (cancelled)" }
+  }
+}

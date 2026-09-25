@@ -11,8 +11,8 @@ export default function AdminEkspertiz() {
   return (
     <AdminPage>
       <Card>
-        <T variant="h3">Jeanneau Sun Odyssey 349 · Kapsamlı</T>
-        <T variant="caption" color={colors.muted}>2026-09-18 · Eksper Ahmet Yalçın · 82/100</T>
+        <T variant="h3">{t('expertise.reportBoat')}</T>
+        <T variant="caption" color={colors.muted}>{t('expertise.reportMeta', { date: '2026-09-18' })} · 82/100</T>
         <T variant="caption" color={colors.success}>✓ {t('admin.status.onaylandi')}</T>
       </Card>
       {bookings.length === 0 ? <EmptyState icon="clipboard" title={t('admin.noBookings')} /> : bookings.map((b) => (

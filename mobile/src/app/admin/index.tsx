@@ -30,7 +30,7 @@ export default function AdminHome() {
         <Card>
           {audit.map((a) => (
             <View key={a.id} style={{ paddingVertical: space(1.5), borderBottomWidth: 1, borderColor: colors.line }}>
-              <T variant="bodySemi">{a.action}</T>
+              <T variant="bodySemi">{t(a.key, a.params)}</T>
               <T variant="caption" color={colors.muted}>{a.at} · {a.who}</T>
             </View>
           ))}

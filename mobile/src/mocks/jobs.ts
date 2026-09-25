@@ -41,8 +41,8 @@ export const makeAdminItems = (): AdminItem[] => [
 ];
 
 export const makeAudit = (): AuditEntry[] => [
-  { id: 'au1', at: '2026-09-25 09:14', who: 'moderator@ekip', action: 'İlan onaylandı: Hanse 418' },
-  { id: 'au2', at: '2026-09-25 08:52', who: 'destek@ekip', action: 'Kullanıcı kaydı görüntülendi (maskeli): Elif S.' },
-  { id: 'au3', at: '2026-09-24 18:03', who: 'finans@ekip', action: 'Ödeme ustaya aktarıldı: j0 · ₺14.000' },
-  { id: 'au4', at: '2026-09-24 16:40', who: 'moderator@ekip', action: 'Belge reddedildi: SRC Telsiz (okunaksız)' },
+  { id: 'au1', at: '2026-09-25 09:14', who: 'moderator@ekip', key: 'audit.listingApproved', params: { title: 'Hanse 418' } },
+  { id: 'au2', at: '2026-09-25 08:52', who: 'destek@ekip', key: 'audit.userViewedMasked', params: { name: 'Elif S.' } },
+  { id: 'au3', at: '2026-09-24 18:03', who: 'finans@ekip', key: 'audit.paymentReleased', params: { ref: 'j0', amount: '₺14.000' } },
+  { id: 'au4', at: '2026-09-24 16:40', who: 'moderator@ekip', key: 'audit.docRejected', params: { title: 'SRC Telsiz' } },
 ];

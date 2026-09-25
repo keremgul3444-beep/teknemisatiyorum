@@ -609,7 +609,9 @@
     "addService": "Request a service",
     "empty": "You have no boats yet",
     "emptyBody": "Add a boat to start its logbook.",
-    "add": "Add a boat"
+    "add": "Add a boat",
+    "boatAdded": "Boat added",
+    "owner": "Owner"
   },
   "transfer": {
     "title": "Transfer assistant",
@@ -672,7 +674,12 @@
     "title": "Devices and sessions",
     "current": "This device",
     "signOut": "Sign out",
-    "signedOut": "Session signed out"
+    "signedOut": "Session signed out",
+    "ago": {
+      "now": "now",
+      "days": "{{count}} days ago",
+      "weeks": "{{count}} weeks ago"
+    }
   },
   "deleteAcc": {
     "title": "Delete account",
@@ -771,6 +778,16 @@
     "refund": "Refund",
     "who": "Who",
     "what": "What",
-    "when": "When"
+    "when": "When",
+    "refundSample": "Canvas sewing (cancelled)"
+  },
+  "audit": {
+    "listingApproved": "Listing approved: {{title}}",
+    "listingRejected": "Listing rejected: {{title}}",
+    "docApproved": "Document approved: {{title}}",
+    "docRejected": "Document rejected: {{title}}",
+    "brokerAdvanced": "Broker file advanced: {{boat}}",
+    "userViewedMasked": "User record viewed (masked): {{name}}",
+    "paymentReleased": "Payment released to technician: {{ref}} · {{amount}}"
   }
 }

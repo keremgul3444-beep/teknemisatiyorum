@@ -1,11 +1,12 @@
 import { create } from 'zustand';
+import i18n from 'i18next';
 import type {
   AdminItem, AdminStatus, AuditEntry, Boat, BoatInput, BrokerCase, CaptainBooking, Company, Conversation, ExpertiseBooking,
   ExpertisePackage, Job, JobInput, Listing, ListingDraft, Provider, SavedSearch, Seller, SubjectKind,
 } from './types';
 import { makeListings } from '@/mocks/listings';
 import { makeProviders } from '@/mocks/providers';
-import { makeBoats, makeCompanies, makeConversations, makeExpertisePackages, makeSavedSearches, makeSellers } from '@/mocks/people';
+import { DEMO_USER, makeBoats, makeCompanies, makeConversations, makeExpertisePackages, makeSavedSearches, makeSellers } from '@/mocks/people';
 import { makeAdminItems, makeAudit, makeBrokerCases, makeJobs, makeOffers } from '@/mocks/jobs';
 
 export interface Data {
@@ -60,8 +61,8 @@ export const useStore = create<Data & Actions>((set, get) => {
     const next = fn(job);
     if (next) set({ jobs: get().jobs.map((j) => (j.id === id ? next : j)) });
   };
-  const log = (action: string, who = 'demo@kullanici') =>
-    set({ audit: [{ id: nextId('au'), at: `${today()} ${nowHM()}`, who, action }, ...get().audit] });
+  const log = (key: string, params: Record<string, string>, who = 'demo@kullanici') =>
+    set({ audit: [{ id: nextId('au'), at: `${today()} ${nowHM()}`, who, key, params }, ...get().audit] });
 
   return {
     ...seed(),
@@ -73,7 +74,7 @@ export const useStore = create<Data & Actions>((set, get) => {
       };
       set({
         listings: [listing, ...get().listings],
-        adminItems: [{ id: nextId('a'), kind: 'ilan', title: `${d.brand} ${d.model}`, who: 'Sen', status: 'bekliyor', refId: id }, ...get().adminItems],
+        adminItems: [{ id: nextId('a'), kind: 'ilan', title: `${d.brand} ${d.model}`, who: DEMO_USER.name, status: 'bekliyor', refId: id }, ...get().adminItems],
       });
       return id;
     },
@@ -144,8 +145,10 @@ export const useStore = create<Data & Actions>((set, get) => {
       return id;
     },
     advanceBroker(id) {
-      set({ brokerCases: get().brokerCases.map((c) => (c.id === id && c.step < 4 ? { ...c, step: (c.step + 1) as BrokerCase['step'] } : c)) });
-      log(`Broker dosyası ilerletildi: ${id}`, 'broker@ekip');
+      const c = get().brokerCases.find((x) => x.id === id);
+      if (!c || c.step >= 4) return;
+      set({ brokerCases: get().brokerCases.map((x) => (x.id === id ? { ...x, step: (x.step + 1) as BrokerCase['step'] } : x)) });
+      log('audit.brokerAdvanced', { boat: c.boatName }, 'broker@ekip');
     },
 
     addBoat(input) {
@@ -153,7 +156,7 @@ export const useStore = create<Data & Actions>((set, get) => {
       set({
         boats: [...get().boats, {
           ...input, id, photoSeed: counter,
-          logbook: [{ id: nextId('lg'), date: today(), kind: 'sahiplik', title: 'Tekne eklendi', by: 'Sahibi', verified: false }],
+          logbook: [{ id: nextId('lg'), date: today(), kind: 'sahiplik', title: i18n.t('logbook.boatAdded'), by: i18n.t('logbook.owner'), verified: false }],
         }],
       });
       return id;
@@ -189,7 +192,8 @@ export const useStore = create<Data & Actions>((set, get) => {
       if (item.kind === 'belge' && item.refId && status === 'onaylandi') {
         set({ providers: get().providers.map((p) => (p.id === item.refId ? { ...p, verified: true } : p)) });
       }
-      log(`${item.kind === 'ilan' ? 'İlan' : 'Belge'} ${status === 'onaylandi' ? 'onaylandı' : 'reddedildi'}: ${item.title}`, 'moderator@ekip');
+      const verb = status === 'onaylandi' ? 'Approved' : 'Rejected';
+      log(`audit.${item.kind === 'ilan' ? 'listing' : 'doc'}${verb}`, { title: item.title }, 'moderator@ekip');
     },
 
     resetDemo() {
