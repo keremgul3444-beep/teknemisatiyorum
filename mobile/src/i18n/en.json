@@ -716,5 +716,60 @@
       "tersane": "Shipyard",
       "servis": "Service company"
     }
+  },
+  "admin": {
+    "title": "Admin · Prototype",
+    "noAccess": "You don't have access to this area",
+    "nav": {
+      "index": "Overview",
+      "ilanlar": "Listing approvals",
+      "belgeler": "Document approvals",
+      "broker": "Broker files",
+      "ekspertiz": "Surveys",
+      "kullanicilar": "Users",
+      "odemeler": "Payments",
+      "kayitlar": "Audit log"
+    },
+    "kpi": {
+      "active": "Active listings",
+      "pending": "Pending approval",
+      "jobs": "Active jobs",
+      "volume": "Volume this month",
+      "users": "New users (7d)",
+      "broker": "Open broker files"
+    },
+    "recent": "Recent activity",
+    "approve": "Approve",
+    "reject": "Reject",
+    "rejectReason": "Choose a rejection reason",
+    "reasons": {
+      "blurry": "Document unreadable",
+      "mismatch": "Details don't match",
+      "rules": "Violates listing rules"
+    },
+    "status": {
+      "bekliyor": "Pending",
+      "onaylandi": "Approved",
+      "reddedildi": "Rejected"
+    },
+    "by": "Submitted by: {{who}}",
+    "empty": "Nothing pending",
+    "advance": "Move to next step",
+    "noBookings": "No appointments yet",
+    "reportPending": "Report pending",
+    "masked": "The support role sees personal data masked.",
+    "cols": {
+      "name": "Name",
+      "role": "Role",
+      "level": "Level",
+      "phone": "Phone",
+      "joined": "Joined"
+    },
+    "held": "Protected",
+    "released": "Released",
+    "refund": "Refund",
+    "who": "Who",
+    "what": "What",
+    "when": "When"
   }
 }

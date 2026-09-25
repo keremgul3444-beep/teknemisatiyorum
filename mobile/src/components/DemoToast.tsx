@@ -17,7 +17,7 @@ export function DemoToastHost() {
   const msg = useToast((s) => s.msg);
   if (!msg) return null;
   return (
-    <View pointerEvents="none" style={{ position: 'absolute', left: space(5), right: space(5), bottom: 100, alignItems: 'center' }}>
+    <View style={{ pointerEvents: "none", position: "absolute", left: space(5), right: space(5), bottom: 100, alignItems: 'center' }}>
       <View style={{ backgroundColor: colors.text, borderRadius: radius.button, paddingVertical: space(3), paddingHorizontal: space(4) }}>
         <T variant="bodySemi" color={colors.white} style={{ textAlign: 'center' }}>{msg}</T>
       </View>

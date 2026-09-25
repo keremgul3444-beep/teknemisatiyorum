@@ -1,9 +1,40 @@
-import { Screen, Header } from '@/components';
+import { View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { colors, fonts, space } from '@/theme';
+import { AdminPage, Card, Icon, T } from '@/components';
+import { maskPhone } from '@/features/mask';
 
-export default function Page() {
+const USERS = [
+  { name: 'Deniz Yılmaz', role: 'bireysel', level: 2, phone: '+905321234512', joined: '2026-03-02' },
+  { name: 'Mehmet Arslan', role: 'usta', level: 3, phone: '+905339876540', joined: '2025-11-19' },
+  { name: 'Kaptan Selin Er', role: 'kaptan', level: 3, phone: '+905445551203', joined: '2026-01-07' },
+  { name: 'Mavi Koy Yatçılık', role: 'kurumsal', level: 3, phone: '+902523130088', joined: '2025-08-30' },
+  { name: 'Elif S.', role: 'bireysel', level: 1, phone: '+905057778899', joined: '2026-09-21' },
+];
+
+export default function AdminKullanicilar() {
+  const { t } = useTranslation();
+  const cols = ['name', 'role', 'level', 'phone', 'joined'] as const;
   return (
-    <Screen>
-      <Header title="admin/kullanicilar" back={true} />
-    </Screen>
+    <AdminPage>
+      <View style={{ flexDirection: 'row', gap: space(2), alignItems: 'center' }}>
+        <Icon name="shield" size={16} color={colors.primary} />
+        <T variant="caption" color={colors.muted}>{t('admin.masked')}</T>
+      </View>
+      <Card padded={false}>
+        <View style={{ flexDirection: 'row', padding: space(3), backgroundColor: colors.surface }}>
+          {cols.map((c) => <T key={c} variant="caption" style={{ flex: c === 'name' ? 2 : 1, fontFamily: fonts.bodyBold }}>{t(`admin.cols.${c}`)}</T>)}
+        </View>
+        {USERS.map((u) => (
+          <View key={u.name} style={{ flexDirection: 'row', padding: space(3), borderTopWidth: 1, borderColor: colors.line }}>
+            <T variant="caption" style={{ flex: 2 }} numberOfLines={1}>{u.name}</T>
+            <T variant="caption" style={{ flex: 1 }}>{t(`profile.role.${u.role}`)}</T>
+            <T variant="caption" style={{ flex: 1 }}>{u.level}</T>
+            <T variant="caption" style={{ flex: 1 }} numberOfLines={1}>{maskPhone(u.phone)}</T>
+            <T variant="caption" style={{ flex: 1 }}>{u.joined}</T>
+          </View>
+        ))}
+      </Card>
+    </AdminPage>
   );
 }
