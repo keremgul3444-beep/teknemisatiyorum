@@ -71,5 +71,24 @@
   },
   "legal": {
     "draft": "Taslak metin — avukat onayı bekliyor"
+  },
+  "listing": {
+    "logbookCount": "Karne: {{count}} kayıt"
+  },
+  "usta": {
+    "freeSurvey": "Keşif ücretsiz",
+    "cat": {
+      "motor": "Motor",
+      "elektrik": "Elektrik",
+      "boya": "Boya",
+      "jelkot": "Jelkot",
+      "branda": "Branda",
+      "doseme": "Döşeme",
+      "elektronik": "Elektronik",
+      "yelken": "Yelken"
+    }
+  },
+  "expertise": {
+    "surveyor": "Tekne eksperi"
   }
 }

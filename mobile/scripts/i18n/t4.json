@@ -1,0 +1,18 @@
+{
+  "tr": {
+    "listing": { "logbookCount": "Karne: {{count}} kayıt" },
+    "usta": {
+      "freeSurvey": "Keşif ücretsiz",
+      "cat": { "motor": "Motor", "elektrik": "Elektrik", "boya": "Boya", "jelkot": "Jelkot", "branda": "Branda", "doseme": "Döşeme", "elektronik": "Elektronik", "yelken": "Yelken" }
+    },
+    "expertise": { "surveyor": "Tekne eksperi" }
+  },
+  "en": {
+    "listing": { "logbookCount": "Logbook: {{count}} entries" },
+    "usta": {
+      "freeSurvey": "Free inspection",
+      "cat": { "motor": "Engine", "elektrik": "Electrical", "boya": "Paint", "jelkot": "Gelcoat", "branda": "Canvas", "doseme": "Upholstery", "elektronik": "Electronics", "yelken": "Sails" }
+    },
+    "expertise": { "surveyor": "Marine surveyor" }
+  }
+}

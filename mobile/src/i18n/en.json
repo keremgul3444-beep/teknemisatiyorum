@@ -71,5 +71,24 @@
   },
   "legal": {
     "draft": "Draft text — pending legal review"
+  },
+  "listing": {
+    "logbookCount": "Logbook: {{count}} entries"
+  },
+  "usta": {
+    "freeSurvey": "Free inspection",
+    "cat": {
+      "motor": "Engine",
+      "elektrik": "Electrical",
+      "boya": "Paint",
+      "jelkot": "Gelcoat",
+      "branda": "Canvas",
+      "doseme": "Upholstery",
+      "elektronik": "Electronics",
+      "yelken": "Sails"
+    }
+  },
+  "expertise": {
+    "surveyor": "Marine surveyor"
   }
 }
