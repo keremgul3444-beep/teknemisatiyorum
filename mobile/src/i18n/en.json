@@ -533,5 +533,24 @@
     "brokerName": "Aslı Er · Mavi Koy Yachting",
     "write": "Message broker",
     "asked": "Asking: {{price}}"
+  },
+  "messages": {
+    "title": "Messages",
+    "empty": "No messages yet",
+    "emptyBody": "Start a conversation from a listing or a service request.",
+    "loginTitle": "Log in to see your messages",
+    "kind": {
+      "ilan": "Listing",
+      "is": "Job",
+      "kaptan": "Captain",
+      "broker": "Broker"
+    },
+    "placeholder": "Write a message…",
+    "sharePhone": "Share my number",
+    "sharePhoneConfirm": "Your phone number will be shown only to this person. Continue?",
+    "phoneShared": "Your phone number was shared in this conversation.",
+    "safety": "Don't pay outside the platform; secure payment protects you.",
+    "autoReply": "Thanks, I'll get back to you shortly.",
+    "noMessages": "Write the first message to start the conversation."
   }
 }

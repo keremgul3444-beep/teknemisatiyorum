@@ -1,0 +1,34 @@
+{
+  "tr": {
+    "messages": {
+      "title": "Mesajlar",
+      "empty": "Henüz mesajın yok",
+      "emptyBody": "İlanlardan ya da hizmet taleplerinden sohbet başlatabilirsin.",
+      "loginTitle": "Mesajlarını görmek için giriş yap",
+      "kind": { "ilan": "İlan", "is": "İş", "kaptan": "Kaptan", "broker": "Broker" },
+      "placeholder": "Mesaj yaz…",
+      "sharePhone": "Numaramı paylaş",
+      "sharePhoneConfirm": "Telefon numaran yalnızca bu kişiye gösterilecek. Onaylıyor musun?",
+      "phoneShared": "Telefon numaran bu sohbette paylaşıldı.",
+      "safety": "Ödemeyi platform dışında yapma; güvenli ödeme seni korur.",
+      "autoReply": "Teşekkürler, en kısa sürede dönüş yapacağım.",
+      "noMessages": "Sohbeti başlatmak için ilk mesajı yaz."
+    }
+  },
+  "en": {
+    "messages": {
+      "title": "Messages",
+      "empty": "No messages yet",
+      "emptyBody": "Start a conversation from a listing or a service request.",
+      "loginTitle": "Log in to see your messages",
+      "kind": { "ilan": "Listing", "is": "Job", "kaptan": "Captain", "broker": "Broker" },
+      "placeholder": "Write a message…",
+      "sharePhone": "Share my number",
+      "sharePhoneConfirm": "Your phone number will be shown only to this person. Continue?",
+      "phoneShared": "Your phone number was shared in this conversation.",
+      "safety": "Don't pay outside the platform; secure payment protects you.",
+      "autoReply": "Thanks, I'll get back to you shortly.",
+      "noMessages": "Write the first message to start the conversation."
+    }
+  }
+}

@@ -533,5 +533,24 @@
     "brokerName": "Aslı Er · Mavi Koy Yatçılık",
     "write": "Broker'a yaz",
     "asked": "Beklenen: {{price}}"
+  },
+  "messages": {
+    "title": "Mesajlar",
+    "empty": "Henüz mesajın yok",
+    "emptyBody": "İlanlardan ya da hizmet taleplerinden sohbet başlatabilirsin.",
+    "loginTitle": "Mesajlarını görmek için giriş yap",
+    "kind": {
+      "ilan": "İlan",
+      "is": "İş",
+      "kaptan": "Kaptan",
+      "broker": "Broker"
+    },
+    "placeholder": "Mesaj yaz…",
+    "sharePhone": "Numaramı paylaş",
+    "sharePhoneConfirm": "Telefon numaran yalnızca bu kişiye gösterilecek. Onaylıyor musun?",
+    "phoneShared": "Telefon numaran bu sohbette paylaşıldı.",
+    "safety": "Ödemeyi platform dışında yapma; güvenli ödeme seni korur.",
+    "autoReply": "Teşekkürler, en kısa sürede dönüş yapacağım.",
+    "noMessages": "Sohbeti başlatmak için ilk mesajı yaz."
   }
 }
