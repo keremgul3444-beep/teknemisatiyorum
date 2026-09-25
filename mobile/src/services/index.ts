@@ -10,6 +10,7 @@ export const useListings = () => useStore((s) => s.listings);
 export const useListing = (id?: string) => useStore((s) => s.listings.find((l) => l.id === id));
 export const useProviders = (kind: ProviderKind, category?: UstaCategory) =>
   useStore(useShallow((s) => s.providers.filter((p) => p.kind === kind && (!category || p.categories.includes(category)))));
+export const useAllProviders = () => useStore((s) => s.providers);
 export const useProvider = (id?: string) => useStore((s) => s.providers.find((p) => p.id === id));
 export const useJobs = () => useStore((s) => s.jobs);
 export const useJob = (id?: string) => useStore((s) => s.jobs.find((j) => j.id === id));

@@ -72,3 +72,12 @@ describe('matchListings', () => {
     expect(r.near).toEqual([]);
   });
 });
+
+import { detectCategory } from '@/features/assistant/serviceCategory';
+
+describe('detectCategory', () => {
+  test('motor derdi motor kategorisine gider', () => { expect(detectCategory('motorum su alıyor')).toBe('motor'); });
+  test('akü sorunu elektrik', () => { expect(detectCategory('akü şarj etmiyor')).toBe('elektrik'); });
+  test('İngilizce', () => { expect(detectCategory('need new sails')).toBe('yelken'); });
+  test('tanınmayan metin', () => { expect(detectCategory('merhaba')).toBeUndefined(); });
+});

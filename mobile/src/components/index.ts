@@ -24,3 +24,4 @@ export * from './SuccessView';
 export * from './QueryChips';
 export * from './MapPreview';
 export * from './FilterSheet';
+export * from './ProviderProfile';
