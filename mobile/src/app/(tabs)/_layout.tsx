@@ -21,7 +21,7 @@ export default function TabsLayout() {
         tabBarLabel: t(`tabs.${route.name}`),
         tabBarIcon: ({ color }) =>
           route.name === 'ekle' ? (
-            <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: colors.primary, alignItems: "center", justifyContent: "center" }}>
+            <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: colors.primary, alignItems: "center", justifyContent: "center" }}>
               <Icon name="plus" size={22} color={colors.white} />
             </View>
           ) : (
