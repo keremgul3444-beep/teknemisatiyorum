@@ -1,0 +1,75 @@
+{
+  "common": {
+    "notFound": "Bulunamadı",
+    "notFoundBody": "Aradığın sayfa kaldırılmış ya da hiç var olmamış olabilir.",
+    "goBack": "Geri dön",
+    "next": "İleri",
+    "back": "Geri",
+    "save": "Kaydet",
+    "cancel": "Vazgeç",
+    "confirm": "Onayla",
+    "continue": "Devam et",
+    "seeAll": "Tümü",
+    "done": "Tamam",
+    "close": "Kapat",
+    "loading": "Yükleniyor…",
+    "upload": "Yükle",
+    "uploaded": "Yüklendi",
+    "inReview": "İncelemede",
+    "optional": "İsteğe bağlı",
+    "required": "Zorunlu",
+    "perDay": "/gün",
+    "perWeek": "/hafta",
+    "day": "gün",
+    "days": "{{count}} gün",
+    "m": "m",
+    "login": "Giriş yap",
+    "verified": "Doğrulanmış",
+    "sort": "Sırala",
+    "filter": "Filtre",
+    "apply": "Uygula",
+    "clear": "Temizle",
+    "all": "Tümü",
+    "send": "Gönder",
+    "prototype": "Prototip"
+  },
+  "tabs": {
+    "kesfet": "Keşfet",
+    "hizmetler": "Hizmetler",
+    "ekle": "Ekle",
+    "mesajlar": "Mesajlar",
+    "profil": "Profil"
+  },
+  "badge": {
+    "ekspertizli": "Ekspertizli",
+    "sahiplik": "Sahipliği doğrulandı",
+    "broker": "Broker güvencesi",
+    "dogrulanmis": "Doğrulanmış",
+    "beklemede": "Onay bekliyor"
+  },
+  "boatType": {
+    "motoryat": "Motoryat",
+    "yelkenli": "Yelkenli",
+    "gulet": "Gulet",
+    "surat": "Sürat teknesi",
+    "balikci": "Balıkçı teknesi",
+    "katamaran": "Katamaran"
+  },
+  "equipment": {
+    "jenerator": "Jeneratör",
+    "branda": "Branda",
+    "klima": "Klima",
+    "radar": "Radar",
+    "otopilot": "Otopilot",
+    "bowThruster": "Baş pervane",
+    "teak": "Tik güverte",
+    "tender": "Tender bot"
+  },
+  "demo": {
+    "simulated": "Prototipte simüle edildi",
+    "linkCopied": "Link kopyalandı"
+  },
+  "legal": {
+    "draft": "Taslak metin — avukat onayı bekliyor"
+  }
+}

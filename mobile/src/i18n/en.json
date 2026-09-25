@@ -1,0 +1,75 @@
+{
+  "common": {
+    "notFound": "Not found",
+    "notFoundBody": "The page you're looking for may have been removed or never existed.",
+    "goBack": "Go back",
+    "next": "Next",
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "continue": "Continue",
+    "seeAll": "See all",
+    "done": "Done",
+    "close": "Close",
+    "loading": "Loading…",
+    "upload": "Upload",
+    "uploaded": "Uploaded",
+    "inReview": "In review",
+    "optional": "Optional",
+    "required": "Required",
+    "perDay": "/day",
+    "perWeek": "/week",
+    "day": "day",
+    "days": "{{count}} days",
+    "m": "m",
+    "login": "Log in",
+    "verified": "Verified",
+    "sort": "Sort",
+    "filter": "Filter",
+    "apply": "Apply",
+    "clear": "Clear",
+    "all": "All",
+    "send": "Send",
+    "prototype": "Prototype"
+  },
+  "tabs": {
+    "kesfet": "Explore",
+    "hizmetler": "Services",
+    "ekle": "Add",
+    "mesajlar": "Messages",
+    "profil": "Profile"
+  },
+  "badge": {
+    "ekspertizli": "Surveyed",
+    "sahiplik": "Ownership verified",
+    "broker": "Broker assured",
+    "dogrulanmis": "Verified",
+    "beklemede": "Pending approval"
+  },
+  "boatType": {
+    "motoryat": "Motor yacht",
+    "yelkenli": "Sailboat",
+    "gulet": "Gulet",
+    "surat": "Speedboat",
+    "balikci": "Fishing boat",
+    "katamaran": "Catamaran"
+  },
+  "equipment": {
+    "jenerator": "Generator",
+    "branda": "Canvas cover",
+    "klima": "Air conditioning",
+    "radar": "Radar",
+    "otopilot": "Autopilot",
+    "bowThruster": "Bow thruster",
+    "teak": "Teak deck",
+    "tender": "Tender"
+  },
+  "demo": {
+    "simulated": "Simulated in prototype",
+    "linkCopied": "Link copied"
+  },
+  "legal": {
+    "draft": "Draft text — pending legal review"
+  }
+}
