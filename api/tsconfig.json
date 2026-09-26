@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", "module": "node16", "moduleResolution": "node16", "strict": true, "esModuleInterop": true,
+    "experimentalDecorators": true, "emitDecoratorMetadata": true, "skipLibCheck": true, "resolveJsonModule": true,
+    "types": ["jest", "node"], "outDir": "dist"
+  },
+  "include": ["src", "test", "scripts", "prisma"]
+}

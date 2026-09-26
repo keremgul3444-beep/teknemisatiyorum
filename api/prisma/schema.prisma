@@ -1,0 +1,337 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  user
+  moderator
+  admin
+}
+
+enum ListingStatus {
+  draft
+  pending
+  published
+  rejected
+  sold
+  removed
+}
+
+enum VerificationKind {
+  identity
+  usta
+  kaptan
+  eksper
+  firma
+  ruhsat
+}
+
+enum ReviewStatus {
+  pending
+  approved
+  rejected
+}
+
+enum LogKind {
+  bakim
+  onarim
+  ekspertiz
+  sahiplik
+}
+
+enum SubjectKind {
+  listing
+  broker
+  expertise
+}
+
+enum Visibility {
+  public
+  private
+}
+
+enum Currency {
+  TRY
+  EUR
+  USD
+}
+
+model User {
+  id              String    @id @default(cuid())
+  phone           String?   @unique
+  name            String?
+  email           String?
+  lang            String    @default("tr")
+  verifyLevel     Int       @default(0)
+  roles           Role[]    @default([user])
+  /// AES-256-GCM ile şifreli kimlik numarası; API yanıtlarında asla dönmez.
+  nationalIdEnc   String?
+  nationalIdLast2 String?
+  createdAt       DateTime  @default(now())
+  deletedAt       DateTime?
+
+  sessions Session[]
+  listings Listing[]
+  boats    Boat[]
+}
+
+model Session {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deviceName   String
+  /// Yenileme anahtarının SHA-256 özeti; anahtarın kendisi saklanmaz.
+  refreshHash  String    @unique
+  createdAt    DateTime  @default(now())
+  lastSeenAt   DateTime  @default(now())
+  revokedAt    DateTime?
+  replacedById String?
+
+  @@index([userId])
+}
+
+model OtpCode {
+  id         String    @id @default(cuid())
+  phone      String
+  codeHash   String
+  attempts   Int       @default(0)
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([phone, createdAt])
+}
+
+model Company {
+  id        String          @id @default(cuid())
+  name      String
+  kind      String
+  city      String
+  createdAt DateTime        @default(now())
+  members   CompanyMember[]
+}
+
+model CompanyMember {
+  companyId String
+  userId    String
+  role      String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@id([companyId, userId])
+  @@index([userId])
+}
+
+model File {
+  id         String     @id @default(cuid())
+  ownerId    String
+  visibility Visibility
+  key        String     @unique
+  mime       String
+  size       Int
+  createdAt  DateTime   @default(now())
+}
+
+model VerificationRequest {
+  id           String           @id @default(cuid())
+  userId       String
+  kind         VerificationKind
+  fileIds      String[]
+  listingId    String?
+  status       ReviewStatus     @default(pending)
+  rejectReason String?
+  reviewedById String?
+  createdAt    DateTime         @default(now())
+  decidedAt    DateTime?
+
+  @@index([status, kind])
+}
+
+model Listing {
+  id           String         @id @default(cuid())
+  ownerId      String
+  owner        User           @relation(fields: [ownerId], references: [id])
+  companyId    String?
+  brand        String
+  model        String
+  year         Int
+  lengthM      Float
+  type         String
+  price        Float
+  currency     Currency
+  location     String
+  equipment    String[]
+  cabins       Int            @default(0)
+  engine       String         @default("")
+  description  String         @default("")
+  status       ListingStatus  @default(draft)
+  badges       String[]
+  rejectReason String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  publishedAt  DateTime?
+  photos       ListingPhoto[]
+  favorites    Favorite[]
+
+  @@index([status])
+  @@index([ownerId])
+}
+
+model ListingPhoto {
+  id        String  @id @default(cuid())
+  listingId String
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  fileId    String
+  order     Int
+}
+
+model Favorite {
+  userId    String
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([userId, listingId])
+}
+
+model SavedSearch {
+  id            String   @id @default(cuid())
+  userId        String
+  text          String
+  filter        Json
+  createdAt     DateTime @default(now())
+  lastCheckedAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Boat {
+  id        String         @id @default(cuid())
+  ownerId   String
+  owner     User           @relation(fields: [ownerId], references: [id])
+  name      String
+  brand     String
+  model     String
+  year      Int
+  lengthM   Float
+  createdAt DateTime       @default(now())
+  entries   LogbookEntry[]
+}
+
+model LogbookEntry {
+  id        String   @id @default(cuid())
+  boatId    String
+  boat      Boat     @relation(fields: [boatId], references: [id], onDelete: Cascade)
+  kind      LogKind
+  /// Takvim günü; saat dilimi dönüşümüne girmez.
+  date      DateTime @db.Date
+  title     String
+  byName    String
+  verified  Boolean
+  sourceRef String?
+  createdAt DateTime @default(now())
+}
+
+model Conversation {
+  id           String               @id @default(cuid())
+  subjectKind  SubjectKind
+  subjectId    String
+  subjectTitle String
+  /// Katılımcı id'lerinin sıralı birleşimi; aynı konu + aynı taraflar için tek sohbet.
+  memberKey    String
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  members      ConversationMember[]
+  messages     Message[]
+
+  @@unique([subjectKind, subjectId, memberKey])
+}
+
+model ConversationMember {
+  conversationId String
+  userId         String
+  lastReadAt     DateTime?
+  phoneShared    Boolean      @default(false)
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@id([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  text           String
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+}
+
+model ExpertisePackage {
+  id       String   @id @default(cuid())
+  name     String
+  priceTry Int
+  items    String[]
+  order    Int
+}
+
+model ExpertiseBooking {
+  id           String   @id @default(cuid())
+  userId       String
+  packageId    String
+  listingId    String?
+  date         DateTime @db.Date
+  slot         String
+  reportStatus String   @default("pending")
+  score        Int?
+  createdAt    DateTime @default(now())
+}
+
+model BrokerCase {
+  id           String   @id @default(cuid())
+  userId       String
+  boatName     String
+  askingPrice  Float
+  currency     Currency
+  step         Int      @default(0)
+  assigneeName String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model FxRate {
+  currency    Currency @id
+  rateToTry   Float
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+}
+
+/// Yalnızca ekleme yapılır; güncelleme ve silme kodu yazılmaz.
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String
+  params     Json?
+  targetType String?
+  targetId   String?
+  at         DateTime @default(now())
+
+  @@index([at])
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  key       String
+  params    Json?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, createdAt])
+}
