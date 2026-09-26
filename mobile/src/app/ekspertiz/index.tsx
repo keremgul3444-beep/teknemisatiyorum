@@ -9,6 +9,7 @@ import { currentLang } from '@/i18n';
 import { requireLevel } from '@/session/role';
 import { attempt } from '@/services/errors';
 import { localDateString } from '@/features/dates';
+import { defaultPackageId, isPopularPackage } from '@/features/expertise';
 
 const SLOTS = ['morning', 'noon', 'afternoon'] as const;
 
@@ -17,7 +18,9 @@ export default function Ekspertiz() {
   const { ilan } = useLocalSearchParams<{ ilan?: string }>();
   const listing = useListing(ilan);
   const packages = useExpertisePackages();
-  const [pkg, setPkg] = useState('x2');
+  // Paketler sunucudan sonradan gelebilir; seçim yapılmadıysa önerilen paket kullanılır.
+  const [picked, setPkg] = useState<string>();
+  const pkg = picked ?? defaultPackageId(packages) ?? '';
   const [dateIdx, setDateIdx] = useState<number | null>(null);
   const [slot, setSlot] = useState<(typeof SLOTS)[number]>('morning');
   const [done, setDone] = useState(false);
@@ -44,7 +47,7 @@ export default function Ekspertiz() {
   };
 
   return (
-    <Screen footer={<Button title={t('expertise.book')} disabled={dateIdx === null} onPress={book} />}>
+    <Screen footer={<Button title={t('expertise.book')} disabled={dateIdx === null || !pkg} onPress={book} />}>
       <Header title={t('expertise.title')} subtitle={t('expertise.subtitle')}
         right={<Button small variant="ghost" title={t('expertise.sampleReport')} onPress={() => router.push('/ekspertiz/rapor')} />} />
       {listing ? <Section title={t('expertise.forListing')}><ListingCard listing={listing} compact /></Section> : null}
@@ -55,7 +58,7 @@ export default function Ekspertiz() {
               <T variant="h3">{p.name}</T>
               <T variant="h3" color={colors.primary}>{formatPrice(p.priceTRY, 'TRY', lang)}</T>
             </View>
-            {p.id === 'x2' ? <Chip label={t('expertise.popular')} selected /> : null}
+            {isPopularPackage(packages, p.id) ? <Chip label={t('expertise.popular')} selected /> : null}
             {p.items.map((i) => (
               <View key={i} style={{ flexDirection: 'row', gap: space(2), alignItems: 'center' }}>
                 <Icon name="check" size={14} color={colors.success} /><T variant="caption">{i}</T>
