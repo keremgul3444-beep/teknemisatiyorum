@@ -16,7 +16,7 @@ export interface TestApp { app: INestApplication; prisma: PrismaService; http: (
  * Her test dosyası için ayrı bir PostgreSQL şeması açar, migration'ları uygular ve uygulamayı başlatır.
  * `override` ile adaptörler (SMS, LLM, saat) sahte uygulamalarla değiştirilebilir.
  */
-export async function createTestApp(override?: (b: import('@nestjs/testing').TestingModuleBuilder) => void): Promise<TestApp> {
+export async function createTestApp(opts: { controllers?: any[]; override?: (b: import('@nestjs/testing').TestingModuleBuilder) => void } = {}): Promise<TestApp> {
   const schema = `t_${crypto.randomBytes(5).toString('hex')}`;
   const url = `${process.env.TEST_DB_BASE_URL}?schema=${schema}`;
   Object.assign(process.env, {
@@ -30,8 +30,8 @@ export async function createTestApp(override?: (b: import('@nestjs/testing').Tes
   resetEnvCache();
   execSync('npx prisma migrate deploy', { cwd: path.resolve(__dirname, '..'), env: process.env, stdio: 'ignore' });
 
-  const builder = Test.createTestingModule({ imports: [AppModule] });
-  override?.(builder);
+  const builder = Test.createTestingModule({ imports: [AppModule], controllers: opts.controllers ?? [] });
+  opts.override?.(builder);
   const moduleRef = await builder.compile();
   const app = configureApp(moduleRef.createNestApplication());
   await app.init();
