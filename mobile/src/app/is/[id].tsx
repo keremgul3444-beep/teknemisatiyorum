@@ -6,8 +6,9 @@ import { colors, space } from '@/theme';
 import { Avatar, Button, Card, Header, Icon, NotFound, Rating, Screen, Section, Stepper, SuccessView, T } from '@/components';
 import { actions, formatPrice, JOB_STEPS, useJob, useAllProviders } from '@/services';
 import { currentLang } from '@/i18n';
+import { demoOnly } from '@/components/DemoOnly';
 
-export default function IsDetay() {
+function IsDetay() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const job = useJob(id);
@@ -18,9 +19,9 @@ export default function IsDetay() {
   const usta = (pid?: string) => providers.find((p) => p.id === pid);
   const accepted = job.offers.find((o) => o.id === job.acceptedOfferId);
   const current = job.status === 'degerlendirildi' ? JOB_STEPS.length - 1 : JOB_STEPS.indexOf(job.status);
-  const chat = () => {
+  const chat = async () => {
     const u = usta(accepted?.providerId ?? job.offers[0]?.providerId);
-    const conv = actions.startConversation({ kind: 'is', id: job.id, title: job.title }, u?.name ?? '—');
+    const conv = await actions.startConversation({ kind: 'is', id: job.id, title: job.title }, u?.name ?? '—');
     router.push(`/sohbet/${conv}`);
   };
 
@@ -109,3 +110,5 @@ export default function IsDetay() {
     </Screen>
   );
 }
+
+export default demoOnly(IsDetay);

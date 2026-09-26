@@ -5,6 +5,7 @@ import { colors, space } from '@/theme';
 import { Avatar, Button, Card, Header, Icon, NotFound, Screen, Section, Stepper, T } from '@/components';
 import { actions, BROKER_CONTACT, formatPrice, useBrokerCase } from '@/services';
 import { currentLang } from '@/i18n';
+import { attempt } from '@/services/errors';
 
 export default function BrokerCase() {
   const { t } = useTranslation();
@@ -12,9 +13,9 @@ export default function BrokerCase() {
   const c = useBrokerCase(id);
   if (!c) return <NotFound />;
   const steps = [0, 1, 2, 3, 4];
-  const write = () => {
-    const conv = actions.startConversation({ kind: 'broker', id: c.id, title: `${t('broker.caseTitle')} · ${c.boatName}` }, BROKER_CONTACT.name);
-    router.push(`/sohbet/${conv}`);
+  const write = async () => {
+    const conv = await attempt(() => actions.startConversation({ kind: 'broker', id: c.id, title: `${t('broker.caseTitle')} · ${c.boatName}` }, BROKER_CONTACT.name));
+    if (conv) router.push(`/sohbet/${conv}`);
   };
   return (
     <Screen>

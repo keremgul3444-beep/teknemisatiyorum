@@ -5,15 +5,16 @@ import { useTranslation } from 'react-i18next';
 import { space } from '@/theme';
 import { Button, Field, Header, Screen } from '@/components';
 import { actions } from '@/services';
+import { attempt } from '@/services/errors';
 
 export default function TekneEkle() {
   const { t } = useTranslation();
   const [f, setF] = useState({ name: '', brand: '', model: '', year: '', length: '' });
   const set = (k: keyof typeof f) => (v: string) => setF((s) => ({ ...s, [k]: v }));
   const valid = f.name && f.brand && f.model && Number(f.year) > 1950 && Number(f.length.replace(',', '.')) > 2;
-  const save = () => {
-    const id = actions.addBoat({ name: f.name, brand: f.brand, model: f.model, year: Number(f.year), lengthM: Number(f.length.replace(',', '.')) });
-    router.replace(`/teknelerim/${id}`);
+  const save = async () => {
+    const id = await attempt(() => actions.addBoat({ name: f.name, brand: f.brand, model: f.model, year: Number(f.year), lengthM: Number(f.length.replace(',', '.')) }));
+    if (id) router.replace(`/teknelerim/${id}`);
   };
   return (
     <Screen footer={<Button title={t('boatAdd.save')} disabled={!valid} onPress={save} />}>

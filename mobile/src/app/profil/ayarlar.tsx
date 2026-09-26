@@ -7,12 +7,14 @@ import { Button, Card, Chip, Divider, Header, MenuRow, Screen, Section, Segmente
 import { actions, type Role } from '@/services';
 import { currentLang, setLanguage, type Lang } from '@/i18n';
 import { useSession } from '@/session/role';
+import { API_URL, useMode } from '@/services/mode';
 
 const ROLES: Role[] = ['bireysel', 'usta', 'kaptan', 'kurumsal', 'yonetici'];
 
 export default function Ayarlar() {
   const { t } = useTranslation();
   const role = useSession((s) => s.role);
+  const { mode, setMode } = useMode();
   const [lang, setLang] = useState<Lang>(currentLang());
   const [n, setN] = useState({ messages: true, matches: true, jobs: true, marketing: false });
   const [p, setP] = useState({ phone: false, marketing: false });
@@ -55,11 +57,25 @@ export default function Ayarlar() {
       </Section>
       <Section title={t('settings.demo')}>
         <Card style={{ borderColor: colors.warning, borderStyle: 'dashed', borderWidth: 1.5 }}>
-          <T variant="caption" color={colors.muted}>{t('settings.demoRole')}</T>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space(2) }}>
-            {ROLES.map((r) => <Chip key={r} label={t(`profile.role.${r}`)} selected={role === r} onPress={() => pickRole(r)} />)}
-          </View>
-          <Button small variant="ghost" icon="x" title={t('settings.reset')} onPress={() => { actions.resetDemo(); showDemoToast(t('settings.resetDone')); }} />
+          {API_URL ? (
+            <>
+              <T variant="caption" color={colors.muted}>{t('settings.modeHint')}</T>
+              <Segmented value={mode} onChange={(m) => {
+                setMode(m);
+                if (m === 'demo') { actions.resetDemo(); useSession.getState().logout(); }
+                showDemoToast(t(m === 'api' ? 'settings.modeApi' : 'settings.modeDemo'));
+              }} options={[{ key: 'api', label: t('settings.modeApiShort') }, { key: 'demo', label: t('settings.modeDemoShort') }]} />
+            </>
+          ) : null}
+          {mode === 'demo' ? (
+            <>
+              <T variant="caption" color={colors.muted}>{t('settings.demoRole')}</T>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space(2) }}>
+                {ROLES.map((r) => <Chip key={r} label={t(`profile.role.${r}`)} selected={role === r} onPress={() => pickRole(r)} />)}
+              </View>
+              <Button small variant="ghost" icon="x" title={t('settings.reset')} onPress={() => { actions.resetDemo(); showDemoToast(t('settings.resetDone')); }} />
+            </>
+          ) : null}
         </Card>
       </Section>
     </Screen>

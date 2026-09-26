@@ -6,8 +6,9 @@ import { Button, Card, Chip, Header, NotFound, ProviderProfile, Screen, Section,
 import { actions, formatPrice, useProvider } from '@/services';
 import { currentLang } from '@/i18n';
 import { requireLevel } from '@/session/role';
+import { demoOnly } from '@/components/DemoOnly';
 
-export default function KaptanDetay() {
+function KaptanDetay() {
   const { t } = useTranslation();
   const { id, start, days: daysParam } = useLocalSearchParams<{ id: string; start?: string; days?: string }>();
   const p = useProvider(id);
@@ -18,9 +19,9 @@ export default function KaptanDetay() {
   const total = weekly ? (p.weekRateEUR ?? 0) * Math.ceil(days / 7) : (p.dayRateEUR ?? 0) * days;
   const lang = currentLang();
 
-  const reserve = () => {
+  const reserve = async () => {
     if (!requireLevel(2)) return;
-    const bid = actions.bookCaptain({ captainId: p.id, start: startDate, days });
+    const bid = await actions.bookCaptain({ captainId: p.id, start: startDate, days });
     router.push({ pathname: '/odeme', params: { tur: 'kaptan', id: bid } });
   };
 
@@ -48,3 +49,5 @@ export default function KaptanDetay() {
     </Screen>
   );
 }
+
+export default demoOnly(KaptanDetay);

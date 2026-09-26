@@ -6,7 +6,7 @@ import { useListings, type ListingStatus } from '@/services';
 
 export default function Ilanlarim() {
   const { t } = useTranslation();
-  const mine = useListings().filter((l) => l.sellerId === 'me');
+  const mine = useListings().filter((l) => l.sellerId === 'me' || l.isMine);
   const [tab, setTab] = useState<ListingStatus>(mine.some((l) => l.status === 'onay-bekliyor') ? 'onay-bekliyor' : 'yayinda');
   const list = mine.filter((l) => l.status === tab);
   return (

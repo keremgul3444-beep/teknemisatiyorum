@@ -18,3 +18,6 @@ i18n.use(initReactI18next).init({
 export const setLanguage = (lang: Lang) => i18n.changeLanguage(lang);
 export const currentLang = (): Lang => (i18n.language === 'en' ? 'en' : 'tr');
 export default i18n;
+
+/** Sunucunun yazdığı sistem metinleri 'i18n:' önekli çeviri anahtarıdır; kullanıcı metni olduğu gibi gösterilir. */
+export const tx = (t: (k: string) => string, s: string) => (s.startsWith('i18n:') ? t(s.slice(5)) : s);

@@ -4,11 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { colors, fonts, radius, space } from '@/theme';
 import { Button, Card, Field, Header, Icon, Screen, Section, T, showDemoToast } from '@/components';
 import { currentLang } from '@/i18n';
+import { demoOnly } from '@/components/DemoOnly';
 
 const REQS = ['req1', 'req2', 'req3'] as const;
 const WEEK = [true, false, true, true, false, false, true];
 
-export default function HizmetPaneli() {
+function HizmetPaneli() {
   const { t } = useTranslation();
   const [open, setOpen] = useState<string | null>(null);
   const [sent, setSent] = useState<string[]>([]);
@@ -85,3 +86,5 @@ export default function HizmetPaneli() {
     </Screen>
   );
 }
+
+export default demoOnly(HizmetPaneli);

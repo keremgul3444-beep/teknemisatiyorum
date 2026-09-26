@@ -2,8 +2,9 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Button, Header, NotFound, ProviderProfile, Screen } from '@/components';
 import { useProvider } from '@/services';
+import { demoOnly } from '@/components/DemoOnly';
 
-export default function UstaDetay() {
+function UstaDetay() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const p = useProvider(id);
@@ -15,3 +16,5 @@ export default function UstaDetay() {
     </Screen>
   );
 }
+
+export default demoOnly(UstaDetay);

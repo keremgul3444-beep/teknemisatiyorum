@@ -5,6 +5,9 @@ import { useTranslation } from 'react-i18next';
 import { space } from '@/theme';
 import { Button, Chip, Header, Screen, Section, SuccessView, UploadBox, showDemoToast, type UploadState } from '@/components';
 import { useSession } from '@/session/role';
+import { actions, isApiMode } from '@/services';
+import { attempt } from '@/services/errors';
+import { pickImage } from '@/services/pickImage';
 
 type ProRole = 'usta' | 'kaptan' | 'eksper' | 'firma';
 const DOCS: Record<ProRole, string[]> = {
@@ -20,6 +23,7 @@ export default function Professional() {
   const [role, setRole] = useState<ProRole>('usta');
   const [docs, setDocs] = useState<Record<string, UploadState>>({});
   const [done, setDone] = useState(false);
+  const [uris, setUris] = useState<Record<string, string>>({});
   const all = DOCS[role].every((d) => docs[d] && docs[d] !== 'bos');
 
   if (done) {
@@ -33,9 +37,11 @@ export default function Professional() {
   }
 
   return (
-    <Screen footer={<Button title={t('verify.sendApp')} disabled={!all} onPress={() => {
+    <Screen footer={<Button title={t('verify.sendApp')} disabled={!all} onPress={async () => {
+      const ok = await attempt(async () => { await actions.submitProfessional(role, DOCS[role].map((d) => uris[d]).filter(Boolean)); return true; });
+      if (!ok) return;
       const s = useSession.getState();
-      s.setVerifyLevel(3);
+      if (!isApiMode()) s.setVerifyLevel(3);
       if (role === 'usta' || role === 'kaptan') s.setRole(role);
       if (role === 'firma') s.setRole('kurumsal');
       setDone(true);
@@ -51,7 +57,14 @@ export default function Professional() {
       <Section title={t('verify.docs')}>
         {DOCS[role].map((d) => (
           <UploadBox key={d} label={t(`verify.doc.${d}`)} state={docs[d] ?? 'bos'}
-            onPress={() => { setDocs((s) => ({ ...s, [d]: 'incelemede' })); showDemoToast(); }} />
+            onPress={async () => {
+            if (isApiMode()) {
+              const uri = await pickImage();
+              if (!uri) return;
+              setUris((s) => ({ ...s, [d]: uri }));
+            } else showDemoToast();
+            setDocs((s) => ({ ...s, [d]: 'incelemede' }));
+          }} />
         ))}
       </Section>
     </Screen>

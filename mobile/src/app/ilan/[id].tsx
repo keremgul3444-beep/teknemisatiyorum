@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FlatList, Pressable, View, useWindowDimensions } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,12 +9,16 @@ import { Avatar, Badge, BoatImage, Button, Card, Chip, Icon, NotFound, Section, 
 import { actions, formatPrice, useFavorites, useListing, useSeller } from '@/services';
 import { currentLang } from '@/i18n';
 import { requireLevel } from '@/session/role';
+import { attempt } from '@/services/errors';
+import { tx } from '@/i18n';
 
 export default function IlanDetay() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const l = useListing(id);
   const seller = useSeller(l?.sellerId);
+  // Gerçek modda ilanın güncel hali (fotoğraflar, karne özeti) sayfa açılınca çekilir.
+  useEffect(() => { if (id) attempt(() => actions.loadListing(id)); }, [id]);
   const fav = useFavorites().includes(id ?? '');
   const { width } = useWindowDimensions();
   const [page, setPage] = useState(0);
@@ -22,13 +26,14 @@ export default function IlanDetay() {
   const lang = currentLang();
   const galleryW = Math.min(width, 600);
 
-  const message = () => {
+  const message = async () => {
     if (!requireLevel(1)) return;
-    const conv = actions.startConversation({ kind: 'ilan', id: l.id, title: `${l.brand} ${l.model} · ${l.year}` }, seller?.name ?? t('listing.seller'));
-    router.push(`/sohbet/${conv}`);
+    const conv = await attempt(() => actions.startConversation({ kind: 'ilan', id: l.id, title: `${l.brand} ${l.model} · ${l.year}` }, seller?.name ?? t('listing.seller')));
+    if (conv) router.push(`/sohbet/${conv}`);
   };
-  const toggleFav = () => {
-    actions.toggleFavorite(l.id);
+  const toggleFav = async () => {
+    if (!requireLevel(1)) return;
+    await attempt(() => actions.toggleFavorite(l.id));
     showDemoToast(fav ? t('listing.favRemoved') : t('listing.favAdded'));
   };
   const specs: [string, string][] = [
@@ -41,9 +46,9 @@ export default function IlanDetay() {
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
       <ScrollView contentContainerStyle={{ paddingBottom: space(8) }}>
         <View>
-          <FlatList horizontal pagingEnabled data={[0, 1, 2, 3]} keyExtractor={(i) => String(i)} showsHorizontalScrollIndicator={false}
+          <FlatList horizontal pagingEnabled data={l.photoUrls?.length ? l.photoUrls.map((_, i) => i) : [0, 1, 2, 3]} keyExtractor={(i) => String(i)} showsHorizontalScrollIndicator={false}
             onScroll={(e) => setPage(Math.round(e.nativeEvent.contentOffset.x / galleryW))} scrollEventThrottle={32}
-            style={{ width: galleryW }} renderItem={({ item }) => <View style={{ width: galleryW }}><BoatImage seed={l.photoSeed + item} height={280} /></View>} />
+            style={{ width: galleryW }} renderItem={({ item }) => <View style={{ width: galleryW }}><BoatImage seed={l.photoSeed + item} height={280} uri={l.photoUrls?.[item]} /></View>} />
           <View style={{ position: 'absolute', top: space(3), left: space(4), right: space(4), flexDirection: 'row', justifyContent: 'space-between' }}>
             <RoundBtn icon="back" label={t('common.back')} onPress={goBack} />
             <View style={{ flexDirection: 'row', gap: space(2) }}>
@@ -52,7 +57,7 @@ export default function IlanDetay() {
             </View>
           </View>
           <View style={{ position: 'absolute', bottom: space(3), right: space(4), backgroundColor: colors.overlay, borderRadius: radius.sm, paddingHorizontal: space(2), paddingVertical: space(0.5) }}>
-            <T variant="caption" color={colors.white}>{page + 1}/4</T>
+            <T variant="caption" color={colors.white}>{page + 1}/{l.photoUrls?.length || 4}</T>
           </View>
         </View>
 
@@ -86,19 +91,25 @@ export default function IlanDetay() {
           <Section title={t('listing.description')}><T color={colors.muted}>{l.description}</T></Section>
 
           <Section title={t('listing.logbook')}>
-            <Card onPress={l.logbookCount ? () => router.push('/teknelerim/b1') : undefined}>
+            <Card onPress={l.isMine && l.boatId ? () => router.push(`/teknelerim/${l.boatId}`) : undefined}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(3) }}>
                 <Icon name="logbook" size={24} color={colors.primary} />
                 <View style={{ flex: 1 }}>
                   {l.logbookCount ? (
                     <>
                       <T variant="h3">{t('listing.logbookCount', { count: l.logbookCount })}</T>
-                      <T variant="caption" color={colors.muted}>{t('listing.logbookSample1')}</T>
-                      <T variant="caption" color={colors.muted}>{t('listing.logbookSample2')}</T>
+                      {l.logbookLatest?.length ? l.logbookLatest.map((e) => (
+                        <T key={e.id} variant="caption" color={colors.muted}>{tx(t, e.title)} · {e.date.slice(0, 4)}</T>
+                      )) : (
+                        <>
+                          <T variant="caption" color={colors.muted}>{t('listing.logbookSample1')}</T>
+                          <T variant="caption" color={colors.muted}>{t('listing.logbookSample2')}</T>
+                        </>
+                      )}
                     </>
                   ) : <T color={colors.muted}>{t('listing.logbookEmpty')}</T>}
                 </View>
-                {l.logbookCount ? <T variant="caption" color={colors.primary} style={{ fontFamily: fonts.bodySemi }}>{t('listing.logbookSee')} →</T> : null}
+                {l.isMine && l.boatId ? <T variant="caption" color={colors.primary} style={{ fontFamily: fonts.bodySemi }}>{t('listing.logbookSee')} →</T> : null}
               </View>
             </Card>
           </Section>
@@ -123,7 +134,9 @@ export default function IlanDetay() {
       </ScrollView>
       <View style={{ flexDirection: 'row', gap: space(3), padding: space(4), borderTopWidth: 1, borderColor: colors.line, backgroundColor: colors.card }}>
         <View style={{ flex: 1 }}><Button variant="ghost" icon="clipboard" title={t('listing.requestExpertise')} onPress={() => router.push({ pathname: '/ekspertiz', params: { ilan: l.id } })} /></View>
-        <View style={{ flex: 1 }}><Button icon="mail" title={t('listing.message')} onPress={message} /></View>
+        <View style={{ flex: 1 }}>{l.isMine || l.sellerId === 'me'
+          ? <Button variant="secondary" icon="anchor" title={t('profile.listings')} onPress={() => router.push('/profil/ilanlarim')} />
+          : <Button icon="mail" title={t('listing.message')} onPress={message} />}</View>
       </View>
     </SafeAreaView>
   );

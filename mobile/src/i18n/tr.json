@@ -196,7 +196,8 @@
     "verify": "Doğrula",
     "resend": "Kodu tekrar gönder",
     "resendIn": "{{s}} sn sonra tekrar gönderebilirsin",
-    "demoHint": "Prototip: herhangi bir 6 haneli kod kabul edilir."
+    "demoHint": "Prototip: herhangi bir 6 haneli kod kabul edilir.",
+    "betaHint": "Kapalı beta: kod SMS yerine yönetim panelindeki gelen kodlar kutusuna düşer."
   },
   "kvkk": {
     "title": "Kişisel verilerin korunması",
@@ -251,7 +252,9 @@
       "sorvey": "Sörveyörlük belgesi",
       "sicil": "Ticaret sicil gazetesi",
       "imza": "İmza sirküleri"
-    }
+    },
+    "pendingTitle": "Belgen incelemeye alındı",
+    "pendingBody": "Ekibimiz pasaportunu inceleyince kimliğin doğrulanacak ve bildirim alacaksın."
   },
   "home": {
     "hello": "Merhaba",
@@ -611,7 +614,9 @@
     "emptyBody": "Tekne ekle, karnesini başlat.",
     "add": "Tekne ekle",
     "boatAdded": "Tekne eklendi",
-    "owner": "Sahibi"
+    "owner": "Sahibi",
+    "expertiseReport": "Platform ekspertiz raporu",
+    "platformSurveyor": "Platform eksperi"
   },
   "transfer": {
     "title": "Devir asistanı",
@@ -668,7 +673,12 @@
     "demo": "Demo",
     "demoRole": "Rol değiştir (yalnızca prototip)",
     "reset": "Demo verisini sıfırla",
-    "resetDone": "Demo verisi sıfırlandı"
+    "resetDone": "Demo verisi sıfırlandı",
+    "modeHint": "Gerçek mod sunucuya bağlanır; demo modu prototipin örnek verisini gösterir.",
+    "modeApiShort": "Gerçek",
+    "modeDemoShort": "Demo",
+    "modeApi": "Gerçek moda geçildi",
+    "modeDemo": "Demo moduna geçildi"
   },
   "devices": {
     "title": "Cihazlar ve oturumlar",
@@ -789,5 +799,31 @@
     "brokerAdvanced": "Broker dosyası ilerletildi: {{boat}}",
     "userViewedMasked": "Kullanıcı kaydı görüntülendi (maskeli): {{name}}",
     "paymentReleased": "Ödeme ustaya aktarıldı: {{ref}} · {{amount}}"
+  },
+  "errors": {
+    "generic": "Bir şeyler ters gitti, tekrar dene.",
+    "network": "Sunucuya ulaşılamadı. Bağlantını kontrol et.",
+    "validation": "Bazı alanlar geçersiz.",
+    "unauthenticated": "Oturumun kapandı, tekrar giriş yap.",
+    "forbidden": "Bu işlem için yetkin yok.",
+    "notFound": "Bulunamadı.",
+    "rateLimited": "Çok fazla deneme. Biraz sonra tekrar dene.",
+    "tooLarge": "Dosya çok büyük (en fazla 10 MB).",
+    "unsupportedType": "Bu dosya türü desteklenmiyor.",
+    "otp_rate": "Yeni kod için bir dakika bekle.",
+    "otp_invalid": "Kod hatalı.",
+    "otp_expired": "Kodun süresi doldu, yenisini iste.",
+    "otp_locked": "Çok fazla hatalı deneme. Yeni kod iste.",
+    "invalid_tckn": "T.C. kimlik numarası geçersiz.",
+    "photo_required": "En az bir fotoğraf ekle.",
+    "too_many_photos": "En fazla {{max}} fotoğraf eklenebilir.",
+    "own_listing": "Kendi ilanına mesaj gönderemezsin.",
+    "already_decided": "Bu kayıt için zaten karar verilmiş.",
+    "broker_done": "Dosya son adımda.",
+    "internal": "Sunucuda bir hata oluştu."
+  },
+  "soon": {
+    "title": "Yakında",
+    "body": "Usta, kaptan ve güvenli ödeme kapalı betanın sonraki aşamasında açılacak. Demo modunda prototipini görebilirsin (Ayarlar › Demo)."
   }
 }

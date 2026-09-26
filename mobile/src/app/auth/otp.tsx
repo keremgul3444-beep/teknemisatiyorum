@@ -5,6 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { colors, space, radius, fonts } from '@/theme';
 import { Button, Header, Screen, T, showDemoToast } from '@/components';
 import { useSession } from '@/session/role';
+import { actions, isApiMode } from '@/services';
+import { attempt } from '@/services/errors';
 
 export default function Otp() {
   const { t } = useTranslation();
@@ -19,12 +21,16 @@ export default function Otp() {
     return () => clearTimeout(id);
   }, [left]);
 
-  const verify = () => {
-    const s = useSession.getState();
-    s.login();
-    s.setVerifyLevel(Math.max(1, s.verifyLevel) as 1);
-    router.dismissTo('/kesfet');
+  const [busy, setBusy] = useState(false);
+  const verify = async () => {
+    setBusy(true);
+    const ok = await attempt(async () => { await actions.verifyOtp(String(phone), code); return true; });
+    setBusy(false);
+    if (!ok) return;
+    // Girişi isteyen ekrana geri dön (login + otp iki adım geri); yığın yoksa Keşfet.
+    router.dismiss(2);
   };
+
 
   return (
     <Screen>
@@ -41,10 +47,10 @@ export default function Otp() {
       </Pressable>
       <TextInput ref={input} value={code} onChangeText={(v) => setCode(v.replace(/\D/g, '').slice(0, 6))} keyboardType="number-pad" autoFocus
         style={{ position: 'absolute', opacity: 0, height: 1, width: 1, fontFamily: fonts.body }} />
-      <T variant="caption" color={colors.muted}>{t('auth.demoHint')}</T>
-      <Button title={t('auth.verify')} disabled={code.length < 6} onPress={verify} />
+      <T variant="caption" color={colors.muted}>{t(isApiMode() ? 'auth.betaHint' : 'auth.demoHint')}</T>
+      <Button title={t('auth.verify')} disabled={code.length < 6} loading={busy} onPress={verify} />
       <Button variant="ghost" disabled={left > 0} title={left > 0 ? t('auth.resendIn', { s: left }) : t('auth.resend')}
-        onPress={() => { setLeft(30); showDemoToast(); }} />
+        onPress={() => { setLeft(30); attempt(() => actions.requestOtp(String(phone))); showDemoToast(); }} />
     </Screen>
   );
 }

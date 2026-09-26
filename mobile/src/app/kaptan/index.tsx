@@ -6,10 +6,11 @@ import { colors, space } from '@/theme';
 import { Chip, DateRangePicker, Header, ProviderCard, Screen, Section, T, type DateRange } from '@/components';
 import { useProviders } from '@/services';
 import { currentLang } from '@/i18n';
+import { demoOnly } from '@/components/DemoOnly';
 
 const tomorrow = () => { const d = new Date(); d.setDate(d.getDate() + 1); d.setHours(12); return d.toISOString().slice(0, 10); };
 
-export default function KaptanList() {
+function KaptanList() {
   const { t } = useTranslation();
   const [range, setRange] = useState<DateRange | null>({ start: tomorrow(), days: 1 });
   const [region, setRegion] = useState<string | undefined>();
@@ -44,3 +45,5 @@ export default function KaptanList() {
     </Screen>
   );
 }
+
+export default demoOnly(KaptanList);

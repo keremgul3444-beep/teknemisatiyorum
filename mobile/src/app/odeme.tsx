@@ -6,8 +6,9 @@ import { colors, space } from '@/theme';
 import { Button, Card, Field, Header, Icon, NotFound, Screen, Section, T, showDemoToast } from '@/components';
 import { actions, formatPrice, useCaptainBookings, useJob, type Currency } from '@/services';
 import { currentLang } from '@/i18n';
+import { demoOnly } from '@/components/DemoOnly';
 
-export default function Odeme() {
+function Odeme() {
   const { t } = useTranslation();
   const { tur, id } = useLocalSearchParams<{ tur?: 'is' | 'kaptan'; id?: string }>();
   const job = useJob(tur === 'is' ? id : undefined);
@@ -78,3 +79,5 @@ export default function Odeme() {
     </Screen>
   );
 }
+
+export default demoOnly(Odeme);

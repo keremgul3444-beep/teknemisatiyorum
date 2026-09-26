@@ -1,10 +1,19 @@
 import { ReactNode } from 'react';
-import { View } from 'react-native';
+import { Image, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
 import { gradients, colors } from '@/theme';
 
-export function BoatImage({ seed, height = 160, rounded = 0, children }: { seed: number; height?: number; rounded?: number; children?: ReactNode }) {
+/** İlan/tekne görseli: gerçek fotoğraf varsa onu, yoksa prototipin degrade + silüet görselini gösterir. */
+export function BoatImage({ seed, height = 160, rounded = 0, children, uri }: { seed: number; height?: number; rounded?: number; children?: ReactNode; uri?: string }) {
+  if (uri) {
+    return (
+      <View style={{ height, borderRadius: rounded, overflow: 'hidden', backgroundColor: colors.surface }}>
+        <Image source={{ uri }} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} resizeMode="cover" />
+        {children}
+      </View>
+    );
+  }
   const g = gradients[Math.abs(seed) % gradients.length];
   const w = Math.min(170, height * 1.1);
   return (

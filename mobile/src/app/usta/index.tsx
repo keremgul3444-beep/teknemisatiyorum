@@ -5,8 +5,9 @@ import { useTranslation } from 'react-i18next';
 import { space } from '@/theme';
 import { Chip, Header, ProviderCard, Screen } from '@/components';
 import { USTA_CATEGORIES, useProviders, type UstaCategory } from '@/services';
+import { demoOnly } from '@/components/DemoOnly';
 
-export default function UstaList() {
+function UstaList() {
   const { t } = useTranslation();
   const params = useLocalSearchParams<{ kategori?: string }>();
   const initial = USTA_CATEGORIES.includes(params.kategori as UstaCategory) ? (params.kategori as UstaCategory) : undefined;
@@ -29,3 +30,5 @@ export default function UstaList() {
     </Screen>
   );
 }
+
+export default demoOnly(UstaList);

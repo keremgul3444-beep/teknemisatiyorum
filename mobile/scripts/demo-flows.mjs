@@ -94,6 +94,9 @@ await fillPh('5xx', '5321234512');
 await click('Kod gönder');
 await vis(page.locator('input[inputmode="numeric"]')).fill('123456');
 await click('Doğrula', true);
+// Girişten sonra girişi başlatan sayfaya (Profil) dönülür.
+await see('Çıkış yap');
+await tab('Keşfet');
 await see('Teknen için her şey');
 
 await flow(1, 'Asistanla arama → ilan → mesaj', 'Keşfet\'te asistana sorgu yazılır, 3 tam eşleşme görülür, ilan açılır, satıcıya mesaj atılır ve otomatik yanıt gelir.', async () => {

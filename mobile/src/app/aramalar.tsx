@@ -6,14 +6,16 @@ import { colors, space } from '@/theme';
 import { Button, Card, EmptyState, Field, Header, Icon, Screen, Section, T, showDemoToast } from '@/components';
 import { actions, useSavedSearches } from '@/services';
 import { requireLevel } from '@/session/role';
+import { attempt } from '@/services/errors';
 
 export default function Aramalar() {
   const { t } = useTranslation();
   const searches = useSavedSearches();
   const [text, setText] = useState('');
-  const create = () => {
+  const create = async () => {
     if (!requireLevel(1)) return;
-    actions.saveSearch(text.trim());
+    const ok = await attempt(async () => { await actions.saveSearch(text.trim()); return true; });
+    if (!ok) return;
     setText('');
     showDemoToast(t('assistant.saved'));
   };

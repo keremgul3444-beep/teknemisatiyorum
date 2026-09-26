@@ -32,27 +32,6 @@ export const useSeller = (id?: string) => useStore((s) => s.sellers.find((x) => 
 export const useAdminItems = () => useStore((s) => s.adminItems);
 export const useAudit = () => useStore((s) => s.audit);
 
-// Eylemler — gerçek API gelince yalnızca bu katmanın arkası değişir.
-const g = () => useStore.getState();
-export const actions = {
-  createListing: (...a: Parameters<ReturnType<typeof g>['createListing']>) => g().createListing(...a),
-  toggleFavorite: (id: string) => g().toggleFavorite(id),
-  saveSearch: (q: string) => g().saveSearch(q),
-  createJob: (...a: Parameters<ReturnType<typeof g>['createJob']>) => g().createJob(...a),
-  acceptOffer: (jobId: string, offerId: string) => g().acceptOffer(jobId, offerId),
-  payJob: (jobId: string) => g().payJob(jobId),
-  completeJob: (jobId: string) => g().completeJob(jobId),
-  rateJob: (jobId: string, stars: number) => g().rateJob(jobId, stars),
-  bookCaptain: (...a: Parameters<ReturnType<typeof g>['bookCaptain']>) => g().bookCaptain(...a),
-  payCaptain: (id: string) => g().payCaptain(id),
-  bookExpertise: (...a: Parameters<ReturnType<typeof g>['bookExpertise']>) => g().bookExpertise(...a),
-  applyBroker: (...a: Parameters<ReturnType<typeof g>['applyBroker']>) => g().applyBroker(...a),
-  advanceBroker: (id: string) => g().advanceBroker(id),
-  addBoat: (...a: Parameters<ReturnType<typeof g>['addBoat']>) => g().addBoat(...a),
-  sendMessage: (convId: string, text: string, from?: 'me' | 'them') => g().sendMessage(convId, text, from),
-  sharePhone: (convId: string) => g().sharePhone(convId),
-  markRead: (convId: string) => g().markRead(convId),
-  startConversation: (...a: Parameters<ReturnType<typeof g>['startConversation']>) => g().startConversation(...a),
-  setAdminStatus: (...a: Parameters<ReturnType<typeof g>['setAdminStatus']>) => g().setAdminStatus(...a),
-  resetDemo: () => g().resetDemo(),
-};
+// Eylemler — demo modunda yerel depo, gerçek modda sunucu (bkz. actions.ts).
+export { actions, type AssistantResult } from './actions';
+export { useMode, isApiMode, API_URL } from './mode';

@@ -5,12 +5,14 @@ import { colors, space } from '@/theme';
 import { Avatar, Button, Card, Chip, Divider, MenuRow, Screen, T } from '@/components';
 import { useBoats, useFavorites, useJobs, useListings, useSavedSearches } from '@/services';
 import { useSession } from '@/session/role';
+import { actions } from '@/services';
+import { attempt } from '@/services/errors';
 
 export default function Profil() {
   const { t } = useTranslation();
   const s = useSession();
   const boats = useBoats().length;
-  const mine = useListings().filter((l) => l.sellerId === 'me').length;
+  const mine = useListings().filter((l) => l.sellerId === 'me' || l.isMine).length;
   const favs = useFavorites().length;
   const saved = useSavedSearches().length;
   const jobs = useJobs().filter((j) => j.status !== 'degerlendirildi').length;
@@ -62,7 +64,7 @@ export default function Profil() {
 
       <Card>
         <MenuRow icon="settings" label={t('profile.settings')} onPress={() => router.push('/profil/ayarlar')} />
-        {s.loggedIn ? (<><Divider /><MenuRow icon="x" label={t('profile.logout')} danger onPress={() => s.logout()} /></>) : null}
+        {s.loggedIn ? (<><Divider /><MenuRow icon="x" label={t('profile.logout')} danger onPress={() => attempt(() => actions.logout())} /></>) : null}
       </Card>
     </Screen>
   );

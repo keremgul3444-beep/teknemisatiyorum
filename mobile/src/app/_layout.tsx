@@ -7,8 +7,14 @@ import { SpaceGrotesk_500Medium, SpaceGrotesk_700Bold } from '@expo-google-fonts
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { colors } from '@/theme';
 import { DemoToastHost } from '@/components';
+import { useEffect } from 'react';
+import { useMode } from '@/services/mode';
+import { syncAll } from '@/services/api/sync';
+import { attempt } from '@/services/errors';
 
 export default function RootLayout() {
+  const mode = useMode((s) => s.mode);
+  useEffect(() => { if (mode === 'api') attempt(() => syncAll()); }, [mode]);
   const [loaded] = useFonts({ Inter_400Regular, Inter_600SemiBold, Inter_700Bold, SpaceGrotesk_500Medium, SpaceGrotesk_700Bold });
   if (!loaded) return <View style={{ flex: 1, backgroundColor: colors.bg }} />;
   return (

@@ -9,6 +9,7 @@ import { matchListings } from '@tms/shared';
 import { isEmptyQuery, type ParsedQuery } from '@tms/shared';
 import { queryToText } from '@tms/shared';
 import { requireLevel } from '@/session/role';
+import { attempt } from '@/services/errors';
 
 type Sort = 'new' | 'asc' | 'desc';
 
@@ -56,8 +57,7 @@ export default function Ilanlar() {
       )}
       {!isEmptyQuery(query) ? <Button variant="ghost" icon="bell" title={t('assistant.save')} onPress={() => {
         if (!requireLevel(1)) return;
-        actions.saveSearch(queryToText(query));
-        showDemoToast(t('assistant.saved'));
+        attempt(async () => { await actions.saveSearch(queryToText(query), query); return true; }).then((ok) => ok && showDemoToast(t('assistant.saved')));
       }} /> : null}
 
       <FilterSheet visible={sheet} value={query} onClose={() => setSheet(false)} onApply={(q) => { setQuery(q); setSheet(false); }} />

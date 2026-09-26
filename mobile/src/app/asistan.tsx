@@ -1,14 +1,14 @@
-import { useMemo, useState } from 'react';
-import { TextInput, View, Pressable } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, TextInput, View, Pressable } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { colors, fonts, radius, space } from '@/theme';
 import { Button, Chip, EmptyState, Header, Icon, ListingCard, QueryChips, Screen, Section, T, showDemoToast } from '@/components';
-import { actions, useListings } from '@/services';
-import { parseQuery, isEmptyQuery } from '@tms/shared';
-import { matchListings } from '@tms/shared';
+import { actions, useListings, type AssistantResult } from '@/services';
+import { isEmptyQuery } from '@tms/shared';
 import { criterionLabel } from '@tms/shared';
 import { requireLevel } from '@/session/role';
+import { attempt } from '@/services/errors';
 
 export default function Asistan() {
   const { t } = useTranslation();
@@ -16,14 +16,22 @@ export default function Asistan() {
   const [draft, setDraft] = useState(params.q ?? '');
   const [q, setQ] = useState(params.q ?? '');
   const listings = useListings();
-  const parsed = useMemo(() => parseQuery(q), [q]);
-  const empty = isEmptyQuery(parsed);
-  const result = useMemo(() => matchListings(listings, parsed), [listings, parsed]);
+  const [result, setResult] = useState<AssistantResult | null>(null);
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    if (!q.trim()) { setResult(null); return; }
+    let alive = true;
+    setLoading(true);
+    attempt(() => actions.assistantSearch(q)).then((r) => { if (alive) { setResult(r ?? null); setLoading(false); } });
+    return () => { alive = false; };
+  }, [q, listings]);
+  const parsed = result?.query ?? { equipment: [] };
+  const empty = !loading && (!result || isEmptyQuery(result.query));
 
-  const save = () => {
+  const save = async () => {
     if (!requireLevel(1)) return;
-    actions.saveSearch(q);
-    showDemoToast(t('assistant.saved'));
+    const ok = await attempt(async () => { await actions.saveSearch(q, result?.query); return true; });
+    if (ok) showDemoToast(t('assistant.saved'));
   };
 
   return (
@@ -36,7 +44,7 @@ export default function Asistan() {
         <Pressable onPress={() => setQ(draft)} style={{ padding: space(3) }}><Icon name="search" size={20} color={colors.primary} /></Pressable>
       </View>
 
-      {empty ? (
+      {loading ? <ActivityIndicator color={colors.primary} style={{ marginTop: space(8) }} /> : empty ? (
         <>
           <EmptyState icon="sparkle" title={t('assistant.notUnderstood')} body={t('assistant.notUnderstoodBody')} />
           <View style={{ gap: space(2) }}>
@@ -50,13 +58,13 @@ export default function Asistan() {
             <T variant="label" color={colors.muted}>{t('assistant.understood').toLocaleUpperCase('tr-TR')}</T>
             <QueryChips query={parsed} />
           </View>
-          <Section title={t('assistant.exact', { count: result.exact.length })}>
-            {result.exact.length === 0 ? <T color={colors.muted}>{t('assistant.noExact')}</T> : result.exact.map((l) => <ListingCard key={l.id} listing={l} />)}
+          <Section title={t('assistant.exact', { count: result!.exact.length })}>
+            {result!.exact.length === 0 ? <T color={colors.muted}>{t('assistant.noExact')}</T> : result!.exact.map((l) => <ListingCard key={l.id} listing={l} />)}
           </Section>
-          {result.near.length > 0 ? (
+          {result!.near.length > 0 ? (
             <Section title={t('assistant.near')}>
               <T variant="caption" color={colors.muted}>{t('assistant.nearHint')}</T>
-              {result.near.map(({ listing, missing }) => (
+              {result!.near.map(({ listing, missing }) => (
                 <ListingCard key={listing.id} listing={listing} missing={t('assistant.missing', { what: missing.map((m) => criterionLabel(m, t)).join(', ') })} />
               ))}
             </Section>

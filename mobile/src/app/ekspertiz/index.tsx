@@ -7,6 +7,8 @@ import { Button, Card, Chip, Header, Icon, ListingCard, Screen, Section, Success
 import { actions, formatPrice, useExpertisePackages, useListing } from '@/services';
 import { currentLang } from '@/i18n';
 import { requireLevel } from '@/session/role';
+import { attempt } from '@/services/errors';
+import { localDateString } from '@/features/dates';
 
 const SLOTS = ['morning', 'noon', 'afternoon'] as const;
 
@@ -35,10 +37,10 @@ export default function Ekspertiz() {
     );
   }
 
-  const book = () => {
+  const book = async () => {
     if (!requireLevel(1) || dateIdx === null) return;
-    actions.bookExpertise({ packageId: pkg, listingId: listing?.id, date: dates[dateIdx].toISOString().slice(0, 10), slot });
-    setDone(true);
+    const id = await attempt(() => actions.bookExpertise({ packageId: pkg, listingId: listing?.id, date: localDateString(dates[dateIdx]), slot }));
+    if (id) setDone(true);
   };
 
   return (

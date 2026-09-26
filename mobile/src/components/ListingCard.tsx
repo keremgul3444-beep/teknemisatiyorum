@@ -10,11 +10,12 @@ import { Badge } from './Badge';
 import { T } from './T';
 import { Chip } from './Chip';
 
-export function ListingCard({ listing: l, compact, width, missing }: { listing: Listing; compact?: boolean; width?: number; missing?: string }) {
+/** `disabled`: önizleme gibi henüz var olmayan ilanlarda karta dokunulmaz. */
+export function ListingCard({ listing: l, compact, width, missing, disabled }: { listing: Listing; compact?: boolean; width?: number; missing?: string; disabled?: boolean }) {
   const { t } = useTranslation();
   return (
-    <Card padded={false} onPress={() => router.push(`/ilan/${l.id}`)} style={width ? { width } : undefined}>
-      <BoatImage seed={l.photoSeed} height={compact ? 110 : 150}>
+    <Card padded={false} onPress={disabled ? undefined : () => router.push(`/ilan/${l.id}`)} style={width ? { width } : undefined}>
+      <BoatImage seed={l.photoSeed} height={compact ? 110 : 150} uri={l.photoUrls?.[0]}>
         <View style={{ position: 'absolute', top: space(2.5), left: space(2.5), flexDirection: 'row', flexWrap: 'wrap', gap: space(1.5) }}>
           {l.status === 'onay-bekliyor' ? <Badge kind="beklemede" onDark /> : l.badges.slice(0, compact ? 1 : 2).map((b) => <Badge key={b} kind={b} onDark />)}
         </View>

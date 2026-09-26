@@ -4,6 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { colors, space } from '@/theme';
 import { Button, Field, Header, Icon, Screen, Segmented, SuccessView, T, UploadBox, goBack } from '@/components';
 import { useSession } from '@/session/role';
+import { actions, isApiMode } from '@/services';
+import { attempt } from '@/services/errors';
+import { pickImage } from '@/services/pickImage';
 
 export default function Identity() {
   const { t } = useTranslation();
@@ -14,23 +17,27 @@ export default function Identity() {
   const set = (k: keyof typeof f) => (v: string) => setF((s) => ({ ...s, [k]: v }));
   const valid = mode === 'tc'
     ? f.tckn.length === 11 && f.first && f.last && f.year.length === 4
-    : f.passport.length >= 6 && f.nat && f.first && f.last && photo;
+    : f.passport.length >= 5 && f.nat && f.first && f.last && f.year.length === 4 && photo;
 
-  const submit = () => {
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+  const submit = async () => {
     setPhase('loading');
-    setTimeout(() => {
-      const s = useSession.getState();
-      s.login();
-      s.setVerifyLevel(Math.max(2, s.verifyLevel) as 2);
-      setPhase('done');
-    }, 1200);
+    const person = { firstName: f.first, lastName: f.last, birthYear: Number(f.year) || 1990 };
+    const r = await attempt(() => actions.verifyIdentity(mode === 'tc'
+      ? { tckn: f.tckn, ...person }
+      : { passport: f.passport, nationality: f.nat, ...person, fileUri: photoUri ?? '' }));
+    if (!r) return setPhase('form');
+    setPending(r.pending);
+    setPhase('done');
   };
+
 
   if (phase === 'done') {
     return (
       <Screen>
         <Header title="" />
-        <SuccessView title={t('verify.successTitle')} body={t('verify.successBody')} actions={[{ title: t('common.continue'), onPress: goBack }]} />
+        <SuccessView title={t(pending ? 'verify.pendingTitle' : 'verify.successTitle')} body={t(pending ? 'verify.pendingBody' : 'verify.successBody')} actions={[{ title: t('common.continue'), onPress: goBack }]} />
       </Screen>
     );
   }
@@ -52,7 +59,14 @@ export default function Identity() {
       {mode === 'tc' ? (
         <Field label={t('verify.birthYear')} value={f.year} onChangeText={(v) => set('year')(v.replace(/\D/g, ''))} keyboardType="number-pad" maxLength={4} />
       ) : (
-        <UploadBox label={t('verify.passportPhoto')} state={photo ? 'yuklendi' : 'bos'} onPress={() => setPhoto(true)} />
+        <>
+        <Field label={t('verify.birthYear')} value={f.year} onChangeText={(v) => set('year')(v.replace(/\D/g, ''))} keyboardType="number-pad" maxLength={4} />
+        <UploadBox label={t('verify.passportPhoto')} state={photo ? 'yuklendi' : 'bos'} onPress={async () => {
+          if (!isApiMode()) return setPhoto(true);
+          const uri = await pickImage();
+          if (uri) { setPhotoUri(uri); setPhoto(true); }
+        }} />
+        </>
       )}
       <View style={{ flexDirection: 'row', gap: space(2), alignItems: 'center' }}>
         <Icon name="shield" size={18} color={colors.primary} />

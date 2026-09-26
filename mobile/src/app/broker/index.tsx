@@ -7,6 +7,7 @@ import { Button, Card, Chip, Field, Header, Icon, Screen, Section, T } from '@/c
 import { actions, formatPrice, useBoats, useBrokerCases } from '@/services';
 import { currentLang } from '@/i18n';
 import { requireLevel } from '@/session/role';
+import { attempt } from '@/services/errors';
 
 export default function Broker() {
   const { t } = useTranslation();
@@ -15,10 +16,10 @@ export default function Broker() {
   const [boat, setBoat] = useState(boats[0]?.name);
   const [asking, setAsking] = useState('');
   const [note, setNote] = useState('');
-  const apply = () => {
+  const apply = async () => {
     if (!requireLevel(2) || !boat) return;
-    const id = actions.applyBroker({ boatName: boat, askingEUR: Number(asking) || 0 });
-    router.replace(`/broker/${id}`);
+    const id = await attempt(() => actions.applyBroker({ boatName: boat, askingEUR: Number(asking) || 0 }));
+    if (id) router.replace(`/broker/${id}`);
   };
   return (
     <Screen footer={<Button title={t('broker.apply')} disabled={!boat || !asking} onPress={apply} />}>

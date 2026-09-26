@@ -33,7 +33,7 @@ export default function Mesajlar() {
                     {t(`messages.kind.${c.subject.kind}`)} · {c.subject.title}
                   </T>
                   <T variant="caption" color={c.unread ? colors.text : colors.muted} numberOfLines={1} style={c.unread ? { fontFamily: fonts.bodyBold } : undefined}>
-                    {last?.text ?? t('messages.noMessages')}
+                    {last?.text ?? c.preview ?? t('messages.noMessages')}
                   </T>
                 </View>
                 {c.unread ? <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: colors.primary }} /> : null}

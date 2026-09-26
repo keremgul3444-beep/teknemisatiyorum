@@ -9,6 +9,9 @@ import {
 import { actions, type BoatType, type Currency, type Equipment, type Listing } from '@/services';
 import { LOCATIONS } from '@tms/shared';
 import { requireLevel } from '@/session/role';
+import { isApiMode } from '@/services';
+import { attempt } from '@/services/errors';
+import { pickImage } from '@/services/pickImage';
 
 const TYPES: BoatType[] = ['motoryat', 'yelkenli', 'katamaran', 'gulet', 'surat', 'balikci'];
 const EQUIP: Equipment[] = ['jenerator', 'branda', 'klima', 'radar', 'otopilot', 'bowThruster', 'teak', 'tender'];
@@ -28,6 +31,9 @@ export default function IlanVer() {
   const [doc, setDoc] = useState(false);
   const [preview, setPreview] = useState(false);
   const [done, setDone] = useState(false);
+  const [uris, setUris] = useState<Record<number, string>>({});
+  const [docUri, setDocUri] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
   // Değerleme, karne ya da ilanlarım gibi her giriş noktasında aynı kimlik kapısı geçerli.
   useEffect(() => { requireLevel(2); }, []);
   const set = (k: keyof typeof f) => (v: string) => setF((s) => ({ ...s, [k]: v }));
@@ -45,7 +51,7 @@ export default function IlanVer() {
     brand: f.brand, model: f.model, year: num(f.year), lengthM: num(f.length), price: num(f.price), currency, type: type ?? 'motoryat',
     location: location ?? '', equipment, cabins: num(f.cabins) || 0, engine: f.engine || '—', description: f.description || '—',
   };
-  const previewListing: Listing = { ...draft, id: 'preview', badges: doc ? ['sahiplik'] : [], sellerId: 'me', logbookCount: 0, status: 'onay-bekliyor', photoSeed: photos[0] ?? 0 };
+  const previewListing: Listing = { ...draft, id: 'preview', badges: doc ? ['sahiplik'] : [], sellerId: 'me', logbookCount: 0, status: 'onay-bekliyor', photoSeed: photos[0] ?? 0, photoUrls: photos.map((i) => uris[i]).filter(Boolean) };
 
   if (done) {
     return (
@@ -64,16 +70,17 @@ export default function IlanVer() {
       <Screen footer={
         <View style={{ flexDirection: 'row', gap: space(3) }}>
           <View style={{ flex: 1 }}><Button variant="ghost" title={t('common.back')} onPress={() => setPreview(false)} /></View>
-          <View style={{ flex: 2 }}><Button title={t('wizard.publish')} onPress={() => {
+          <View style={{ flex: 2 }}><Button title={t('wizard.publish')} loading={busy} onPress={async () => {
             if (!requireLevel(2)) return;
-            actions.createListing(draft);
-            if (broker) actions.applyBroker({ boatName: `${f.brand} ${f.model}`, askingEUR: currency === 'EUR' ? draft.price : 0 });
-            setDone(true);
+            setBusy(true);
+            const id = await attempt(() => actions.createListing(draft, { photoUris: photos.map((i) => uris[i]).filter(Boolean), broker, ownershipUri: docUri ?? undefined }));
+            setBusy(false);
+            if (id) setDone(true);
           }} /></View>
         </View>
       }>
         <Header title={t('wizard.preview')} back={false} />
-        <ListingCard listing={previewListing} />
+        <ListingCard listing={previewListing} disabled />
       </Screen>
     );
   }
@@ -94,10 +101,18 @@ export default function IlanVer() {
           <T variant="caption" color={colors.muted}>{t('wizard.photosHint')}</T>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space(2) }}>
             {Array.from({ length: 6 }).map((_, i) => (
-              <Pressable key={i} onPress={() => setPhotos((p) => (p.includes(i) ? p.filter((x) => x !== i) : [...p, i]))}
+              <Pressable key={i} onPress={async () => {
+                if (photos.includes(i)) return setPhotos((p) => p.filter((x) => x !== i));
+                if (isApiMode()) {
+                  const uri = await pickImage();
+                  if (!uri) return;
+                  setUris((s) => ({ ...s, [i]: uri }));
+                }
+                setPhotos((p) => [...p, i]);
+              }}
                 style={{ width: '31.5%', aspectRatio: 1, borderRadius: radius.button, overflow: 'hidden', borderWidth: 1.5, borderStyle: 'dashed', borderColor: colors.line, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center' }}>
                 {photos.includes(i) ? (
-                  <View style={{ position: 'absolute', inset: 0 }}><BoatImage seed={i + 1} height={200} /></View>
+                  <View style={{ position: 'absolute', inset: 0 }}><BoatImage seed={i + 1} height={200} uri={uris[i]} /></View>
                 ) : (
                   <View style={{ alignItems: 'center', gap: space(1) }}>
                     <Icon name="camera" size={22} color={colors.muted} />
@@ -159,7 +174,14 @@ export default function IlanVer() {
       {step === 4 ? (
         <Section title={t('wizard.docsTitle')}>
           <T variant="caption" color={colors.muted}>{t('wizard.docsHint')}</T>
-          <UploadBox label={t('wizard.docLabel')} state={doc ? 'incelemede' : 'bos'} onPress={() => setDoc(true)} />
+          <UploadBox label={t('wizard.docLabel')} state={doc ? 'incelemede' : 'bos'} onPress={async () => {
+            if (isApiMode()) {
+              const uri = await pickImage();
+              if (!uri) return;
+              setDocUri(uri);
+            }
+            setDoc(true);
+          }} />
         </Section>
       ) : null}
     </Screen>

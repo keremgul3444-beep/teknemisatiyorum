@@ -7,6 +7,8 @@ export interface Listing {
   id: string; brand: string; model: string; year: number; lengthM: number; price: number; currency: Currency;
   type: BoatType; location: string; equipment: Equipment[]; badges: BadgeKind[]; sellerId: string;
   logbookCount: number; description: string; status: ListingStatus; photoSeed: number; cabins: number; engine: string;
+  /** Gerçek modda: sunucudaki fotoğraflar, ham durum (draft/pending/rejected…), ilan sahibi mi, bağlı tekne ve karne özeti. */
+  photoUrls?: string[]; rawStatus?: string; isMine?: boolean; boatId?: string | null; logbookLatest?: LogEntry[]; rejectReason?: string | null;
 }
 export type ListingDraft = Pick<Listing, 'brand' | 'model' | 'year' | 'lengthM' | 'price' | 'currency' | 'type' | 'location' | 'equipment' | 'cabins' | 'engine' | 'description'>;
 
@@ -38,11 +40,13 @@ export type SubjectKind = 'ilan' | 'is' | 'kaptan' | 'broker';
 export interface Conversation {
   id: string; withName: string; subject: { kind: SubjectKind; id: string; title: string };
   phoneShared: boolean; unread: boolean; messages: Message[];
+  /** Gerçek modda: karşı tarafın paylaştığı numara ve son mesaj önizlemesi. */
+  otherPhone?: string | null; preview?: string;
 }
 
 export interface SavedSearch { id: string; query: string; createdAt: string; newMatches: number }
 export interface CaptainBooking { id: string; captainId: string; start: string; days: number; totalEUR: number; paid: boolean }
-export interface ExpertiseBooking { id: string; packageId: string; listingId?: string; date: string; slot: string }
+export interface ExpertiseBooking { id: string; packageId: string; listingId?: string; date: string; slot: string; reportStatus?: string; score?: number | null }
 export interface ExpertisePackage { id: string; name: string; priceTRY: number; items: string[] }
 export interface BrokerCase { id: string; boatName: string; step: 0 | 1 | 2 | 3 | 4; askingEUR: number; createdAt: string }
 export interface Company { id: string; name: string; kind: 'galeri' | 'broker' | 'tersane' | 'servis'; city: string; staff: string[]; listingIds: string[] }
@@ -50,5 +54,5 @@ export type AdminStatus = 'bekliyor' | 'onaylandi' | 'reddedildi';
 export interface AdminItem { id: string; kind: 'ilan' | 'belge'; title: string; who: string; status: AdminStatus; refId?: string }
 /** İşlem kaydı dile bağlı metin değil, çeviri anahtarı + parametre taşır. */
 export interface AuditEntry { id: string; at: string; who: string; key: string; params?: Record<string, string> }
-export interface Seller { id: string; name: string; since: number; companyId?: string }
+export interface Seller { id: string; name: string; since: number; companyId?: string; companyName?: string | null }
 export type Role = 'bireysel' | 'usta' | 'kaptan' | 'kurumsal' | 'yonetici';

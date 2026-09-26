@@ -6,8 +6,9 @@ import { colors, radius, space } from '@/theme';
 import { BoatImage, Button, Chip, Field, Header, Icon, Screen, Section, T } from '@/components';
 import { actions, USTA_CATEGORIES, useBoats, type UstaCategory } from '@/services';
 import { requireLevel } from '@/session/role';
+import { demoOnly } from '@/components/DemoOnly';
 
-export default function IsYeni() {
+function IsYeni() {
   const { t } = useTranslation();
   const params = useLocalSearchParams<{ kategori?: string; baslik?: string }>();
   const boats = useBoats();
@@ -19,9 +20,9 @@ export default function IsYeni() {
   const [when, setWhen] = useState<'urgent' | 'thisWeek' | 'flexible'>('thisWeek');
   const valid = boatId && cat && title.trim().length > 2;
 
-  const send = () => {
+  const send = async () => {
     if (!requireLevel(1) || !boatId || !cat) return;
-    const id = actions.createJob({ category: cat, title: title.trim(), description: desc.trim(), boatId });
+    const id = await actions.createJob({ category: cat, title: title.trim(), description: desc.trim(), boatId });
     router.replace(`/is/${id}`);
   };
 
@@ -67,3 +68,5 @@ export default function IsYeni() {
     </Screen>
   );
 }
+
+export default demoOnly(IsYeni);

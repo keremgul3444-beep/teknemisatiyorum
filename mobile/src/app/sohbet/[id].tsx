@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { colors, fonts, radius, space } from '@/theme';
 import { Button, Header, Icon, NotFound, T } from '@/components';
 import { actions, useConversation, type SubjectKind } from '@/services';
+import { attempt } from '@/services/errors';
 
 const SUBJECT_ROUTE: Record<SubjectKind, (id: string) => string> = {
   ilan: (id) => `/ilan/${id}`, is: (id) => `/is/${id}`, kaptan: (id) => `/kaptan/${id}`, broker: (id) => `/broker/${id}`,
@@ -19,16 +20,16 @@ export default function Sohbet() {
   const [confirm, setConfirm] = useState(false);
   const scroll = useRef<ScrollView>(null);
 
-  useEffect(() => { if (id) actions.markRead(id); }, [id]);
+  useEffect(() => { if (id) attempt(() => actions.openConversation(id)); }, [id]);
   useEffect(() => { setTimeout(() => scroll.current?.scrollToEnd({ animated: true }), 50); }, [c?.messages.length]);
   if (!c) return <NotFound />;
 
-  const send = () => {
+  const send = async () => {
     const msg = text.trim();
     if (!msg) return;
-    actions.sendMessage(c.id, msg);
     setText('');
-    setTimeout(() => actions.sendMessage(c.id, t('messages.autoReply'), 'them'), 1500);
+    await attempt(() => actions.sendMessage(c.id, msg));
+    setTimeout(() => actions.demoReply(c.id, t('messages.autoReply')), 1500);
   };
 
   return (
@@ -49,7 +50,7 @@ export default function Sohbet() {
               <T variant="caption">{t('messages.sharePhoneConfirm')}</T>
               <View style={{ flexDirection: 'row', gap: space(2) }}>
                 <View style={{ flex: 1 }}><Button small variant="ghost" title={t('common.cancel')} onPress={() => setConfirm(false)} /></View>
-                <View style={{ flex: 1 }}><Button small title={t('messages.sharePhone')} onPress={() => { actions.sharePhone(c.id); setConfirm(false); }} /></View>
+                <View style={{ flex: 1 }}><Button small title={t('messages.sharePhone')} onPress={async () => { await attempt(() => actions.sharePhone(c.id)); setConfirm(false); }} /></View>
               </View>
             </View>
           ) : null}

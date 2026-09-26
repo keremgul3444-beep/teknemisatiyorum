@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { colors, fonts, space } from '@/theme';
 import { BoatImage, Button, Card, Header, Icon, NotFound, Screen, Section, T, showDemoToast } from '@/components';
 import { useBoat, type LogKind } from '@/services';
+import { tx } from '@/i18n';
 
 const KIND_ICON: Record<LogKind, string> = { bakim: 'wrench', onarim: 'settings', ekspertiz: 'clipboard', sahiplik: 'doc' };
 
@@ -50,8 +51,8 @@ export default function Karne() {
               </View>
               <View style={{ flex: 1, paddingBottom: space(4), gap: space(0.5) }}>
                 <T variant="caption" color={colors.muted}>{e.date} · {t(`logbook.kind.${e.kind}`)}</T>
-                <T variant="bodySemi">{e.title}</T>
-                <T variant="caption" color={colors.muted}>{e.by}</T>
+                <T variant="bodySemi">{tx(t, e.title)}</T>
+                <T variant="caption" color={colors.muted}>{tx(t, e.by)}</T>
                 <T variant="caption" color={e.verified ? colors.success : colors.muted} style={{ fontFamily: fonts.bodySemi }}>
                   {e.verified ? `✓ ${t('logbook.verified')}` : t('logbook.selfReported')}
                 </T>
