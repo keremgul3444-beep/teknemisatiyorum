@@ -65,7 +65,8 @@ class MessagesController {
     const c = await this.memberOf(id, u.id);
     const other = c.members.find((m) => m.userId !== u.id)!;
     const otherUser = await this.prisma.user.findUnique({ where: { id: other.userId }, select: { name: true, phone: true } });
-    const msgs = await this.prisma.message.findMany({ where: { conversationId: id }, orderBy: { createdAt: 'asc' }, take: 500 });
+    // En yeni 500 mesaj (eskiden yeniye sıralı döner).
+    const msgs = (await this.prisma.message.findMany({ where: { conversationId: id }, orderBy: { createdAt: 'desc' }, take: 500 })).reverse();
     return {
       id: c.id,
       subject: { kind: c.subjectKind, id: c.subjectId, title: c.subjectTitle },

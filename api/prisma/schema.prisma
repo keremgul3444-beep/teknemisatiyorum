@@ -144,6 +144,8 @@ model VerificationRequest {
   userId       String
   kind         VerificationKind
   fileIds      String[]
+  /// Yabancı kimlik başvurusunda pasaport bilgileri (moderatör belgeyle karşılaştırır).
+  details      Json?
   listingId    String?
   status       ReviewStatus     @default(pending)
   rejectReason String?

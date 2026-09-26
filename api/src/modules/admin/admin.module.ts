@@ -53,7 +53,10 @@ class AdminController {
       return rows.map((r) => ({ ...r, userName: users.find((x) => x.id === r.userId)?.name ?? null }));
     }
     const rows = await this.prisma.listing.findMany({ where: { status: 'pending' }, orderBy: { updatedAt: 'asc' }, include: { owner: { select: { name: true } }, photos: true } });
-    return rows.map((l) => ({ id: l.id, title: `${l.brand} ${l.model}`, year: l.year, price: l.price, currency: l.currency, ownerName: l.owner.name, photoCount: l.photos.length, updatedAt: l.updatedAt }));
+    return rows.map((l) => ({
+      id: l.id, title: `${l.brand} ${l.model}`, year: l.year, price: l.price, currency: l.currency, ownerName: l.owner.name,
+      photoCount: l.photos.length, photos: [...l.photos].sort((a, b) => a.order - b.order).map((p) => `/media/${p.fileId}`), updatedAt: l.updatedAt,
+    }));
   }
 
   @Auth(STAFF)
@@ -99,6 +102,26 @@ class AdminController {
     await this.notifications.push(v.userId, approve ? 'notif.docApproved' : 'notif.docRejected', { kind: v.kind, ...(approve ? {} : { reason: b.reason }) });
     await this.audit.log(u.id, approve ? 'audit.docApproved' : 'audit.docRejected', { title: v.kind }, 'verification', id);
     return { id, status: approve ? 'approved' : 'rejected' };
+  }
+
+  @Auth(STAFF)
+  @Get('broker')
+  async brokerCases() {
+    const rows = await this.prisma.brokerCase.findMany({ orderBy: { updatedAt: 'desc' }, take: 200 });
+    const users = await this.prisma.user.findMany({ where: { id: { in: rows.map((r) => r.userId) } }, select: { id: true, name: true } });
+    return rows.map((c) => ({ ...c, userName: users.find((x) => x.id === c.userId)?.name ?? null }));
+  }
+
+  @Auth(STAFF)
+  @Get('expertise')
+  async expertiseBookings() {
+    const rows = await this.prisma.expertiseBooking.findMany({ orderBy: { date: 'desc' }, take: 200 });
+    const pkgs = await this.prisma.expertisePackage.findMany();
+    const users = await this.prisma.user.findMany({ where: { id: { in: rows.map((r) => r.userId) } }, select: { id: true, name: true } });
+    return rows.map((b) => ({
+      id: b.id, date: dateOnly(b.date), slot: b.slot, reportStatus: b.reportStatus, score: b.score, listingId: b.listingId,
+      packageName: pkgs.find((p) => p.id === b.packageId)?.name ?? null, userName: users.find((x) => x.id === b.userId)?.name ?? null,
+    }));
   }
 
   @Auth(STAFF)

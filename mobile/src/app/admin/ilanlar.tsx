@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { AdminPage, ApprovalRow, EmptyState } from '@/components';
 import { actions, useAdminItems } from '@/services';
+import { attempt } from '@/services/errors';
 
 export default function AdminIlanlar() {
   const { t } = useTranslation();
@@ -8,7 +9,7 @@ export default function AdminIlanlar() {
   return (
     <AdminPage>
       {items.length === 0 ? <EmptyState icon="check" title={t('admin.empty')} /> : items.map((i) => (
-        <ApprovalRow key={i.id} item={i} onDecide={(s) => actions.setAdminStatus(i.id, s)} />
+        <ApprovalRow key={i.id} item={i} onDecide={(s) => attempt(() => actions.setAdminStatus(i.id, s))} />
       ))}
     </AdminPage>
   );

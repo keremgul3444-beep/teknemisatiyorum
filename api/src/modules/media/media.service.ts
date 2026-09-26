@@ -73,6 +73,14 @@ export class MediaService {
     if (n !== new Set(ids).size) throw Errors.notFound();
   }
 
+  /** Hesap silmede: kullanıcının korumalı belgeleri (kimlik, ruhsat vb.) diskten ve veritabanından kaldırılır. */
+  async purgePrivate(userId: string) {
+    const files = await this.prisma.file.findMany({ where: { ownerId: userId, visibility: 'private' } });
+    await Promise.all(files.map((f) => this.storage.remove(f.key)));
+    await this.prisma.file.deleteMany({ where: { id: { in: files.map((f) => f.id) } } });
+    await this.prisma.verificationRequest.updateMany({ where: { userId }, data: { fileIds: [] } });
+  }
+
   private async read(key: string, mime: string) {
     const data = await this.storage.get(key);
     if (!data) throw Errors.notFound();

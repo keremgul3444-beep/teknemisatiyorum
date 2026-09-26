@@ -1,5 +1,6 @@
 // Kapalı beta kabul testi: tasarım belgesi §11'deki 6 kriteri gerçek sunucuya karşı tarayıcıdan dener.
 // Önkoşul: `npm run dev` açık (API_PROXY ile), api/.env'de DEV_OTP_ECHO=1.
+// Yönetici kodu ekranda çıkmaz: DEV_LOG=<npm run dev çıktısının dosyası> ile çalıştır.
 // Kullanım: node mobile/scripts/beta-acceptance.mjs   → docs/beta-kabul.md + docs/beta-shots/*.jpg
 import { chromium } from 'playwright-core';
 import sharp from 'sharp';
@@ -80,6 +81,15 @@ function helpers(page) {
       await see('Doğrulama kodu');
     }
     await page.waitForTimeout(500);
+    // Yönetici hesaplarına kod ekranda gösterilmez (güvenlik); kapalı betada sunucu günlüğünden okunur.
+    if (phone === PHONES.admin) {
+      if (!process.env.DEV_LOG) throw new Error('Yönetici kodu için DEV_LOG=<sunucu günlüğü> gerekli');
+      const lines = fs.readFileSync(process.env.DEV_LOG, 'utf8').split(/\r?\n/).filter((l) => l.includes(`+90${phone} için giriş kodu`));
+      const code = lines.at(-1)?.match(/giriş kodu: (\d{6})/)?.[1];
+      if (!code) throw new Error('Yönetici kodu günlükte yok');
+      await page.keyboard.type(code);
+      await page.waitForTimeout(300);
+    }
     await click('Doğrula', true);
     await see('Çıkış yap');
   }

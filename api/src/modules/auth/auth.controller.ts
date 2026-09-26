@@ -21,9 +21,10 @@ export class AuthController {
   @Throttle({ default: { limit: () => env().OTP_IP_LIMIT, ttl: 60 * 60_000 } })
   @Post('otp')
   async otp(@Body(new ZodPipe(otpBody)) b: z.infer<typeof otpBody>, @Res({ passthrough: true }) res: Response) {
-    const code = await this.auth.requestOtp(b.phone);
+    const { code, staff } = await this.auth.requestOtp(b.phone);
     const e = env();
-    if (e.DEV_OTP_ECHO === '1' && e.NODE_ENV !== 'production') {
+    // Yalnızca açıkça 'development' ortamında ve ekip (moderatör/yönetici) olmayan numaralarda; ekip kodu sunucu kaydına düşer.
+    if (e.DEV_OTP_ECHO === '1' && e.NODE_ENV === 'development' && !staff) {
       res.status(200);
       return { devCode: code };
     }

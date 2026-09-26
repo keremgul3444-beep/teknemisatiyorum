@@ -16,9 +16,10 @@ export class ListingsService {
   constructor(private readonly prisma: PrismaService, private readonly fx: FxService) {}
 
   /** Sahibi değilse yalnızca yayındaki (ve satılmış) ilanlar görünür; aksi halde 404 (varlığı da sızdırılmaz). */
-  async getVisible(id: string, viewerId?: string) {
+  async getVisible(id: string, viewerId?: string, staff = false) {
     const l = await this.prisma.listing.findUnique({ where: { id }, include: listingInclude });
-    if (!l || (l.ownerId !== viewerId && !['published', 'sold'].includes(l.status))) throw Errors.notFound();
+    // Moderasyon için ekip her durumdaki ilanı görür; diğerleri yalnızca yayındaki/satılmış ilanları.
+    if (!l || (l.ownerId !== viewerId && !staff && !['published', 'sold'].includes(l.status))) throw Errors.notFound();
     return l;
   }
 

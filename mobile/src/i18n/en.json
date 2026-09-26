@@ -789,7 +789,19 @@
     "who": "Who",
     "what": "What",
     "when": "When",
-    "refundSample": "Canvas sewing (cancelled)"
+    "refundSample": "Canvas sewing (cancelled)",
+    "openListing": "Open listing",
+    "openDoc": "Document {{n}}",
+    "detail": {
+      "passport": "Passport no",
+      "nationality": "Nationality",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "birthYear": "Birth year"
+    },
+    "reportScore": "Report score",
+    "reportComplete": "Complete report",
+    "reportDone": "Report done · {{score}}/100"
   },
   "audit": {
     "listingApproved": "Listing approved: {{title}}",

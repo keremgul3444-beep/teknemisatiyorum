@@ -51,7 +51,11 @@ export interface ExpertisePackage { id: string; name: string; priceTRY: number; 
 export interface BrokerCase { id: string; boatName: string; step: 0 | 1 | 2 | 3 | 4; askingEUR: number; createdAt: string }
 export interface Company { id: string; name: string; kind: 'galeri' | 'broker' | 'tersane' | 'servis'; city: string; staff: string[]; listingIds: string[] }
 export type AdminStatus = 'bekliyor' | 'onaylandi' | 'reddedildi';
-export interface AdminItem { id: string; kind: 'ilan' | 'belge'; title: string; who: string; status: AdminStatus; refId?: string }
+export interface AdminItem {
+  id: string; kind: 'ilan' | 'belge'; title: string; who: string; status: AdminStatus; refId?: string;
+  /** Gerçek modda moderatörün görmesi gerekenler: ilan fotoğrafları, korumalı belge kimlikleri, pasaport bilgileri. */
+  photos?: string[]; fileIds?: string[]; details?: Record<string, unknown> | null;
+}
 /** İşlem kaydı dile bağlı metin değil, çeviri anahtarı + parametre taşır. */
 export interface AuditEntry { id: string; at: string; who: string; key: string; params?: Record<string, string> }
 export interface Seller { id: string; name: string; since: number; companyId?: string; companyName?: string | null }

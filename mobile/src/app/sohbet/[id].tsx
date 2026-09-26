@@ -7,6 +7,7 @@ import { colors, fonts, radius, space } from '@/theme';
 import { Button, Header, Icon, NotFound, T } from '@/components';
 import { actions, useConversation, type SubjectKind } from '@/services';
 import { attempt } from '@/services/errors';
+import { usePolling } from '@/services/usePolling';
 
 const SUBJECT_ROUTE: Record<SubjectKind, (id: string) => string> = {
   ilan: (id) => `/ilan/${id}`, is: (id) => `/is/${id}`, kaptan: (id) => `/kaptan/${id}`, broker: (id) => `/broker/${id}`,
@@ -21,6 +22,8 @@ export default function Sohbet() {
   const scroll = useRef<ScrollView>(null);
 
   useEffect(() => { if (id) attempt(() => actions.openConversation(id)); }, [id]);
+  // Gerçek modda karşı tarafın yeni mesajları ~5 sn içinde gelir (anlık bildirim altyapısı sonraki dalgada).
+  usePolling(async () => { if (id) await actions.openConversation(id); }, 5000);
   useEffect(() => { setTimeout(() => scroll.current?.scrollToEnd({ animated: true }), 50); }, [c?.messages.length]);
   if (!c) return <NotFound />;
 

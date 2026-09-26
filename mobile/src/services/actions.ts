@@ -1,7 +1,7 @@
-import { Platform } from 'react-native';
+import { Linking, Platform } from 'react-native';
 import { matchListings, parseQuery, parsedQuerySchema, type Criterion, type ParsedQuery } from '@tms/shared';
 import { useStore } from './store';
-import { isApiMode } from './mode';
+import { absolute, isApiMode } from './mode';
 import { api } from './api/instance';
 import { applyUser, syncAdmin, syncAll, syncListings, syncMine } from './api/sync';
 import { toBoat, toListing, toThread, type ApiBoat, type ApiListing, type ApiThread, type ApiUser } from './api/mappers';
@@ -186,6 +186,30 @@ export const actions = {
     if (!isApiMode()) return g().advanceBroker(id);
     await api.post(`/admin/broker/${id}/advance`);
     await syncMine();
+  },
+
+  /** Korumalı belgeyi (kimlik, ruhsat) 5 dakikalık imzalı bağlantıyla açar — yalnızca sahibi ya da ekip. */
+  async openDocument(fileId: string) {
+    const r = await api.get<{ url: string }>(`/media/${fileId}/signed`);
+    await Linking.openURL(absolute(r.url));
+  },
+  async adminBrokerCases() {
+    return api.get<{ id: string; boatName: string; step: number; askingPrice: number; currency: string; userName: string | null }[]>('/admin/broker');
+  },
+  async adminExpertise() {
+    return api.get<{ id: string; date: string; slot: string; reportStatus: string; score: number | null; packageName: string | null; userName: string | null }[]>('/admin/expertise');
+  },
+  async adminAdvanceBroker(id: string) {
+    await api.post(`/admin/broker/${id}/advance`);
+  },
+  async adminReport(id: string, score: number) {
+    await api.post(`/admin/expertise/${id}/report`, { score });
+  },
+  async sessions() {
+    return api.get<{ id: string; deviceName: string; lastSeenAt: string; current: boolean }[]>('/auth/sessions');
+  },
+  async revokeSession(id: string) {
+    await api.del(`/auth/sessions/${id}`);
   },
 
   // ——— Yalnızca demo (2. dalga: usta, kaptan, ödeme) ———

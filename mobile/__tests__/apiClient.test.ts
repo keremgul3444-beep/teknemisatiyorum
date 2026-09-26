@@ -69,3 +69,18 @@ test('ağ hatası anlaşılır hataya çevrilir', async () => {
   const { api } = setup(() => { throw new TypeError('Network request failed'); });
   await expect(api.get('/x')).rejects.toMatchObject({ code: 'NETWORK' });
 });
+
+test('I-1: toplu isteklerde yenileme başarısızsa çıkış yalnızca bir kez yapılır', async () => {
+  const { api, onLoggedOut } = setup(() => ({ status: 401, body: { code: 'UNAUTHENTICATED' } }));
+  await Promise.allSettled(Array.from({ length: 7 }, (_, i) => api.get(`/x${i}`)));
+  expect(onLoggedOut).toHaveBeenCalledTimes(1);
+});
+
+test('I-1: oturum uç noktaları (çıkış, cihazlar) da süresi dolunca yenilenir', async () => {
+  const { api, calls } = setup((url, init) => {
+    if (url.endsWith('/auth/refresh')) return { status: 200, body: { accessToken: 'A2', refreshToken: 'R2' } };
+    return auth(init) === 'Bearer A2' ? { status: 204 } : { status: 401 };
+  });
+  await api.post('/auth/logout');
+  expect(calls.map((c) => c.url)).toEqual(['http://api/auth/logout', 'http://api/auth/refresh', 'http://api/auth/logout']);
+});

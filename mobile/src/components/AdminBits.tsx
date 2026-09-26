@@ -1,6 +1,7 @@
 import { ReactNode, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { Image, Pressable, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { router } from 'expo-router';
 import { colors, fonts, radius, space } from '@/theme';
 import type { AdminItem, AdminStatus } from '@/services';
 import { Button } from './Button';
@@ -23,7 +24,7 @@ export function StatusPill({ status }: { status: AdminStatus }) {
 }
 
 /** Onay kuyruğu satırı: onayla ya da gerekçe seçerek reddet. */
-export function ApprovalRow({ item, onDecide }: { item: AdminItem; onDecide: (s: AdminStatus) => void }) {
+export function ApprovalRow({ item, onDecide, onOpenFile }: { item: AdminItem; onDecide: (s: AdminStatus) => void; onOpenFile?: (fileId: string) => void }) {
   const { t } = useTranslation();
   const [rejecting, setRejecting] = useState(false);
   return (
@@ -34,6 +35,26 @@ export function ApprovalRow({ item, onDecide }: { item: AdminItem; onDecide: (s:
           <T variant="caption" color={colors.muted}>{t('admin.by', { who: item.who })}</T>
         </View>
         <StatusPill status={item.status} />
+      </View>
+      {item.photos?.length ? (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space(2) }}>
+          {item.photos.map((u) => <Image key={u} source={{ uri: u }} style={{ width: 96, height: 72, borderRadius: radius.sm }} />)}
+        </ScrollView>
+      ) : null}
+      {item.details ? (
+        <View style={{ gap: space(0.5) }}>
+          {Object.entries(item.details).map(([k, v]) => (
+            <T key={k} variant="caption" color={colors.muted}>{t(`admin.detail.${k}`, { defaultValue: k })}: {String(v)}</T>
+          ))}
+        </View>
+      ) : null}
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space(2) }}>
+        {item.kind === 'ilan' && item.refId && item.photos ? (
+          <Pressable onPress={() => router.push(`/ilan/${item.refId}`)}><T variant="caption" color={colors.primary}>{t('admin.openListing')} →</T></Pressable>
+        ) : null}
+        {(item.fileIds ?? []).map((f, i) => (
+          <Pressable key={f} onPress={() => onOpenFile?.(f)}><T variant="caption" color={colors.primary}>{t('admin.openDoc', { n: i + 1 })} →</T></Pressable>
+        ))}
       </View>
       {item.status === 'bekliyor' ? (
         rejecting ? (

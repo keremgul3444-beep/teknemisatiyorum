@@ -51,7 +51,12 @@ export class VerificationController {
       return userView(user);
     }
     await this.media.assertOwnPrivate(u.id, [b.fileId]);
-    await this.prisma.verificationRequest.create({ data: { userId: u.id, kind: 'identity', fileIds: [b.fileId] } });
+    await this.prisma.verificationRequest.create({
+      data: {
+        userId: u.id, kind: 'identity', fileIds: [b.fileId],
+        details: { passport: b.passport, nationality: b.nationality, firstName: b.firstName, lastName: b.lastName, birthYear: b.birthYear },
+      },
+    });
     return userView(await this.prisma.user.update({ where: { id: u.id }, data: { name: `${b.firstName} ${b.lastName}` } }));
   }
 

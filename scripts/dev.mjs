@@ -20,7 +20,11 @@ if (!fs.existsSync(ENV_FILE)) {
   const example = fs.readFileSync(path.join(API, '.env.example'), 'utf8');
   fs.writeFileSync(ENV_FILE, example
     .replace(/^JWT_SECRET=.*$/m, `JWT_SECRET=${crypto.randomBytes(48).toString('base64')}`)
-    .replace(/^ID_ENC_KEY=.*$/m, `ID_ENC_KEY=${crypto.randomBytes(32).toString('base64')}`));
+    .replace(/^ID_ENC_KEY=.*$/m, `ID_ENC_KEY=${crypto.randomBytes(32).toString('base64')}`)
+    // Yalnızca bu bilgisayar: geliştirme ortamı, SMS yokken kod uygulamada görünür, yerel IP sınırı yükseltilir.
+    .replace(/^NODE_ENV=.*$/m, 'NODE_ENV=development')
+    .replace(/^DEV_OTP_ECHO=.*$/m, 'DEV_OTP_ECHO=1')
+    .replace(/^OTP_IP_LIMIT=.*$/m, 'OTP_IP_LIMIT=200'));
   console.log('api/.env oluşturuldu (rastgele gizli anahtarlarla).');
 }
 

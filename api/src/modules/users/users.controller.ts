@@ -5,6 +5,7 @@ import { ZodPipe } from '../../common/zod.pipe';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/audit.service';
 import { userView } from './user.view';
+import { MediaService } from '../media/media.service';
 
 const patchBody = z.object({
   name: z.string().trim().min(1).max(80).optional(),
@@ -14,7 +15,7 @@ const patchBody = z.object({
 
 @Controller('me')
 export class UsersController {
-  constructor(private readonly prisma: PrismaService, private readonly audit: AuditService) {}
+  constructor(private readonly prisma: PrismaService, private readonly audit: AuditService, private readonly media: MediaService) {}
 
   @Auth()
   @Get()
@@ -44,6 +45,7 @@ export class UsersController {
       }),
       this.prisma.session.updateMany({ where: { userId: u.id, revokedAt: null }, data: { revokedAt: now } }),
     ]);
+    await this.media.purgePrivate(u.id);
     await this.audit.log(u.id, 'audit.accountDeleted', {}, 'user', u.id);
   }
 }

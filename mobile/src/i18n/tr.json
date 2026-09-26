@@ -789,7 +789,19 @@
     "who": "Kim",
     "what": "Ne",
     "when": "Ne zaman",
-    "refundSample": "Branda dikimi (iptal)"
+    "refundSample": "Branda dikimi (iptal)",
+    "openListing": "İlanı aç",
+    "openDoc": "Belge {{n}}",
+    "detail": {
+      "passport": "Pasaport no",
+      "nationality": "Uyruk",
+      "firstName": "Ad",
+      "lastName": "Soyad",
+      "birthYear": "Doğum yılı"
+    },
+    "reportScore": "Rapor puanı",
+    "reportComplete": "Raporu tamamla",
+    "reportDone": "Rapor tamamlandı · {{score}}/100"
   },
   "audit": {
     "listingApproved": "İlan onaylandı: {{title}}",

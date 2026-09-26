@@ -21,10 +21,14 @@ interface Options {
   onLevelRequired: (level: number) => void;
 }
 
+/** Yalnızca giriş akışının kendi uç noktaları yenilemeye girmez; çıkış ve cihazlar gibi oturum uç noktaları girer. */
+const NO_REFRESH = ['/auth/otp', '/auth/verify', '/auth/refresh'];
+
 /**
  * Giriş anahtarını ekleyen istemci. 401'de **bir kez** yenileme dener ve isteği tekrarlar;
  * eşzamanlı 401'ler tek yenileme isteğini paylaşır; yenileme de başarısızsa oturumu kapatır (döngü yok).
  */
+
 export function createApiClient(o: Options) {
   const fetchFn = o.fetchFn ?? fetch;
   let refreshing: Promise<boolean> | null = null;
@@ -40,28 +44,34 @@ export function createApiClient(o: Options) {
     }
   }
 
-  async function refresh(): Promise<boolean> {
+  /**
+   * Tek uçuşlu yenileme: eşzamanlı 401'ler aynı sözü paylaşır. Yenileme reddedilirse oturum kapatma da
+   * bu sözün içinde bir kez yapılır (toplu isteklerde N kez giriş ekranı açılmaz).
+   * Sunucu hatası (5xx) oturumu kapatmaz; yalnızca yenileme anahtarı reddedilirse kapanır.
+   */
+  async function refreshOrLogout(): Promise<boolean> {
     refreshing ??= (async () => {
       const { refresh: r } = await o.tokens.get();
       if (!r) return false;
       const res = await raw('/auth/refresh', { method: 'POST', body: JSON.stringify({ refreshToken: r }) }, null);
-      if (!res.ok) return false;
-      const body = await res.json();
-      await o.tokens.set(body.accessToken, body.refreshToken);
-      return true;
+      if (res.ok) {
+        const body = await res.json();
+        await o.tokens.set(body.accessToken, body.refreshToken);
+        return true;
+      }
+      if (res.status === 401 || res.status === 400) {
+        await o.tokens.clear();
+        o.onLoggedOut();
+      }
+      return false;
     })().finally(() => { refreshing = null; });
     return refreshing;
   }
 
   async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     let res = await raw(path, init, (await o.tokens.get()).access);
-    if (res.status === 401 && !path.startsWith('/auth/')) {
-      const had = (await o.tokens.get()).refresh;
-      if (had && await refresh()) res = await raw(path, init, (await o.tokens.get()).access);
-      else if (had) {
-        await o.tokens.clear();
-        o.onLoggedOut();
-      }
+    if (res.status === 401 && !NO_REFRESH.includes(path)) {
+      if ((await o.tokens.get()).refresh && await refreshOrLogout()) res = await raw(path, init, (await o.tokens.get()).access);
     }
     if (res.status === 204) return undefined as T;
     const body = await res.json().catch(() => ({}));

@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Query } from '@nestjs/common';
-import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { BOAT_TYPES, CURRENCIES, EQUIPMENT, parsedQuerySchema } from '@tms/shared';
 import { Auth, CurrentUser, OptionalUser, Public, type AuthUser } from '../../common/decorators';
@@ -28,7 +27,8 @@ const draftSchema = z.object({
   boatId: z.string().optional(),
 });
 const patchSchema = draftSchema.partial();
-const photosSchema = z.object({ fileIds: z.array(z.string().min(1)).min(1) });
+const photosSchema = z.object({ fileIds: z.array(z.string().min(1)).min(1).transform((a) => [...new Set(a)]) });
+const mineQuery = z.object({ status: z.enum(['draft', 'pending', 'published', 'rejected', 'sold', 'removed']).optional() });
 const searchQuery = z.object({
   q: z.string().max(2000).optional().transform((s, ctx) => {
     if (!s) return { equipment: [] };
@@ -62,14 +62,15 @@ export class ListingsController {
   @Public()
   @Get('listings/:id')
   async get(@OptionalUser() u: AuthUser | undefined, @Param('id') id: string) {
-    return this.listings.view(await this.listings.getVisible(id, u?.id), u?.id);
+    const staff = !!u?.roles.some((r) => r === 'admin' || r === 'moderator');
+    return this.listings.view(await this.listings.getVisible(id, u?.id, staff), u?.id);
   }
 
   @Auth()
   @Get('me/listings')
-  async mine(@CurrentUser() u: AuthUser, @Query('status') status?: string) {
+  async mine(@CurrentUser() u: AuthUser, @Query(new ZodPipe(mineQuery)) q: z.infer<typeof mineQuery>) {
     const rows = await this.prisma.listing.findMany({
-      where: { ownerId: u.id, status: status ? (status as Prisma.ListingWhereInput['status']) : { not: 'removed' } },
+      where: { ownerId: u.id, status: q.status ?? { not: 'removed' } },
       include: listingInclude, orderBy: { updatedAt: 'desc' },
     });
     return Promise.all(rows.map((l) => this.listings.view(l, u.id)));
@@ -104,7 +105,10 @@ export class ListingsController {
     const l = await this.listings.getOwn(id, u.id);
     await this.media.assertOwnPublic(u.id, b.fileIds);
     if (l.photos.length + b.fileIds.length > MAX_PHOTOS) throw Errors.bad('TOO_MANY_PHOTOS', { max: MAX_PHOTOS });
-    await this.prisma.listingPhoto.createMany({ data: b.fileIds.map((fileId, i) => ({ listingId: id, fileId, order: l.photos.length + i })) });
+    const fresh = b.fileIds.filter((f) => !l.photos.some((p) => p.fileId === f));
+    await this.prisma.listingPhoto.createMany({ data: fresh.map((fileId, i) => ({ listingId: id, fileId, order: l.photos.length + i })) });
+    // Onaylanmış içerik denetimsiz değişmesin: yayındaki/reddedilmiş ilana fotoğraf eklenince yeniden onaya düşer.
+    if (fresh.length && (l.status === 'published' || l.status === 'rejected')) await this.prisma.listing.update({ where: { id }, data: { status: 'pending' } });
     return this.listings.view(await this.listings.getOwn(id, u.id), u.id);
   }
 

@@ -67,9 +67,9 @@ export const toBooking = (b: { id: string; packageId: string; listingId: string 
 export const toBroker = (c: { id: string; boatName: string; step: number; askingPrice: number; currency: Currency; createdAt: string }): BrokerCase =>
   ({ id: c.id, boatName: c.boatName, step: c.step as BrokerCase['step'], askingEUR: c.currency === 'EUR' ? c.askingPrice : 0, createdAt: c.createdAt.slice(0, 10) });
 
-export const toAdminListing = (x: { id: string; title: string; ownerName: string | null }): AdminItem =>
-  ({ id: `l:${x.id}`, kind: 'ilan', title: x.title, who: x.ownerName ?? '—', status: 'bekliyor', refId: x.id });
-export const toAdminVerification = (x: { id: string; kind: string; userName: string | null }): AdminItem =>
-  ({ id: `v:${x.id}`, kind: 'belge', title: x.kind, who: x.userName ?? '—', status: 'bekliyor', refId: x.id });
+export const toAdminListing = (x: { id: string; title: string; ownerName: string | null; photos?: string[] }): AdminItem =>
+  ({ id: `l:${x.id}`, kind: 'ilan', title: x.title, who: x.ownerName ?? '—', status: 'bekliyor', refId: x.id, photos: (x.photos ?? []).map(absolute) });
+export const toAdminVerification = (x: { id: string; kind: string; userName: string | null; fileIds?: string[]; details?: Record<string, unknown> | null }): AdminItem =>
+  ({ id: `v:${x.id}`, kind: 'belge', title: x.kind, who: x.userName ?? '—', status: 'bekliyor', refId: x.id, fileIds: x.fileIds ?? [], details: x.details ?? null });
 export const toAudit = (a: { id: string; at: string; actorId: string | null; action: string; params: Record<string, string> | null }): AuditEntry =>
   ({ id: a.id, at: a.at.slice(0, 16).replace('T', ' '), who: a.actorId ?? '—', key: a.action, params: a.params ?? undefined });

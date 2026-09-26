@@ -1,3 +1,4 @@
+import { demoOnly } from '@/components/DemoOnly';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -5,7 +6,7 @@ import { colors, radius, space } from '@/theme';
 import { Avatar, BoatImage, Button, Card, Header, Icon, ListingCard, Screen, Section, T, showDemoToast } from '@/components';
 import { useCompanies, useListings } from '@/services';
 
-export default function KurumsalPanel() {
+function KurumsalPanel() {
   const { t } = useTranslation();
   const company = useCompanies()[0];
   const all = useListings();
@@ -55,3 +56,6 @@ export default function KurumsalPanel() {
     </Screen>
   );
 }
+
+// Kurumsal panel 2. dalgada; gerçek modda "yakında" ekranına yönlenir.
+export default demoOnly(KurumsalPanel);

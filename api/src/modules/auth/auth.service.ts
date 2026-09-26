@@ -36,19 +36,23 @@ export class AuthService {
       data: { phone, codeHash: await argon2.hash(code), expiresAt: new Date(now.getTime() + OTP_TTL_MS), createdAt: now },
     });
     await this.sms.sendOtp(phone, code);
-    return code;
+    const user = await this.prisma.user.findUnique({ where: { phone }, select: { roles: true } });
+    const staff = !!user?.roles.some((r) => r === 'admin' || r === 'moderator');
+    return { code, staff };
   }
 
   async verifyOtp(phone: string, code: string, deviceName: string) {
     const now = this.clock.now();
     const otp = await this.prisma.otpCode.findFirst({ where: { phone, consumedAt: null }, orderBy: { createdAt: 'desc' } });
     if (!otp) throw otpError('OTP_INVALID');
-    if (otp.attempts >= OTP_MAX_ATTEMPTS) throw otpError('OTP_LOCKED');
     if (otp.expiresAt <= now) throw otpError('OTP_EXPIRED');
-    if (!(await argon2.verify(otp.codeHash, code))) {
-      await this.prisma.otpCode.update({ where: { id: otp.id }, data: { attempts: { increment: 1 } } });
-      throw otpError('OTP_INVALID');
-    }
+    // Deneme hakkı doğrulamadan ÖNCE atomik olarak düşülür: eşzamanlı tahminler 5 sınırını aşamaz.
+    const slot = await this.prisma.otpCode.updateMany({
+      where: { id: otp.id, consumedAt: null, attempts: { lt: OTP_MAX_ATTEMPTS } },
+      data: { attempts: { increment: 1 } },
+    });
+    if (slot.count !== 1) throw otpError('OTP_LOCKED');
+    if (!(await argon2.verify(otp.codeHash, code))) throw otpError('OTP_INVALID');
     // Atomik tüketim: aynı kodla eşzamanlı iki istekten yalnızca biri geçer.
     const consumed = await this.prisma.otpCode.updateMany({ where: { id: otp.id, consumedAt: null }, data: { consumedAt: now } });
     if (consumed.count !== 1) throw otpError('OTP_INVALID');

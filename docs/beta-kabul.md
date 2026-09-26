@@ -1,6 +1,6 @@
 # Kapalı beta kabul testi
 
-Çalıştırma: 2026-09-26 14:42 · Betik: `mobile/scripts/beta-acceptance.mjs` · Gerçek sunucu (npm run dev) · Chrome 390×844
+Çalıştırma: 2026-09-26 15:20 · Betik: `mobile/scripts/beta-acceptance.mjs` · Gerçek sunucu (npm run dev) · Chrome 390×844
 
 ## ✓ 1. Telefonla giriş (kod SMS yerine uygulamaya gelir) — geçti
 
