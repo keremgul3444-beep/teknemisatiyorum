@@ -25,6 +25,7 @@ const draftSchema = z.object({
   engine: z.string().trim().max(80).default(''),
   description: z.string().trim().max(4000).default(''),
   companyId: z.string().optional(),
+  boatId: z.string().optional(),
 });
 const patchSchema = draftSchema.partial();
 const photosSchema = z.object({ fileIds: z.array(z.string().min(1)).min(1) });
@@ -79,6 +80,7 @@ export class ListingsController {
   @Post('listings')
   async create(@CurrentUser() u: AuthUser, @Body(new ZodPipe(draftSchema)) b: z.infer<typeof draftSchema>) {
     if (b.companyId) await this.assertMember(u.id, b.companyId);
+    if (b.boatId) await this.assertOwnBoat(u.id, b.boatId);
     const l = await this.prisma.listing.create({ data: { ...b, ownerId: u.id, status: 'draft', badges: [] }, include: listingInclude });
     return this.listings.view(l, u.id);
   }
@@ -89,6 +91,7 @@ export class ListingsController {
     const l = await this.listings.getOwn(id, u.id);
     if (['sold', 'removed'].includes(l.status)) throw Errors.conflict('LISTING_CLOSED');
     if (b.companyId) await this.assertMember(u.id, b.companyId);
+    if (b.boatId) await this.assertOwnBoat(u.id, b.boatId);
     // Yayındaki ya da reddedilmiş ilan düzenlenirse yeniden onaya düşer.
     const status = l.status === 'published' || l.status === 'rejected' ? 'pending' : l.status;
     const updated = await this.prisma.listing.update({ where: { id }, data: { ...b, status }, include: listingInclude });
@@ -156,6 +159,10 @@ export class ListingsController {
       where: { favorites: { some: { userId: u.id } }, status: { in: ['published', 'sold'] } }, include: listingInclude,
     });
     return Promise.all(rows.map((l) => this.listings.view(l, u.id)));
+  }
+
+  private async assertOwnBoat(userId: string, boatId: string) {
+    if (!(await this.prisma.boat.count({ where: { id: boatId, ownerId: userId } }))) throw Errors.notFound();
   }
 
   private async assertMember(userId: string, companyId: string) {

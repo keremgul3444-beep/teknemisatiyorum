@@ -159,6 +159,9 @@ model Listing {
   ownerId      String
   owner        User           @relation(fields: [ownerId], references: [id])
   companyId    String?
+  /// İlanın bağlı olduğu tekne; ilan sayfasında bu teknenin karne özeti gösterilir.
+  boatId       String?
+  boat         Boat?          @relation(fields: [boatId], references: [id])
   brand        String
   model        String
   year         Int
@@ -223,6 +226,7 @@ model Boat {
   lengthM   Float
   createdAt DateTime       @default(now())
   entries   LogbookEntry[]
+  listings  Listing[]
 }
 
 model LogbookEntry {

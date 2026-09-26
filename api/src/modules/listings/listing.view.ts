@@ -1,10 +1,16 @@
-import type { Listing, ListingPhoto, User } from '@prisma/client';
+import type { Listing, ListingPhoto, LogbookEntry, User } from '@prisma/client';
+import { entryView } from '../boats/logbook.service';
 import { env } from '../../config/env';
 
-export type ListingRow = Listing & { photos: ListingPhoto[]; owner: Pick<User, 'id' | 'name' | 'createdAt' | 'deletedAt'> };
+export type ListingRow = Listing & {
+  photos: ListingPhoto[];
+  owner: Pick<User, 'id' | 'name' | 'createdAt' | 'deletedAt'>;
+  boat: { id: string; entries: LogbookEntry[]; _count: { entries: number } } | null;
+};
 export const listingInclude = {
   photos: { orderBy: { order: 'asc' as const } },
   owner: { select: { id: true, name: true, createdAt: true, deletedAt: true } },
+  boat: { select: { id: true, _count: { select: { entries: true } }, entries: { orderBy: { date: 'desc' as const }, take: 2 } } },
 };
 
 /** İstemciye dönen ilan görünümü. Satıcının iletişim bilgisi bilerek yoktur; iletişim uygulama içi mesajla. */
@@ -22,6 +28,8 @@ export function listingView(l: ListingRow, viewerId?: string, companyName?: stri
       since: l.owner.createdAt.getFullYear(),
       companyName: companyName ?? null,
     },
+    /** Bağlı teknenin karne özeti: kayıt sayısı ve en yeni iki kayıt. */
+    logbook: l.boat ? { count: l.boat._count.entries, latest: l.boat.entries.map(entryView), boatId: viewerId === l.ownerId ? l.boat.id : undefined } : null,
     isMine: !!viewerId && viewerId === l.ownerId,
     createdAt: l.createdAt, publishedAt: l.publishedAt,
   };

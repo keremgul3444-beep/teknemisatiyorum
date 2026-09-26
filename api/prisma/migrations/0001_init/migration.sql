@@ -124,6 +124,7 @@ CREATE TABLE "Listing" (
     "id" TEXT NOT NULL,
     "ownerId" TEXT NOT NULL,
     "companyId" TEXT,
+    "boatId" TEXT,
     "brand" TEXT NOT NULL,
     "model" TEXT NOT NULL,
     "year" INTEGER NOT NULL,
@@ -372,6 +373,9 @@ ALTER TABLE "CompanyMember" ADD CONSTRAINT "CompanyMember_companyId_fkey" FOREIG
 
 -- AddForeignKey
 ALTER TABLE "Listing" ADD CONSTRAINT "Listing_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Listing" ADD CONSTRAINT "Listing_boatId_fkey" FOREIGN KEY ("boatId") REFERENCES "Boat"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ListingPhoto" ADD CONSTRAINT "ListingPhoto_listingId_fkey" FOREIGN KEY ("listingId") REFERENCES "Listing"("id") ON DELETE CASCADE ON UPDATE CASCADE;
