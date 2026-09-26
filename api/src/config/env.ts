@@ -11,7 +11,8 @@ const schema = z.object({
   LLM_MODEL: z.string().default('claude-haiku-4-5'),
   CORS_ORIGINS: z.string().default('http://localhost:8081'),
   STORAGE_DIR: z.string().default('storage'),
-  PUBLIC_URL: z.string().default('http://localhost:3000'),
+  /** Boşsa medya bağlantıları göreli döner (önerilen); yalnızca farklı bir alan adından sunulacaksa doldurulur. */
+  PUBLIC_URL: z.string().default(''),
   /** IP başına saatlik giriş kodu isteği sınırı. */
   OTP_IP_LIMIT: z.coerce.number().default(10),
 });

@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "tsx watch src/main.ts",
-    "start": "tsx src/main.ts",
+    "build": "npm run build -w @tms/shared && tsc -p tsconfig.json",
+    "dev": "npm run build && npm run start",
+    "start": "node --env-file=.env dist/src/main.js",
     "db": "tsx scripts/db.ts",
     "test": "jest --runInBand",
     "typecheck": "tsc --noEmit",

@@ -68,6 +68,7 @@ describe('fotoğraflar ve onaya gönderme', () => {
     const ids = [await photo(a.auth), await photo(a.auth)];
     const p = await t.http().post(`/listings/${c.body.id}/photos`).set(a.auth).send({ fileIds: ids });
     expect(p.body.photos).toHaveLength(2);
+    expect(p.body.photos[0].url).toBe(`/media/${ids[0]}`);
     const s = await t.http().post(`/listings/${c.body.id}/submit`).set(a.auth);
     expect(s.status).toBe(200);
     expect(s.body.status).toBe('pending');

@@ -92,7 +92,9 @@ describe('dosyalar', () => {
     expect((await t.http().get(`/media/${f.body.id}/signed`).set(b.auth)).status).toBe(404);
     const s = await t.http().get(`/media/${f.body.id}/signed`).set(a.auth);
     expect(s.status).toBe(200);
-    const path = new URL(s.body.url).pathname + new URL(s.body.url).search;
+    // Bağlantılar göreli döner: istemci kendi sunucu adresinin önüne ekler (tünel/proxy arkasında da çalışsın).
+    expect(s.body.url).toMatch(/^\/media\//);
+    const path = s.body.url as string;
     expect((await t.http().get(path)).status).toBe(200);
     expect((await t.http().get(path.replace(/sig=[^&]+/, 'sig=bozuk'))).status).toBe(404);
   });

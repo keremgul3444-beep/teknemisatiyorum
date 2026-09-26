@@ -20,6 +20,7 @@ import { MessagesModule } from './modules/messages/messages.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { ServicesModule } from './modules/services/services.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { BackupScheduler } from './backup/backup';
 
 @Controller('health')
 class HealthController {
@@ -50,6 +51,7 @@ class HealthController {
   providers: [
     PrismaService,
     AuditService,
+    BackupScheduler,
     DevSmsSender,
     { provide: SMS_SENDER, useExisting: DevSmsSender },
     { provide: CLOCK, useValue: systemClock },

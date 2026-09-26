@@ -7,7 +7,9 @@ import { env } from './config/env';
 
 /** Uygulamayı ortak ayarlarla yapılandırır; testler de aynı fonksiyonu kullanır. */
 export function configureApp(app: INestApplication) {
-  app.use(helmet());
+  // Geliştirmede istekler Metro proxy'sinden (127.0.0.1) gelir; gerçek istemci IP'si X-Forwarded-For'dan okunur.
+  (app.getHttpAdapter().getInstance() as { set(k: string, v: unknown): void }).set('trust proxy', 'loopback');
+  app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
   app.enableCors({ origin: env().CORS_ORIGINS.split(',').map((s) => s.trim()), credentials: false });
   return app;
 }

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { execFileSync } from 'child_process';
+import { execFileSync, spawnSync } from 'child_process';
 
 export interface RunningDb { url: string; stop(): Promise<void> }
 
@@ -31,19 +31,33 @@ export async function startDb({ port, dataDir }: { port: number; dataDir: string
     execFileSync(bin('initdb'), ['-D', dataDir, '-U', 'postgres', '-A', 'trust', '--locale=C', '--encoding=UTF8'], { stdio: 'ignore' });
   }
   const log = path.join(dataDir, 'server.log');
-  execFileSync(bin('pg_ctl'), ['start', '-w', '-D', dataDir, '-l', log, '-o', `-p ${port} -h 127.0.0.1`], { stdio: 'ignore' });
+  // Önceki oturumdan açık kalmışsa yeniden başlatmaya gerek yok.
+  const running = spawnSync(bin('pg_ctl'), ['status', '-D', dataDir], { stdio: 'ignore' }).status === 0;
+  if (!running) execFileSync(bin('pg_ctl'), ['start', '-w', '-D', dataDir, '-l', log, '-o', `-p ${port} -h 127.0.0.1`], { stdio: 'ignore' });
   return {
     url: `postgresql://postgres@127.0.0.1:${port}/postgres`,
     stop: async () => { execFileSync(bin('pg_ctl'), ['stop', '-w', '-m', 'fast', '-D', dataDir], { stdio: 'ignore' }); },
   };
 }
 
+/** Çalışan yerel sunucuyu durdurur (Windows'ta alt süreçlere sinyal güvenilir iletilmediği için ayrı komut). */
+export function stopDb(dataDir: string) {
+  if (fs.existsSync(path.join(dataDir, 'postmaster.pid'))) execFileSync(bin('pg_ctl'), ['stop', '-w', '-m', 'fast', '-D', dataDir], { stdio: 'ignore' });
+}
+
 if (require.main === module) {
   const dataDir = path.resolve(__dirname, '..', '.data', 'pg');
-  startDb({ port: Number(process.env.PG_PORT ?? 54329), dataDir }).then((db) => {
-    console.log(`PostgreSQL hazır: ${db.url}`);
-    const stop = () => db.stop().then(() => process.exit(0));
-    process.on('SIGINT', stop);
-    process.on('SIGTERM', stop);
-  });
+  if (process.argv.includes('--stop')) {
+    stopDb(dataDir);
+    console.log('PostgreSQL durduruldu.');
+  } else {
+    startDb({ port: Number(process.env.PG_PORT ?? 54329), dataDir }).then((db) => {
+      console.log(`PostgreSQL hazır: ${db.url}`);
+      const stop = () => db.stop().then(() => process.exit(0));
+      process.on('SIGINT', stop);
+      process.on('SIGTERM', stop);
+      // pg_ctl sunucuyu arka planda başlatır; bu süreç yaşam döngüsünü temsil etmek için açık kalır.
+      setInterval(() => undefined, 1 << 30);
+    });
+  }
 }

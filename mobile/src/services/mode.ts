@@ -1,7 +1,27 @@
+import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 import { create } from 'zustand';
 
-/** Sunucu adresi derleme ortamından gelir (`EXPO_PUBLIC_API_URL`); tanımlı değilse uygulama demo modunda açılır. */
-export const API_URL = process.env.EXPO_PUBLIC_API_URL ?? '';
+/**
+ * Sunucu adresi:
+ * - `EXPO_PUBLIC_API_URL` verilmişse o kullanılır (ayrı alan adındaki sunucu).
+ * - `EXPO_PUBLIC_API_PROXY=1` ise geliştirme sunucusunun kendi adresi + `/api` (metro.config.js proxy'si; tünelde de çalışır).
+ * - İkisi de yoksa uygulama demo modunda açılır.
+ */
+function resolveApiUrl(): string {
+  if (process.env.EXPO_PUBLIC_API_URL) return process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '');
+  if (process.env.EXPO_PUBLIC_API_PROXY !== '1') return '';
+  if (Platform.OS === 'web' && typeof window !== 'undefined') return `${window.location.origin}/api`;
+  const host = Constants.expoConfig?.hostUri;
+  if (!host) return '';
+  const secure = !/^(\d+\.){3}\d+(:\d+)?$|^localhost/.test(host);
+  return `${secure ? 'https' : 'http'}://${host}/api`;
+}
+
+export const API_URL = resolveApiUrl();
+
+/** Sunucunun döndürdüğü göreli bağlantıyı (ör. /media/…) tam adrese çevirir. */
+export const absolute = (url: string) => (url.startsWith('/') ? `${API_URL}${url}` : url);
 
 export type Mode = 'demo' | 'api';
 

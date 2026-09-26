@@ -89,7 +89,7 @@ export async function runSeed(prisma: PrismaClient) {
 
 if (require.main === module) {
   const prisma = new PrismaClient();
-  runSeed(prisma)
-    .then(() => console.log('Başlangıç verisi yüklendi.'))
+  prisma.listing.count()
+    .then((n) => (n ? console.log('Veritabanında ilan var; başlangıç verisi atlandı.') : runSeed(prisma).then(() => console.log('Başlangıç verisi yüklendi.'))))
     .finally(() => prisma.$disconnect());
 }
