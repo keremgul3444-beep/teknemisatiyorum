@@ -11,6 +11,8 @@ import { env } from './config/env';
 import { CLOCK, systemClock } from './common/clock';
 import { DevSmsSender, SMS_SENDER } from './adapters/sms';
 import { AuthModule } from './modules/auth/auth.module';
+import { UsersModule } from './modules/users/users.module';
+import { MediaModule } from './modules/media/media.module';
 
 @Controller('health')
 class HealthController {
@@ -27,6 +29,8 @@ class HealthController {
     JwtModule.registerAsync({ global: true, useFactory: () => ({ secret: env().JWT_SECRET, signOptions: { expiresIn: '15m' } }) }),
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 120 }]),
     AuthModule,
+    MediaModule,
+    UsersModule,
   ],
   controllers: [HealthController],
   providers: [
