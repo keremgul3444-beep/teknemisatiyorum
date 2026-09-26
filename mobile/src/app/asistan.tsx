@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next';
 import { colors, fonts, radius, space } from '@/theme';
 import { Button, Chip, EmptyState, Header, Icon, ListingCard, QueryChips, Screen, Section, T, showDemoToast } from '@/components';
 import { actions, useListings } from '@/services';
-import { parseQuery, isEmptyQuery } from '@/features/assistant/parse';
-import { matchListings } from '@/features/assistant/match';
-import { criterionLabel } from '@/features/assistant/chips';
+import { parseQuery, isEmptyQuery } from '@tms/shared';
+import { matchListings } from '@tms/shared';
+import { criterionLabel } from '@tms/shared';
 import { requireLevel } from '@/session/role';
 
 export default function Asistan() {

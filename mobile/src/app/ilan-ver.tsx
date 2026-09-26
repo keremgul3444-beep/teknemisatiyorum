@@ -7,7 +7,7 @@ import {
   BoatImage, Button, CheckRow, Chip, Field, Header, Icon, ListingCard, Screen, Section, Stepper, SuccessView, T, UploadBox,
 } from '@/components';
 import { actions, type BoatType, type Currency, type Equipment, type Listing } from '@/services';
-import { LOCATIONS } from '@/features/assistant/parse';
+import { LOCATIONS } from '@tms/shared';
 import { requireLevel } from '@/session/role';
 
 const TYPES: BoatType[] = ['motoryat', 'yelkenli', 'katamaran', 'gulet', 'surat', 'balikci'];

@@ -1,0 +1,9 @@
+{
+  "name": "teknemisatiyorum",
+  "private": true,
+  "workspaces": ["shared", "api", "mobile"],
+  "scripts": {
+    "test": "npm test -w shared && npm test -w api && npm test -w mobile",
+    "dev": "node scripts/dev.mjs"
+  }
+}

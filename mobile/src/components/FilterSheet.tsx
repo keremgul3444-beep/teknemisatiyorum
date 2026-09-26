@@ -3,7 +3,7 @@ import { Modal, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { colors, radius, space } from '@/theme';
 import type { BoatType, Currency, Equipment } from '@/services';
-import { LOCATIONS, type ParsedQuery } from '@/features/assistant/parse';
+import { LOCATIONS, type ParsedQuery } from '@tms/shared';
 import { T } from './T';
 import { Chip } from './Chip';
 import { Field } from './Field';

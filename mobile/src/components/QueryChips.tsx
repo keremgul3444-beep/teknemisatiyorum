@@ -2,8 +2,8 @@ import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { space } from '@/theme';
 import { currentLang } from '@/i18n';
-import { queryChips } from '@/features/assistant/chips';
-import type { ParsedQuery } from '@/features/assistant/parse';
+import { queryChips } from '@tms/shared';
+import type { ParsedQuery } from '@tms/shared';
 import { Chip } from './Chip';
 
 export function QueryChips({ query }: { query: ParsedQuery }) {

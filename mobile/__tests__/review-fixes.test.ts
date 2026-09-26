@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { parseQuery, LOCATIONS } from '@/features/assistant/parse';
-import { queryToText } from '@/features/assistant/chips';
+import { parseQuery, LOCATIONS } from '@tms/shared';
+import { queryToText } from '@tms/shared';
 import { useStore } from '@/services/store';
 
 // Bulgu 1: filtre ekranındaki sorgu, kaydedilip tekrar açıldığında aynı filtreye dönmeli.

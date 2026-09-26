@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { colors, fonts, radius, space } from '@/theme';
 import { Card, Icon, Screen, Section, T } from '@/components';
 import { useJobs } from '@/services';
-import { detectCategory } from '@/features/assistant/serviceCategory';
+import { detectCategory } from '@tms/shared';
 
 const CARDS = [
   { k: 'usta', icon: 'wrench', to: '/usta' },

@@ -1,8 +1,7 @@
-export type Currency = 'TRY' | 'EUR' | 'USD';
-export type BoatType = 'motoryat' | 'yelkenli' | 'gulet' | 'surat' | 'balikci' | 'katamaran';
-export type Equipment = 'jenerator' | 'branda' | 'klima' | 'radar' | 'otopilot' | 'bowThruster' | 'teak' | 'tender';
-export type BadgeKind = 'ekspertizli' | 'sahiplik' | 'broker';
-export type ListingStatus = 'yayinda' | 'onay-bekliyor' | 'satildi';
+import type { BadgeKind, BoatType, Currency, Equipment, ListingStatus, UstaCategory } from '@tms/shared';
+export type { BadgeKind, BoatType, Currency, Equipment, ListingStatus, UstaCategory } from '@tms/shared';
+export { USTA_CATEGORIES } from '@tms/shared';
+
 
 export interface Listing {
   id: string; brand: string; model: string; year: number; lengthM: number; price: number; currency: Currency;
@@ -12,8 +11,6 @@ export interface Listing {
 export type ListingDraft = Pick<Listing, 'brand' | 'model' | 'year' | 'lengthM' | 'price' | 'currency' | 'type' | 'location' | 'equipment' | 'cabins' | 'engine' | 'description'>;
 
 export type ProviderKind = 'usta' | 'kaptan' | 'eksper';
-export type UstaCategory = 'motor' | 'elektrik' | 'boya' | 'jelkot' | 'branda' | 'doseme' | 'elektronik' | 'yelken';
-export const USTA_CATEGORIES: UstaCategory[] = ['motor', 'elektrik', 'boya', 'jelkot', 'branda', 'doseme', 'elektronik', 'yelken'];
 
 export interface ProviderDoc { name: string; expires: string; verified: boolean }
 export interface Provider {

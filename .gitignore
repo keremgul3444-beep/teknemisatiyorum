@@ -4,3 +4,7 @@ dist/
 .expo/
 *.log
 .playwright-mcp/
+api/.env
+api/.data/
+api/storage/
+api/backups/

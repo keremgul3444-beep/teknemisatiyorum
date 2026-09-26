@@ -4,7 +4,7 @@ import type {
   AdminItem, AdminStatus, AuditEntry, Boat, BoatInput, BrokerCase, CaptainBooking, Company, Conversation, ExpertiseBooking,
   ExpertisePackage, Job, JobInput, Listing, ListingDraft, Provider, SavedSearch, Seller, SubjectKind,
 } from './types';
-import { makeListings } from '@/mocks/listings';
+import { makeListings } from '@tms/shared';
 import { makeProviders } from '@/mocks/providers';
 import { DEMO_USER, makeBoats, makeCompanies, makeConversations, makeExpertisePackages, makeSavedSearches, makeSellers } from '@/mocks/people';
 import { makeAdminItems, makeAudit, makeBrokerCases, makeJobs, makeOffers } from '@/mocks/jobs';

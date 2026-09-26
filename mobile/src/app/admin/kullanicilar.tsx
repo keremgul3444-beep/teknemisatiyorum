@@ -2,7 +2,7 @@ import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { colors, fonts, space } from '@/theme';
 import { AdminPage, Card, Icon, T } from '@/components';
-import { maskPhone } from '@/features/mask';
+import { maskPhone } from '@tms/shared';
 import { ADMIN_USERS } from '@/services';
 
 

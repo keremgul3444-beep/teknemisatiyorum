@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next';
 import { colors, space } from '@/theme';
 import { Button, Chip, EmptyState, FilterSheet, Header, ListingCard, MapPreview, QueryChips, Screen, Segmented, T, showDemoToast } from '@/components';
 import { actions, toTRY, useListings } from '@/services';
-import { matchListings } from '@/features/assistant/match';
-import { isEmptyQuery, type ParsedQuery } from '@/features/assistant/parse';
-import { queryToText } from '@/features/assistant/chips';
+import { matchListings } from '@tms/shared';
+import { isEmptyQuery, type ParsedQuery } from '@tms/shared';
+import { queryToText } from '@tms/shared';
 import { requireLevel } from '@/session/role';
 
 type Sort = 'new' | 'asc' | 'desc';

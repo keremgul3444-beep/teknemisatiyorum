@@ -1,10 +1,7 @@
-import type { BoatType, Currency, Equipment } from '@/services/types';
+import type { BoatType, Currency, Equipment, ParsedQuery } from '../filter';
 
-export interface ParsedQuery {
-  minLength?: number; maxLength?: number; minYear?: number; maxYear?: number;
-  minPrice?: number; maxPrice?: number; currency?: Currency;
-  equipment: Equipment[]; type?: BoatType; location?: string;
-}
+export type { ParsedQuery };
+
 
 export const LOCATIONS = ['Bodrum', 'Göcek', 'Marmaris', 'Fethiye', 'İstanbul', 'Çeşme', 'Didim', 'Antalya', 'Kaş'];
 
