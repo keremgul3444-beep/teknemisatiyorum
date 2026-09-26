@@ -18,6 +18,8 @@ import { AssistantModule } from './modules/assistant/assistant.module';
 import { BoatsModule } from './modules/boats/boats.module';
 import { MessagesModule } from './modules/messages/messages.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { ServicesModule } from './modules/services/services.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Controller('health')
 class HealthController {
@@ -41,6 +43,8 @@ class HealthController {
     NotificationsModule,
     BoatsModule,
     MessagesModule,
+    ServicesModule,
+    AdminModule,
   ],
   controllers: [HealthController],
   providers: [
