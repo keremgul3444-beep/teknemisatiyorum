@@ -14,6 +14,15 @@ const SHOTS = path.join(ROOT, 'docs', 'beta-shots');
 fs.mkdirSync(SHOTS, { recursive: true });
 const RUN = Date.now().toString().slice(-5);
 const BRAND = `Kabul${RUN}`;
+/** Her çalıştırmada yeni, algoritmik olarak geçerli T.C. numarası (numara tek hesaba bağlanır). */
+function randomTckn() {
+  const d = [1 + Math.floor(Math.random() * 9), ...Array.from({ length: 8 }, () => Math.floor(Math.random() * 10))];
+  const odd = d[0] + d[2] + d[4] + d[6] + d[8];
+  const even = d[1] + d[3] + d[5] + d[7];
+  d.push((((odd * 7 - even) % 10) + 10) % 10);
+  d.push(d.reduce((a, b) => a + b, 0) % 10);
+  return d.join('');
+}
 const PHONES = { seller: `532${RUN}01`.slice(0, 10), buyer: `533${RUN}02`.slice(0, 10), admin: '5000000000' };
 
 const photo = path.join(os.tmpdir(), `kabul-${RUN}.jpg`);
@@ -144,7 +153,7 @@ await criterion(2, 'Kimlik → fotoğraflı ilan → yönetici onayı → Keşfe
   await S.tab('Ekle');
   await S.click('İlan ver', true);
   await S.see('Kimliğini doğrula');
-  await S.fillPh('•••', '10000000146');
+  await S.fillPh('•••', randomTckn());
   await S.byLabel('Ad').fill('Deniz');
   await S.byLabel('Soyad').fill('Kabul');
   await S.byLabel('Doğum yılı').fill('1988');

@@ -71,7 +71,7 @@ export class ListingsController {
   async mine(@CurrentUser() u: AuthUser, @Query(new ZodPipe(mineQuery)) q: z.infer<typeof mineQuery>) {
     const rows = await this.prisma.listing.findMany({
       where: { ownerId: u.id, status: q.status ?? { not: 'removed' } },
-      include: listingInclude, orderBy: { updatedAt: 'desc' },
+      include: listingInclude, orderBy: { updatedAt: 'desc' }, take: 200,
     });
     return Promise.all(rows.map((l) => this.listings.view(l, u.id)));
   }

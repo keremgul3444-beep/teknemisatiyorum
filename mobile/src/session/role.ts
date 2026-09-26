@@ -5,20 +5,24 @@ import { DEMO_USER } from '@/mocks/people';
 
 export type VerifyLevel = 0 | 1 | 2 | 3;
 
+/** Kullanıcı tercihleri; gerçek modda sunucuda saklanır (bkz. PATCH /me). */
+export interface Prefs { notifyMessages: boolean; notifyMatches: boolean; notifyMarketing: boolean; phoneVisible: boolean; marketingConsent: boolean }
+export const DEFAULT_PREFS: Prefs = { notifyMessages: true, notifyMatches: true, notifyMarketing: false, phoneVisible: false, marketingConsent: false };
+
 interface Session {
   onboarded: boolean; loggedIn: boolean; verifyLevel: VerifyLevel; role: Role; name: string;
   /** Gerçek modda sunucudaki kullanıcı kimliği ve ekip (moderatör/yönetici) üyeliği. */
-  userId?: string; staff: boolean;
+  userId?: string; staff: boolean; prefs: Prefs;
   finishOnboarding(): void; login(): void; setVerifyLevel(n: VerifyLevel): void; setRole(r: Role): void; logout(): void;
 }
 
 export const useSession = create<Session>((set, get) => ({
-  onboarded: false, loggedIn: false, verifyLevel: 0, role: 'bireysel', name: DEMO_USER.name, staff: false,
+  onboarded: false, loggedIn: false, verifyLevel: 0, role: 'bireysel', name: DEMO_USER.name, staff: false, prefs: DEFAULT_PREFS,
   finishOnboarding: () => set({ onboarded: true }),
   login: () => set({ loggedIn: true, verifyLevel: (Math.max(1, get().verifyLevel) as VerifyLevel) }),
   setVerifyLevel: (n) => set({ verifyLevel: n, loggedIn: n > 0 ? true : get().loggedIn }),
   setRole: (role) => set({ role }),
-  logout: () => set({ loggedIn: false, verifyLevel: 0, role: 'bireysel', userId: undefined, staff: false }),
+  logout: () => set({ loggedIn: false, verifyLevel: 0, role: 'bireysel', userId: undefined, staff: false, prefs: DEFAULT_PREFS }),
 }));
 
 /** Gerekli seviye yoksa gidilecek sayfa; yeterliyse null. */

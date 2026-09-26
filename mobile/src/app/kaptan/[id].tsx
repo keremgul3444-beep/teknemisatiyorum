@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -12,9 +13,10 @@ function KaptanDetay() {
   const { t } = useTranslation();
   const { id, start, days: daysParam } = useLocalSearchParams<{ id: string; start?: string; days?: string }>();
   const p = useProvider(id);
+  const [tomorrow] = useState(() => new Date(Date.now() + 864e5).toISOString().slice(0, 10));
   if (!p || p.kind !== 'kaptan') return <NotFound />;
   const days = Math.max(1, Number(daysParam) || 1);
-  const startDate = start ?? new Date(Date.now() + 864e5).toISOString().slice(0, 10);
+  const startDate = start ?? tomorrow;
   const weekly = days >= 7;
   const total = weekly ? (p.weekRateEUR ?? 0) * Math.ceil(days / 7) : (p.dayRateEUR ?? 0) * days;
   const lang = currentLang();

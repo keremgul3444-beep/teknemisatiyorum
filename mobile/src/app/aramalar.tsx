@@ -34,7 +34,7 @@ export default function Aramalar() {
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(3) }}>
               <Icon name="sparkle" size={20} color={colors.primary} />
               <View style={{ flex: 1, gap: space(0.5) }}>
-                <T variant="bodySemi">"{s.query}"</T>
+                <T variant="bodySemi">{`“${s.query}”`}</T>
                 <T variant="caption" color={colors.muted}>{t('saved.created', { date: s.createdAt })}</T>
               </View>
               <T variant="caption" color={s.newMatches ? colors.primary : colors.muted} style={{ fontFamily: fonts.bodyBold }}>

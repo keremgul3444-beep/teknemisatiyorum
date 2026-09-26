@@ -1,3 +1,4 @@
+import type { Prefs } from '@/session/role';
 import type { BadgeKind, BoatType, Currency, Equipment } from '@tms/shared';
 import { absolute } from '../mode';
 import type { AdminItem, AuditEntry, Boat, BrokerCase, Conversation, ExpertiseBooking, ExpertisePackage, Listing, LogEntry, SavedSearch, Seller } from '../types';
@@ -12,7 +13,7 @@ export interface ApiListing {
 }
 export interface ApiEntry { id: string; kind: LogEntry['kind']; date: string; title: string; byName: string; verified: boolean }
 export interface ApiBoat { id: string; name: string; brand: string; model: string; year: number; lengthM: number; entries: ApiEntry[] }
-export interface ApiUser { id: string; phone: string | null; name: string | null; email: string | null; lang: string; verifyLevel: number; roles: string[]; nationalIdLast2: string | null }
+export interface ApiUser { id: string; phone: string | null; name: string | null; email: string | null; lang: string; verifyLevel: number; roles: string[]; nationalIdLast2: string | null; prefs?: Prefs }
 export interface ApiConversationRow {
   id: string; subject: { kind: string; id: string; title: string }; otherName: string | null;
   lastMessage: { text: string; at: string; mine: boolean } | null; unread: boolean;

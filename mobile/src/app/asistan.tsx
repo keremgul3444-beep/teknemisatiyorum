@@ -16,15 +16,17 @@ export default function Asistan() {
   const [draft, setDraft] = useState(params.q ?? '');
   const [q, setQ] = useState(params.q ?? '');
   const listings = useListings();
-  const [result, setResult] = useState<AssistantResult | null>(null);
-  const [loading, setLoading] = useState(false);
+  // Sonuç hangi sorgu ve ilan listesi için alındıysa onunla saklanır; "yükleniyor" bundan türetilir.
+  const [fetched, setFetched] = useState<{ q: string; listings: unknown; r: AssistantResult | null } | null>(null);
   useEffect(() => {
-    if (!q.trim()) { setResult(null); return; }
+    if (!q.trim()) return;
     let alive = true;
-    setLoading(true);
-    attempt(() => actions.assistantSearch(q)).then((r) => { if (alive) { setResult(r ?? null); setLoading(false); } });
+    attempt(() => actions.assistantSearch(q)).then((r) => { if (alive) setFetched({ q, listings, r: r ?? null }); });
     return () => { alive = false; };
   }, [q, listings]);
+  const current = !!q.trim() && fetched?.q === q && fetched.listings === listings;
+  const result = current ? fetched!.r : null;
+  const loading = !!q.trim() && !current;
   const parsed = result?.query ?? { equipment: [] };
   const empty = !loading && (!result || isEmptyQuery(result.query));
 

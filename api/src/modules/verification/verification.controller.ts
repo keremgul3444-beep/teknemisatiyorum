@@ -4,8 +4,8 @@ import { Auth, CurrentUser, type AuthUser } from '../../common/decorators';
 import { ZodPipe } from '../../common/zod.pipe';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/audit.service';
-import { Errors } from '../../common/errors';
-import { encrypt } from '../../common/crypto';
+import { AppError, Errors } from '../../common/errors';
+import { blindIndex, encrypt } from '../../common/crypto';
 import { IDENTITY_VERIFIER, type IdentityVerifier } from '../../adapters/identity';
 import { MediaService } from '../media/media.service';
 import { userView } from '../users/user.view';
@@ -20,6 +20,8 @@ const requestBody = z.object({
   fileIds: z.array(z.string().min(1)).min(1).max(5),
   listingId: z.string().optional(),
 });
+
+const tcknInUse = () => new AppError('TCKN_IN_USE', 'errors.tckn_in_use', 409);
 
 @Controller('verification')
 export class VerificationController {
@@ -40,13 +42,17 @@ export class VerificationController {
   async verifyIdentity(@CurrentUser() u: AuthUser, @Body(new ZodPipe(identityBody)) b: z.infer<typeof identityBody>) {
     if ('tckn' in b) {
       if (!(await this.identity.verify(b))) throw Errors.bad('INVALID_TCKN');
+      // Bir kimlik numarası tek hesaba bağlanır (sahte çoklu hesap önlemi); eşzamanlı denemeyi tekil dizin yakalar.
+      const hash = blindIndex(b.tckn);
+      const taken = await this.prisma.user.findFirst({ where: { nationalIdHash: hash, id: { not: u.id } }, select: { id: true } });
+      if (taken) throw tcknInUse();
       const user = await this.prisma.user.update({
         where: { id: u.id },
         data: {
           verifyLevel: Math.max(2, u.level), name: `${b.firstName} ${b.lastName}`,
-          nationalIdEnc: encrypt(b.tckn), nationalIdLast2: b.tckn.slice(-2),
+          nationalIdEnc: encrypt(b.tckn), nationalIdLast2: b.tckn.slice(-2), nationalIdHash: hash,
         },
-      });
+      }).catch((e) => { throw e?.code === 'P2002' ? tcknInUse() : e; });
       await this.audit.log(u.id, 'audit.identityVerified', {}, 'user', u.id);
       return userView(user);
     }

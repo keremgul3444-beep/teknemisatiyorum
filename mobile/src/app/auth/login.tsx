@@ -7,6 +7,7 @@ import { Button, Header, Screen, T, goBack } from '@/components';
 import { useSession } from '@/session/role';
 import { actions, useMode } from '@/services';
 import { attempt } from '@/services/errors';
+import { putDevCode } from '@/features/otp';
 
 export default function Login() {
   const { t } = useTranslation();
@@ -33,9 +34,12 @@ export default function Login() {
       </View>
       <Button title={t('auth.sendCode')} disabled={digits.length < 10} loading={busy} onPress={async () => {
         setBusy(true);
-        const r = await attempt(async () => ({ dev: await actions.requestOtp(`+90${digits.slice(-10)}`) }));
+        const full = `+90${digits.slice(-10)}`;
+        const r = await attempt(async () => ({ dev: await actions.requestOtp(full) }));
         setBusy(false);
-        if (r) router.push({ pathname: '/auth/otp', params: { phone: `+90${digits.slice(-10)}`, ...(r.dev ? { dev: r.dev } : {}) } });
+        if (!r) return;
+        if (r.dev) putDevCode(full, r.dev);
+        router.push({ pathname: '/auth/otp', params: { phone: full } });
       }} />
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(3) }}>
         <View style={{ flex: 1, height: 1, backgroundColor: colors.line }} />

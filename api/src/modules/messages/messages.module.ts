@@ -4,8 +4,9 @@ import { z } from 'zod';
 import { Auth, CurrentUser, type AuthUser } from '../../common/decorators';
 import { ZodPipe } from '../../common/zod.pipe';
 import { PrismaService } from '../../common/prisma.service';
-import { Errors } from '../../common/errors';
+import { AppError, Errors } from '../../common/errors';
 import { NotificationsService } from '../notifications/notifications.module';
+import { prefsOf } from '../users/user.view';
 
 const startBody = z.object({ subjectKind: z.enum(['listing', 'broker', 'expertise']), subjectId: z.string().min(1) });
 const messageBody = z.object({ text: z.string().trim().min(1).max(2000) });
@@ -23,16 +24,22 @@ class MessagesController {
   async start(@CurrentUser() u: AuthUser, @Body(new ZodPipe(startBody)) b: z.infer<typeof startBody>) {
     const { otherId, title } = await this.counterpart(u.id, b.subjectKind, b.subjectId);
     const memberKey = [u.id, otherId].sort().join(':');
-    const existing = await this.prisma.conversation.findUnique({
-      where: { subjectKind_subjectId_memberKey: { subjectKind: b.subjectKind, subjectId: b.subjectId, memberKey } },
-    });
-    const c = existing ?? await this.prisma.conversation.create({
-      data: {
-        subjectKind: b.subjectKind, subjectId: b.subjectId, subjectTitle: title, memberKey,
-        members: { create: [{ userId: u.id, lastReadAt: new Date() }, { userId: otherId }] },
-      },
-    });
-    return { id: c.id };
+    const where = { subjectKind_subjectId_memberKey: { subjectKind: b.subjectKind, subjectId: b.subjectId, memberKey } };
+    const existing = await this.prisma.conversation.findUnique({ where });
+    if (existing) return { id: existing.id };
+    try {
+      const c = await this.prisma.conversation.create({
+        data: {
+          subjectKind: b.subjectKind, subjectId: b.subjectId, subjectTitle: title, memberKey,
+          members: { create: [{ userId: u.id, lastReadAt: new Date() }, { userId: otherId }] },
+        },
+      });
+      return { id: c.id };
+    } catch (e) {
+      // Aynı anda iki istek: ikincisi tekillik ihlaline düşer; oluşan sohbet döndürülür.
+      if ((e as { code?: string }).code !== 'P2002') throw e;
+      return { id: (await this.prisma.conversation.findUniqueOrThrow({ where })).id };
+    }
   }
 
   @Auth()
@@ -42,6 +49,7 @@ class MessagesController {
       where: { members: { some: { userId: u.id } } },
       include: { members: true, messages: { orderBy: { createdAt: 'desc' }, take: 1 } },
       orderBy: { updatedAt: 'desc' },
+      take: 200,
     });
     const otherIds = rows.map((c) => c.members.find((m) => m.userId !== u.id)!.userId);
     const others = await this.prisma.user.findMany({ where: { id: { in: otherIds } }, select: { id: true, name: true } });
@@ -64,15 +72,15 @@ class MessagesController {
   async messages(@CurrentUser() u: AuthUser, @Param('id') id: string) {
     const c = await this.memberOf(id, u.id);
     const other = c.members.find((m) => m.userId !== u.id)!;
-    const otherUser = await this.prisma.user.findUnique({ where: { id: other.userId }, select: { name: true, phone: true } });
+    const otherUser = await this.prisma.user.findUnique({ where: { id: other.userId }, select: { name: true, phone: true, prefs: true } });
     // En yeni 500 mesaj (eskiden yeniye sıralı döner).
     const msgs = (await this.prisma.message.findMany({ where: { conversationId: id }, orderBy: { createdAt: 'desc' }, take: 500 })).reverse();
     return {
       id: c.id,
       subject: { kind: c.subjectKind, id: c.subjectId, title: c.subjectTitle },
       otherName: otherUser?.name ?? null,
-      /** Karşı taraf numarasını paylaştıysa görünür; paylaşım tek yönlüdür. */
-      otherPhone: other.phoneShared ? otherUser?.phone ?? null : null,
+      /** Karşı taraf numarasını bu sohbette paylaştıysa ya da ayarlardan herkese görünür yaptıysa. */
+      otherPhone: otherUser && (other.phoneShared || prefsOf(otherUser).phoneVisible) ? otherUser.phone : null,
       iSharedPhone: c.members.find((m) => m.userId === u.id)!.phoneShared,
       messages: msgs.map((m) => ({ id: m.id, text: m.text, at: m.createdAt, mine: m.senderId === u.id })),
     };
@@ -82,12 +90,14 @@ class MessagesController {
   @Post(':id/messages')
   async send(@CurrentUser() u: AuthUser, @Param('id') id: string, @Body(new ZodPipe(messageBody)) b: z.infer<typeof messageBody>) {
     const c = await this.memberOf(id, u.id);
+    const other = c.members.find((x) => x.userId !== u.id)!;
+    const gone = await this.prisma.user.count({ where: { id: other.userId, deletedAt: { not: null } } });
+    if (gone) throw new AppError('USER_DELETED', 'errors.user_deleted', 409);
     const [m] = await this.prisma.$transaction([
       this.prisma.message.create({ data: { conversationId: id, senderId: u.id, text: b.text } }),
       this.prisma.conversation.update({ where: { id }, data: { updatedAt: new Date() } }),
       this.prisma.conversationMember.update({ where: { conversationId_userId: { conversationId: id, userId: u.id } }, data: { lastReadAt: new Date() } }),
     ]);
-    const other = c.members.find((x) => x.userId !== u.id)!;
     await this.notifications.push(other.userId, 'notif.newMessage', { conversationId: id, title: c.subjectTitle });
     return { id: m.id, text: m.text, at: m.createdAt, mine: true };
   }

@@ -1,10 +1,12 @@
 import { useStore } from '../store';
 import { api } from './instance';
+import { ApiError } from './client';
+import { setRates, type Rates } from '../rates';
 import {
   toAdminListing, toAdminVerification, toAudit, toBoat, toBooking, toBroker, toConversation, toListing, toPackage, toSaved, toSeller,
   type ApiBoat, type ApiConversationRow, type ApiListing, type ApiUser,
 } from './mappers';
-import { useSession } from '@/session/role';
+import { DEFAULT_PREFS, useSession } from '@/session/role';
 import type { Role } from '../types';
 
 const set = (patch: Partial<ReturnType<typeof useStore.getState>>) => useStore.setState(patch);
@@ -16,6 +18,7 @@ export function applyUser(u: ApiUser) {
   useSession.setState({
     loggedIn: true, verifyLevel: Math.min(3, u.verifyLevel) as 0 | 1 | 2 | 3, name: u.name ?? '',
     role: staff ? 'yonetici' : (s.role === 'yonetici' ? 'bireysel' : s.role) as Role, userId: u.id, staff,
+    prefs: { ...DEFAULT_PREFS, ...u.prefs },
   });
 }
 
@@ -81,10 +84,12 @@ export async function syncAll() {
   if (await api.hasSession()) {
     try {
       applyUser(await api.get<ApiUser>('/me'));
-    } catch {
-      /* oturum geçersizse istemci çıkışı kendisi yapar */
+    } catch (e) {
+      // Oturum düşmüşse (401) istemci çıkışı kendisi yapar, misafir olarak sürer; diğer hatalar kullanıcıya gösterilir.
+      if (!(e instanceof ApiError && e.status === 401)) throw e;
     }
   }
+  setRates(await api.get<Rates>('/fx'));
   const pk = await api.get<Parameters<typeof toPackage>[0][]>('/expertise/packages');
   set({ expertisePackages: pk.map(toPackage), favorites: [], savedSearches: [], boats: [], conversations: [], expertiseBookings: [], brokerCases: [], adminItems: [], audit: [] });
   await syncListings();

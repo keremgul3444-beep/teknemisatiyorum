@@ -72,6 +72,10 @@ model User {
   /// AES-256-GCM ile şifreli kimlik numarası; API yanıtlarında asla dönmez.
   nationalIdEnc   String?
   nationalIdLast2 String?
+  /// Kimlik numarasının HMAC özeti: aynı numaranın ikinci hesapta kullanılmasını engeller (numaranın kendisi geri çıkarılamaz).
+  nationalIdHash  String?   @unique
+  /// Kullanıcı tercihleri (bildirimler, telefon görünürlüğü, pazarlama izni); biçimi users.controller'daki prefsSchema.
+  prefs           Json?
   createdAt       DateTime  @default(now())
   deletedAt       DateTime?
 

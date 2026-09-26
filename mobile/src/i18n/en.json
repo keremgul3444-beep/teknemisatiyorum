@@ -586,7 +586,8 @@
     "adminPanel": "Admin panel",
     "settings": "Settings",
     "becomePro": "Offer services (technician, captain, surveyor)",
-    "logout": "Log out"
+    "logout": "Log out",
+    "notifications": "Notifications"
   },
   "logbook": {
     "title": "Boat Logbook",
@@ -678,7 +679,8 @@
     "modeApiShort": "Live",
     "modeDemoShort": "Demo",
     "modeApi": "Switched to live mode",
-    "modeDemo": "Switched to demo mode"
+    "modeDemo": "Switched to demo mode",
+    "downloadReady": "Your data copy is ready (verilerim.json)"
   },
   "devices": {
     "title": "Devices and sessions",
@@ -810,7 +812,17 @@
     "docRejected": "Document rejected: {{title}}",
     "brokerAdvanced": "Broker file advanced: {{boat}}",
     "userViewedMasked": "User record viewed (masked): {{name}}",
-    "paymentReleased": "Payment released to technician: {{ref}} · {{amount}}"
+    "paymentReleased": "Payment released to technician: {{ref}} · {{amount}}",
+    "accountDeleted": "Account deleted",
+    "brokerApplied": "Broker application: {{boat}}",
+    "dataExported": "Personal data copy downloaded",
+    "expertiseBooked": "Survey booked: {{date}}",
+    "fxUpdated": "Rate updated: {{currency}} = {{rate}} TRY",
+    "identityVerified": "Identity verified",
+    "listingSubmitted": "Listing submitted for review: {{title}}",
+    "marketingConsent": "Marketing consent changed: {{value}}",
+    "memberChanged": "Company member role: {{before}} → {{role}}",
+    "reportCompleted": "Survey report completed: {{score}}/100"
   },
   "errors": {
     "generic": "Something went wrong, please try again.",
@@ -832,10 +844,36 @@
     "own_listing": "You can't message your own listing.",
     "already_decided": "A decision was already made for this item.",
     "broker_done": "The file is at its final step.",
-    "internal": "A server error occurred."
+    "internal": "A server error occurred.",
+    "badRequest": "Invalid request",
+    "file_required": "Please choose a file",
+    "levelRequired": "This needs verification level {{level}}",
+    "listing_closed": "This listing is no longer live",
+    "listing_not_draft": "This listing can't be edited right now",
+    "listing_not_published": "Listing is not live",
+    "no_staff": "Support team is not reachable right now",
+    "owner_locked": "The company owner's role can't be changed",
+    "self_decision": "You can't decide on your own listing or document",
+    "tckn_in_use": "This national ID number is registered to another account",
+    "too_many_saved_searches": "You can save up to 20 searches",
+    "user_deleted": "This user deleted their account; messages can't be sent",
+    "user_not_found": "No user registered with this number"
   },
   "soon": {
     "title": "Coming soon",
     "body": "Technicians, captains and secure payment open in the next phase of the closed beta. You can see the prototype in demo mode (Settings › Demo)."
+  },
+  "notif": {
+    "brokerAdvanced": "{{boat}} broker case moved to step {{step}}",
+    "docApproved": "Your document was approved",
+    "docRejected": "Your document was rejected",
+    "listingApproved": "Your listing is live: {{title}}",
+    "listingRejected": "Your listing was rejected: {{title}}",
+    "newMessage": "New message: {{title}}",
+    "reportReady": "Your survey report is ready · {{score}}/100"
+  },
+  "notifs": {
+    "title": "Notifications",
+    "empty": "No notifications yet"
   }
 }

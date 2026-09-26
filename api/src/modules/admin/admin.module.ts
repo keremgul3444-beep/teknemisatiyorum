@@ -19,6 +19,8 @@ const decisionBody = z.discriminatedUnion('decision', [
 ]);
 const reportBody = z.object({ score: z.number().int().min(0).max(100) });
 const alreadyDecided = () => new AppError('ALREADY_DECIDED', 'errors.already_decided', 409);
+/** Ekip üyesi kendi ilanına ya da belgesine karar veremez (çıkar çatışması). */
+const selfDecision = () => new AppError('SELF_DECISION', 'errors.self_decision', 403);
 
 @Controller('admin')
 class AdminController {
@@ -65,6 +67,7 @@ class AdminController {
   async decideListing(@CurrentUser() u: AuthUser, @Param('id') id: string, @Body(new ZodPipe(decisionBody)) b: z.infer<typeof decisionBody>) {
     const l = await this.prisma.listing.findUnique({ where: { id } });
     if (!l) throw Errors.notFound();
+    if (l.ownerId === u.id) throw selfDecision();
     // Yarış güvenliği: yalnızca hâlâ bekleyen ilan için karar yazılır.
     const approve = b.decision === 'approve';
     const r = await this.prisma.listing.updateMany({
@@ -85,20 +88,23 @@ class AdminController {
   async decideVerification(@CurrentUser() u: AuthUser, @Param('id') id: string, @Body(new ZodPipe(decisionBody)) b: z.infer<typeof decisionBody>) {
     const v = await this.prisma.verificationRequest.findUnique({ where: { id } });
     if (!v) throw Errors.notFound();
+    if (v.userId === u.id) throw selfDecision();
     const approve = b.decision === 'approve';
-    const r = await this.prisma.verificationRequest.updateMany({
-      where: { id, status: 'pending' },
-      data: { status: approve ? 'approved' : 'rejected', rejectReason: approve ? null : b.reason, reviewedById: u.id, decidedAt: new Date() },
-    });
-    if (!r.count) throw alreadyDecided();
-    if (approve) {
-      const user = await this.prisma.user.findUniqueOrThrow({ where: { id: v.userId } });
-      if (v.kind === 'identity') await this.prisma.user.update({ where: { id: v.userId }, data: { verifyLevel: Math.max(2, user.verifyLevel) } });
+    // Karar ve etkisi (seviye/rozet) tek işlemde: biri yazılıp diğeri yarım kalmaz.
+    await this.prisma.$transaction(async (tx) => {
+      const r = await tx.verificationRequest.updateMany({
+        where: { id, status: 'pending' },
+        data: { status: approve ? 'approved' : 'rejected', rejectReason: approve ? null : b.reason, reviewedById: u.id, decidedAt: new Date() },
+      });
+      if (!r.count) throw alreadyDecided();
+      if (!approve) return;
+      const user = await tx.user.findUniqueOrThrow({ where: { id: v.userId } });
+      if (v.kind === 'identity') await tx.user.update({ where: { id: v.userId }, data: { verifyLevel: Math.max(2, user.verifyLevel) } });
       else if (v.kind === 'ruhsat' && v.listingId) {
-        const l = await this.prisma.listing.findUnique({ where: { id: v.listingId } });
-        if (l && !l.badges.includes('sahiplik')) await this.prisma.listing.update({ where: { id: l.id }, data: { badges: [...l.badges, 'sahiplik'] } });
-      } else if (v.kind !== 'ruhsat') await this.prisma.user.update({ where: { id: v.userId }, data: { verifyLevel: 3 } });
-    }
+        const l = await tx.listing.findUnique({ where: { id: v.listingId } });
+        if (l && !l.badges.includes('sahiplik')) await tx.listing.update({ where: { id: l.id }, data: { badges: [...l.badges, 'sahiplik'] } });
+      } else if (v.kind !== 'ruhsat') await tx.user.update({ where: { id: v.userId }, data: { verifyLevel: 3 } });
+    });
     await this.notifications.push(v.userId, approve ? 'notif.docApproved' : 'notif.docRejected', { kind: v.kind, ...(approve ? {} : { reason: b.reason }) });
     await this.audit.log(u.id, approve ? 'audit.docApproved' : 'audit.docRejected', { title: v.kind }, 'verification', id);
     return { id, status: approve ? 'approved' : 'rejected' };

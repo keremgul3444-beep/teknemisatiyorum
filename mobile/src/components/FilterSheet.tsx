@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { Modal, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { colors, radius, space } from '@/theme';
@@ -29,11 +29,16 @@ export function FilterSheet({ visible, value, onClose, onApply }: { visible: boo
   const { t } = useTranslation();
   const [q, setQ] = useState<ParsedQuery>(value);
   const [f, setF] = useState({ minL: '', maxL: '', minY: '', maxY: '', maxP: '' });
-  useEffect(() => {
-    if (!visible) return;
-    setQ(value);
-    setF({ minL: str(value.minLength), maxL: str(value.maxLength), minY: str(value.minYear), maxY: str(value.maxYear), maxP: str(value.maxPrice) });
-  }, [visible, value]);
+  // Sayfa her açıldığında taslak güncel filtreden başlar (etki yerine çizim sırasında, React'in önerdiği biçim).
+  const [shownFor, setShownFor] = useState<ParsedQuery | null>(null);
+  const opening = visible ? value : null;
+  if (opening !== shownFor) {
+    setShownFor(opening);
+    if (opening) {
+      setQ(opening);
+      setF({ minL: str(opening.minLength), maxL: str(opening.maxLength), minY: str(opening.minYear), maxY: str(opening.maxYear), maxP: str(opening.maxPrice) });
+    }
+  }
   const toggleEq = (e: Equipment) => setQ((s) => ({ ...s, equipment: s.equipment.includes(e) ? s.equipment.filter((x) => x !== e) : [...s.equipment, e] }));
   const apply = () => onApply({
     equipment: q.equipment, type: q.type, location: q.location, currency: num(f.maxP) !== undefined ? q.currency ?? 'EUR' : undefined,

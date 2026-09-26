@@ -1,4 +1,4 @@
-import { Linking, Platform } from 'react-native';
+import { Linking, Platform, Share } from 'react-native';
 import { matchListings, parseQuery, parsedQuerySchema, type Criterion, type ParsedQuery } from '@tms/shared';
 import { useStore } from './store';
 import { absolute, isApiMode } from './mode';
@@ -6,7 +6,9 @@ import { api } from './api/instance';
 import { applyUser, syncAdmin, syncAll, syncListings, syncMine } from './api/sync';
 import { toBoat, toListing, toThread, type ApiBoat, type ApiListing, type ApiThread, type ApiUser } from './api/mappers';
 import type { AdminStatus, BoatInput, Listing, ListingDraft, SubjectKind } from './types';
-import { useSession } from '@/session/role';
+import { useSession, type Prefs } from '@/session/role';
+import { resetRates } from './rates';
+import { createPublisher } from '@/features/publishListing';
 
 const g = () => useStore.getState();
 const SUBJECT_TO_API: Partial<Record<SubjectKind, string>> = { ilan: 'listing', broker: 'broker' };
@@ -21,6 +23,9 @@ async function upload(uri: string, visibility: 'public' | 'private'): Promise<st
   else form.append('file', { uri, name: 'photo.jpg', type: 'image/jpeg' } as unknown as Blob);
   return (await api.upload<{ id: string }>('/media', form)).id;
 }
+
+/** İlan gönderimi yarıda kalırsa yeniden denemede kaldığı yerden sürer (yeni taslak açılmaz). */
+const publishListing = createPublisher({ post: (p, b) => api.post(p, b), patch: (p, b) => api.patch(p, b), upload });
 
 /**
  * Ekranların tek eylem kapısı. Demo modunda prototipin yerel deposu, gerçek modda sunucu kullanılır;
@@ -89,14 +94,9 @@ export const actions = {
       if (extra.broker) g().applyBroker({ boatName: `${d.brand} ${d.model}`, askingEUR: d.currency === 'EUR' ? d.price : 0 });
       return id;
     }
-    const l = await api.post<ApiListing>('/listings', d);
-    const fileIds = await Promise.all((extra.photoUris ?? []).map((u) => upload(u, 'public')));
-    if (fileIds.length) await api.post(`/listings/${l.id}/photos`, { fileIds });
-    await api.post(`/listings/${l.id}/submit`);
-    if (extra.ownershipUri) await api.post('/verification/requests', { kind: 'ruhsat', fileIds: [await upload(extra.ownershipUri, 'private')], listingId: l.id });
-    if (extra.broker) await api.post('/broker/cases', { boatName: `${d.brand} ${d.model}`, askingPrice: d.price, currency: d.currency });
+    const id = await publishListing(d, extra);
     await syncMine();
-    return l.id;
+    return id;
   },
   async loadListing(id: string) {
     if (!isApiMode()) return;
@@ -205,6 +205,34 @@ export const actions = {
   async adminReport(id: string, score: number) {
     await api.post(`/admin/expertise/${id}/report`, { score });
   },
+  /** Dil ve tercihler sunucuda saklanır (başka cihazda da geçerli); demo modunda yalnızca yerel. */
+  async updateProfile(patch: { lang?: 'tr' | 'en'; prefs?: Partial<Prefs> }) {
+    if (!isApiMode() || !useSession.getState().loggedIn) {
+      if (patch.prefs) useSession.setState({ prefs: { ...useSession.getState().prefs, ...patch.prefs } });
+      return;
+    }
+    applyUser(await api.patch<ApiUser>('/me', patch));
+  },
+  /** KVKK: kişisel verinin kopyası. Web'de dosya olarak iner, telefonda paylaşım menüsü açılır. */
+  async exportData(): Promise<boolean> {
+    if (!isApiMode()) return false;
+    const data = await api.get<unknown>('/me/export');
+    const json = JSON.stringify(data, null, 2);
+    if (Platform.OS === 'web') {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+      a.download = 'verilerim.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } else await Share.share({ title: 'verilerim.json', message: json });
+    return true;
+  },
+  async notifications() {
+    return api.get<{ id: string; key: string; params: Record<string, string> | null; readAt: string | null; createdAt: string }[]>('/notifications');
+  },
+  async readNotification(id: string) {
+    await api.post(`/notifications/${id}/read`);
+  },
   async sessions() {
     return api.get<{ id: string; deviceName: string; lastSeenAt: string; current: boolean }[]>('/auth/sessions');
   },
@@ -223,5 +251,5 @@ export const actions = {
   /** Demo sohbetinde karşı tarafın otomatik yanıtı. */
   demoReply: (convId: string, text: string) => { if (!isApiMode()) g().sendMessage(convId, text, 'them'); },
   markRead: async (convId: string) => (isApiMode() ? actions.openConversation(convId) : g().markRead(convId)),
-  resetDemo: async () => g().resetDemo(),
+  resetDemo: async () => { resetRates(); g().resetDemo(); },
 };

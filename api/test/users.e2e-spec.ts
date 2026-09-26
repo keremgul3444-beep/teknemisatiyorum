@@ -1,6 +1,6 @@
 import sharp from 'sharp';
 import { createTestApp, type TestApp } from './setup';
-import { deepContains, jpegWithExif, loginAs } from './helpers';
+import { deepContains, jpegWithExif, loginAs, randomTckn } from './helpers';
 
 let t: TestApp;
 beforeAll(async () => { t = await createTestApp(); });
@@ -134,7 +134,7 @@ describe('kurumsal hesap', () => {
 describe('hesap silme', () => {
   test('kişisel alanlar temizlenir, oturum kapanır', async () => {
     const a = await loginAs(t, { level: 2 });
-    await t.http().post('/verification/identity').set(a.auth).send({ tckn: TCKN, firstName: 'A', lastName: 'B', birthYear: 1990 });
+    await t.http().post('/verification/identity').set(a.auth).send({ tckn: randomTckn(), firstName: 'A', lastName: 'B', birthYear: 1990 });
     expect((await t.http().delete('/me').set(a.auth)).status).toBe(204);
     const row = await t.prisma.user.findUnique({ where: { id: a.user.id } });
     expect(row).toMatchObject({ phone: null, name: null, email: null, nationalIdEnc: null, nationalIdLast2: null });

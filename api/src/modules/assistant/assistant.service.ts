@@ -21,6 +21,7 @@ export class AssistantService {
   private readonly log = new Logger('Assistant');
   private readonly cache = new Map<string, { q: ParsedQuery; at: number }>();
   private readonly usage = new Map<string, number>();
+  private usageDay = '';
 
   constructor(
     @Inject(LLM_CLIENT) private readonly llm: LlmClient,
@@ -64,6 +65,8 @@ export class AssistantService {
   /** Günlük kota: kullanıcı başına 50, misafir IP başına 20 model çağrısı. Aşım aramayı engellemez, yalnızca modeli. */
   private takeQuota(who: { userId?: string; ip: string }, now: number) {
     const day = new Date(now).toISOString().slice(0, 10);
+    // Sayaç yalnızca bugünü tutar; gün değişince eski anahtarlar silinir (bellek büyümesin).
+    if (day !== this.usageDay) { this.usage.clear(); this.usageDay = day; }
     const id = who.userId ? `u:${who.userId}:${day}` : `ip:${who.ip}:${day}`;
     const used = this.usage.get(id) ?? 0;
     if (used >= (who.userId ? DAILY_LIMIT.user : DAILY_LIMIT.guest)) return false;

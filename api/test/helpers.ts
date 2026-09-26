@@ -28,3 +28,13 @@ export async function jpegWithExif(width = 3000, height = 1000) {
 
 /** Bir yanıt gövdesinde verilen metnin (derinlemesine) geçip geçmediği. */
 export const deepContains = (body: unknown, needle: string) => JSON.stringify(body).includes(needle);
+
+/** Algoritmik olarak geçerli, rastgele T.C. kimlik numarası (her test kendi numarasını kullansın; numara tekildir). */
+export function randomTckn() {
+  const d = [crypto.randomInt(1, 10), ...Array.from({ length: 8 }, () => crypto.randomInt(0, 10))];
+  const odd = d[0] + d[2] + d[4] + d[6] + d[8];
+  const even = d[1] + d[3] + d[5] + d[7];
+  d.push((((odd * 7 - even) % 10) + 10) % 10);
+  d.push(d.reduce((a, b) => a + b, 0) % 10);
+  return d.join('');
+}

@@ -6,7 +6,8 @@ import { colors, space } from '@/theme';
 import { Button, Card, Chip, Divider, Header, MenuRow, Screen, Section, Segmented, T, ToggleRow, showDemoToast } from '@/components';
 import { actions, type Role } from '@/services';
 import { currentLang, setLanguage, type Lang } from '@/i18n';
-import { useSession } from '@/session/role';
+import { useSession, type Prefs } from '@/session/role';
+import { attempt } from '@/services/errors';
 import { API_URL, useMode } from '@/services/mode';
 
 const ROLES: Role[] = ['bireysel', 'usta', 'kaptan', 'kurumsal', 'yonetici'];
@@ -16,8 +17,10 @@ export default function Ayarlar() {
   const role = useSession((s) => s.role);
   const { mode, setMode } = useMode();
   const [lang, setLang] = useState<Lang>(currentLang());
-  const [n, setN] = useState({ messages: true, matches: true, jobs: true, marketing: false });
-  const [p, setP] = useState({ phone: false, marketing: false });
+  // Tercihler oturumda (gerçek modda sunucudan gelir); değişiklik anında kaydedilir.
+  const prefs = useSession((s) => s.prefs);
+  const [jobs, setJobs] = useState(true);
+  const setPref = (k: keyof Prefs, v: boolean) => attempt(() => actions.updateProfile({ prefs: { [k]: v } }));
 
   const pickRole = (r: Role) => {
     const s = useSession.getState();
@@ -31,22 +34,22 @@ export default function Ayarlar() {
     <Screen>
       <Header title={t('settings.title')} />
       <Section title={t('settings.language')}>
-        <Segmented value={lang} onChange={(l) => { setLang(l); setLanguage(l); }} options={[{ key: 'tr', label: 'Türkçe' }, { key: 'en', label: 'English' }]} />
+        <Segmented value={lang} onChange={(l) => { setLang(l); setLanguage(l); attempt(() => actions.updateProfile({ lang: l })); }} options={[{ key: 'tr', label: 'Türkçe' }, { key: 'en', label: 'English' }]} />
       </Section>
       <Section title={t('settings.notifications')}>
         <Card>
-          <ToggleRow label={t('settings.nMessages')} value={n.messages} onChange={(v) => setN((s) => ({ ...s, messages: v }))} />
-          <ToggleRow label={t('settings.nMatches')} value={n.matches} onChange={(v) => setN((s) => ({ ...s, matches: v }))} />
-          <ToggleRow label={t('settings.nJobs')} value={n.jobs} onChange={(v) => setN((s) => ({ ...s, jobs: v }))} />
-          <ToggleRow label={t('settings.nMarketing')} value={n.marketing} onChange={(v) => setN((s) => ({ ...s, marketing: v }))} />
+          <ToggleRow label={t('settings.nMessages')} value={prefs.notifyMessages} onChange={(v) => setPref('notifyMessages', v)} />
+          <ToggleRow label={t('settings.nMatches')} value={prefs.notifyMatches} onChange={(v) => setPref('notifyMatches', v)} />
+          {mode === 'demo' ? <ToggleRow label={t('settings.nJobs')} value={jobs} onChange={setJobs} /> : null}
+          <ToggleRow label={t('settings.nMarketing')} value={prefs.notifyMarketing} onChange={(v) => setPref('notifyMarketing', v)} />
         </Card>
       </Section>
       <Section title={t('settings.privacy')}>
         <Card>
-          <ToggleRow label={t('settings.phoneVisible')} value={p.phone} onChange={(v) => setP((s) => ({ ...s, phone: v }))} />
-          <ToggleRow label={t('settings.marketingConsent')} value={p.marketing} onChange={(v) => setP((s) => ({ ...s, marketing: v }))} />
+          <ToggleRow label={t('settings.phoneVisible')} value={prefs.phoneVisible} onChange={(v) => setPref('phoneVisible', v)} />
+          <ToggleRow label={t('settings.marketingConsent')} value={prefs.marketingConsent} onChange={(v) => setPref('marketingConsent', v)} />
           <Divider />
-          <MenuRow icon="doc" label={t('settings.download')} onPress={() => showDemoToast(t('settings.downloadDone'))} />
+          <MenuRow icon="doc" label={t('settings.download')} onPress={() => attempt(() => actions.exportData()).then((ok) => showDemoToast(t(ok ? 'settings.downloadReady' : 'settings.downloadDone')))} />
           <Divider />
           <MenuRow icon="shield" label={t('settings.kvkk')} onPress={() => router.push('/auth/kvkk')} />
           <Divider />

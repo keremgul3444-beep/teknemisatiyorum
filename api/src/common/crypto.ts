@@ -27,3 +27,9 @@ export function safeEqual(a: string, b: string): boolean {
   const y = Buffer.from(b);
   return x.length === y.length && crypto.timingSafeEqual(x, y);
 }
+
+/** Kimlik numarası için kör dizin: aynı numara hep aynı özeti verir, özetten numara çıkarılamaz (anahtar şifreleme anahtarından türetilir). */
+export function blindIndex(value: string): string {
+  const key = crypto.createHmac('sha256', Buffer.from(env().ID_ENC_KEY, 'base64')).update('national-id-index').digest();
+  return crypto.createHmac('sha256', key).update(value).digest('base64url');
+}

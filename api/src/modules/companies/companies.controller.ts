@@ -3,7 +3,8 @@ import { z } from 'zod';
 import { Auth, CurrentUser, type AuthUser } from '../../common/decorators';
 import { ZodPipe } from '../../common/zod.pipe';
 import { PrismaService } from '../../common/prisma.service';
-import { Errors } from '../../common/errors';
+import { AppError, Errors } from '../../common/errors';
+import { AuditService } from '../../common/audit.service';
 import { phoneSchema } from '../auth/phone';
 
 const companyBody = z.object({
@@ -15,7 +16,7 @@ const memberBody = z.object({ phone: phoneSchema, role: z.enum(['admin', 'staff'
 
 @Controller('companies')
 export class CompaniesController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService, private readonly audit: AuditService) {}
 
   @Auth({ level: 2 })
   @Post()
@@ -37,10 +38,15 @@ export class CompaniesController {
     if (!me || !['owner', 'admin'].includes(me.role)) throw Errors.notFound();
     const target = await this.prisma.user.findUnique({ where: { phone: b.phone } });
     if (!target || target.deletedAt) throw Errors.bad('USER_NOT_FOUND');
-    return this.prisma.companyMember.upsert({
+    // Sahibin rolü bu uç noktadan değişmez (yönetici sahibi düşüremez; sahip de kendini düşüremez).
+    const cur = await this.prisma.companyMember.findUnique({ where: { companyId_userId: { companyId: id, userId: target.id } } });
+    if (cur?.role === 'owner') throw new AppError('OWNER_LOCKED', 'errors.owner_locked', 409);
+    const m = await this.prisma.companyMember.upsert({
       where: { companyId_userId: { companyId: id, userId: target.id } },
       create: { companyId: id, userId: target.id, role: b.role },
       update: { role: b.role },
     });
+    await this.audit.log(u.id, 'audit.memberChanged', { role: b.role, before: cur?.role ?? '-' }, 'company', id);
+    return m;
   }
 }

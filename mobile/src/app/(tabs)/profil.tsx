@@ -41,6 +41,8 @@ export default function Profil() {
       )}
 
       <Card>
+        <MenuRow icon="bell" label={t('profile.notifications')} onPress={() => router.push('/profil/bildirimler')} />
+        <Divider />
         <MenuRow icon="logbook" label={t('profile.boats')} right={String(boats)} onPress={() => router.push('/teknelerim')} />
         <Divider />
         <MenuRow icon="anchor" label={t('profile.listings')} right={String(mine)} onPress={() => router.push('/profil/ilanlarim')} />

@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Post, Query, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { SkipThrottle } from '@nestjs/throttler';
 import type { Response } from 'express';
 import { z } from 'zod';
 import { Auth, CurrentUser, Public, type AuthUser } from '../../common/decorators';
@@ -21,7 +22,9 @@ export class MediaController {
     return this.media.upload(u.id, file.buffer, b.visibility);
   }
 
+  // Görsel okumaları genel istek sınırına sayılmaz (fotoğraflı sayfalar tek seferde çok istek yapar).
   @Public()
+  @SkipThrottle()
   @Get(':id')
   async get(@Param('id') id: string, @Res() res: Response) {
     const f = await this.media.readPublic(id);
@@ -35,6 +38,7 @@ export class MediaController {
   }
 
   @Public()
+  @SkipThrottle()
   @Get(':id/raw')
   async raw(@Param('id') id: string, @Query('exp') exp: string, @Query('sig') sig: string, @Res() res: Response) {
     const f = await this.media.readSigned(id, exp, sig);
