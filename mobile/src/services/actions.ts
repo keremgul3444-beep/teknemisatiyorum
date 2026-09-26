@@ -28,8 +28,11 @@ async function upload(uri: string, visibility: 'public' | 'private'): Promise<st
  */
 export const actions = {
   // ——— Giriş ve doğrulama ———
-  async requestOtp(phone: string) {
-    if (isApiMode()) await api.post('/auth/otp', { phone });
+  /** Kapalı betada sunucu kodu yanıtta döndürebilir (SMS yokken); dönerse ekran kodu kendisi doldurur. */
+  async requestOtp(phone: string): Promise<string | undefined> {
+    if (!isApiMode()) return undefined;
+    const r = await api.post<{ devCode?: string } | undefined>('/auth/otp', { phone });
+    return r?.devCode;
   },
   async verifyOtp(phone: string, code: string, deviceName = 'Telefon') {
     if (!isApiMode()) {

@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, Res } from '@nestjs/common';
+import type { Response } from 'express';
 import { Throttle } from '@nestjs/throttler';
 import { z } from 'zod';
 import { Auth, CurrentUser, Public, type AuthUser } from '../../common/decorators';
@@ -19,9 +20,14 @@ export class AuthController {
   @Public()
   @Throttle({ default: { limit: () => env().OTP_IP_LIMIT, ttl: 60 * 60_000 } })
   @Post('otp')
-  @HttpCode(204)
-  async otp(@Body(new ZodPipe(otpBody)) b: z.infer<typeof otpBody>) {
-    await this.auth.requestOtp(b.phone);
+  async otp(@Body(new ZodPipe(otpBody)) b: z.infer<typeof otpBody>, @Res({ passthrough: true }) res: Response) {
+    const code = await this.auth.requestOtp(b.phone);
+    const e = env();
+    if (e.DEV_OTP_ECHO === '1' && e.NODE_ENV !== 'production') {
+      res.status(200);
+      return { devCode: code };
+    }
+    res.status(204);
   }
 
   @Public()

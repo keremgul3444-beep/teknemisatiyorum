@@ -10,8 +10,8 @@ import { attempt } from '@/services/errors';
 
 export default function Otp() {
   const { t } = useTranslation();
-  const { phone = '' } = useLocalSearchParams<{ phone?: string }>();
-  const [code, setCode] = useState('');
+  const { phone = '', dev } = useLocalSearchParams<{ phone?: string; dev?: string }>();
+  const [code, setCode] = useState(dev ?? '');
   const [left, setLeft] = useState(30);
   const input = useRef<TextInput>(null);
 
@@ -50,7 +50,7 @@ export default function Otp() {
       <T variant="caption" color={colors.muted}>{t(isApiMode() ? 'auth.betaHint' : 'auth.demoHint')}</T>
       <Button title={t('auth.verify')} disabled={code.length < 6} loading={busy} onPress={verify} />
       <Button variant="ghost" disabled={left > 0} title={left > 0 ? t('auth.resendIn', { s: left }) : t('auth.resend')}
-        onPress={() => { setLeft(30); attempt(() => actions.requestOtp(String(phone))); showDemoToast(); }} />
+        onPress={() => { setLeft(30); attempt(() => actions.requestOtp(String(phone))).then((c) => c && setCode(c)); showDemoToast(); }} />
     </Screen>
   );
 }

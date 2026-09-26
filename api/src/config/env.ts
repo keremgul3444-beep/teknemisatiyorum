@@ -15,6 +15,8 @@ const schema = z.object({
   PUBLIC_URL: z.string().default(''),
   /** IP başına saatlik giriş kodu isteği sınırı. */
   OTP_IP_LIMIT: z.coerce.number().default(10),
+  /** Kapalı beta: SMS bağlanana kadar giriş kodu yanıtta döner. Üretimde (NODE_ENV=production) hiçbir koşulda çalışmaz. */
+  DEV_OTP_ECHO: z.enum(['0', '1']).default('0'),
 });
 
 export type Env = z.infer<typeof schema>;

@@ -36,6 +36,7 @@ export class AuthService {
       data: { phone, codeHash: await argon2.hash(code), expiresAt: new Date(now.getTime() + OTP_TTL_MS), createdAt: now },
     });
     await this.sms.sendOtp(phone, code);
+    return code;
   }
 
   async verifyOtp(phone: string, code: string, deviceName: string) {

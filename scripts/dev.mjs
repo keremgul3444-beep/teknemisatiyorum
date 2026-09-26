@@ -57,7 +57,10 @@ process.on('SIGTERM', shutdown);
 
 start('PostgreSQL', 'node', [...nodeEnv, 'scripts/db.ts'], { cwd: API });
 await waitPort(54329);
-run('npx', ['prisma', 'migrate', 'deploy'], API);
+// Beklenmedik kapanıştan sonra veritabanı port açıkken bir süre kendini toparlar; hazır olana kadar denenir.
+for (let i = 1; ; i++) {
+  try { run('npx', ['prisma', 'migrate', 'deploy'], API); break; } catch (e) { if (i >= 10) throw e; await new Promise((r) => setTimeout(r, 2000)); }
+}
 run('npm', ['run', 'build'], API);
 run('node', [...nodeEnv, 'prisma/seed.ts'], API);
 start('API', 'node', ['--env-file=.env', 'dist/src/main.js'], { cwd: API });
