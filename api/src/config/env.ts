@@ -8,7 +8,7 @@ const schema = z.object({
   /** 32 baytlık anahtarın base64 hali — kimlik numarası şifrelemesi için. */
   ID_ENC_KEY: z.string().refine((s) => Buffer.from(s, 'base64').length === 32, 'ID_ENC_KEY 32 bayt (base64) olmalı'),
   ANTHROPIC_API_KEY: z.string().optional().default(''),
-  LLM_MODEL: z.string().default('claude-haiku-4-5-20251001'),
+  LLM_MODEL: z.string().default('claude-haiku-4-5'),
   CORS_ORIGINS: z.string().default('http://localhost:8081'),
   STORAGE_DIR: z.string().default('storage'),
   PUBLIC_URL: z.string().default('http://localhost:3000'),
