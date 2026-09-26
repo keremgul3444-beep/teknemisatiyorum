@@ -26,6 +26,7 @@ export async function createTestApp(opts: { controllers?: any[]; override?: (b: 
     ID_ENC_KEY: Buffer.alloc(32, 7).toString('base64'),
     STORAGE_DIR: path.join(require('os').tmpdir(), `tms-storage-${schema}`),
     ANTHROPIC_API_KEY: '',
+    OTP_IP_LIMIT: '1000',
   });
   resetEnvCache();
   execSync('npx prisma migrate deploy', { cwd: path.resolve(__dirname, '..'), env: process.env, stdio: 'ignore' });

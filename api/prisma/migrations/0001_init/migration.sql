@@ -47,6 +47,7 @@ CREATE TABLE "Session" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "deviceName" TEXT NOT NULL,
+    "familyId" TEXT NOT NULL,
     "refreshHash" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "lastSeenAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -323,6 +324,9 @@ CREATE UNIQUE INDEX "Session_refreshHash_key" ON "Session"("refreshHash");
 
 -- CreateIndex
 CREATE INDEX "Session_userId_idx" ON "Session"("userId");
+
+-- CreateIndex
+CREATE INDEX "Session_familyId_idx" ON "Session"("familyId");
 
 -- CreateIndex
 CREATE INDEX "OtpCode_phone_createdAt_idx" ON "OtpCode"("phone", "createdAt");

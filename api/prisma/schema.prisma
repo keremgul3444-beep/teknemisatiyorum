@@ -85,6 +85,8 @@ model Session {
   userId       String
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   deviceName   String
+  /// Aynı girişten doğan (yenilemeyle zincirlenen) oturumların ortak kimliği; çalınma şüphesinde hepsi birlikte iptal edilir.
+  familyId     String
   /// Yenileme anahtarının SHA-256 özeti; anahtarın kendisi saklanmaz.
   refreshHash  String    @unique
   createdAt    DateTime  @default(now())
@@ -93,6 +95,7 @@ model Session {
   replacedById String?
 
   @@index([userId])
+  @@index([familyId])
 }
 
 model OtpCode {

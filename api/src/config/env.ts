@@ -12,6 +12,8 @@ const schema = z.object({
   CORS_ORIGINS: z.string().default('http://localhost:8081'),
   STORAGE_DIR: z.string().default('storage'),
   PUBLIC_URL: z.string().default('http://localhost:3000'),
+  /** IP başına saatlik giriş kodu isteği sınırı. */
+  OTP_IP_LIMIT: z.coerce.number().default(10),
 });
 
 export type Env = z.infer<typeof schema>;
