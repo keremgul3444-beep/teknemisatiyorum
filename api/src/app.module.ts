@@ -13,6 +13,7 @@ import { DevSmsSender, SMS_SENDER } from './adapters/sms';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { MediaModule } from './modules/media/media.module';
+import { ListingsModule } from './modules/listings/listings.module';
 
 @Controller('health')
 class HealthController {
@@ -31,6 +32,7 @@ class HealthController {
     AuthModule,
     MediaModule,
     UsersModule,
+    ListingsModule,
   ],
   controllers: [HealthController],
   providers: [
