@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { colors, fonts } from '@/theme';
+import { colors, fonts, radius } from '@/theme';
 import { Icon } from '@/components';
 import { useConversations } from '@/services';
 
@@ -21,14 +21,14 @@ export default function TabsLayout() {
         tabBarLabel: t(`tabs.${route.name}`),
         tabBarIcon: ({ color }) =>
           route.name === 'ekle' ? (
-            <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: colors.primary, alignItems: "center", justifyContent: "center" }}>
+            <View style={{ width: 28, height: 28, borderRadius: radius.chip, backgroundColor: colors.primary, alignItems: "center", justifyContent: "center" }}>
               <Icon name="plus" size={22} color={colors.white} />
             </View>
           ) : (
             <View>
               <Icon name={TAB_ICONS[route.name]} size={22} color={String(color)} />
               {route.name === 'mesajlar' && unread ? (
-                <View style={{ position: 'absolute', top: -2, right: -4, width: 9, height: 9, borderRadius: 5, backgroundColor: colors.danger }} />
+                <View style={{ position: 'absolute', top: -2, right: -4, width: 9, height: 9, borderRadius: radius.xs, backgroundColor: colors.danger }} />
               ) : null}
             </View>
           ),

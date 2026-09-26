@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { colors, space, fonts } from '@/theme';
+import { colors, fonts, radius, space } from '@/theme';
 import { Avatar, Card, EmptyState, Screen, T } from '@/components';
 import { useConversations } from '@/services';
 import { useSession } from '@/session/role';
@@ -36,7 +36,7 @@ export default function Mesajlar() {
                     {last?.text ?? c.preview ?? t('messages.noMessages')}
                   </T>
                 </View>
-                {c.unread ? <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: colors.primary }} /> : null}
+                {c.unread ? <View style={{ width: 10, height: 10, borderRadius: radius.xs, backgroundColor: colors.primary }} /> : null}
               </View>
             </Card>
           );

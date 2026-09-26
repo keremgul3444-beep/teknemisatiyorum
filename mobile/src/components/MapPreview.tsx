@@ -1,6 +1,6 @@
 import { Pressable, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { colors, radius, space, fonts } from '@/theme';
+import { colors, fonts, radius, space } from '@/theme';
 import type { Listing } from '@/services';
 import { T } from './T';
 
@@ -25,7 +25,7 @@ export function MapPreview({ listings, selected, onSelect }: { listings: Listing
         return (
           <Pressable key={city} onPress={() => onSelect(on ? undefined : city)}
             style={{ position: 'absolute', left: `${x}%`, top: `${y}%`, transform: [{ translateX: -20 }, { translateY: -14 }], alignItems: 'center' }}>
-            <View style={{ backgroundColor: on ? colors.text : colors.primary, borderRadius: 14, paddingHorizontal: space(2.5), paddingVertical: space(1) }}>
+            <View style={{ backgroundColor: on ? colors.text : colors.primary, borderRadius: radius.chip, paddingHorizontal: space(2.5), paddingVertical: space(1) }}>
               <T variant="caption" color={colors.white} style={{ fontFamily: fonts.bodyBold }}>{n}</T>
             </View>
             <T variant="caption" style={{ fontFamily: fonts.bodySemi, fontSize: 10 }}>{city}</T>

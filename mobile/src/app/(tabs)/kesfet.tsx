@@ -30,7 +30,7 @@ export default function Kesfet() {
         <T variant="h1">{t('home.title')}</T>
       </View>
 
-      <View style={{ backgroundColor: colors.card, borderRadius: 16, borderWidth: 1.5, borderColor: colors.primary, padding: space(3.5), gap: space(2) }}>
+      <View style={{ backgroundColor: colors.card, borderRadius: radius.card, borderWidth: 1.5, borderColor: colors.primary, padding: space(3.5), gap: space(2) }}>
         <T variant="label" color={colors.primary}>✦ {t('assistant.label')}</T>
         <TextInput value={q} onChangeText={setQ} onSubmitEditing={() => ask(q)} placeholder={t('assistant.placeholder')} placeholderTextColor={colors.muted}
           multiline returnKeyType="search" blurOnSubmit
@@ -72,7 +72,7 @@ function PromoCard({ icon, title, body, onPress }: { icon: string; title: string
   return (
     <Card onPress={onPress}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(3) }}>
-        <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' }}>
           <Icon name={icon} size={20} color={colors.primary} />
         </View>
         <View style={{ flex: 1 }}>

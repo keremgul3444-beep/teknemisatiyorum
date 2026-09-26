@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { colors, space } from '@/theme';
+import { colors, fonts, radius, space } from '@/theme';
 import { Button, Card, Field, Header, Icon, NotFound, Screen, Section, T, showDemoToast } from '@/components';
 import { actions, formatPrice, useCaptainBookings, useJob, type Currency } from '@/services';
 import { currentLang } from '@/i18n';
@@ -54,8 +54,8 @@ function Odeme() {
       <Card style={{ backgroundColor: colors.surface }}>
         {(['g1', 'g2', 'g3'] as const).map((g, i) => (
           <View key={g} style={{ flexDirection: 'row', gap: space(3), alignItems: 'center' }}>
-            <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }}>
-              <T variant="caption" color={colors.white} style={{ fontFamily: 'Inter_700Bold' }}>{i + 1}</T>
+            <View style={{ width: 26, height: 26, borderRadius: radius.pill, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }}>
+              <T variant="caption" color={colors.white} style={{ fontFamily: fonts.bodyBold }}>{i + 1}</T>
             </View>
             <T style={{ flex: 1 }}>{t(`payment.${g}`)}</T>
           </View>

@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { colors, space } from '@/theme';
+import { colors, radius, space } from '@/theme';
 import { T } from './T';
 import { Icon } from './Icon';
 import { Button } from './Button';
@@ -7,7 +7,7 @@ import { Button } from './Button';
 export function SuccessView({ title, body, actions }: { title: string; body?: string; actions: { title: string; onPress: () => void; variant?: 'primary' | 'ghost' }[] }) {
   return (
     <View style={{ alignItems: 'center', gap: space(4), paddingVertical: space(10) }}>
-      <View style={{ width: 84, height: 84, borderRadius: 42, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ width: 84, height: 84, borderRadius: radius.pill, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }}>
         <Icon name="check" size={40} color={colors.white} />
       </View>
       <T variant="h2" style={{ textAlign: 'center' }}>{title}</T>

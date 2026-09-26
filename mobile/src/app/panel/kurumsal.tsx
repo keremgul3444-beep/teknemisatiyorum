@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { colors, space } from '@/theme';
+import { colors, radius, space } from '@/theme';
 import { Avatar, BoatImage, Button, Card, Header, Icon, ListingCard, Screen, Section, T, showDemoToast } from '@/components';
 import { useCompanies, useListings } from '@/services';
 
@@ -41,7 +41,7 @@ export default function KurumsalPanel() {
         {listings.map((l) => (
           <View key={l.id} style={{ gap: space(2) }}>
             <Pressable onPress={() => toggle(l.id)} style={{ flexDirection: 'row', alignItems: 'center', gap: space(2) }}>
-              <View style={{ width: 22, height: 22, borderRadius: 6, borderWidth: 1.5, borderColor: colors.primary, backgroundColor: sel.includes(l.id) ? colors.primary : colors.card, alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 22, height: 22, borderRadius: radius.sm, borderWidth: 1.5, borderColor: colors.primary, backgroundColor: sel.includes(l.id) ? colors.primary : colors.card, alignItems: 'center', justifyContent: 'center' }}>
                 {sel.includes(l.id) ? <Icon name="check" size={14} color={colors.white} /> : null}
               </View>
               <T variant="caption" color={colors.muted}>{l.brand} {l.model}</T>

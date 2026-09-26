@@ -83,3 +83,15 @@ describe('aralıklar', () => {
   test('boy aralığı', () => { expect(parseQuery('10-14 metre motoryat')).toEqual({ minLength: 10, maxLength: 14, type: 'motoryat', equipment: [] }); });
   test('yıl aralığı', () => { expect(parseQuery('2010–2015 yelkenli')).toEqual({ minYear: 2010, maxYear: 2015, type: 'yelkenli', equipment: [] }); });
 });
+
+describe('para birimsiz fiyat', () => {
+  test('"300 bine kadar" TL sayılır', () => {
+    expect(parseQuery('300 bine kadar sürat teknesi')).toEqual({ maxPrice: 300000, currency: 'TRY', type: 'surat', equipment: [] });
+  });
+  test('"2 milyona kadar"', () => {
+    expect(parseQuery('2 milyona kadar yelkenli')).toEqual({ maxPrice: 2000000, currency: 'TRY', type: 'yelkenli', equipment: [] });
+  });
+  test('çıplak sayı fiyat sayılmaz', () => {
+    expect(parseQuery('12 metre').maxPrice).toBeUndefined();
+  });
+});

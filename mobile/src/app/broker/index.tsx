@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { colors, space } from '@/theme';
+import { colors, fonts, radius, space } from '@/theme';
 import { Button, Card, Chip, Field, Header, Icon, Screen, Section, T } from '@/components';
 import { actions, formatPrice, useBoats, useBrokerCases } from '@/services';
 import { currentLang } from '@/i18n';
@@ -27,8 +27,8 @@ export default function Broker() {
       <Card>
         {[0, 1, 2, 3, 4].map((i) => (
           <View key={i} style={{ flexDirection: 'row', gap: space(3), paddingVertical: space(1) }}>
-            <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }}>
-              <T variant="caption" color={colors.white} style={{ fontFamily: 'Inter_700Bold' }}>{i + 1}</T>
+            <View style={{ width: 26, height: 26, borderRadius: radius.pill, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }}>
+              <T variant="caption" color={colors.white} style={{ fontFamily: fonts.bodyBold }}>{i + 1}</T>
             </View>
             <View style={{ flex: 1 }}>
               <T variant="bodySemi">{t(`broker.steps.s${i}`)}</T>

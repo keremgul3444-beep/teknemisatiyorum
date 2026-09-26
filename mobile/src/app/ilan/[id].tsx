@@ -144,7 +144,7 @@ export default function IlanDetay() {
 
 function RoundBtn({ icon, onPress, filled, label }: { icon: string; onPress: () => void; filled?: boolean; label: string }) {
   return (
-    <Pressable onPress={onPress} hitSlop={8} accessibilityLabel={label} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center' }}>
+    <Pressable onPress={onPress} hitSlop={8} accessibilityLabel={label} style={{ width: 40, height: 40, borderRadius: radius.pill, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center' }}>
       <Icon name={icon} size={20} color={filled ? colors.danger : colors.text} filled={filled} />
     </Pressable>
   );

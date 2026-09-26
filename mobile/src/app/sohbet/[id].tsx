@@ -64,7 +64,7 @@ export default function Sohbet() {
           {c.messages.length === 0 ? <T variant="caption" color={colors.muted} style={{ textAlign: 'center' }}>{t('messages.noMessages')}</T> : null}
           {c.messages.map((m) => (
             <View key={m.id} style={{ alignSelf: m.from === 'me' ? 'flex-end' : 'flex-start', maxWidth: '80%',
-              backgroundColor: m.from === 'me' ? colors.primary : colors.card, borderRadius: 16,
+              backgroundColor: m.from === 'me' ? colors.primary : colors.card, borderRadius: radius.card,
               borderBottomRightRadius: m.from === 'me' ? 4 : 16, borderBottomLeftRadius: m.from === 'me' ? 16 : 4,
               borderWidth: m.from === 'me' ? 0 : 1, borderColor: colors.line, paddingVertical: space(2), paddingHorizontal: space(3) }}>
               <T color={m.from === 'me' ? colors.white : colors.text}>{m.text}</T>
@@ -78,9 +78,9 @@ export default function Sohbet() {
 
         <View style={{ flexDirection: 'row', gap: space(2), padding: space(3), borderTopWidth: 1, borderColor: colors.line, backgroundColor: colors.card }}>
           <TextInput value={text} onChangeText={setText} placeholder={t('messages.placeholder')} placeholderTextColor={colors.muted} onSubmitEditing={send}
-            style={{ flex: 1, backgroundColor: colors.bg, borderRadius: 20, paddingHorizontal: space(4), paddingVertical: space(2.5), fontFamily: fonts.body, fontSize: 15, color: colors.text }} />
+            style={{ flex: 1, backgroundColor: colors.bg, borderRadius: radius.pill, paddingHorizontal: space(4), paddingVertical: space(2.5), fontFamily: fonts.body, fontSize: 15, color: colors.text }} />
           <Pressable onPress={send} accessibilityLabel={t('common.send')}
-            style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: text.trim() ? colors.primary : colors.surface, alignItems: 'center', justifyContent: 'center' }}>
+            style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: text.trim() ? colors.primary : colors.surface, alignItems: 'center', justifyContent: 'center' }}>
             <Icon name="send" size={20} color={colors.white} />
           </Pressable>
         </View>

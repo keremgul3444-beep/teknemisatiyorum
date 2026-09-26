@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { colors, space } from '@/theme';
+import { colors, radius, space } from '@/theme';
 import { Card, Icon, Screen, T } from '@/components';
 import { requireLevel } from '@/session/role';
 
@@ -18,7 +18,7 @@ export default function Ekle() {
       {items.map((i) => (
         <Card key={i.title} onPress={i.go} style={{ padding: space(5) }}>
           <View style={{ flexDirection: 'row', gap: space(4), alignItems: 'center' }}>
-            <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ width: 56, height: 56, borderRadius: radius.pill, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }}>
               <Icon name={i.icon} size={26} color={colors.white} />
             </View>
             <View style={{ flex: 1, gap: space(1) }}>

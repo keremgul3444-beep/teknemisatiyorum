@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { colors, fonts, space } from '@/theme';
+import { colors, fonts, radius, space } from '@/theme';
 import { BoatImage, Button, Card, Header, Icon, NotFound, Screen, Section, T, showDemoToast } from '@/components';
 import { useBoat, type LogKind } from '@/services';
 import { tx } from '@/i18n';
@@ -29,7 +29,7 @@ export default function Karne() {
       <Card padded={false}>
         <BoatImage seed={b.photoSeed} height={130} />
         <View style={{ padding: space(4), flexDirection: 'row', alignItems: 'center', gap: space(4) }}>
-          <View style={{ width: 70, height: 70, borderRadius: 35, borderWidth: 5, borderColor: colors.primary, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ width: 70, height: 70, borderRadius: radius.pill, borderWidth: 5, borderColor: colors.primary, alignItems: 'center', justifyContent: 'center' }}>
             <T variant="h2">{score}</T>
           </View>
           <View style={{ flex: 1 }}>
@@ -44,7 +44,7 @@ export default function Karne() {
           {entries.map((e, i) => (
             <View key={e.id} style={{ flexDirection: 'row', gap: space(3) }}>
               <View style={{ alignItems: 'center' }}>
-                <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: e.verified ? colors.primary : colors.surface, alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 34, height: 34, borderRadius: radius.pill, backgroundColor: e.verified ? colors.primary : colors.surface, alignItems: 'center', justifyContent: 'center' }}>
                   <Icon name={KIND_ICON[e.kind]} size={16} color={e.verified ? colors.white : colors.muted} />
                 </View>
                 {i < entries.length - 1 ? <View style={{ width: 2, flex: 1, backgroundColor: colors.line, minHeight: 24 }} /> : null}

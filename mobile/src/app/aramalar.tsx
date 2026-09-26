@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { colors, space } from '@/theme';
+import { colors, fonts, space } from '@/theme';
 import { Button, Card, EmptyState, Field, Header, Icon, Screen, Section, T, showDemoToast } from '@/components';
 import { actions, useSavedSearches } from '@/services';
 import { requireLevel } from '@/session/role';
@@ -37,7 +37,7 @@ export default function Aramalar() {
                 <T variant="bodySemi">"{s.query}"</T>
                 <T variant="caption" color={colors.muted}>{t('saved.created', { date: s.createdAt })}</T>
               </View>
-              <T variant="caption" color={s.newMatches ? colors.primary : colors.muted} style={{ fontFamily: 'Inter_700Bold' }}>
+              <T variant="caption" color={s.newMatches ? colors.primary : colors.muted} style={{ fontFamily: fonts.bodyBold }}>
                 {s.newMatches ? t('saved.newMatches', { count: s.newMatches }) : t('saved.noMatches')}
               </T>
             </View>

@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { colors, space } from '@/theme';
+import { colors, fonts, space } from '@/theme';
 import type { Provider } from '@/services';
 import { Card } from './Card';
 import { T } from './T';
@@ -27,7 +27,7 @@ export function ProviderCard({ provider: p, onPress }: { provider: Provider; onP
         </View>
         <View style={{ alignItems: 'flex-end', gap: space(1.5) }}>
           {p.verified ? <Badge kind="dogrulanmis" /> : <Badge kind="beklemede" />}
-          <T variant="caption" color={colors.primary} style={{ fontFamily: 'Inter_700Bold' }}>
+          <T variant="caption" color={colors.primary} style={{ fontFamily: fonts.bodyBold }}>
             {p.kind === 'kaptan' ? `€${p.dayRateEUR}${t('common.perDay')}` : p.kind === 'usta' ? t('usta.freeSurvey') : ''}
           </T>
         </View>

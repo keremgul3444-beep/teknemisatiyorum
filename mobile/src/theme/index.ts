@@ -3,7 +3,7 @@ export const colors = {
   muted: '#6B736B', surface: '#E7DFD0', line: '#E2D9C8', success: '#2E7D4F', warning: '#C98A1B',
   danger: '#B3261E', white: '#FFFFFF', overlay: 'rgba(29,43,42,0.45)',
 } as const;
-export const radius = { card: 18, button: 12, chip: 14, sm: 8 } as const;
+export const radius = { card: 18, button: 12, chip: 14, sm: 8, xs: 4, lg: 24, pill: 999 } as const;
 export const fonts = {
   heading: 'SpaceGrotesk_700Bold', headingMedium: 'SpaceGrotesk_500Medium',
   body: 'Inter_400Regular', bodySemi: 'Inter_600SemiBold', bodyBold: 'Inter_700Bold',

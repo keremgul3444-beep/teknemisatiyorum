@@ -1,6 +1,6 @@
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { colors, radius, space } from '@/theme';
+import { colors, fonts, radius, space } from '@/theme';
 import { T } from './T';
 import { Icon } from './Icon';
 
@@ -15,7 +15,7 @@ export function UploadBox({ label, state, onPress }: { label: string; state: Upl
       <Icon name={done ? 'check' : 'doc'} size={20} color={done ? colors.primary : colors.muted} />
       <T style={{ flex: 1 }}>{label}</T>
       <View style={{ backgroundColor: done ? colors.surface : colors.primary, borderRadius: radius.sm, paddingHorizontal: space(2.5), paddingVertical: space(1) }}>
-        <T variant="caption" color={done ? colors.warning : colors.white} style={{ fontFamily: 'Inter_700Bold' }}>
+        <T variant="caption" color={done ? colors.warning : colors.white} style={{ fontFamily: fonts.bodyBold }}>
           {state === 'bos' ? t('common.upload') : state === 'incelemede' ? t('common.inReview') : t('common.uploaded')}
         </T>
       </View>

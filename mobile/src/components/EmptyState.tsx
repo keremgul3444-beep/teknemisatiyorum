@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { colors, space } from '@/theme';
+import { colors, radius, space } from '@/theme';
 import { T } from './T';
 import { Button } from './Button';
 import { Icon } from './Icon';
@@ -10,7 +10,7 @@ import { goBack } from './Header';
 export function EmptyState({ title, body, actionLabel, onAction, icon = 'anchor' }: { title: string; body?: string; actionLabel?: string; onAction?: () => void; icon?: string }) {
   return (
     <View style={{ alignItems: 'center', padding: space(8), gap: space(3) }}>
-      <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ width: 64, height: 64, borderRadius: radius.pill, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' }}>
         <Icon name={icon} size={28} color={colors.primary} />
       </View>
       <T variant="h3" style={{ textAlign: 'center' }}>{title}</T>

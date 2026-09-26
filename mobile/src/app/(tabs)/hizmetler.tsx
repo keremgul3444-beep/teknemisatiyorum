@@ -29,7 +29,7 @@ export default function Hizmetler() {
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space(3) }}>
         {CARDS.map((c) => (
           <Card key={c.k} onPress={() => router.push(c.to)} style={{ width: '47.5%', minHeight: 150 }}>
-            <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }}>
               <Icon name={c.icon} size={22} color={colors.white} />
             </View>
             <T variant="h3">{t(`services.${c.k}`)}</T>
@@ -38,7 +38,7 @@ export default function Hizmetler() {
         ))}
       </View>
 
-      <View style={{ backgroundColor: colors.card, borderRadius: 16, borderWidth: 1.5, borderColor: colors.primary, padding: space(3.5), gap: space(2) }}>
+      <View style={{ backgroundColor: colors.card, borderRadius: radius.card, borderWidth: 1.5, borderColor: colors.primary, padding: space(3.5), gap: space(2) }}>
         <T variant="label" color={colors.primary}>✦ {t('services.askTitle').toLocaleUpperCase('tr-TR')}</T>
         <TextInput value={text} onChangeText={setText} placeholder={t('services.askPh')} placeholderTextColor={colors.muted} onSubmitEditing={ask}
           style={{ fontFamily: fonts.body, fontSize: 15, color: colors.text, paddingVertical: space(1) }} />

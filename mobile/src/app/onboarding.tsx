@@ -3,7 +3,7 @@ import { FlatList, View, useWindowDimensions, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { colors, space } from '@/theme';
+import { colors, radius, space } from '@/theme';
 import { BoatImage, Button, T } from '@/components';
 import { useSession } from '@/session/role';
 
@@ -44,7 +44,7 @@ export default function Onboarding() {
       <View style={{ padding: space(6), gap: space(5) }}>
         <View style={{ flexDirection: 'row', gap: space(2), justifyContent: 'center' }}>
           {PAGES.map((p, i) => (
-            <View key={p.k} style={{ width: i === page ? 22 : 8, height: 8, borderRadius: 4, backgroundColor: i === page ? colors.primary : colors.surface }} />
+            <View key={p.k} style={{ width: i === page ? 22 : 8, height: 8, borderRadius: radius.xs, backgroundColor: i === page ? colors.primary : colors.surface }} />
           ))}
         </View>
         <Button title={t('onboarding.start')} onPress={finish} />

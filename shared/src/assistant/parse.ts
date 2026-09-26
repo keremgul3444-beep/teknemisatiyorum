@@ -46,9 +46,11 @@ export function parseQuery(input: string): ParsedQuery {
   // 1) Fiyat — önce ki "2000 euro" yıl sanılmasın.
   const priceA = /([€$₺])\s*(\d+(?:[.,]\d+)*)\s*(bin|k|milyon|million|mn)?/.exec(text);
   const priceB = /(\d+(?:[.,]\d+)*)\s*(bin|k|milyon|million|mn)?\s*(tl|₺|lira|euro|eur|€|dolar|usd|\$)/.exec(text);
-  const pm = priceA ?? priceB;
+  // Para birimi yazılmamış ama çarpan kelimesi olan tutar ("300 bine kadar", "2 milyona kadar") TL sayılır.
+  const priceC = priceA || priceB ? null : /(\d+(?:[.,]\d+)*)\s*(bin|milyon|million|mn)[a-zçğıöşü]*/.exec(text);
+  const pm = priceA ?? priceB ?? priceC;
   if (pm) {
-    const [numStr, multStr, curStr] = priceA ? [pm[2], pm[3], pm[1]] : [pm[1], pm[2], pm[3]];
+    const [numStr, multStr, curStr] = priceA ? [pm[2], pm[3], pm[1]] : priceB ? [pm[1], pm[2], pm[3]] : [pm[1], pm[2], 'tl'];
     const value = toNumber(numStr) * (multStr ? MULT[multStr] : 1);
     const end = pm.index + pm[0].length;
     q.currency = CURRENCY[curStr];

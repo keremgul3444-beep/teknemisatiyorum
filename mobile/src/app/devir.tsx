@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { colors, space } from '@/theme';
+import { colors, radius, space } from '@/theme';
 import { Card, CheckRow, Header, LegalDraftNote, Screen, T } from '@/components';
 
 const STEPS = ['s1', 's2', 's3', 's4', 's5', 's6'] as const;
@@ -15,7 +15,7 @@ export default function Devir() {
     <Screen>
       <Header title={t('transfer.title')} subtitle={t('transfer.subtitle')} />
       <View style={{ gap: space(2) }}>
-        <View style={{ height: 8, borderRadius: 4, backgroundColor: colors.surface, overflow: 'hidden' }}>
+        <View style={{ height: 8, borderRadius: radius.xs, backgroundColor: colors.surface, overflow: 'hidden' }}>
           <View style={{ width: `${pct * 100}%`, height: 8, backgroundColor: colors.primary }} />
         </View>
         <T variant="caption" color={colors.muted}>{t('transfer.progress', { done: done.length, total: STEPS.length })}</T>
