@@ -104,8 +104,9 @@ export class ListingsController {
   async photos(@CurrentUser() u: AuthUser, @Param('id') id: string, @Body(new ZodPipe(photosSchema)) b: z.infer<typeof photosSchema>) {
     const l = await this.listings.getOwn(id, u.id);
     await this.media.assertOwnPublic(u.id, b.fileIds);
-    if (l.photos.length + b.fileIds.length > MAX_PHOTOS) throw Errors.bad('TOO_MANY_PHOTOS', { max: MAX_PHOTOS });
+    // Zaten ekli fotoğrafların yeniden gönderilmesi (yarıda kalan gönderimin tekrarı) sınıra sayılmaz.
     const fresh = b.fileIds.filter((f) => !l.photos.some((p) => p.fileId === f));
+    if (l.photos.length + fresh.length > MAX_PHOTOS) throw Errors.bad('TOO_MANY_PHOTOS', { max: MAX_PHOTOS });
     await this.prisma.listingPhoto.createMany({ data: fresh.map((fileId, i) => ({ listingId: id, fileId, order: l.photos.length + i })) });
     // Onaylanmış içerik denetimsiz değişmesin: yayındaki/reddedilmiş ilana fotoğraf eklenince yeniden onaya düşer.
     if (fresh.length && (l.status === 'published' || l.status === 'rejected')) await this.prisma.listing.update({ where: { id }, data: { status: 'pending' } });

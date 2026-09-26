@@ -26,6 +26,8 @@ async function upload(uri: string, visibility: 'public' | 'private'): Promise<st
 
 /** İlan gönderimi yarıda kalırsa yeniden denemede kaldığı yerden sürer (yeni taslak açılmaz). */
 const publishListing = createPublisher({ post: (p, b) => api.post(p, b), patch: (p, b) => api.patch(p, b), upload });
+// Hesap değişince (çıkış, başka kullanıcıyla giriş) yarım kalan ilan gönderimi unutulur.
+useSession.subscribe((s, prev) => { if (s.userId !== prev.userId || s.loggedIn !== prev.loggedIn) publishListing.reset(); });
 
 /**
  * Ekranların tek eylem kapısı. Demo modunda prototipin yerel deposu, gerçek modda sunucu kullanılır;
@@ -72,12 +74,12 @@ export const actions = {
     await api.post('/verification/requests', { kind, fileIds });
   },
   async logout() {
-    if (isApiMode()) {
-      await api.post('/auth/logout').catch(() => undefined);
-      await api.logoutLocal();
-      await syncAll();
-    }
+    if (!isApiMode()) return useSession.getState().logout();
+    await api.post('/auth/logout').catch(() => undefined);
+    await api.logoutLocal();
+    // Ekran önce çıkışa geçer; misafir verisinin yüklenmesi ağ hatası verse bile oturum açık görünmez.
     useSession.getState().logout();
+    await syncAll();
   },
   async deleteAccount() {
     if (isApiMode()) {
@@ -208,7 +210,11 @@ export const actions = {
   /** Dil ve tercihler sunucuda saklanır (başka cihazda da geçerli); demo modunda yalnızca yerel. */
   async updateProfile(patch: { lang?: 'tr' | 'en'; prefs?: Partial<Prefs> }) {
     if (!isApiMode() || !useSession.getState().loggedIn) {
-      if (patch.prefs) useSession.setState({ prefs: { ...useSession.getState().prefs, ...patch.prefs } });
+      if (patch.prefs) {
+        const next = { ...useSession.getState().prefs, ...patch.prefs };
+        if (!next.marketingConsent) next.notifyMarketing = false; // sunucudaki kuralın aynısı
+        useSession.setState({ prefs: next });
+      }
       return;
     }
     applyUser(await api.patch<ApiUser>('/me', patch));

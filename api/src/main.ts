@@ -4,6 +4,8 @@ import type { INestApplication } from '@nestjs/common';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { env } from './config/env';
+import { PrismaService } from './common/prisma.service';
+import { backfillNationalIdHashes } from './modules/verification/backfill';
 
 /** Uygulamayı ortak ayarlarla yapılandırır; testler de aynı fonksiyonu kullanır. */
 export function configureApp(app: INestApplication) {
@@ -16,6 +18,11 @@ export function configureApp(app: INestApplication) {
 
 async function bootstrap() {
   const app = configureApp(await NestFactory.create(AppModule));
+  // Kimlik tekliği kuralından önce doğrulanmış kullanıcıların izi doldurulur (tekrar çalışması zararsız).
+  const bf = await backfillNationalIdHashes(app.get(PrismaService));
+  if (bf.filled) console.log(`Kimlik izi dolduruldu: ${bf.filled} kullanıcı`);
+  for (const c of bf.conflicts) console.warn(`UYARI: aynı T.C. numarası iki hesapta — ${c.userId} (asıl: ${c.heldBy}); yönetici incelemeli`);
+  if (bf.unreadable.length) console.warn(`UYARI: ${bf.unreadable.length} kimlik kaydı çözülemedi (ID_ENC_KEY değişmiş olabilir)`);
   await app.listen(env().PORT);
   console.log(`API hazır: http://localhost:${env().PORT}`);
 }

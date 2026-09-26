@@ -37,3 +37,20 @@ test('başarılı gönderimden sonra yeni ilan yeni taslak açar', async () => {
   expect(await publish(draft, {})).toBe('L1');
   expect(await publish(draft, {})).toBe('L2');
 });
+
+test('çıkış yapılınca yarım kalan gönderim unutulur; başka hesap yeni taslak açar', async () => {
+  const f = fakeApi(1);
+  const publisher = createPublisher(f.deps);
+  await expect(publisher(draft, {})).rejects.toThrow();
+  publisher.reset();
+  expect(await publisher(draft, {})).toBe('L2');
+  expect(f.calls).not.toContain('PATCH /listings/L1');
+});
+
+test('yarım taslak silinmişse (404/409) yeni taslakla baştan başlanır', async () => {
+  const f = fakeApi(1);
+  const publisher = createPublisher(f.deps);
+  await expect(publisher(draft, {})).rejects.toThrow();
+  f.deps.patch.mockImplementationOnce(async () => { throw Object.assign(new Error('gone'), { status: 409 }); });
+  expect(await publisher(draft, {})).toBe('L2');
+});

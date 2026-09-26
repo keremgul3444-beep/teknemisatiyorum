@@ -664,7 +664,7 @@
     "nJobs": "İş ve ödeme durumu",
     "nMarketing": "Kampanyalar",
     "privacy": "Gizlilik",
-    "phoneVisible": "Numaram ilanlarda görünsün",
+    "phoneVisible": "Numaram, ilanlarıma yazan herkese görünsün",
     "marketingConsent": "Ticari ileti izni",
     "download": "Verilerimi indir",
     "downloadDone": "Verilerin hazırlanıyor; e-postana gönderilecek",
@@ -680,7 +680,8 @@
     "modeDemoShort": "Demo",
     "modeApi": "Gerçek moda geçildi",
     "modeDemo": "Demo moduna geçildi",
-    "downloadReady": "Veri kopyan hazırlandı (verilerim.json)"
+    "downloadReady": "Veri kopyan hazırlandı (verilerim.json)",
+    "nMarketingHint": "Önce aşağıdaki ticari ileti iznini vermelisin"
   },
   "devices": {
     "title": "Cihazlar ve oturumlar",
@@ -857,7 +858,8 @@
     "tckn_in_use": "Bu T.C. kimlik numarası başka bir hesapta kayıtlı",
     "too_many_saved_searches": "En fazla 20 arama kaydedebilirsin",
     "user_deleted": "Bu kullanıcı hesabını sildi; mesaj gönderilemez",
-    "user_not_found": "Bu numarayla kayıtlı kullanıcı yok"
+    "user_not_found": "Bu numarayla kayıtlı kullanıcı yok",
+    "consent_required": "Bunun için önce ticari ileti izni vermelisin"
   },
   "soon": {
     "title": "Yakında",
@@ -870,7 +872,8 @@
     "listingApproved": "İlanın yayında: {{title}}",
     "listingRejected": "İlanın reddedildi: {{title}}",
     "newMessage": "Yeni mesaj: {{title}}",
-    "reportReady": "Ekspertiz raporun hazır · {{score}}/100"
+    "reportReady": "Ekspertiz raporun hazır · {{score}}/100",
+    "searchMatch": "Kayıtlı aramana yeni ilan: {{title}}"
   },
   "notifs": {
     "title": "Bildirimler",

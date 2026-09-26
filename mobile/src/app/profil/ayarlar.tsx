@@ -41,7 +41,8 @@ export default function Ayarlar() {
           <ToggleRow label={t('settings.nMessages')} value={prefs.notifyMessages} onChange={(v) => setPref('notifyMessages', v)} />
           <ToggleRow label={t('settings.nMatches')} value={prefs.notifyMatches} onChange={(v) => setPref('notifyMatches', v)} />
           {mode === 'demo' ? <ToggleRow label={t('settings.nJobs')} value={jobs} onChange={setJobs} /> : null}
-          <ToggleRow label={t('settings.nMarketing')} value={prefs.notifyMarketing} onChange={(v) => setPref('notifyMarketing', v)} />
+          <ToggleRow label={t('settings.nMarketing')} value={prefs.notifyMarketing} onChange={(v) => setPref('notifyMarketing', v)}
+            disabled={!prefs.marketingConsent} hint={prefs.marketingConsent ? undefined : t('settings.nMarketingHint')} />
         </Card>
       </Section>
       <Section title={t('settings.privacy')}>

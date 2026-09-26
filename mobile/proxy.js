@@ -2,11 +2,13 @@
 const http = require('http');
 
 /**
- * İstemcinin gönderdiği X-Forwarded-For korunur ama gerçek bağlantı adresi HER ZAMAN sona eklenir.
- * API yalnızca son (güvenilen proxy'nin eklediği) adrese güvenir; istemci sahte IP ile istek sınırlarını aşamaz.
+ * Gerçek bağlantı adresi HER ZAMAN sona eklenir. Gelen X-Forwarded-For'dan yalnızca son halka (bize bağlanan
+ * tünelin eklediği gerçek istemci adresi) tutulur; istemcinin kendi uydurduğu önceki adresler atılır. Böylece
+ * API ("loopback" güvenir) tünel arkasındaki istemcinin sahte IP ile istek sınırlarını aşmasına izin vermez.
  */
 function forwardedFor(xff, remote) {
-  return xff ? `${xff}, ${remote}` : remote;
+  const last = xff ? String(xff).split(',').map((s) => s.trim()).filter(Boolean).at(-1) : undefined;
+  return last ? `${last}, ${remote}` : remote;
 }
 
 function apiProxy(target) {

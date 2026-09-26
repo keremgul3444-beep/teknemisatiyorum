@@ -13,12 +13,24 @@ interface Deps {
  * yüklenmiş fotoğraflar yeniden yüklenmez. Başarıdan sonra durum sıfırlanır.
  */
 export function createPublisher(deps: Deps) {
-  let st: { listingId?: string; files: Map<string, string>; submitted?: boolean; ownership?: boolean; broker?: boolean } = { files: new Map() };
+  type State = { listingId?: string; files: Map<string, string>; submitted?: boolean; ownership?: boolean; broker?: boolean };
+  let st: State = { files: new Map() };
+  const create = async (d: ListingDraft) => ((await deps.post('/listings', d)) as { id: string }).id;
 
-  return async function publish(d: ListingDraft, extra: PublishExtra): Promise<string> {
+  async function publish(d: ListingDraft, extra: PublishExtra): Promise<string> {
     let id = st.listingId;
-    if (!id) id = st.listingId = ((await deps.post('/listings', d)) as { id: string }).id;
-    else await deps.patch(`/listings/${id}`, d);
+    if (id) {
+      try {
+        await deps.patch(`/listings/${id}`, d);
+      } catch (e) {
+        // Yarım taslak silinmiş ya da kapanmışsa (404/409) baştan, yeni taslakla başlanır.
+        const status = (e as { status?: number }).status;
+        if (status !== 404 && status !== 409) throw e;
+        st = { files: new Map() };
+        id = undefined;
+      }
+    }
+    if (!id) id = st.listingId = await create(d);
 
     for (const uri of extra.photoUris ?? []) if (!st.files.has(uri)) st.files.set(uri, await deps.upload(uri, 'public'));
     const fileIds = (extra.photoUris ?? []).map((u) => st.files.get(u)!);
@@ -35,5 +47,8 @@ export function createPublisher(deps: Deps) {
     }
     st = { files: new Map() };
     return id;
-  };
+  }
+  /** Çıkış/giriş yapılınca yarım kalan gönderim unutulur (başka hesap aynı taslağa dokunmasın). */
+  publish.reset = () => { st = { files: new Map() }; };
+  return publish;
 }

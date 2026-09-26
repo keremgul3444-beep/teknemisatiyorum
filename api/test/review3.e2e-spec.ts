@@ -154,7 +154,7 @@ test('KVKK: kullanıcı kendi verisinin kopyasını indirir; gizli alanlar yoktu
   expect(r.headers['content-disposition']).toContain('attachment');
   expect(r.body.profile.name).toBe('Veri Sahibi');
   expect(r.body.listings.map((l: { id: string }) => l.id)).toContain(id);
-  for (const k of ['sessions', 'boats', 'favorites', 'savedSearches', 'messages', 'expertiseBookings', 'brokerCases', 'notifications', 'verificationRequests']) expect(r.body).toHaveProperty(k);
+  for (const k of ['sessions', 'boats', 'favorites', 'savedSearches', 'conversations', 'consentHistory', 'expertiseBookings', 'brokerCases', 'notifications', 'verificationRequests']) expect(r.body).toHaveProperty(k);
   const raw = JSON.stringify(r.body);
   for (const secret of ['nationalIdEnc', 'nationalIdHash', 'refreshHash', 'codeHash']) expect(raw).not.toContain(secret);
 });

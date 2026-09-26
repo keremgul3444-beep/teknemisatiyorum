@@ -3,14 +3,14 @@ import { useMode } from './mode';
 
 /**
  * Gerçek modda `fn`'i `ms` aralıkla çağırır (ör. açık sohbette yeni mesajlar). Önceki çağrı bitmeden
- * yenisi başlamaz; hatalar sessizce yutulur (her turda hata kutusu açılmasın), sonraki turda tekrar denenir.
+ * yenisi başlamaz; `enabled` false iken (ör. ekran arkada kaldı) durur; hatalar sessizce yutulur (her turda hata kutusu açılmasın), sonraki turda tekrar denenir.
  */
-export function usePolling(fn: () => Promise<unknown>, ms: number) {
+export function usePolling(fn: () => Promise<unknown>, ms: number, enabled = true) {
   const mode = useMode((s) => s.mode);
   const latest = useRef(fn);
   useEffect(() => { latest.current = fn; });
   useEffect(() => {
-    if (mode !== 'api') return;
+    if (mode !== 'api' || !enabled) return;
     let busy = false;
     const h = setInterval(() => {
       if (busy) return;
@@ -18,5 +18,5 @@ export function usePolling(fn: () => Promise<unknown>, ms: number) {
       latest.current().catch(() => {}).finally(() => { busy = false; });
     }, ms);
     return () => clearInterval(h);
-  }, [mode, ms]);
+  }, [mode, ms, enabled]);
 }

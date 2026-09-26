@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import sharp from 'sharp';
-import type { Visibility } from '@prisma/client';
+import { Prisma, type Visibility } from '@prisma/client';
 import { PrismaService } from '../../common/prisma.service';
 import { AppError, Errors } from '../../common/errors';
 import { safeEqual, sign } from '../../common/crypto';
@@ -43,6 +43,9 @@ export class MediaService {
   async readPublic(id: string) {
     const f = await this.prisma.file.findUnique({ where: { id } });
     if (!f || f.visibility !== 'public') throw Errors.notFound();
+    // Hesabını silen kişinin fotoğrafları bağlantısı bilinse bile açılmaz.
+    const gone = await this.prisma.user.count({ where: { id: f.ownerId, deletedAt: { not: null } } });
+    if (gone) throw Errors.notFound();
     return this.read(f.key, f.mime);
   }
 
@@ -78,7 +81,9 @@ export class MediaService {
     const files = await this.prisma.file.findMany({ where: { ownerId: userId, visibility: 'private' } });
     await Promise.all(files.map((f) => this.storage.remove(f.key)));
     await this.prisma.file.deleteMany({ where: { id: { in: files.map((f) => f.id) } } });
-    await this.prisma.verificationRequest.updateMany({ where: { userId }, data: { fileIds: [] } });
+    await this.prisma.verificationRequest.updateMany({ where: { userId }, data: { fileIds: [], details: Prisma.DbNull } });
+    // Bekleyen başvurular geri çekilir: silinmiş hesap moderatör kuyruğunda görünmez, onaylanamaz.
+    await this.prisma.verificationRequest.updateMany({ where: { userId, status: 'pending' }, data: { status: 'rejected', rejectReason: 'withdrawn', decidedAt: new Date() } });
   }
 
   private async read(key: string, mime: string) {

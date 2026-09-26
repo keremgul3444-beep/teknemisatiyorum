@@ -3,8 +3,8 @@ import { act, render } from '@testing-library/react-native';
 import { usePolling } from '@/services/usePolling';
 import { useMode } from '@/services/mode';
 
-function Probe({ fn }: { fn: () => Promise<void> }) {
-  usePolling(fn, 5000);
+function Probe({ fn, on = true }: { fn: () => Promise<void>; on?: boolean }) {
+  usePolling(fn, 5000, on);
   return <Text>x</Text>;
 }
 
@@ -37,5 +37,13 @@ describe('usePolling', () => {
     await render(<Probe fn={bad} />);
     await tick(); await tick();
     expect(bad).toHaveBeenCalledTimes(2);
+  });
+
+  it('ekran arkada kalınca (odak yok) çağırmaz', async () => {
+    useMode.setState({ mode: 'api' });
+    const fn = jest.fn(async () => {});
+    await render(<Probe fn={fn} on={false} />);
+    await tick(); await tick();
+    expect(fn).not.toHaveBeenCalled();
   });
 });

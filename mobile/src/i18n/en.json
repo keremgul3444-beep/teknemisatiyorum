@@ -664,7 +664,7 @@
     "nJobs": "Job and payment status",
     "nMarketing": "Promotions",
     "privacy": "Privacy",
-    "phoneVisible": "Show my number on listings",
+    "phoneVisible": "Show my number to anyone who messages about my listings",
     "marketingConsent": "Marketing consent",
     "download": "Download my data",
     "downloadDone": "Your data is being prepared and will be emailed to you",
@@ -680,7 +680,8 @@
     "modeDemoShort": "Demo",
     "modeApi": "Switched to live mode",
     "modeDemo": "Switched to demo mode",
-    "downloadReady": "Your data copy is ready (verilerim.json)"
+    "downloadReady": "Your data copy is ready (verilerim.json)",
+    "nMarketingHint": "Give commercial message consent below first"
   },
   "devices": {
     "title": "Devices and sessions",
@@ -857,7 +858,8 @@
     "tckn_in_use": "This national ID number is registered to another account",
     "too_many_saved_searches": "You can save up to 20 searches",
     "user_deleted": "This user deleted their account; messages can't be sent",
-    "user_not_found": "No user registered with this number"
+    "user_not_found": "No user registered with this number",
+    "consent_required": "You need to give commercial message consent first"
   },
   "soon": {
     "title": "Coming soon",
@@ -870,7 +872,8 @@
     "listingApproved": "Your listing is live: {{title}}",
     "listingRejected": "Your listing was rejected: {{title}}",
     "newMessage": "New message: {{title}}",
-    "reportReady": "Your survey report is ready · {{score}}/100"
+    "reportReady": "Your survey report is ready · {{score}}/100",
+    "searchMatch": "New listing for your saved search: {{title}}"
   },
   "notifs": {
     "title": "Notifications",

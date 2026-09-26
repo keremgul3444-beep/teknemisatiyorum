@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useIsFocused, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { colors, fonts, radius, space } from '@/theme';
@@ -23,7 +23,9 @@ export default function Sohbet() {
 
   useEffect(() => { if (id) attempt(() => actions.openConversation(id)); }, [id]);
   // Gerçek modda karşı tarafın yeni mesajları ~5 sn içinde gelir (anlık bildirim altyapısı sonraki dalgada).
-  usePolling(async () => { if (id) await actions.openConversation(id); }, 5000);
+  // Yalnızca ekran önündeyken: arkada kalan sohbet görülmemiş mesajları okundu saymasın.
+  const focused = useIsFocused();
+  usePolling(async () => { if (id) await actions.openConversation(id); }, 5000, focused);
   useEffect(() => { setTimeout(() => scroll.current?.scrollToEnd({ animated: true }), 50); }, [c?.messages.length]);
   if (!c) return <NotFound />;
 

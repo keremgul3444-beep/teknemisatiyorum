@@ -254,7 +254,7 @@ await criterion(5, 'Karne, favori, kayıtlı arama, ekspertiz ve broker kalıcı
   await B.see(`Kabul arama ${RUN}`, 15000);
   // Ekspertiz ve broker (kimlik seviyesi 2 gerektirir): önce kimlik
   await B.nav(`/verify/identity`);
-  await B.fillPh('•••', '10000000146');
+  await B.fillPh('•••', randomTckn());
   await B.byLabel('Ad').fill('Alıcı');
   await B.byLabel('Soyad').fill('Kabul');
   await B.byLabel('Doğum yılı').fill('1990');
