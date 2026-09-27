@@ -866,7 +866,8 @@
     "bad_signature": "Ödeme bildirimi doğrulanamadı",
     "bad_receipt": "Satın alma makbuzu geçersiz",
     "amount_mismatch": "Ödeme tutarı siparişle uyuşmuyor",
-    "not_refundable": "Bu sipariş iade edilemez"
+    "not_refundable": "Bu sipariş iade edilemez",
+    "receipt_used": "Bu satın alma zaten kullanıldı"
   },
   "soon": {
     "title": "Yakında",

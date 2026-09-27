@@ -7,6 +7,7 @@ import { Errors } from '../../common/errors';
 import { OrdersService } from './orders.service';
 
 const orderBody = z.object({ listingId: z.string().min(1), productCode: z.string().min(1).max(40) });
+const storeBody = z.object({ listingId: z.string().min(1), platform: z.enum(['ios', 'android']), receipt: z.string().min(6).max(20000) });
 
 @Controller()
 export class OrdersController {
@@ -16,6 +17,13 @@ export class OrdersController {
   @Post('orders')
   create(@CurrentUser() u: AuthUser, @Body(new ZodPipe(orderBody)) b: z.infer<typeof orderBody>) {
     return this.orders.create(u.id, b.listingId, b.productCode);
+  }
+
+  /** Uygulama içi (Apple/Google) satın alma: makbuz sunucuda doğrulanmadan ürün açılmaz. */
+  @Auth({ level: 1 })
+  @Post('orders/store')
+  store(@CurrentUser() u: AuthUser, @Body(new ZodPipe(storeBody)) b: z.infer<typeof storeBody>) {
+    return this.orders.createFromStore(u.id, b.listingId, b.platform, b.receipt);
   }
 
   @Auth()

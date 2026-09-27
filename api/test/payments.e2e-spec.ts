@@ -101,3 +101,21 @@ test('deneme tamamlama: yalnızca sipariş sahibi; ürün açılır', async () =
   expect((await t.http().post('/payments/web/dev-complete').set(u.auth).send({ orderId: o.body.orderId, result: 'success' })).status).toBe(200);
   expect((await t.prisma.listing.findUniqueOrThrow({ where: { id } })).bumpedAt).toBeTruthy();
 });
+
+test('mağaza makbuzu: doğrulanır, ürün açılır; aynı makbuz ikinci kez kullanılamaz', async () => {
+  const u = await loginAs(t, { level: 2 });
+  const id = await published(u.auth);
+  const receipt = `dev:tms.acil_7:${Date.now()}abc`;
+  const r = await t.http().post('/orders/store').set(u.auth).send({ listingId: id, platform: 'ios', receipt });
+  expect(r.status).toBe(201);
+  expect(r.body.status).toBe('paid');
+  const o = await t.prisma.order.findUniqueOrThrow({ where: { id: r.body.orderId } });
+  expect(o).toMatchObject({ channel: 'ios', amountKurus: 5900, productCode: 'acil_7' });
+  expect((await t.prisma.listing.findUniqueOrThrow({ where: { id } })).urgentUntil).toBeTruthy();
+  const again = await t.http().post('/orders/store').set(u.auth).send({ listingId: id, platform: 'ios', receipt });
+  expect(again.status).toBe(409);
+  expect(again.body.code).toBe('RECEIPT_USED');
+  expect((await t.http().post('/orders/store').set(u.auth).send({ listingId: id, platform: 'android', receipt: 'dev:bilinmeyen:abcdef' })).status).toBe(400);
+  const other = await loginAs(t, { level: 2 });
+  expect((await t.http().post('/orders/store').set(other.auth).send({ listingId: id, platform: 'ios', receipt: `dev:tms.acil_7:${Date.now()}zzz` })).status).toBe(404);
+});

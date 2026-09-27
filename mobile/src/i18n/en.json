@@ -866,7 +866,8 @@
     "bad_signature": "Payment notification could not be verified",
     "bad_receipt": "Invalid purchase receipt",
     "amount_mismatch": "Payment amount does not match the order",
-    "not_refundable": "This order can't be refunded"
+    "not_refundable": "This order can't be refunded",
+    "receipt_used": "This purchase was already used"
   },
   "soon": {
     "title": "Coming soon",

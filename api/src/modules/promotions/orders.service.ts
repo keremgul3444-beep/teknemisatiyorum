@@ -3,7 +3,7 @@ import type { Order, Prisma } from '@prisma/client';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/audit.service';
 import { AppError, Errors } from '../../common/errors';
-import { WEB_PAYMENT, type WebPaymentProvider } from '../../adapters/payments';
+import { STORE_VERIFIER, WEB_PAYMENT, type StoreVerifier, type WebPaymentProvider } from '../../adapters/payments';
 import { applyProduct, revertProduct } from './promotion.rules';
 
 const PENDING_TTL_MS = 24 * 3600e3;
@@ -15,6 +15,7 @@ export class OrdersService {
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
     @Inject(WEB_PAYMENT) private readonly web: WebPaymentProvider,
+    @Inject(STORE_VERIFIER) private readonly store: StoreVerifier,
   ) {}
 
   /** Satın alınabilirlik: ilan var, sahibi bu kullanıcı (değilse 404) ve yayında (değilse 409). */
@@ -38,6 +39,28 @@ export class OrdersService {
     const { providerRef, checkoutUrl } = await this.web.createCheckout({ orderId: o.id, amountKurus: o.amountKurus });
     await this.prisma.order.update({ where: { id: o.id }, data: { providerRef } });
     return { orderId: o.id, checkoutUrl };
+  }
+
+  /** Mağaza satın alması: makbuz doğrulanır, sipariş `paid` olarak oluşur ve aynı işlemde etkinleşir. */
+  async createFromStore(userId: string, listingId: string, platform: 'ios' | 'android', receipt: string) {
+    await this.assertBuyable(userId, listingId);
+    const { storeProductId, transactionId } = await this.store.verify(platform, receipt);
+    const p = await this.prisma.product.findFirst({
+      where: platform === 'ios' ? { iosProductId: storeProductId, active: true } : { androidProductId: storeProductId, active: true },
+    });
+    if (!p) throw new AppError('BAD_RECEIPT', 'errors.bad_receipt', 400);
+    const providerRef = `${platform}:${transactionId}`;
+    try {
+      return await this.prisma.$transaction(async (db) => {
+        const o = await db.order.create({ data: { userId, listingId, productCode: p.code, channel: platform, amountKurus: p.priceAppKurus, providerRef } });
+        await this.markPaid({ id: o.id }, new Date(), db);
+        return { orderId: o.id, status: 'paid' as const };
+      });
+    } catch (e) {
+      // Aynı makbuz (işlem kimliği) ikinci kez: tekillik ihlali.
+      if ((e as { code?: string }).code === 'P2002') throw new AppError('RECEIPT_USED', 'errors.receipt_used', 409);
+      throw e;
+    }
   }
 
   /**
