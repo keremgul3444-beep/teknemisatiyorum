@@ -66,7 +66,23 @@
   },
   "promo": {
     "featured": "Featured",
-    "urgent": "Urgent"
+    "urgent": "Urgent",
+    "title": "Promote your listing",
+    "intro": "Reach more buyers on the home page showcase, at the top of search results or with an \"Urgent\" label.",
+    "product": {
+      "vitrin_7": "Featured · 7 days",
+      "vitrin_30": "Featured · 30 days",
+      "acil_7": "Urgent sale · 7 days",
+      "acil_30": "Urgent sale · 30 days",
+      "ust_tasi": "Bump to top"
+    },
+    "kindHint": {
+      "vitrin": "Home page showcase and top of search results",
+      "acil": "Red \"Urgent\" label and the urgent sales strip",
+      "bump": "Your listing jumps back to the top of \"newest\""
+    },
+    "trialPrice": "Trial price",
+    "buy": "Buy"
   },
   "boatType": {
     "motoryat": "Motor yacht",
@@ -402,6 +418,120 @@
           "b": "Used only with your consent. No analytics tool is in use right now."
         }
       ]
+    }
+  },
+  "errors": {
+    "generic": "Something went wrong, please try again.",
+    "network": "Couldn't reach the server. Check your connection.",
+    "validation": "Some fields are invalid.",
+    "unauthenticated": "Your session ended, please log in again.",
+    "forbidden": "You don't have permission for this.",
+    "notFound": "Not found.",
+    "rateLimited": "Too many attempts. Try again shortly.",
+    "tooLarge": "File is too large (max 10 MB).",
+    "unsupportedType": "This file type isn't supported.",
+    "otp_rate": "Wait a minute before requesting a new code.",
+    "otp_invalid": "Incorrect code.",
+    "otp_expired": "The code expired, request a new one.",
+    "otp_locked": "Too many wrong attempts. Request a new code.",
+    "invalid_tckn": "Invalid Turkish ID number.",
+    "photo_required": "Add at least one photo.",
+    "too_many_photos": "You can add up to {{max}} photos.",
+    "own_listing": "You can't message your own listing.",
+    "already_decided": "A decision was already made for this item.",
+    "broker_done": "The file is at its final step.",
+    "internal": "A server error occurred.",
+    "badRequest": "Invalid request",
+    "file_required": "Please choose a file",
+    "levelRequired": "This needs verification level {{level}}",
+    "listing_closed": "This listing is no longer live",
+    "listing_not_draft": "This listing can't be edited right now",
+    "listing_not_published": "Listing is not live",
+    "no_staff": "Support team is not reachable right now",
+    "owner_locked": "The company owner's role can't be changed",
+    "self_decision": "You can't decide on your own listing or document",
+    "tckn_in_use": "This national ID number is registered to another account",
+    "too_many_saved_searches": "You can save up to 20 searches",
+    "user_deleted": "This user deleted their account; messages can't be sent",
+    "user_not_found": "No user registered with this number",
+    "consent_required": "You need to give commercial message consent first",
+    "bad_width": "Invalid image width",
+    "bad_signature": "Payment notification could not be verified",
+    "bad_receipt": "Invalid purchase receipt",
+    "amount_mismatch": "Payment amount does not match the order",
+    "not_refundable": "This order can't be refunded",
+    "receipt_used": "This purchase was already used"
+  },
+  "login": {
+    "title": "Log in",
+    "subtitle": "Log in with your phone number to manage and promote your listings.",
+    "phone": "Phone",
+    "sendCode": "Send code",
+    "code": "Verification code",
+    "verify": "Verify",
+    "resend": "Resend code",
+    "resendIn": "Resend ({{s}} s)",
+    "codeSent": "We sent a 6-digit code to your number.",
+    "betaHint": "Closed beta: the code fills in automatically instead of SMS."
+  },
+  "account": {
+    "title": "My account",
+    "hello": "Hello {{name}}",
+    "level": "Verification level {{n}}",
+    "listings": "My listings",
+    "listingsBody": "See and promote your listings.",
+    "orders": "My orders",
+    "ordersBody": "Your promotion orders and their status.",
+    "logout": "Log out",
+    "noListings": "You have no listings yet. Use the app to post one.",
+    "noOrders": "No orders yet.",
+    "promote": "Promote",
+    "notPublished": "The listing must be live to be promoted",
+    "featuredLeft": "Featured · {{n}} days",
+    "urgentLeft": "Urgent · {{n}} days",
+    "status": {
+      "draft": "Draft",
+      "pending": "Pending review",
+      "published": "Live",
+      "rejected": "Rejected",
+      "sold": "Sold",
+      "removed": "Removed"
+    },
+    "orderStatus": {
+      "pending": "Awaiting payment",
+      "paid": "Paid",
+      "failed": "Failed",
+      "refunded": "Refunded",
+      "cancelled": "Cancelled"
+    },
+    "col": {
+      "listing": "Listing",
+      "product": "Product",
+      "amount": "Amount",
+      "status": "Status",
+      "date": "Date"
+    }
+  },
+  "pay": {
+    "devTitle": "Trial payment",
+    "devBanner": "TRIAL PAYMENT — no money is charged. This page is replaced by the real payment page once the card processor is set up.",
+    "devSuccess": "Pay (success)",
+    "devFailure": "Try failure",
+    "resultTitle": "Payment result",
+    "retry": "Try again",
+    "result": {
+      "pending": "Waiting for payment confirmation",
+      "paid": "Promotion active",
+      "failed": "Payment failed",
+      "refunded": "Order refunded",
+      "cancelled": "Order cancelled"
+    },
+    "resultBody": {
+      "pending": "This page updates by itself when confirmation arrives.",
+      "paid": "Your listing is now promoted.",
+      "failed": "No money was charged. You can try again.",
+      "refunded": "This order was refunded.",
+      "cancelled": "This order timed out; you can buy again."
     }
   }
 }

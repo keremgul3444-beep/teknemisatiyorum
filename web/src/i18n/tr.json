@@ -66,7 +66,23 @@
   },
   "promo": {
     "featured": "Vitrin",
-    "urgent": "Acil"
+    "urgent": "Acil",
+    "title": "İlanını öne çıkar",
+    "intro": "İlanın ana sayfa vitrininde, arama sonuçlarının üstünde ya da \"Acil\" etiketiyle daha çok kişiye ulaşsın.",
+    "product": {
+      "vitrin_7": "Vitrin · 7 gün",
+      "vitrin_30": "Vitrin · 30 gün",
+      "acil_7": "Acil satılık · 7 gün",
+      "acil_30": "Acil satılık · 30 gün",
+      "ust_tasi": "Üste taşı"
+    },
+    "kindHint": {
+      "vitrin": "Ana sayfa vitrini ve arama sonuçlarının üstü",
+      "acil": "Kırmızı \"Acil\" etiketi ve Acil satılıklar şeridi",
+      "bump": "İlanın \"en yeni\" sıralamada yeniden en üste çıkar"
+    },
+    "trialPrice": "Deneme fiyatı",
+    "buy": "Satın al"
   },
   "boatType": {
     "motoryat": "Motoryat",
@@ -402,6 +418,120 @@
           "b": "Yalnızca iznin olursa kullanılır. Şu an hiçbir istatistik aracı kullanılmıyor."
         }
       ]
+    }
+  },
+  "errors": {
+    "generic": "Bir şeyler ters gitti, tekrar dene.",
+    "network": "Sunucuya ulaşılamadı. Bağlantını kontrol et.",
+    "validation": "Bazı alanlar geçersiz.",
+    "unauthenticated": "Oturumun kapandı, tekrar giriş yap.",
+    "forbidden": "Bu işlem için yetkin yok.",
+    "notFound": "Bulunamadı.",
+    "rateLimited": "Çok fazla deneme. Biraz sonra tekrar dene.",
+    "tooLarge": "Dosya çok büyük (en fazla 10 MB).",
+    "unsupportedType": "Bu dosya türü desteklenmiyor.",
+    "otp_rate": "Yeni kod için bir dakika bekle.",
+    "otp_invalid": "Kod hatalı.",
+    "otp_expired": "Kodun süresi doldu, yenisini iste.",
+    "otp_locked": "Çok fazla hatalı deneme. Yeni kod iste.",
+    "invalid_tckn": "T.C. kimlik numarası geçersiz.",
+    "photo_required": "En az bir fotoğraf ekle.",
+    "too_many_photos": "En fazla {{max}} fotoğraf eklenebilir.",
+    "own_listing": "Kendi ilanına mesaj gönderemezsin.",
+    "already_decided": "Bu kayıt için zaten karar verilmiş.",
+    "broker_done": "Dosya son adımda.",
+    "internal": "Sunucuda bir hata oluştu.",
+    "badRequest": "İstek geçersiz",
+    "file_required": "Dosya seçmelisin",
+    "levelRequired": "Bu işlem için doğrulama seviyesi {{level}} gerekli",
+    "listing_closed": "Bu ilan artık yayında değil",
+    "listing_not_draft": "İlan şu an düzenlenemez",
+    "listing_not_published": "İlan yayında değil",
+    "no_staff": "Şu an destek ekibine ulaşılamıyor",
+    "owner_locked": "Firma sahibinin rolü değiştirilemez",
+    "self_decision": "Kendi ilanın ya da belgen hakkında karar veremezsin",
+    "tckn_in_use": "Bu T.C. kimlik numarası başka bir hesapta kayıtlı",
+    "too_many_saved_searches": "En fazla 20 arama kaydedebilirsin",
+    "user_deleted": "Bu kullanıcı hesabını sildi; mesaj gönderilemez",
+    "user_not_found": "Bu numarayla kayıtlı kullanıcı yok",
+    "consent_required": "Bunun için önce ticari ileti izni vermelisin",
+    "bad_width": "Geçersiz görsel boyutu",
+    "bad_signature": "Ödeme bildirimi doğrulanamadı",
+    "bad_receipt": "Satın alma makbuzu geçersiz",
+    "amount_mismatch": "Ödeme tutarı siparişle uyuşmuyor",
+    "not_refundable": "Bu sipariş iade edilemez",
+    "receipt_used": "Bu satın alma zaten kullanıldı"
+  },
+  "login": {
+    "title": "Giriş yap",
+    "subtitle": "Telefon numaranla giriş yap; ilanlarını yönet ve öne çıkar.",
+    "phone": "Telefon",
+    "sendCode": "Kod gönder",
+    "code": "Doğrulama kodu",
+    "verify": "Doğrula",
+    "resend": "Kodu tekrar gönder",
+    "resendIn": "Tekrar gönder ({{s}} sn)",
+    "codeSent": "Numarana 6 haneli kod gönderdik.",
+    "betaHint": "Kapalı beta: kod SMS yerine otomatik doldurulur."
+  },
+  "account": {
+    "title": "Hesabım",
+    "hello": "Merhaba {{name}}",
+    "level": "Doğrulama seviyesi {{n}}",
+    "listings": "İlanlarım",
+    "listingsBody": "İlanlarını gör, öne çıkar.",
+    "orders": "Siparişlerim",
+    "ordersBody": "Öne çıkarma siparişlerin ve durumları.",
+    "logout": "Çıkış yap",
+    "noListings": "Henüz ilanın yok. İlan vermek için uygulamayı kullan.",
+    "noOrders": "Henüz siparişin yok.",
+    "promote": "Öne çıkar",
+    "notPublished": "Öne çıkarmak için ilan yayında olmalı",
+    "featuredLeft": "Vitrinde · {{n}} gün",
+    "urgentLeft": "Acil · {{n}} gün",
+    "status": {
+      "draft": "Taslak",
+      "pending": "Onay bekliyor",
+      "published": "Yayında",
+      "rejected": "Reddedildi",
+      "sold": "Satıldı",
+      "removed": "Kaldırıldı"
+    },
+    "orderStatus": {
+      "pending": "Ödeme bekleniyor",
+      "paid": "Ödendi",
+      "failed": "Başarısız",
+      "refunded": "İade edildi",
+      "cancelled": "İptal"
+    },
+    "col": {
+      "listing": "İlan",
+      "product": "Ürün",
+      "amount": "Tutar",
+      "status": "Durum",
+      "date": "Tarih"
+    }
+  },
+  "pay": {
+    "devTitle": "Deneme ödemesi",
+    "devBanner": "DENEME ÖDEMESİ — gerçek para çekilmez. Sanal POS anlaşması yapılınca bu sayfa gerçek ödeme sayfasıyla değişecek.",
+    "devSuccess": "Başarılı öde",
+    "devFailure": "Başarısız dene",
+    "resultTitle": "Ödeme sonucu",
+    "retry": "Tekrar dene",
+    "result": {
+      "pending": "Ödeme onayı bekleniyor",
+      "paid": "Öne çıkarma etkin",
+      "failed": "Ödeme başarısız",
+      "refunded": "Sipariş iade edildi",
+      "cancelled": "Sipariş iptal"
+    },
+    "resultBody": {
+      "pending": "Onay gelince bu sayfa kendiliğinden güncellenir.",
+      "paid": "İlanın şimdi öne çıkarıldı.",
+      "failed": "Kartından para çekilmedi. Tekrar deneyebilirsin.",
+      "refunded": "Bu sipariş iade edildi.",
+      "cancelled": "Bu sipariş zaman aşımına uğradı; yeniden satın alabilirsin."
     }
   }
 }

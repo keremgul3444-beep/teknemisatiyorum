@@ -23,6 +23,12 @@ export function tList(locale: Locale, key: string): string[] {
   return Array.isArray(v) ? (v as string[]) : [];
 }
 
+/** Düz metin sözlüğü (ör. istemci bileşenine hata mesajları). */
+export function tDict(locale: Locale, key: string): Record<string, string> {
+  const v = key.split('.').reduce<unknown>((o, k) => (o as Record<string, unknown> | undefined)?.[k], dicts[locale]);
+  return Object.fromEntries(Object.entries((v ?? {}) as Record<string, unknown>).filter((e): e is [string, string] => typeof e[1] === 'string'));
+}
+
 /** Başlık/gövde çiftlerinden oluşan bölüm listesi (sabit sayfalar). */
 export function tSections(locale: Locale, key: string): { h: string; b: string }[] {
   const v = key.split('.').reduce<unknown>((o, k) => (o as Record<string, unknown> | undefined)?.[k], dicts[locale]);
