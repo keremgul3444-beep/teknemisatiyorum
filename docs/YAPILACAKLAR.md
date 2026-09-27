@@ -28,7 +28,6 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 - [ ] Anlık (push) bildirim; şu an yalnızca uygulama içi bildirim listesi var
 - [ ] Mağaza derlemesi (EAS build) ve mağaza başvurusu; şu an yalnızca Expo Go
 - [ ] Veri kopyası telefonda dosya olarak paylaşılsın (çok büyük kopyada paylaşım menüsü sınırı)
-- [ ] React sürümleri hizalansın (kök 19.3.0 / mobil 19.2.3)
 - [ ] Arama veritabanı sorgusuna taşınsın (binlerce ilanda gerekli)
 - [ ] Yasaklama mekanizması (T.C. silmede serbest kaldığı için T.C.'ye dayanamaz)
 - [ ] Kapalı beta deneme hesaplarının temizliği (aynı T.C. ile açılmış kabul testi hesapları)

@@ -1,9 +1,21 @@
 {
   "name": "teknemisatiyorum",
   "private": true,
-  "workspaces": ["shared", "api", "mobile"],
+  "workspaces": [
+    "shared",
+    "api",
+    "mobile"
+  ],
+  "overrides": {
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
   "scripts": {
     "test": "npm test -w shared && npm test -w api && npm test -w mobile",
     "dev": "node scripts/dev.mjs"
+  },
+  "dependencies": {
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
   }
 }
