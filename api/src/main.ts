@@ -19,10 +19,12 @@ export function configureApp(app: INestApplication) {
 async function bootstrap() {
   const app = configureApp(await NestFactory.create(AppModule));
   // Kimlik tekliği kuralından önce doğrulanmış kullanıcıların izi doldurulur (tekrar çalışması zararsız).
-  const bf = await backfillNationalIdHashes(app.get(PrismaService));
-  if (bf.filled) console.log(`Kimlik izi dolduruldu: ${bf.filled} kullanıcı`);
-  for (const c of bf.conflicts) console.warn(`UYARI: aynı T.C. numarası iki hesapta — ${c.userId} (asıl: ${c.heldBy}); yönetici incelemeli`);
-  if (bf.unreadable.length) console.warn(`UYARI: ${bf.unreadable.length} kimlik kaydı çözülemedi (ID_ENC_KEY değişmiş olabilir)`);
+  // Veritabanına o an ulaşılamasa da sunucu açılır; iş bir sonraki açılışta yeniden denenir.
+  await backfillNationalIdHashes(app.get(PrismaService)).then((bf) => {
+    if (bf.filled) console.log(`Kimlik izi dolduruldu: ${bf.filled} kullanıcı`);
+    for (const c of bf.conflicts) console.warn(`UYARI: aynı T.C. numarası iki hesapta — ${c.userId} (asıl: ${c.heldBy}); yönetici incelemeli`);
+    if (bf.unreadable.length) console.warn(`UYARI: ${bf.unreadable.length} kimlik kaydı çözülemedi (ID_ENC_KEY değişmiş olabilir)`);
+  }).catch((e) => console.warn(`UYARI: kimlik izi doldurma atlandı (${e instanceof Error ? e.message.split(/\r?\n/).find(Boolean) : e})`));
   await app.listen(env().PORT);
   console.log(`API hazır: http://localhost:${env().PORT}`);
 }

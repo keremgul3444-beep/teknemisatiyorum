@@ -161,33 +161,38 @@ model VerificationRequest {
 }
 
 model Listing {
-  id           String         @id @default(cuid())
-  ownerId      String
-  owner        User           @relation(fields: [ownerId], references: [id])
-  companyId    String?
+  id            String         @id @default(cuid())
+  ownerId       String
+  owner         User           @relation(fields: [ownerId], references: [id])
+  companyId     String?
   /// İlanın bağlı olduğu tekne; ilan sayfasında bu teknenin karne özeti gösterilir.
-  boatId       String?
-  boat         Boat?          @relation(fields: [boatId], references: [id])
-  brand        String
-  model        String
-  year         Int
-  lengthM      Float
-  type         String
-  price        Float
-  currency     Currency
-  location     String
-  equipment    String[]
-  cabins       Int            @default(0)
-  engine       String         @default("")
-  description  String         @default("")
-  status       ListingStatus  @default(draft)
-  badges       String[]
-  rejectReason String?
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  publishedAt  DateTime?
-  photos       ListingPhoto[]
-  favorites    Favorite[]
+  boatId        String?
+  boat          Boat?          @relation(fields: [boatId], references: [id])
+  brand         String
+  model         String
+  year          Int
+  lengthM       Float
+  type          String
+  price         Float
+  currency      Currency
+  location      String
+  equipment     String[]
+  cabins        Int            @default(0)
+  engine        String         @default("")
+  description   String         @default("")
+  status        ListingStatus  @default(draft)
+  badges        String[]
+  rejectReason  String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  publishedAt   DateTime?
+  /// Öne çıkarma: vitrin ve acil bitişleri, son üste taşınma (sorgu zamanında denetlenir).
+  featuredUntil DateTime?
+  urgentUntil   DateTime?
+  bumpedAt      DateTime?
+  photos        ListingPhoto[]
+  favorites     Favorite[]
+  orders        Order[]
 
   @@index([status])
   @@index([ownerId])
@@ -347,4 +352,63 @@ model Notification {
   createdAt DateTime  @default(now())
 
   @@index([userId, createdAt])
+}
+
+enum ProductKind {
+  vitrin
+  acil
+  bump
+}
+
+enum OrderChannel {
+  web
+  ios
+  android
+  manual
+}
+
+enum OrderStatus {
+  pending
+  paid
+  failed
+  refunded
+  cancelled
+}
+
+/// Satılan öne çıkarma ürünleri; fiyatlar kuruş, site ve uygulama ayrı (mağaza kesintisi).
+model Product {
+  code             String      @id
+  kind             ProductKind
+  days             Int?
+  priceWebKurus    Int
+  priceAppKurus    Int
+  iosProductId     String?
+  androidProductId String?
+  active           Boolean     @default(true)
+  /// Gerçek fiyat girilene kadar true; yönetim ekranında uyarı gösterilir.
+  isTrialPrice     Boolean     @default(true)
+  updatedAt        DateTime    @updatedAt
+  orders           Order[]
+}
+
+model Order {
+  id          String       @id @default(cuid())
+  userId      String
+  listingId   String
+  listing     Listing      @relation(fields: [listingId], references: [id])
+  productCode String
+  product     Product      @relation(fields: [productCode], references: [code])
+  channel     OrderChannel
+  amountKurus Int
+  status      OrderStatus  @default(pending)
+  /// Sağlayıcının işlem/makbuz referansı; tekil — aynı ödeme iki kez etkinleştirmez.
+  providerRef String?      @unique
+  note        String?
+  createdById String?
+  createdAt   DateTime     @default(now())
+  paidAt      DateTime?
+  refundedAt  DateTime?
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
 }

@@ -1,6 +1,7 @@
 import type { Listing, ListingPhoto, LogbookEntry, User } from '@prisma/client';
 import { entryView } from '../boats/logbook.service';
 import { env } from '../../config/env';
+import { isActive } from '../promotions/promotion.rules';
 
 export type ListingRow = Listing & {
   photos: ListingPhoto[];
@@ -30,7 +31,18 @@ export function listingView(l: ListingRow, viewerId?: string, companyName?: stri
     },
     /** Bağlı teknenin karne özeti: kayıt sayısı ve en yeni iki kayıt. */
     logbook: l.boat ? { count: l.boat._count.entries, latest: l.boat.entries.map(entryView), boatId: viewerId === l.ownerId ? l.boat.id : undefined } : null,
+    /** Öne çıkarma durumu; bitiş tarihleri yalnızca sahibine (ne zaman yenileyeceğini bilsin). */
+    promo: promoView(l, viewerId),
     isMine: !!viewerId && viewerId === l.ownerId,
     createdAt: l.createdAt, publishedAt: l.publishedAt,
+  };
+}
+
+function promoView(l: ListingRow, viewerId?: string, now = new Date()) {
+  const own = !!viewerId && viewerId === l.ownerId;
+  return {
+    featured: isActive(l.featuredUntil, now),
+    urgent: isActive(l.urgentUntil, now),
+    ...(own ? { featuredUntil: l.featuredUntil?.toISOString(), urgentUntil: l.urgentUntil?.toISOString() } : {}),
   };
 }
