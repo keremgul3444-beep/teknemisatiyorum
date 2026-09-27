@@ -119,3 +119,14 @@ test('mağaza makbuzu: doğrulanır, ürün açılır; aynı makbuz ikinci kez k
   const other = await loginAs(t, { level: 2 });
   expect((await t.http().post('/orders/store').set(other.auth).send({ listingId: id, platform: 'ios', receipt: `dev:tms.acil_7:${Date.now()}zzz` })).status).toBe(404);
 });
+
+test('başarısız bildirimden sonra gelen geçerli başarılı bildirim ürünü açar (para çekildiyse ürün verilir)', async () => {
+  const u = await loginAs(t, { level: 2 });
+  const id = await published(u.auth);
+  const o = await t.http().post('/orders').set(u.auth).send({ listingId: id, productCode: 'vitrin_7' });
+  const row = await t.prisma.order.findUniqueOrThrow({ where: { id: o.body.orderId } });
+  await callback(sim(row.providerRef!, row.id, 'failure', 4900));
+  expect((await callback(sim(row.providerRef!, row.id, 'success', 4900))).status).toBe(200);
+  expect((await t.prisma.order.findUniqueOrThrow({ where: { id: row.id } })).status).toBe('paid');
+  expect((await t.prisma.listing.findUniqueOrThrow({ where: { id } })).featuredUntil).toBeTruthy();
+});

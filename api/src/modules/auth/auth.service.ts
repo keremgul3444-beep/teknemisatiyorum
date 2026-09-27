@@ -7,11 +7,14 @@ import { AppError, Errors } from '../../common/errors';
 import { CLOCK, type Clock } from '../../common/clock';
 import { SMS_SENDER, type SmsSender } from '../../adapters/sms';
 import { userView } from '../users/user.view';
+import { decrypt, encrypt } from '../../common/crypto';
 
 const OTP_TTL_MS = 5 * 60_000;
 const OTP_MAX_ATTEMPTS = 5;
 const OTP_RESEND_MS = 60_000;
 const REFRESH_TTL_MS = 30 * 24 * 60 * 60_000;
+/** Aynı anda gelen yenilemeler (sekmeler, ön yükleme) için: döndürülen anahtar bu süre boyunca aynı halefi alır. */
+const REFRESH_GRACE_MS = 10_000;
 
 const sha256 = (s: string) => crypto.createHash('sha256').update(s).digest('hex');
 const otpError = (code: string) => new AppError(code, `errors.${code.toLowerCase()}`, 401);
@@ -69,8 +72,13 @@ export class AuthService {
     const now = this.clock.now();
     const s = await this.prisma.session.findUnique({ where: { refreshHash: sha256(refreshToken) } });
     if (!s) throw otpError('REFRESH_INVALID');
+    // Süresi geçmiş tolerans kayıtları (şifreli halef anahtarı) veritabanında bekletilmez.
+    await this.prisma.session.updateMany({ where: { familyId: s.familyId, graceUntil: { lte: now } }, data: { graceRefreshEnc: null, graceUntil: null } });
     if (s.revokedAt) {
-      // Daha önce döndürülmüş bir anahtar yeniden geldi: çalınma şüphesi, tüm aile kapatılır.
+      // Az önce döndürülmüş anahtar (aynı anda gelen iki istek, sekmeler, ön yükleme): aynı halef verilir.
+      const grace = await this.graceReturn(s.id, now);
+      if (grace) return grace;
+      // Daha önce döndürülmüş bir anahtar pencere dışında yeniden geldi: çalınma şüphesi, tüm aile kapatılır.
       if (s.replacedById) {
         await this.prisma.session.updateMany({ where: { familyId: s.familyId, revokedAt: null }, data: { revokedAt: now } });
         throw otpError('REFRESH_REUSED');
@@ -84,13 +92,32 @@ export class AuthService {
     // Yarış güvenliği: yalnızca hâlâ açık olan satır döndürülür.
     const rotated = await this.prisma.session.updateMany({
       where: { id: s.id, revokedAt: null },
-      data: { revokedAt: now, replacedById: next.sessionId },
+      data: {
+        revokedAt: now, replacedById: next.sessionId,
+        graceRefreshEnc: encrypt(next.refreshToken), graceUntil: new Date(now.getTime() + REFRESH_GRACE_MS),
+      },
     });
     if (rotated.count !== 1) {
+      // Yarışı başka istek kazandı: bizim açtığımız fazla oturum kapatılır, kazananın halefi verilir.
+      await this.prisma.session.update({ where: { id: next.sessionId }, data: { revokedAt: now } });
+      const grace = await this.graceReturn(s.id, now);
+      if (grace) return grace;
       await this.prisma.session.updateMany({ where: { familyId: s.familyId, revokedAt: null }, data: { revokedAt: now } });
       throw otpError('REFRESH_REUSED');
     }
     return { accessToken: next.accessToken, refreshToken: next.refreshToken, user: userView(user) };
+  }
+
+  /** Tolerans penceresindeki döndürülmüş oturum için halefin anahtarları; pencere dışında ya da halef kapalıysa null. */
+  private async graceReturn(sessionId: string, now: Date) {
+    const s = await this.prisma.session.findUnique({ where: { id: sessionId } });
+    if (!s?.replacedById || !s.graceRefreshEnc || !s.graceUntil || s.graceUntil.getTime() <= now.getTime()) return null;
+    const successor = await this.prisma.session.findUnique({ where: { id: s.replacedById } });
+    if (!successor || successor.revokedAt) return null;
+    const user = await this.prisma.user.findUnique({ where: { id: s.userId } });
+    if (!user || user.deletedAt) return null;
+    const accessToken = await this.jwt.signAsync({ sub: user.id, sid: successor.id });
+    return { accessToken, refreshToken: decrypt(s.graceRefreshEnc), user: userView(user) };
   }
 
   async sessions(userId: string, currentSessionId: string | null) {

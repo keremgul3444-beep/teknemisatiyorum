@@ -91,13 +91,36 @@ test('yenileme anahtarı döner; eskisi tekrar kullanılırsa zincir iptal edili
   const r1 = await t.http().post('/auth/refresh').send({ refreshToken: s.refreshToken });
   expect(r1.status).toBe(200);
   expect(r1.body.refreshToken).not.toBe(s.refreshToken);
-  // eski anahtar ikinci kez → çalınma şüphesi
+  // eski anahtar tolerans penceresinden (10 sn) sonra ikinci kez → çalınma şüphesi
+  advance(11_000);
   const reuse = await t.http().post('/auth/refresh').send({ refreshToken: s.refreshToken });
   expect(reuse.status).toBe(401);
   expect(reuse.body.code).toBe('REFRESH_REUSED');
   // yeni anahtar da artık geçersiz, mevcut giriş anahtarı da
   expect((await t.http().post('/auth/refresh').send({ refreshToken: r1.body.refreshToken })).status).toBe(401);
   expect((await t.http().get('/auth/sessions').set('Authorization', `Bearer ${r1.body.accessToken}`)).status).toBe(401);
+});
+
+test('aynı anda gelen iki yenileme oturumu kapatmaz; ikisi de aynı yeni anahtarı alır', async () => {
+  const s0 = await login('05327777701');
+  const [a, b] = await Promise.all([
+    t.http().post('/auth/refresh').send({ refreshToken: s0.refreshToken }),
+    t.http().post('/auth/refresh').send({ refreshToken: s0.refreshToken }),
+  ]);
+  expect([a.status, b.status]).toEqual([200, 200]);
+  expect(a.body.refreshToken).toBe(b.body.refreshToken);
+  // zincir sağlam: yeni anahtar çalışır, giriş anahtarları geçerli
+  expect((await t.http().get('/auth/sessions').set('Authorization', `Bearer ${b.body.accessToken}`)).status).toBe(200);
+  expect((await t.http().post('/auth/refresh').send({ refreshToken: a.body.refreshToken })).status).toBe(200);
+});
+
+test('tolerans penceresinde (10 sn) eski anahtar aynı yeni anahtarı döndürür', async () => {
+  const s0 = await login('05327777702');
+  const r1 = await t.http().post('/auth/refresh').send({ refreshToken: s0.refreshToken });
+  advance(5_000);
+  const r2 = await t.http().post('/auth/refresh').send({ refreshToken: s0.refreshToken });
+  expect(r2.status).toBe(200);
+  expect(r2.body.refreshToken).toBe(r1.body.refreshToken);
 });
 
 test('başka cihazın oturumu kapatılabilir, kendi listesindeki olmayan kapatılamaz', async () => {
@@ -118,4 +141,13 @@ test('çıkış yapınca oturum kapanır', async () => {
   const s = await login('05321212121');
   expect((await t.http().post('/auth/logout').set('Authorization', `Bearer ${s.accessToken}`)).status).toBe(204);
   expect((await t.http().post('/auth/refresh').send({ refreshToken: s.refreshToken })).status).toBe(401);
+});
+
+test('tolerans süresi geçince şifreli halef anahtarı veritabanından silinir', async () => {
+  const s0 = await login('05327777703');
+  const r1 = await t.http().post('/auth/refresh').send({ refreshToken: s0.refreshToken });
+  advance(11_000);
+  await t.http().post('/auth/refresh').send({ refreshToken: r1.body.refreshToken }).expect(200);
+  const leftovers = await t.prisma.session.count({ where: { user: { phone: '+905327777703' }, graceRefreshEnc: { not: null }, graceUntil: { lte: new Date(clock.now().getTime()) } } });
+  expect(leftovers).toBe(0);
 });

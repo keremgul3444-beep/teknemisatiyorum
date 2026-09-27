@@ -64,14 +64,15 @@ export class OrdersService {
   }
 
   /**
-   * Tek veritabanı işleminde: yalnızca hâlâ `pending` olan siparişi `paid` yapar ve ilanın sürelerini uygular.
+   * Tek veritabanı işleminde: yalnızca `pending` (ya da `failed`) siparişi `paid` yapar ve ilanın sürelerini uygular.
    * Geçiş olmadıysa (zaten ödendi, iade vb.) false — aynı bildirimin tekrarı etkisizdir.
    */
   async markPaid(where: { id?: string; providerRef?: string }, now = new Date(), tx?: Prisma.TransactionClient): Promise<boolean> {
     const run = async (db: Prisma.TransactionClient) => {
       const o = await db.order.findFirst({ where, include: { product: true } });
       if (!o) throw Errors.notFound();
-      const r = await db.order.updateMany({ where: { id: o.id, status: 'pending' }, data: { status: 'paid', paidAt: now } });
+      // Başarısız bildirimden sonra gelen geçerli başarı da kabul edilir: para çekildiyse ürün verilir.
+      const r = await db.order.updateMany({ where: { id: o.id, status: { in: ['pending', 'failed'] } }, data: { status: 'paid', paidAt: now } });
       if (!r.count) return false;
       await db.$queryRaw`SELECT id FROM "Listing" WHERE id = ${o.listingId} FOR UPDATE`;
       const l = await db.listing.findUniqueOrThrow({ where: { id: o.listingId } });

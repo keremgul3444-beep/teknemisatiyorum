@@ -97,6 +97,9 @@ model Session {
   lastSeenAt   DateTime  @default(now())
   revokedAt    DateTime?
   replacedById String?
+  /// Yenileme yarışı toleransı: döndürüldükten sonra 10 sn boyunca eski anahtar aynı halefi alır (şifreli, kısa ömürlü).
+  graceRefreshEnc String?
+  graceUntil      DateTime?
 
   @@index([userId])
   @@index([familyId])
