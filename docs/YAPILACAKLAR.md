@@ -12,6 +12,7 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 - [ ] Google Search Console kaydı (site canlıya çıkınca)
 - [ ] Sohbete yapıştırılan Expo token'larını expo.dev → Access Tokens'tan sil
 - [ ] Broker komisyon oranı ve öne çıkarma fiyatları kararı (piyasa araştırmasıyla)
+- [ ] Şirket unvanı/adresi ve gerçek iletişim e-postası (sitede şimdilik iletisim@teknemisatiyorum.com yazıyor, alan adı alınınca açılmalı)
 
 ## Web sitesi
 - [ ] Aşama 2 ödeme: gerçek sanal POS ve gerçek Apple/Google ödemesi (hesaplar açılınca, deneme modunun yerine takılır)

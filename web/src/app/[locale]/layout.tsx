@@ -2,7 +2,8 @@ import type { ReactNode } from 'react';
 import { notFound } from 'next/navigation';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import { cssVariables } from '@tms/shared';
-import { isLocale, LOCALES, type Locale } from '@/i18n';
+import { isLocale, localePath, LOCALES, t, type Locale } from '@/i18n';
+import { CookieConsent } from '@/components/CookieConsent';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import '../globals.css';
@@ -25,6 +26,10 @@ export default async function RootLayout({ children, params }: { children: React
         <Header locale={locale as Locale} />
         <main className="container">{children}</main>
         <Footer locale={locale as Locale} />
+        <CookieConsent labels={{
+          text: t(locale as Locale, 'consent.text'), necessaryOnly: t(locale as Locale, 'consent.necessaryOnly'),
+          accept: t(locale as Locale, 'consent.accept'), more: t(locale as Locale, 'consent.more'), moreHref: localePath(locale as Locale, '/cerezler'),
+        }} />
       </body>
     </html>
   );

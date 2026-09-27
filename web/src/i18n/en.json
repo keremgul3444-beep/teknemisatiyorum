@@ -178,5 +178,230 @@
   "notFound": {
     "title": "Page not found",
     "body": "The page may have moved or never existed"
+  },
+  "consent": {
+    "text": "We use cookies that are needed for the site to work. Analytics cookies are used only with your consent.",
+    "necessaryOnly": "Necessary only",
+    "accept": "Accept",
+    "more": "Cookie policy"
+  },
+  "ustaCat": {
+    "motor": "Engine",
+    "elektrik": "Electrical",
+    "boya": "Paint",
+    "jelkot": "Gelcoat",
+    "branda": "Canvas",
+    "doseme": "Upholstery",
+    "elektronik": "Electronics",
+    "yelken": "Sails"
+  },
+  "pages": {
+    "soon": "Coming soon",
+    "notifyMe": "Get the app and we'll let you know",
+    "expertise": {
+      "title": "Boat survey",
+      "description": "Know the boat's real condition before you buy, with an independent surveyor's report.",
+      "cta": "Book in the app",
+      "sections": [
+        {
+          "h": "Why a survey?",
+          "b": "Hull, engine, electrics and papers are inspected on site; hidden defects surface before you buy."
+        },
+        {
+          "h": "Report and badge",
+          "b": "The report is added to the Boat Logbook as a verified record and the listing gets a \"surveyed\" badge."
+        }
+      ]
+    },
+    "broker": {
+      "title": "Sell with a broker",
+      "description": "Let a professional sell your boat: the right price, the right buyer, a smooth transfer.",
+      "cta": "Apply in the app",
+      "sections": [
+        {
+          "h": "How it works",
+          "b": "Apply in the app; the broker handles pricing, the listing, buyer talks and the transfer."
+        },
+        {
+          "h": "Transparent",
+          "b": "Follow your case step by step in the app."
+        }
+      ]
+    },
+    "logbook": {
+      "title": "Boat Logbook",
+      "description": "Maintenance, repair and survey history that changes hands with your boat.",
+      "cta": "Create your logbook in the app",
+      "sections": [
+        {
+          "h": "Verified records",
+          "b": "Jobs done through the platform and survey reports become verified logbook records."
+        },
+        {
+          "h": "Adds value when selling",
+          "b": "A logbook summary appears on the listing; buyers trust the boat's history."
+        }
+      ]
+    },
+    "usta": {
+      "title": "Boat technicians and service",
+      "description": "Verified technicians for engines, electrics, paint, gelcoat and more.",
+      "join": "Are you a technician? Join",
+      "sections": [
+        {
+          "h": "Secure payment",
+          "b": "Payment is held safely until the job is done and approved."
+        },
+        {
+          "h": "Recorded in the logbook",
+          "b": "Jobs done through the app are added to the boat's logbook as verified records."
+        }
+      ]
+    },
+    "kaptan": {
+      "title": "Hire a skipper",
+      "description": "Certified, rated skippers by the day or week.",
+      "join": "Are you a skipper? Join",
+      "sections": [
+        {
+          "h": "Certified skippers",
+          "b": "Skippers' certificates are verified; choose by ratings and reviews."
+        },
+        {
+          "h": "Secure payment",
+          "b": "Payment is held safely until the service is complete."
+        }
+      ]
+    },
+    "ustaJoin": {
+      "title": "Join as a technician",
+      "description": "Reach boat owners and get paid securely.",
+      "cta": "Apply in the app",
+      "sections": [
+        {
+          "h": "How to apply",
+          "b": "Get the app, log in with your phone, verify your identity and upload your professional documents."
+        },
+        {
+          "h": "Documents",
+          "b": "Tax certificate or trade certificate; business and insurance documents if you have them."
+        },
+        {
+          "h": "What you get",
+          "b": "Reviews and ratings bring you forward; your jobs are recorded in the boat's logbook."
+        }
+      ]
+    },
+    "kaptanJoin": {
+      "title": "Join as a skipper",
+      "description": "Find daily and weekly skipper jobs.",
+      "cta": "Apply in the app",
+      "sections": [
+        {
+          "h": "How to apply",
+          "b": "Get the app, log in with your phone, verify your identity and upload your documents."
+        },
+        {
+          "h": "Documents",
+          "b": "Yacht master or amateur sailor certificate and a valid health report."
+        }
+      ]
+    },
+    "about": {
+      "title": "About us",
+      "description": "teknemisatıyorum brings buying, selling and the whole life of a boat into one place.",
+      "sections": [
+        {
+          "h": "What we do",
+          "b": "Listings, surveys, brokerage, technicians and skippers, plus the Boat Logbook, on one platform."
+        },
+        {
+          "h": "Why",
+          "b": "Trust is the biggest question when buying a boat; verified records and independent surveys answer it."
+        }
+      ]
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "Write to us with questions or partnership ideas.",
+      "email": "iletisim@teknemisatiyorum.com",
+      "sections": []
+    },
+    "kvkk": {
+      "title": "Privacy notice (KVKK)",
+      "description": "How your personal data is processed and your rights.",
+      "sections": [
+        {
+          "h": "Data controller",
+          "b": "teknemisatıyorum.com (legal name and address to be added)."
+        },
+        {
+          "h": "Data we process",
+          "b": "Identity, contact, boat and listing details, transaction and payment records, device and session data."
+        },
+        {
+          "h": "Purposes",
+          "b": "Running membership, listing and service processes, security, fraud prevention and legal obligations."
+        },
+        {
+          "h": "Transfers",
+          "b": "To the payment institution, hosting provider and authorities, only as needed."
+        },
+        {
+          "h": "Your rights (KVKK art. 11)",
+          "b": "You may access, correct, delete and object to processing of your data and claim compensation."
+        }
+      ]
+    },
+    "privacy": {
+      "title": "Privacy policy",
+      "description": "How we protect your data.",
+      "sections": [
+        {
+          "h": "Security",
+          "b": "National ID numbers are stored encrypted, photo location data is removed, documents open via short-lived links."
+        },
+        {
+          "h": "Your phone number",
+          "b": "Your number is hidden on listings; it shows only if you share it or enable it in settings."
+        },
+        {
+          "h": "Copy and deletion",
+          "b": "You can download a copy of your data and delete your account in the app."
+        }
+      ]
+    },
+    "terms": {
+      "title": "Terms of use",
+      "description": "Rules that apply when using the platform.",
+      "sections": [
+        {
+          "h": "Listings",
+          "b": "Listings are reviewed before going live; misleading or non-compliant listings are rejected."
+        },
+        {
+          "h": "Promotion",
+          "b": "Featured, Urgent and Bump are paid services; their time starts at purchase."
+        },
+        {
+          "h": "Sales",
+          "b": "The boat's price is paid between the parties; the platform is not a party to the sale."
+        }
+      ]
+    },
+    "cookies": {
+      "title": "Cookie policy",
+      "description": "Which cookies we use and why.",
+      "sections": [
+        {
+          "h": "Necessary cookies",
+          "b": "Needed for sessions and to store your cookie choice; they can't be turned off."
+        },
+        {
+          "h": "Analytics cookies",
+          "b": "Used only with your consent. No analytics tool is in use right now."
+        }
+      ]
+    }
   }
 }

@@ -178,5 +178,230 @@
   "notFound": {
     "title": "Sayfa bulunamadı",
     "body": "Aradığın sayfa taşınmış ya da hiç olmamış olabilir"
+  },
+  "consent": {
+    "text": "Sitenin çalışması için gerekli çerezleri kullanıyoruz. İstatistik çerezleri yalnızca iznin olursa kullanılır.",
+    "necessaryOnly": "Yalnızca zorunlu",
+    "accept": "Kabul et",
+    "more": "Çerez politikası"
+  },
+  "ustaCat": {
+    "motor": "Motor",
+    "elektrik": "Elektrik",
+    "boya": "Boya",
+    "jelkot": "Jelkot",
+    "branda": "Branda",
+    "doseme": "Döşeme",
+    "elektronik": "Elektronik",
+    "yelken": "Yelken"
+  },
+  "pages": {
+    "soon": "Yakında",
+    "notifyMe": "Uygulamayı indir, açıldığında haber verelim",
+    "expertise": {
+      "title": "Tekne ekspertizi",
+      "description": "Almadan önce teknenin gerçek durumunu bağımsız eksper raporuyla öğren.",
+      "cta": "Uygulamadan randevu al",
+      "sections": [
+        {
+          "h": "Neden ekspertiz?",
+          "b": "Gövde, motor, elektrik ve belgeler yerinde incelenir; gizli kusurlar satın almadan önce ortaya çıkar."
+        },
+        {
+          "h": "Rapor ve rozet",
+          "b": "Rapor Tekne Karnesi'ne doğrulanmış kayıt olarak işlenir; ilan \"ekspertizli\" rozeti alır."
+        }
+      ]
+    },
+    "broker": {
+      "title": "Broker ile sat",
+      "description": "Tekneni profesyonel broker satsın: doğru fiyat, doğru alıcı, sorunsuz devir.",
+      "cta": "Uygulamadan başvur",
+      "sections": [
+        {
+          "h": "Nasıl işler?",
+          "b": "Başvurunu uygulamadan yaparsın; broker fiyatlamadan ilan hazırlığına, alıcı görüşmelerinden devre kadar süreci yürütür."
+        },
+        {
+          "h": "Şeffaf süreç",
+          "b": "Dosyanın hangi aşamada olduğunu uygulamadan adım adım izlersin."
+        }
+      ]
+    },
+    "logbook": {
+      "title": "Tekne Karnesi",
+      "description": "Bakım, onarım ve ekspertiz geçmişi teknenle birlikte el değiştirsin.",
+      "cta": "Uygulamada karneni oluştur",
+      "sections": [
+        {
+          "h": "Doğrulanmış kayıtlar",
+          "b": "Platform üzerinden yapılan işler ve ekspertiz raporları karneye doğrulanmış kayıt olarak düşer."
+        },
+        {
+          "h": "Satarken değer katar",
+          "b": "İlan sayfasında karne özeti görünür; alıcı teknenin geçmişine güvenir."
+        }
+      ]
+    },
+    "usta": {
+      "title": "Tekne ustası ve servis",
+      "description": "Motor, elektrik, boya, jelkot ve daha fazlası için doğrulanmış ustalar.",
+      "join": "Usta mısın? Katıl",
+      "sections": [
+        {
+          "h": "Güvenli ödeme",
+          "b": "Ödeme iş bitene kadar güvende bekler; iş onaylanınca ustaya aktarılır."
+        },
+        {
+          "h": "Karneye işlenir",
+          "b": "Uygulamadan yapılan iş, teknenin karnesine doğrulanmış kayıt olarak eklenir."
+        }
+      ]
+    },
+    "kaptan": {
+      "title": "Kaptan kirala",
+      "description": "Günlük ya da haftalık, belgeli ve puanlı kaptanlar.",
+      "join": "Kaptan mısın? Katıl",
+      "sections": [
+        {
+          "h": "Belgeli kaptanlar",
+          "b": "Kaptanların yeterlik belgeleri doğrulanır; puan ve yorumlarla seçim yaparsın."
+        },
+        {
+          "h": "Güvenli ödeme",
+          "b": "Ödeme hizmet tamamlanana kadar güvende bekler."
+        }
+      ]
+    },
+    "ustaJoin": {
+      "title": "Usta olarak katıl",
+      "description": "Tekne sahiplerine ulaş, işini güvenli ödemeyle al.",
+      "cta": "Uygulamada başvur",
+      "sections": [
+        {
+          "h": "Nasıl başvurulur?",
+          "b": "Uygulamayı indir, telefonunla giriş yap, kimliğini doğrula ve mesleki belgelerini yükle."
+        },
+        {
+          "h": "Gerekli belgeler",
+          "b": "Vergi levhası ya da ustalık belgesi; varsa işletme ve sigorta belgeleri."
+        },
+        {
+          "h": "Kazandıkların",
+          "b": "Yorum ve puanla öne çıkarsın; yaptığın işler teknenin karnesine işlenir."
+        }
+      ]
+    },
+    "kaptanJoin": {
+      "title": "Kaptan olarak katıl",
+      "description": "Günlük ve haftalık kaptanlık işlerine ulaş.",
+      "cta": "Uygulamada başvur",
+      "sections": [
+        {
+          "h": "Nasıl başvurulur?",
+          "b": "Uygulamayı indir, telefonunla giriş yap, kimliğini doğrula ve belgelerini yükle."
+        },
+        {
+          "h": "Gerekli belgeler",
+          "b": "Yat kaptanlığı ya da amatör denizci belgesi ve geçerli sağlık raporu."
+        }
+      ]
+    },
+    "about": {
+      "title": "Hakkımızda",
+      "description": "teknemisatıyorum, tekne alım-satımını ve teknenin tüm yaşamını tek yerde toplar.",
+      "sections": [
+        {
+          "h": "Ne yapıyoruz?",
+          "b": "İlan, ekspertiz, broker, usta ve kaptan hizmetleri ile Tekne Karnesi'ni tek platformda birleştiriyoruz."
+        },
+        {
+          "h": "Neden?",
+          "b": "Tekne alırken en büyük soru güvendir; doğrulanmış kayıt ve bağımsız ekspertizle bu soruyu yanıtlıyoruz."
+        }
+      ]
+    },
+    "contact": {
+      "title": "İletişim",
+      "description": "Soruların ve iş birlikleri için bize yaz.",
+      "email": "iletisim@teknemisatiyorum.com",
+      "sections": []
+    },
+    "kvkk": {
+      "title": "KVKK aydınlatma metni",
+      "description": "Kişisel verilerinin nasıl işlendiği ve hakların.",
+      "sections": [
+        {
+          "h": "Veri sorumlusu",
+          "b": "teknemisatıyorum.com (unvan ve adres eklenecek)."
+        },
+        {
+          "h": "İşlenen veriler",
+          "b": "Kimlik, iletişim, tekne ve ilan bilgileri, işlem ve ödeme kayıtları, cihaz ve oturum bilgileri."
+        },
+        {
+          "h": "İşleme amaçları",
+          "b": "Üyelik, ilan ve hizmet süreçlerinin yürütülmesi, güvenlik, dolandırıcılığın önlenmesi ve yasal yükümlülükler."
+        },
+        {
+          "h": "Aktarım",
+          "b": "Ödeme kuruluşu, barındırma sağlayıcısı ve yetkili kurumlarla, yalnızca gerektiği ölçüde."
+        },
+        {
+          "h": "Haklarınız (KVKK m.11)",
+          "b": "Verilerinize erişme, düzeltme, silme, itiraz etme ve zararın giderilmesini talep etme hakkınız vardır."
+        }
+      ]
+    },
+    "privacy": {
+      "title": "Gizlilik politikası",
+      "description": "Verilerini nasıl koruduğumuz.",
+      "sections": [
+        {
+          "h": "Güvenlik",
+          "b": "Kimlik numarası şifreli saklanır, fotoğrafların konum bilgisi silinir, belgeler süreli bağlantıyla açılır."
+        },
+        {
+          "h": "Telefon numaran",
+          "b": "Numaran ilanlarda gizlidir; yalnızca sen paylaşırsan ya da ayarlardan açarsan görünür."
+        },
+        {
+          "h": "Verilerinin kopyası ve silme",
+          "b": "Uygulamadan verilerinin kopyasını indirebilir, hesabını silebilirsin."
+        }
+      ]
+    },
+    "terms": {
+      "title": "Kullanım koşulları",
+      "description": "Platformu kullanırken geçerli kurallar.",
+      "sections": [
+        {
+          "h": "İlanlar",
+          "b": "İlanlar yayından önce denetlenir; yanıltıcı ya da kurallara aykırı ilan reddedilir."
+        },
+        {
+          "h": "Öne çıkarma",
+          "b": "Vitrin, Acil ve Üste taşı ücretli hizmetlerdir; süreleri satın alma anında başlar."
+        },
+        {
+          "h": "Satış",
+          "b": "Tekne satış bedeli taraflar arasında ödenir; platform satışın tarafı değildir."
+        }
+      ]
+    },
+    "cookies": {
+      "title": "Çerez politikası",
+      "description": "Hangi çerezleri neden kullandığımız.",
+      "sections": [
+        {
+          "h": "Zorunlu çerezler",
+          "b": "Oturum ve çerez tercihinin saklanması için gereklidir; kapatılamaz."
+        },
+        {
+          "h": "İstatistik çerezleri",
+          "b": "Yalnızca iznin olursa kullanılır. Şu an hiçbir istatistik aracı kullanılmıyor."
+        }
+      ]
+    }
   }
 }
