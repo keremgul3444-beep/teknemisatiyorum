@@ -825,7 +825,9 @@
     "memberChanged": "Company member role: {{before}} → {{role}}",
     "reportCompleted": "Survey report completed: {{score}}/100",
     "orderPaid": "Order paid: {{product}} ({{channel}})",
-    "orderRefunded": "Order refunded: {{product}}"
+    "orderRefunded": "Order refunded: {{product}}",
+    "orderManual": "Bank transfer order: {{product}} ({{note}})",
+    "productPriceChanged": "Product price: {{code}} — web {{web}}, app {{app}} kuruş"
   },
   "errors": {
     "generic": "Something went wrong, please try again.",

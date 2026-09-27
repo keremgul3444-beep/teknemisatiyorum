@@ -1,0 +1,2 @@
+{"tr":{"audit":{"orderManual":"Havale siparişi: {{product}} ({{note}})","productPriceChanged":"Ürün fiyatı: {{code}} — site {{web}}, uygulama {{app}} kuruş"}},
+ "en":{"audit":{"orderManual":"Bank transfer order: {{product}} ({{note}})","productPriceChanged":"Product price: {{code}} — web {{web}}, app {{app}} kuruş"}}}

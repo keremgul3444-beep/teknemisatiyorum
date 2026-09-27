@@ -825,7 +825,9 @@
     "memberChanged": "Firma üyesi rolü: {{before}} → {{role}}",
     "reportCompleted": "Ekspertiz raporu tamamlandı: {{score}}/100",
     "orderPaid": "Sipariş ödendi: {{product}} ({{channel}})",
-    "orderRefunded": "Sipariş iade edildi: {{product}}"
+    "orderRefunded": "Sipariş iade edildi: {{product}}",
+    "orderManual": "Havale siparişi: {{product}} ({{note}})",
+    "productPriceChanged": "Ürün fiyatı: {{code}} — site {{web}}, uygulama {{app}} kuruş"
   },
   "errors": {
     "generic": "Bir şeyler ters gitti, tekrar dene.",

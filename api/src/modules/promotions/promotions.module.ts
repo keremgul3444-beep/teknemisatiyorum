@@ -4,12 +4,13 @@ import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
 import { PaymentsController } from './payments.controller';
 import { ProductsController } from './products.controller';
+import { AdminOrdersController } from './admin-orders.controller';
 
 const PROVIDERS = Symbol('PAYMENT_PROVIDERS');
 type Providers = ReturnType<typeof paymentProviders>;
 
 @Module({
-  controllers: [ProductsController, OrdersController, PaymentsController],
+  controllers: [ProductsController, OrdersController, PaymentsController, AdminOrdersController],
   providers: [
     OrdersService,
     { provide: PROVIDERS, useFactory: paymentProviders },
