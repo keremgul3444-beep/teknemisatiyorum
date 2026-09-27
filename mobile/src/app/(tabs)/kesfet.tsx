@@ -4,7 +4,8 @@ import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { colors, fonts, radius, space } from '@/theme';
 import { Card, Chip, Icon, ListingCard, Screen, Section, T } from '@/components';
-import { useListings } from '@/services';
+import { actions, useListings } from '@/services';
+import { useRemote } from '@/services/useRemote';
 import { useSession } from '@/session/role';
 
 const CATS = [
@@ -21,6 +22,8 @@ export default function Kesfet() {
   const name = useSession((s) => s.name.split(' ')[0]);
   const listings = useListings().filter((l) => l.status === 'yayinda');
   const forYou = [...listings].sort((a, b) => b.badges.length - a.badges.length || b.year - a.year).slice(0, 6);
+  // Ücretli vitrin şeridi (gerçek modda sunucudan; demo modunda boş).
+  const featured = useRemote(() => actions.showcase()).data?.featured ?? [];
   const ask = (text: string) => text.trim() && router.push({ pathname: '/asistan', params: { q: text.trim() } });
 
   return (
@@ -55,6 +58,13 @@ export default function Kesfet() {
           </Pressable>
         ))}
       </View>
+
+      {featured.length ? (
+        <Section title={t('promo.showcase')}>
+          <FlatList horizontal data={featured} keyExtractor={(l) => l.id} showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: space(3) }} renderItem={({ item }) => <ListingCard listing={item} width={280} />} />
+        </Section>
+      ) : null}
 
       <Section title={t('home.forYou')} actionLabel={t('common.seeAll')} onAction={() => router.push('/ilanlar')}>
         <FlatList horizontal data={forYou} keyExtractor={(l) => l.id} showsHorizontalScrollIndicator={false}

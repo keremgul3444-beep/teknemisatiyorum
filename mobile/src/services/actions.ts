@@ -4,7 +4,9 @@ import { useStore } from './store';
 import { absolute, isApiMode } from './mode';
 import { api } from './api/instance';
 import { applyUser, syncAdmin, syncAll, syncListings, syncMine } from './api/sync';
-import { toBoat, toListing, toThread, type ApiBoat, type ApiListing, type ApiThread, type ApiUser } from './api/mappers';
+import { toBoat, toListing, toThread, type AdminOrder, type ApiBoat, type ApiListing, type ApiProduct, type ApiThread, type ApiUser } from './api/mappers';
+import { ApiError } from './api/client';
+import { devReceipt } from '@/features/promo';
 import type { AdminStatus, BoatInput, Listing, ListingDraft, SubjectKind } from './types';
 import { useSession, type Prefs } from '@/session/role';
 import { resetRates } from './rates';
@@ -239,6 +241,30 @@ export const actions = {
   async readNotification(id: string) {
     await api.post(`/notifications/${id}/read`);
   },
+  // ——— Öne çıkarma ———
+  async products(): Promise<ApiProduct[]> {
+    if (!isApiMode()) return [];
+    return api.get<ApiProduct[]>('/products');
+  },
+  /** Uygulama içi satın alma. Bu turda mağaza modülü yok: deneme makbuzu (sunucu yalnızca deneme modunda kabul eder). */
+  async buyInApp(listingId: string, p: ApiProduct) {
+    const platform = Platform.OS === 'android' ? 'android' : 'ios';
+    const storeId = platform === 'ios' ? p.iosProductId : p.androidProductId;
+    if (!storeId) throw new ApiError(400, 'BAD_RECEIPT', 'errors.bad_receipt');
+    await api.post('/orders/store', { listingId, platform, receipt: devReceipt(storeId) });
+    await syncMine();
+  },
+  /** Ana sayfa vitrin ve acil şeritleri. */
+  async showcase(): Promise<{ featured: Listing[]; urgent: Listing[] }> {
+    if (!isApiMode()) return { featured: g().listings.filter((l) => l.promo?.featured), urgent: g().listings.filter((l) => l.promo?.urgent) };
+    const r = await api.get<{ featured: ApiListing[]; urgent: ApiListing[] }>('/listings/showcase');
+    return { featured: r.featured.map(toListing), urgent: r.urgent.map(toListing) };
+  },
+  adminOrders: (status?: string) => api.get<AdminOrder[]>(`/admin/orders${status ? `?status=${status}` : ''}`),
+  adminManualOrder: (listingId: string, productCode: string, note: string) => api.post('/admin/orders/manual', { listingId, productCode, note }),
+  adminRefund: (orderId: string) => api.post(`/admin/orders/${orderId}/refund`),
+  adminSetPrice: (code: string, patch: { priceWebKurus?: number; priceAppKurus?: number }) => api.put(`/admin/products/${code}`, patch),
+
   async sessions() {
     return api.get<{ id: string; deviceName: string; lastSeenAt: string; current: boolean }[]>('/auth/sessions');
   },

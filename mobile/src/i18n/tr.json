@@ -749,7 +749,9 @@
       "ekspertiz": "Ekspertiz",
       "kullanicilar": "Kullanıcılar",
       "odemeler": "Ödemeler",
-      "kayitlar": "İşlem kayıtları"
+      "kayitlar": "İşlem kayıtları",
+      "siparisler": "Siparişler",
+      "fiyatlar": "Fiyatlar"
     },
     "kpi": {
       "active": "Aktif ilan",
@@ -788,7 +790,7 @@
     },
     "held": "Güvencede",
     "released": "Aktarıldı",
-    "refund": "İade",
+    "refund": "İade et",
     "who": "Kim",
     "what": "Ne",
     "when": "Ne zaman",
@@ -804,7 +806,28 @@
     },
     "reportScore": "Rapor puanı",
     "reportComplete": "Raporu tamamla",
-    "reportDone": "Rapor tamamlandı · {{score}}/100"
+    "reportDone": "Rapor tamamlandı · {{score}}/100",
+    "manualOrder": "Havale siparişi",
+    "note": "Açıklama (ör. dekont no)",
+    "listingId": "İlan kimliği",
+    "create": "Oluştur",
+    "save": "Kaydet",
+    "priceWeb": "Site fiyatı (TL)",
+    "priceApp": "Uygulama fiyatı (TL)",
+    "noOrders": "Henüz sipariş yok",
+    "orderStatus": {
+      "pending": "Bekliyor",
+      "paid": "Ödendi",
+      "failed": "Başarısız",
+      "refunded": "İade edildi",
+      "cancelled": "İptal"
+    },
+    "channel": {
+      "web": "Site",
+      "ios": "iPhone",
+      "android": "Android",
+      "manual": "Havale"
+    }
   },
   "audit": {
     "listingApproved": "İlan onaylandı: {{title}}",
@@ -888,5 +911,32 @@
   "notifs": {
     "title": "Bildirimler",
     "empty": "Henüz bildirim yok"
+  },
+  "promo": {
+    "featured": "Vitrin",
+    "urgent": "Acil",
+    "title": "İlanını öne çıkar",
+    "cta": "Öne çıkar",
+    "intro": "İlanın ana sayfa vitrininde, arama sonuçlarının üstünde ya da \"Acil\" etiketiyle daha çok kişiye ulaşsın.",
+    "product": {
+      "vitrin_7": "Vitrin · 7 gün",
+      "vitrin_30": "Vitrin · 30 gün",
+      "acil_7": "Acil satılık · 7 gün",
+      "acil_30": "Acil satılık · 30 gün",
+      "ust_tasi": "Üste taşı"
+    },
+    "kindHint": {
+      "vitrin": "Ana sayfa vitrini ve arama sonuçlarının üstü",
+      "acil": "Kırmızı \"Acil\" etiketi ve Acil satılıklar şeridi",
+      "bump": "İlanın \"en yeni\" sıralamada yeniden en üste çıkar"
+    },
+    "trialPrice": "Deneme fiyatı",
+    "buyDev": "Satın al (deneme)",
+    "bought": "Öne çıkarma etkin",
+    "activeFeatured": "Vitrinde · {{n}} gün",
+    "activeUrgent": "Acil · {{n}} gün",
+    "trialWarning": "Gerçek fiyat girilmedi — deneme fiyatı geçerli",
+    "showcase": "Vitrin",
+    "noProducts": "Öne çıkarma şu an kullanılamıyor"
   }
 }

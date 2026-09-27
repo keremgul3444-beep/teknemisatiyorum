@@ -1,7 +1,7 @@
 import type { Prefs } from '@/session/role';
 import type { BadgeKind, BoatType, Currency, Equipment } from '@tms/shared';
 import { absolute } from '../mode';
-import type { AdminItem, AuditEntry, Boat, BrokerCase, Conversation, ExpertiseBooking, ExpertisePackage, Listing, LogEntry, SavedSearch, Seller } from '../types';
+import type { AdminItem, AuditEntry, Boat, BrokerCase, Conversation, ExpertiseBooking, ExpertisePackage, Listing, LogEntry, Promo, SavedSearch, Seller } from '../types';
 
 // Sunucu yanıt biçimleri (yalnızca kullanılan alanlar).
 export interface ApiListing {
@@ -10,6 +10,16 @@ export interface ApiListing {
   rejectReason?: string | null; photos: { id: string; url: string }[];
   seller: { id: string; name: string | null; since: number; companyName: string | null };
   logbook: { count: number; latest: ApiEntry[]; boatId?: string } | null; isMine: boolean;
+  promo?: Promo;
+}
+/** Öne çıkarma ürünü (fiyatlar kuruş; site ve uygulama ayrı). */
+export interface ApiProduct {
+  code: string; kind: 'vitrin' | 'acil' | 'bump'; days: number | null; priceWebKurus: number; priceAppKurus: number;
+  iosProductId: string | null; androidProductId: string | null; isTrialPrice: boolean;
+}
+export interface AdminOrder {
+  id: string; listingId: string; listingTitle: string | null; productCode: string; channel: string; amountKurus: number;
+  status: string; createdAt: string; paidAt: string | null; note: string | null; userName: string | null;
 }
 export interface ApiEntry { id: string; kind: LogEntry['kind']; date: string; title: string; byName: string; verified: boolean }
 export interface ApiBoat { id: string; name: string; brand: string; model: string; year: number; lengthM: number; entries: ApiEntry[] }
@@ -38,6 +48,7 @@ export function toListing(l: ApiListing): Listing {
     status: STATUS[l.status] ?? 'onay-bekliyor', rawStatus: l.status, photoSeed: seedOf(l.id), cabins: l.cabins, engine: l.engine,
     photoUrls: l.photos.map((p) => absolute(p.url)), isMine: l.isMine, boatId: l.logbook?.boatId ?? null,
     logbookLatest: l.logbook?.latest.map(toEntry) ?? [], rejectReason: l.rejectReason ?? null,
+    promo: l.promo ?? { featured: false, urgent: false },
   };
 }
 

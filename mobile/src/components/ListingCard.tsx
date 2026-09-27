@@ -9,6 +9,7 @@ import { BoatImage } from './BoatImage';
 import { Badge } from './Badge';
 import { T } from './T';
 import { Chip } from './Chip';
+import { PromoBadges } from './PromoBadges';
 
 /** `disabled`: önizleme gibi henüz var olmayan ilanlarda karta dokunulmaz. */
 export function ListingCard({ listing: l, compact, width, missing, disabled }: { listing: Listing; compact?: boolean; width?: number; missing?: string; disabled?: boolean }) {
@@ -19,6 +20,7 @@ export function ListingCard({ listing: l, compact, width, missing, disabled }: {
         <View style={{ position: 'absolute', top: space(2.5), left: space(2.5), flexDirection: 'row', flexWrap: 'wrap', gap: space(1.5) }}>
           {l.status === 'onay-bekliyor' ? <Badge kind="beklemede" onDark /> : l.badges.slice(0, compact ? 1 : 2).map((b) => <Badge key={b} kind={b} onDark />)}
         </View>
+        <View style={{ position: 'absolute', top: space(2.5), right: space(2.5) }}><PromoBadges promo={l.promo} /></View>
       </BoatImage>
       <View style={{ padding: space(3.5), gap: space(1) }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: space(2) }}>

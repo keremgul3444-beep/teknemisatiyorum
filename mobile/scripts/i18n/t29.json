@@ -1,0 +1,32 @@
+{"tr":{
+  "promo":{
+    "featured":"Vitrin","urgent":"Acil","title":"İlanını öne çıkar","cta":"Öne çıkar",
+    "intro":"İlanın ana sayfa vitrininde, arama sonuçlarının üstünde ya da \"Acil\" etiketiyle daha çok kişiye ulaşsın.",
+    "product":{"vitrin_7":"Vitrin · 7 gün","vitrin_30":"Vitrin · 30 gün","acil_7":"Acil satılık · 7 gün","acil_30":"Acil satılık · 30 gün","ust_tasi":"Üste taşı"},
+    "kindHint":{"vitrin":"Ana sayfa vitrini ve arama sonuçlarının üstü","acil":"Kırmızı \"Acil\" etiketi ve Acil satılıklar şeridi","bump":"İlanın \"en yeni\" sıralamada yeniden en üste çıkar"},
+    "trialPrice":"Deneme fiyatı","buyDev":"Satın al (deneme)","bought":"Öne çıkarma etkin",
+    "activeFeatured":"Vitrinde · {{n}} gün","activeUrgent":"Acil · {{n}} gün",
+    "trialWarning":"Gerçek fiyat girilmedi — deneme fiyatı geçerli","showcase":"Vitrin"
+  },
+  "admin":{"nav":{"siparisler":"Siparişler","fiyatlar":"Fiyatlar"},
+    "manualOrder":"Havale siparişi","refund":"İade et","note":"Açıklama (ör. dekont no)","listingId":"İlan kimliği",
+    "create":"Oluştur","save":"Kaydet","priceWeb":"Site fiyatı (TL)","priceApp":"Uygulama fiyatı (TL)","noOrders":"Henüz sipariş yok",
+    "orderStatus":{"pending":"Bekliyor","paid":"Ödendi","failed":"Başarısız","refunded":"İade edildi","cancelled":"İptal"},
+    "channel":{"web":"Site","ios":"iPhone","android":"Android","manual":"Havale"}}
+},
+"en":{
+  "promo":{
+    "featured":"Featured","urgent":"Urgent","title":"Promote your listing","cta":"Promote",
+    "intro":"Reach more buyers on the home page showcase, at the top of search results or with an \"Urgent\" label.",
+    "product":{"vitrin_7":"Featured · 7 days","vitrin_30":"Featured · 30 days","acil_7":"Urgent sale · 7 days","acil_30":"Urgent sale · 30 days","ust_tasi":"Bump to top"},
+    "kindHint":{"vitrin":"Home page showcase and top of search results","acil":"Red \"Urgent\" label and the urgent sales strip","bump":"Your listing jumps back to the top of \"newest\""},
+    "trialPrice":"Trial price","buyDev":"Buy (trial)","bought":"Promotion active",
+    "activeFeatured":"Featured · {{n}} days","activeUrgent":"Urgent · {{n}} days",
+    "trialWarning":"No real price set — trial price applies","showcase":"Featured"
+  },
+  "admin":{"nav":{"siparisler":"Orders","fiyatlar":"Prices"},
+    "manualOrder":"Bank transfer order","refund":"Refund","note":"Note (e.g. receipt no)","listingId":"Listing ID",
+    "create":"Create","save":"Save","priceWeb":"Web price (TRY)","priceApp":"App price (TRY)","noOrders":"No orders yet",
+    "orderStatus":{"pending":"Pending","paid":"Paid","failed":"Failed","refunded":"Refunded","cancelled":"Cancelled"},
+    "channel":{"web":"Web","ios":"iPhone","android":"Android","manual":"Bank transfer"}}
+}}

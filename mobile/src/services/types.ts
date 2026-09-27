@@ -9,7 +9,10 @@ export interface Listing {
   logbookCount: number; description: string; status: ListingStatus; photoSeed: number; cabins: number; engine: string;
   /** Gerçek modda: sunucudaki fotoğraflar, ham durum (draft/pending/rejected…), ilan sahibi mi, bağlı tekne ve karne özeti. */
   photoUrls?: string[]; rawStatus?: string; isMine?: boolean; boatId?: string | null; logbookLatest?: LogEntry[]; rejectReason?: string | null;
+  /** Öne çıkarma: vitrin/acil etkin mi; bitiş tarihleri yalnızca ilan sahibine gelir. */
+  promo?: Promo;
 }
+export interface Promo { featured: boolean; urgent: boolean; featuredUntil?: string; urgentUntil?: string }
 export type ListingDraft = Pick<Listing, 'brand' | 'model' | 'year' | 'lengthM' | 'price' | 'currency' | 'type' | 'location' | 'equipment' | 'cabins' | 'engine' | 'description'>;
 
 export type ProviderKind = 'usta' | 'kaptan' | 'eksper';

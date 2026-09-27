@@ -29,3 +29,4 @@ export * from './DateRangePicker';
 export * from './MenuRow';
 export * from './Toggle';
 export * from './AdminBits';
+export { PromoBadges } from './PromoBadges';
