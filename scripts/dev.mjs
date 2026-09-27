@@ -31,10 +31,7 @@ if (!fs.existsSync(ENV_FILE)) {
 {
   let cur = fs.readFileSync(ENV_FILE, 'utf8');
   if (!/^PAYMENT_WEBHOOK_SECRET=.+$/m.test(cur)) {
-    cur = cur.replace(/^PAYMENT_WEBHOOK_SECRET=.*?
-?/m, '').replace(/\s*$/, '
-') + `PAYMENT_WEBHOOK_SECRET=${crypto.randomBytes(32).toString('hex')}
-`;
+    cur = cur.replace(/^PAYMENT_WEBHOOK_SECRET=.*\r?\n?/m, '').replace(/\s*$/, '\n') + `PAYMENT_WEBHOOK_SECRET=${crypto.randomBytes(32).toString('hex')}\n`;
     fs.writeFileSync(ENV_FILE, cur);
     console.log('api/.env: ödeme bildirimi imza anahtarı eklendi.');
   }
