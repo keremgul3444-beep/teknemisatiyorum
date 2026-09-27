@@ -7,3 +7,4 @@ export * from './assistant/match';
 export * from './assistant/chips';
 export * from './assistant/serviceCategory';
 export * from './seed/listings';
+export * from './design';
