@@ -46,15 +46,137 @@
     "shortcuts": "By city and boat type",
     "seeAll": "See all",
     "appTitle": "More in the app",
-    "appBody": "Message sellers, book a survey, keep a Boat Logbook — all in the app."
+    "appBody": "Message sellers, book a survey, keep a Boat Logbook — all in the app.",
+    "servicesTitle": "Buy and sell with confidence",
+    "expertiseBody": "An independent surveyor reports on the boat; the listing gets a \"surveyed\" badge.",
+    "brokerBody": "Let a professional broker handle your sale: pricing, buyers, transfer.",
+    "logbookBody": "Maintenance and repair history travels with your boat as verified records."
   },
   "seo": {
     "pageTitle": "{{title}} | teknemisatıyorum",
     "homeTitle": "teknemisatıyorum — Boats, yachts and sailboats for sale",
-    "homeDescription": "Sailboats, motor yachts, gulets and catamarans for sale. Search with the Smart Assistant; buy and sell with survey and broker services."
+    "homeDescription": "Sailboats, motor yachts, gulets and catamarans for sale. Search with the Smart Assistant; buy and sell with survey and broker services.",
+    "listingTitle": "{{name}} ({{year}}) for sale · {{city}} · {{price}} | {{site}}",
+    "listingFallback": "{{year}} {{name}}, {{length}} m, {{city}}. Photos, specs and price."
   },
   "common": {
     "unavailable": "Listings are unavailable right now, please try again shortly.",
-    "draft": "Draft text — not yet legally reviewed."
+    "draft": "Draft text — not yet legally reviewed.",
+    "noApp": "No app yet?"
+  },
+  "promo": {
+    "featured": "Featured",
+    "urgent": "Urgent"
+  },
+  "boatType": {
+    "motoryat": "Motor yacht",
+    "yelkenli": "Sailboat",
+    "gulet": "Gulet",
+    "surat": "Speedboat",
+    "balikci": "Fishing boat",
+    "katamaran": "Catamaran"
+  },
+  "equipment": {
+    "jenerator": "Generator",
+    "branda": "Canvas cover",
+    "klima": "Air conditioning",
+    "radar": "Radar",
+    "otopilot": "Autopilot",
+    "bowThruster": "Bow thruster",
+    "teak": "Teak deck",
+    "tender": "Tender"
+  },
+  "assistant": {
+    "chip": {
+      "lenMax": "≤ {{n}} m",
+      "lenMin": "≥ {{n}} m",
+      "lenRange": "{{a}}–{{b}} m",
+      "yearMin": "{{n}} or newer",
+      "yearMax": "{{n}} or older",
+      "yearExact": "{{n}} model",
+      "priceMax": "≤ {{p}}",
+      "priceMin": "≥ {{p}}",
+      "priceRange": "{{a}} – {{b}}"
+    },
+    "crit": {
+      "length": "Length",
+      "year": "Year",
+      "price": "Budget",
+      "type": "Type",
+      "location": "Location"
+    },
+    "title": "Smart Assistant",
+    "exact": "Exact matches ({{n}})",
+    "noExact": "No exact matches — close results below.",
+    "near": "Matching all but one criterion",
+    "missing": "Doesn't match: {{what}}"
+  },
+  "badge": {
+    "ekspertizli": "Surveyed",
+    "sahiplik": "Ownership verified",
+    "broker": "Broker assured",
+    "dogrulanmis": "Verified",
+    "beklemede": "Pending approval"
+  },
+  "logbook": {
+    "boatAdded": "Boat added",
+    "expertiseReport": "Platform survey report",
+    "owner": "Owner",
+    "platformSurveyor": "Platform surveyor"
+  },
+  "filters": {
+    "type": "Boat type",
+    "any": "All",
+    "city": "City",
+    "minLength": "Min length (m)",
+    "maxLength": "Max length (m)",
+    "minYear": "Oldest year",
+    "maxPrice": "Max price",
+    "currency": "Currency",
+    "sort": "Sort",
+    "sortNew": "Newest",
+    "sortAsc": "Price: low to high",
+    "sortDesc": "Price: high to low",
+    "equipment": "Equipment",
+    "urgentOnly": "Urgent only",
+    "apply": "Apply"
+  },
+  "listings": {
+    "title": "Boats for sale",
+    "description": "Sailboats, motor yachts, gulets and catamarans for sale — filter, compare, message sellers in the app.",
+    "count": "{{n}} listings",
+    "empty": "No listings match these filters. Try widening them.",
+    "pages": "Pages",
+    "prev": "← Previous",
+    "next": "Next →",
+    "pageOf": "Page {{a}} of {{b}}"
+  },
+  "landing": {
+    "title": "{{type}} for sale",
+    "titleCity": "{{type}} for sale in {{city}}",
+    "description": "{{title}}: {{n}} current listings with photos, prices, survey and logbook info.",
+    "intro": "{{n}} current listings — {{title}}."
+  },
+  "listing": {
+    "sold": "Sold",
+    "message": "Message seller",
+    "requestSurvey": "Request a survey",
+    "year": "Year",
+    "length": "Length",
+    "cabins": "Cabins",
+    "engine": "Engine",
+    "equipment": "Equipment",
+    "company": "Company",
+    "logbook": "Boat Logbook · {{n}} records",
+    "description": "Description",
+    "similar": "Similar listings"
+  },
+  "gone": {
+    "title": "This listing is no longer live",
+    "body": "The boat may have been sold or the listing removed. Have a look at similar boats."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The page may have moved or never existed"
   }
 }

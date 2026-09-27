@@ -27,11 +27,30 @@ export async function proxy(req: NextRequest) {
   }
 
   const isEn = pathname === '/en' || pathname.startsWith('/en/');
+
+  // Yayında olmayan ilan: Google'a "kalıcı olarak kalktı" (410), ziyaretçiye benzer ilanlar.
+  const gone = await listingGone(pathname);
+  if (gone) {
+    const res = NextResponse.rewrite(new URL(`/${isEn ? 'en' : 'tr'}/ilan-kalkti`, req.url), { status: 410, request: { headers: requestHeaders } });
+    for (const [k, v] of Object.entries(headers)) res.headers.set(k, v);
+    return res;
+  }
+
   const res = isEn
     ? NextResponse.next({ request: { headers: requestHeaders } })
     : NextResponse.rewrite(new URL(`/tr${pathname === '/' ? '' : pathname}${search}`, req.url), { request: { headers: requestHeaders } });
   for (const [k, v] of Object.entries(headers)) res.headers.set(k, v);
   return res;
+}
+
+const LISTING = /^\/(?:en\/)?ilan\/[^/]*-([a-z0-9]{8,40})$/;
+
+/** `/ilan/<slug>` için API'ye sor: 404 ise ilan kalkmış demektir. API'ye ulaşılamazsa sayfa normal akışa bırakılır. */
+async function listingGone(pathname: string): Promise<boolean> {
+  const m = LISTING.exec(pathname);
+  if (!m) return false;
+  const r = await fetch(`${process.env.API_URL ?? 'http://127.0.0.1:3000'}/listings/${m[1]}`, { method: 'GET', signal: AbortSignal.timeout(3000) }).catch(() => null);
+  return r?.status === 404;
 }
 
 export const config = {

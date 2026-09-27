@@ -46,15 +46,137 @@
     "shortcuts": "Şehir ve tekne tipine göre",
     "seeAll": "Tümünü gör",
     "appTitle": "Uygulamada daha fazlası",
-    "appBody": "Satıcıya yaz, ekspertiz iste, Tekne Karnesi'ni tut — hepsi uygulamada."
+    "appBody": "Satıcıya yaz, ekspertiz iste, Tekne Karnesi'ni tut — hepsi uygulamada.",
+    "servicesTitle": "Güvenle al, sat",
+    "expertiseBody": "Bağımsız eksper teknenin durumunu raporlar; ilan \"ekspertizli\" rozeti alır.",
+    "brokerBody": "Satışını profesyonel broker yürütsün: fiyatlama, alıcı bulma, devir.",
+    "logbookBody": "Bakım ve onarım geçmişi doğrulanmış kayıtlarla teknenle birlikte el değiştirir."
   },
   "seo": {
     "pageTitle": "{{title}} | teknemisatıyorum",
     "homeTitle": "teknemisatıyorum — Satılık tekne, yat ve yelkenli ilanları",
-    "homeDescription": "Satılık yelkenli, motoryat, gulet ve katamaran ilanları. Akıllı Asistan ile ara, ekspertiz ve broker hizmetiyle güvenle al-sat."
+    "homeDescription": "Satılık yelkenli, motoryat, gulet ve katamaran ilanları. Akıllı Asistan ile ara, ekspertiz ve broker hizmetiyle güvenle al-sat.",
+    "listingTitle": "Satılık {{name}} ({{year}}) · {{city}} · {{price}} | {{site}}",
+    "listingFallback": "{{year}} model {{name}}, {{length}} m, {{city}}. Fotoğraflar, özellikler ve fiyat."
   },
   "common": {
     "unavailable": "Şu an ilanlara ulaşılamıyor, birazdan tekrar dene.",
-    "draft": "Taslak metin — hukuki incelemeden geçmedi."
+    "draft": "Taslak metin — hukuki incelemeden geçmedi.",
+    "noApp": "Uygulama yok mu?"
+  },
+  "promo": {
+    "featured": "Vitrin",
+    "urgent": "Acil"
+  },
+  "boatType": {
+    "motoryat": "Motoryat",
+    "yelkenli": "Yelkenli",
+    "gulet": "Gulet",
+    "surat": "Sürat teknesi",
+    "balikci": "Balıkçı teknesi",
+    "katamaran": "Katamaran"
+  },
+  "equipment": {
+    "jenerator": "Jeneratör",
+    "branda": "Branda",
+    "klima": "Klima",
+    "radar": "Radar",
+    "otopilot": "Otopilot",
+    "bowThruster": "Baş pervane",
+    "teak": "Tik güverte",
+    "tender": "Tender bot"
+  },
+  "assistant": {
+    "chip": {
+      "lenMax": "≤ {{n}} m",
+      "lenMin": "≥ {{n}} m",
+      "lenRange": "{{a}}–{{b}} m",
+      "yearMin": "{{n}} ve sonrası",
+      "yearMax": "{{n}} ve öncesi",
+      "yearExact": "{{n}} model",
+      "priceMax": "≤ {{p}}",
+      "priceMin": "≥ {{p}}",
+      "priceRange": "{{a}} – {{b}}"
+    },
+    "crit": {
+      "length": "Boy",
+      "year": "Yıl",
+      "price": "Bütçe",
+      "type": "Tip",
+      "location": "Konum"
+    },
+    "title": "Akıllı Asistan",
+    "exact": "Tam uyan ({{n}})",
+    "noExact": "Tam uyan ilan yok — aşağıda yakın sonuçlar var.",
+    "near": "Bir kriter hariç uyanlar",
+    "missing": "Uymayan: {{what}}"
+  },
+  "badge": {
+    "ekspertizli": "Ekspertizli",
+    "sahiplik": "Sahipliği doğrulandı",
+    "broker": "Broker güvencesi",
+    "dogrulanmis": "Doğrulanmış",
+    "beklemede": "Onay bekliyor"
+  },
+  "logbook": {
+    "boatAdded": "Tekne eklendi",
+    "expertiseReport": "Platform ekspertiz raporu",
+    "owner": "Sahibi",
+    "platformSurveyor": "Platform eksperi"
+  },
+  "filters": {
+    "type": "Tekne tipi",
+    "any": "Hepsi",
+    "city": "Şehir",
+    "minLength": "En az boy (m)",
+    "maxLength": "En çok boy (m)",
+    "minYear": "En eski yıl",
+    "maxPrice": "En çok fiyat",
+    "currency": "Para birimi",
+    "sort": "Sıralama",
+    "sortNew": "En yeni",
+    "sortAsc": "Önce ucuz",
+    "sortDesc": "Önce pahalı",
+    "equipment": "Donanım",
+    "urgentOnly": "Sadece acil",
+    "apply": "Uygula"
+  },
+  "listings": {
+    "title": "Satılık tekne ilanları",
+    "description": "Satılık yelkenli, motoryat, gulet ve katamaran ilanları — filtrele, karşılaştır, satıcıya uygulamadan yaz.",
+    "count": "{{n}} ilan",
+    "empty": "Bu kriterlere uyan ilan yok. Filtreleri gevşetmeyi dene.",
+    "pages": "Sayfalar",
+    "prev": "← Önceki",
+    "next": "Sonraki →",
+    "pageOf": "Sayfa {{a}} / {{b}}"
+  },
+  "landing": {
+    "title": "Satılık {{type}}",
+    "titleCity": "{{city}} satılık {{type}}",
+    "description": "{{title}}: {{n}} güncel ilan. Fotoğraflar, fiyatlar, ekspertiz ve Tekne Karnesi bilgisiyle.",
+    "intro": "{{title}} için {{n}} güncel ilan."
+  },
+  "listing": {
+    "sold": "Satıldı",
+    "message": "Satıcıya yaz",
+    "requestSurvey": "Ekspertiz iste",
+    "year": "Yıl",
+    "length": "Boy",
+    "cabins": "Kabin",
+    "engine": "Motor",
+    "equipment": "Donanım",
+    "company": "Firma",
+    "logbook": "Tekne Karnesi · {{n}} kayıt",
+    "description": "Açıklama",
+    "similar": "Benzer ilanlar"
+  },
+  "gone": {
+    "title": "Bu ilan artık yayında değil",
+    "body": "Tekne satılmış ya da ilan kaldırılmış olabilir. Benzer teknelere göz at."
+  },
+  "notFound": {
+    "title": "Sayfa bulunamadı",
+    "body": "Aradığın sayfa taşınmış ya da hiç olmamış olabilir"
   }
 }

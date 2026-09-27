@@ -36,6 +36,22 @@ const COMPANIES: Record<string, { name: string; kind: string; city: string }> = 
   c2: { name: 'Ege Tekne Galerisi', kind: 'galeri', city: 'Çeşme' },
 };
 
+/** Öne çıkarma ürünleri: deneme fiyatı (1 TL). Her çalıştırmada (upsert); yöneticinin girdiği fiyat ezilmez. */
+export async function seedProducts(prisma: PrismaClient) {
+  const PRODUCTS = [
+    { code: 'vitrin_7', kind: 'vitrin', days: 7 }, { code: 'vitrin_30', kind: 'vitrin', days: 30 },
+    { code: 'acil_7', kind: 'acil', days: 7 }, { code: 'acil_30', kind: 'acil', days: 30 },
+    { code: 'ust_tasi', kind: 'bump', days: null },
+  ] as const;
+  for (const p of PRODUCTS) {
+    await prisma.product.upsert({
+      where: { code: p.code },
+      create: { ...p, priceWebKurus: 100, priceAppKurus: 100, isTrialPrice: true, iosProductId: `tms.${p.code}`, androidProductId: `tms_${p.code}` },
+      update: {},
+    });
+  }
+}
+
 export async function runSeed(prisma: PrismaClient) {
   await prisma.user.upsert({
     where: { phone: '+905000000000' },
@@ -55,19 +71,7 @@ export async function runSeed(prisma: PrismaClient) {
     if (!(await prisma.expertisePackage.findFirst({ where: { name: p.name } }))) await prisma.expertisePackage.create({ data: p });
   }
 
-  // Öne çıkarma ürünleri: deneme fiyatı (1 TL) — gerçek fiyatı yönetici girer.
-  const PRODUCTS = [
-    { code: 'vitrin_7', kind: 'vitrin', days: 7 }, { code: 'vitrin_30', kind: 'vitrin', days: 30 },
-    { code: 'acil_7', kind: 'acil', days: 7 }, { code: 'acil_30', kind: 'acil', days: 30 },
-    { code: 'ust_tasi', kind: 'bump', days: null },
-  ] as const;
-  for (const p of PRODUCTS) {
-    await prisma.product.upsert({
-      where: { code: p.code },
-      create: { ...p, priceWebKurus: 100, priceAppKurus: 100, isTrialPrice: true, iosProductId: `tms.${p.code}`, androidProductId: `tms_${p.code}` },
-      update: {},
-    });
-  }
+  await seedProducts(prisma);
 
   const userIds: Record<string, string> = {};
   const companyIds: Record<string, string> = {};
@@ -103,7 +107,9 @@ export async function runSeed(prisma: PrismaClient) {
 
 if (require.main === module) {
   const prisma = new PrismaClient();
-  prisma.listing.count()
+  // Ürün tablosu her seferinde tamamlanır (sonradan eklenen tablolar mevcut veritabanında da dolsun).
+  seedProducts(prisma)
+    .then(() => prisma.listing.count())
     .then((n) => (n ? console.log('Veritabanında ilan var; başlangıç verisi atlandı.') : runSeed(prisma).then(() => console.log('Başlangıç verisi yüklendi.'))))
     .finally(() => prisma.$disconnect());
 }
