@@ -27,6 +27,18 @@ if (!fs.existsSync(ENV_FILE)) {
     .replace(/^OTP_IP_LIMIT=.*$/m, 'OTP_IP_LIMIT=200'));
   console.log('api/.env oluşturuldu (rastgele gizli anahtarlarla).');
 }
+// Sonradan eklenen gizli değerler: mevcut .env'de yoksa eklenir (öncekiler değişmez).
+{
+  let cur = fs.readFileSync(ENV_FILE, 'utf8');
+  if (!/^PAYMENT_WEBHOOK_SECRET=.+$/m.test(cur)) {
+    cur = cur.replace(/^PAYMENT_WEBHOOK_SECRET=.*?
+?/m, '').replace(/\s*$/, '
+') + `PAYMENT_WEBHOOK_SECRET=${crypto.randomBytes(32).toString('hex')}
+`;
+    fs.writeFileSync(ENV_FILE, cur);
+    console.log('api/.env: ödeme bildirimi imza anahtarı eklendi.');
+  }
+}
 
 const nodeEnv = ['--env-file=.env', '--import', 'tsx'];
 const children = [];

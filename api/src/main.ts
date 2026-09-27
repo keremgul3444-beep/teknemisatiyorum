@@ -10,7 +10,7 @@ import { backfillNationalIdHashes } from './modules/verification/backfill';
 /** Uygulamayı ortak ayarlarla yapılandırır; testler de aynı fonksiyonu kullanır. */
 export function configureApp(app: INestApplication) {
   // Geliştirmede istekler Metro proxy'sinden (127.0.0.1) gelir; gerçek istemci IP'si X-Forwarded-For'dan okunur.
-  (app.getHttpAdapter().getInstance() as { set(k: string, v: unknown): void }).set('trust proxy', 'loopback');
+  (app.getHttpAdapter().getInstance() as { set(k: string, v: unknown): void }).set('trust proxy', env().TRUST_PROXY);
   app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
   app.enableCors({ origin: env().CORS_ORIGINS.split(',').map((s) => s.trim()), credentials: false });
   return app;

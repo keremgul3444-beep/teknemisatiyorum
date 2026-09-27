@@ -18,6 +18,14 @@ const schema = z.object({
   OTP_IP_LIMIT: z.coerce.number().default(10),
   /** Kapalı beta: SMS bağlanana kadar giriş kodu yanıtta döner. Üretimde (NODE_ENV=production) hiçbir koşulda çalışmaz. */
   DEV_OTP_ECHO: z.enum(['0', '1']).default('0'),
+  /** Ödeme sağlayıcıları: dev = deneme (gerçek para yok), live = gerçek (Aşama 2). */
+  PAYMENTS_MODE: z.enum(['dev', 'live']).default('dev'),
+  /** Ödeme bildirimi imza anahtarı (sanal POS paneli ile aynı değer). */
+  PAYMENT_WEBHOOK_SECRET: z.string().min(32, 'PAYMENT_WEBHOOK_SECRET en az 32 karakter olmalı'),
+  /** Sitenin adresi (ödeme dönüş ve deneme ödeme sayfası için). */
+  WEB_URL: z.string().default('http://localhost:3001'),
+  /** Express "trust proxy": yalnızca bu ara katmandan gelen X-Forwarded-For'a güvenilir. */
+  TRUST_PROXY: z.string().default('loopback'),
 });
 
 export type Env = z.infer<typeof schema>;

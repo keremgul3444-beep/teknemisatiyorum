@@ -27,6 +27,9 @@ export async function createTestApp(opts: { controllers?: any[]; override?: (b: 
     STORAGE_DIR: path.join(require('os').tmpdir(), `tms-storage-${schema}`),
     ANTHROPIC_API_KEY: '',
     OTP_IP_LIMIT: '1000',
+    PAYMENT_WEBHOOK_SECRET: 'test-webhook-secret-test-webhook-secret',
+    PAYMENTS_MODE: 'dev',
+    WEB_URL: 'http://localhost:3001',
   });
   resetEnvCache();
   execSync('npx prisma migrate deploy', { cwd: path.resolve(__dirname, '..'), env: process.env, stdio: 'ignore' });
