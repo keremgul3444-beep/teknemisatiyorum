@@ -859,7 +859,10 @@
     "too_many_saved_searches": "You can save up to 20 searches",
     "user_deleted": "This user deleted their account; messages can't be sent",
     "user_not_found": "No user registered with this number",
-    "consent_required": "You need to give commercial message consent first"
+    "consent_required": "You need to give commercial message consent first",
+    "bad_width": "Invalid image width",
+    "bad_signature": "Payment notification could not be verified",
+    "bad_receipt": "Invalid purchase receipt"
   },
   "soon": {
     "title": "Coming soon",

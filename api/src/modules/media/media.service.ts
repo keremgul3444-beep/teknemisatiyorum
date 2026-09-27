@@ -9,6 +9,8 @@ import { STORAGE, type Storage } from '../../adapters/storage';
 import { env } from '../../config/env';
 
 const IMAGE_FORMATS = new Set(['jpeg', 'png', 'webp']);
+/** Site ve uygulamanın isteyebileceği görsel genişlikleri (başkası reddedilir: disk dolmasın). */
+export const MEDIA_WIDTHS = [400, 800, 1600] as const;
 const SIGNED_TTL_S = 5 * 60;
 const unsupported = () => new AppError('UNSUPPORTED_TYPE', 'errors.unsupportedType', 415);
 
@@ -38,6 +40,23 @@ export class MediaService {
     await this.storage.put(key, out);
     await this.prisma.file.create({ data: { id, ownerId, visibility, key, mime, size: out.length } });
     return { id, url: visibility === 'public' ? `${env().PUBLIC_URL}/media/${id}` : undefined };
+  }
+
+  /** Herkese açık görselin küçültülmüş WebP'si; ilk istekte üretilir, diskte saklanır. */
+  async readPublicWidth(id: string, w: number) {
+    if (!(MEDIA_WIDTHS as readonly number[]).includes(w)) throw Errors.bad('BAD_WIDTH', { allowed: MEDIA_WIDTHS.join(',') });
+    const f = await this.prisma.file.findUnique({ where: { id } });
+    if (!f || f.visibility !== 'public') throw Errors.notFound();
+    const gone = await this.prisma.user.count({ where: { id: f.ownerId, deletedAt: { not: null } } });
+    if (gone) throw Errors.notFound();
+    const key = `${f.key}.w${w}.webp`;
+    const cached = await this.storage.get(key);
+    if (cached) return { mime: 'image/webp', data: cached };
+    const original = await this.storage.get(f.key);
+    if (!original) throw Errors.notFound();
+    const data = await sharp(original).resize({ width: w, withoutEnlargement: true }).webp({ quality: 78 }).toBuffer();
+    await this.storage.put(key, data);
+    return { mime: 'image/webp', data };
   }
 
   async readPublic(id: string) {

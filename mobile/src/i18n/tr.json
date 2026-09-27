@@ -859,7 +859,10 @@
     "too_many_saved_searches": "En fazla 20 arama kaydedebilirsin",
     "user_deleted": "Bu kullanıcı hesabını sildi; mesaj gönderilemez",
     "user_not_found": "Bu numarayla kayıtlı kullanıcı yok",
-    "consent_required": "Bunun için önce ticari ileti izni vermelisin"
+    "consent_required": "Bunun için önce ticari ileti izni vermelisin",
+    "bad_width": "Geçersiz görsel boyutu",
+    "bad_signature": "Ödeme bildirimi doğrulanamadı",
+    "bad_receipt": "Satın alma makbuzu geçersiz"
   },
   "soon": {
     "title": "Yakında",

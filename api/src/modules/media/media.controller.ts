@@ -26,8 +26,8 @@ export class MediaController {
   @Public()
   @SkipThrottle()
   @Get(':id')
-  async get(@Param('id') id: string, @Res() res: Response) {
-    const f = await this.media.readPublic(id);
+  async get(@Param('id') id: string, @Query('w') w: string | undefined, @Res() res: Response) {
+    const f = w === undefined ? await this.media.readPublic(id) : await this.media.readPublicWidth(id, Number(w));
     res.type(f.mime).setHeader('Cache-Control', 'public, max-age=86400').send(f.data);
   }
 

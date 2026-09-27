@@ -1,0 +1,2 @@
+{"tr":{"errors":{"bad_width":"Geçersiz görsel boyutu","bad_signature":"Ödeme bildirimi doğrulanamadı","bad_receipt":"Satın alma makbuzu geçersiz"}},
+ "en":{"errors":{"bad_width":"Invalid image width","bad_signature":"Payment notification could not be verified","bad_receipt":"Invalid purchase receipt"}}}
