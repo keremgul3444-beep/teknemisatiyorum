@@ -1,0 +1,60 @@
+{
+  "site": {
+    "name": "teknemisatıyorum",
+    "tagline": "Buying, selling and looking after boats"
+  },
+  "nav": {
+    "listings": "Listings",
+    "expertise": "Survey",
+    "broker": "Broker",
+    "logbook": "Boat Logbook",
+    "usta": "Service",
+    "kaptan": "Skipper",
+    "login": "Log in",
+    "account": "My account",
+    "lang": "Türkçe",
+    "menu": "Menu"
+  },
+  "footer": {
+    "popular": "Popular searches",
+    "company": "Company",
+    "legal": "Legal",
+    "about": "About",
+    "contact": "Contact",
+    "kvkk": "Privacy notice (KVKK)",
+    "privacy": "Privacy",
+    "terms": "Terms of use",
+    "cookies": "Cookies",
+    "app": "Get the app",
+    "appSoon": "App coming soon to the stores",
+    "rights": "All rights reserved.",
+    "popularSail": "Sailboats for sale",
+    "popularMotor": "Motor yachts for sale",
+    "popularGulet": "Gulets for sale",
+    "popularCat": "Catamarans for sale",
+    "joinUsta": "Join as a technician",
+    "joinKaptan": "Join as a skipper"
+  },
+  "home": {
+    "title": "Find the boat you dream of",
+    "subtitle": "Describe it and the Smart Assistant finds matching listings.",
+    "searchPlaceholder": "e.g. sailboat under 12 m in Bodrum, up to €150k",
+    "search": "Search",
+    "showcase": "Featured",
+    "urgent": "Urgent sales",
+    "latest": "Latest listings",
+    "shortcuts": "By city and boat type",
+    "seeAll": "See all",
+    "appTitle": "More in the app",
+    "appBody": "Message sellers, book a survey, keep a Boat Logbook — all in the app."
+  },
+  "seo": {
+    "pageTitle": "{{title}} | teknemisatıyorum",
+    "homeTitle": "teknemisatıyorum — Boats, yachts and sailboats for sale",
+    "homeDescription": "Sailboats, motor yachts, gulets and catamarans for sale. Search with the Smart Assistant; buy and sell with survey and broker services."
+  },
+  "common": {
+    "unavailable": "Listings are unavailable right now, please try again shortly.",
+    "draft": "Draft text — not yet legally reviewed."
+  }
+}

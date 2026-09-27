@@ -4,14 +4,15 @@
   "workspaces": [
     "shared",
     "api",
-    "mobile"
+    "mobile",
+    "web"
   ],
   "overrides": {
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
   "scripts": {
-    "test": "npm test -w shared && npm test -w api && npm test -w mobile",
+    "test": "npm test -w shared && npm test -w api && npm test -w mobile && npm test -w web",
     "dev": "node scripts/dev.mjs"
   },
   "dependencies": {

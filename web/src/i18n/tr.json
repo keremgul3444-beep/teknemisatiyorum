@@ -1,0 +1,60 @@
+{
+  "site": {
+    "name": "teknemisatıyorum",
+    "tagline": "Tekne alırken, satarken ve bakarken"
+  },
+  "nav": {
+    "listings": "İlanlar",
+    "expertise": "Ekspertiz",
+    "broker": "Broker",
+    "logbook": "Tekne Karnesi",
+    "usta": "Usta",
+    "kaptan": "Kaptan",
+    "login": "Giriş",
+    "account": "Hesabım",
+    "lang": "English",
+    "menu": "Menü"
+  },
+  "footer": {
+    "popular": "Popüler aramalar",
+    "company": "Kurumsal",
+    "legal": "Yasal",
+    "about": "Hakkımızda",
+    "contact": "İletişim",
+    "kvkk": "KVKK aydınlatma",
+    "privacy": "Gizlilik",
+    "terms": "Kullanım koşulları",
+    "cookies": "Çerezler",
+    "app": "Uygulamayı indir",
+    "appSoon": "Uygulama yakında mağazalarda",
+    "rights": "Tüm hakları saklıdır.",
+    "popularSail": "Satılık yelkenliler",
+    "popularMotor": "Satılık motoryatlar",
+    "popularGulet": "Satılık guletler",
+    "popularCat": "Satılık katamaranlar",
+    "joinUsta": "Usta olarak katıl",
+    "joinKaptan": "Kaptan olarak katıl"
+  },
+  "home": {
+    "title": "Hayalindeki tekneyi bul",
+    "subtitle": "Tarif et, Akıllı Asistan sana uyan ilanları bulsun.",
+    "searchPlaceholder": "Ör. Bodrum'da 12 metre altı yelkenli, 150 bin euro'ya kadar",
+    "search": "Ara",
+    "showcase": "Vitrin",
+    "urgent": "Acil satılıklar",
+    "latest": "Son eklenenler",
+    "shortcuts": "Şehir ve tekne tipine göre",
+    "seeAll": "Tümünü gör",
+    "appTitle": "Uygulamada daha fazlası",
+    "appBody": "Satıcıya yaz, ekspertiz iste, Tekne Karnesi'ni tut — hepsi uygulamada."
+  },
+  "seo": {
+    "pageTitle": "{{title}} | teknemisatıyorum",
+    "homeTitle": "teknemisatıyorum — Satılık tekne, yat ve yelkenli ilanları",
+    "homeDescription": "Satılık yelkenli, motoryat, gulet ve katamaran ilanları. Akıllı Asistan ile ara, ekspertiz ve broker hizmetiyle güvenle al-sat."
+  },
+  "common": {
+    "unavailable": "Şu an ilanlara ulaşılamıyor, birazdan tekrar dene.",
+    "draft": "Taslak metin — hukuki incelemeden geçmedi."
+  }
+}

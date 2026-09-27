@@ -1,0 +1,60 @@
+/* "Kıyı Sıcak" — renk/yarıçap değişkenleri layout'ta @tms/shared cssVariables() ile gelir. */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--c-bg); color: var(--c-text);
+  font-family: var(--font-body), system-ui, sans-serif; font-size: 16px; line-height: 1.5;
+}
+h1, h2, h3 { font-family: var(--font-heading), system-ui, sans-serif; line-height: 1.2; margin: 0 0 12px; }
+h1 { font-size: clamp(26px, 5vw, 40px); }
+h2 { font-size: clamp(20px, 3vw, 26px); }
+h3 { font-size: 17px; }
+p { margin: 0 0 12px; }
+a { color: var(--c-primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { max-width: 100%; display: block; }
+:focus-visible { outline: 3px solid var(--c-primary-soft); outline-offset: 2px; }
+
+.container { width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+.muted { color: var(--c-muted); }
+.small { font-size: 13px; }
+.section { margin: 32px 0; }
+.row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.spread { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+.card { background: var(--c-card); border: 1px solid var(--c-line); border-radius: var(--r-card); padding: 16px; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px;
+  border-radius: var(--r-button); border: 0; background: var(--c-primary); color: var(--c-white);
+  font: 600 15px var(--font-body), sans-serif; cursor: pointer; text-decoration: none;
+}
+.btn:hover { text-decoration: none; filter: brightness(1.05); }
+.btn.secondary { background: var(--c-surface); color: var(--c-text); }
+.btn.ghost { background: transparent; color: var(--c-primary); border: 1px solid var(--c-line); }
+.btn[disabled] { opacity: .5; cursor: not-allowed; }
+.chip { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: var(--r-chip); background: var(--c-surface); color: var(--c-text); font-size: 14px; }
+.pill { display: inline-block; padding: 2px 8px; border-radius: var(--r-sm); color: var(--c-white); font-size: 11px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; }
+.pill.featured { background: var(--c-primary); }
+.pill.urgent { background: var(--c-danger); }
+.input {
+  width: 100%; min-height: 44px; padding: 10px 12px; border-radius: var(--r-button); border: 1px solid var(--c-line);
+  background: var(--c-card); color: var(--c-text); font: 16px var(--font-body), sans-serif;
+}
+label { display: block; font-size: 12px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--c-muted); margin-bottom: 6px; }
+
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.strip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(260px, 300px); gap: 16px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x mandatory; }
+.strip > * { scroll-snap-align: start; }
+
+.site-header { border-bottom: 1px solid var(--c-line); background: var(--c-card); }
+.site-header nav { display: flex; gap: 16px; align-items: center; min-height: 60px; flex-wrap: wrap; }
+.site-header .logo { font: 700 20px var(--font-heading), sans-serif; color: var(--c-text); margin-right: auto; }
+.site-footer { margin-top: 48px; padding: 32px 0; border-top: 1px solid var(--c-line); background: var(--c-card); font-size: 14px; }
+.site-footer .cols { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.site-footer ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.banner { padding: 10px 14px; border-radius: var(--r-button); background: var(--c-surface); border: 1px dashed var(--c-warning); font-size: 14px; }
+
+@media (max-width: 640px) {
+  .site-header nav { gap: 10px; font-size: 14px; }
+  .hide-mobile { display: none; }
+}
