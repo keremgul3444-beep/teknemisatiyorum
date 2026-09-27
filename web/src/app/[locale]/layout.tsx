@@ -8,8 +8,9 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import '../globals.css';
 
-const body = Inter({ subsets: ['latin', 'latin-ext'], variable: '--font-body', display: 'swap' });
-const heading = Space_Grotesk({ subsets: ['latin', 'latin-ext'], variable: '--font-heading', display: 'swap' });
+// Yazı tipleri önceden yüklenmez: yavaş bağlantıda ilk görselle yarışmasın (metin önce sistem yazı tipiyle çizilir).
+const body = Inter({ subsets: ['latin', 'latin-ext'], variable: '--font-body', display: 'swap', preload: false });
+const heading = Space_Grotesk({ subsets: ['latin', 'latin-ext'], variable: '--font-heading', display: 'swap', preload: false });
 
 export const generateStaticParams = () => LOCALES.map((locale) => ({ locale }));
 
@@ -27,7 +28,7 @@ export default async function RootLayout({ children, params }: { children: React
         <main className="container">{children}</main>
         <Footer locale={locale as Locale} />
         <CookieConsent labels={{
-          text: t(locale as Locale, 'consent.text'), necessaryOnly: t(locale as Locale, 'consent.necessaryOnly'),
+          title: t(locale as Locale, 'consent.title'), text: t(locale as Locale, 'consent.text'), necessaryOnly: t(locale as Locale, 'consent.necessaryOnly'),
           accept: t(locale as Locale, 'consent.accept'), more: t(locale as Locale, 'consent.more'), moreHref: localePath(locale as Locale, '/cerezler'),
         }} />
       </body>

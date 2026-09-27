@@ -56,7 +56,7 @@ Bu aşamanın çıktısı **tıklanabilir, görsel olarak bitmiş bir prototip**
 | Kart | `#FFFCF6` |
 | Ana renk / vurgu | `#0F6E68` (petrol yeşili) |
 | Metin | `#1D2B2A` |
-| İkincil metin | `#6B736B` |
+| İkincil metin | `#5B625B` (2026-09-27: WCAG AA kontrastı için `#6B736B`'ten koyulaştırıldı) |
 | Çip / yüzey | `#E7DFD0` |
 | Çizgi | `#E2D9C8` |
 | Başlık fontu | Space Grotesk (500/700) |

@@ -1,6 +1,8 @@
-// Tek komutla kapalı beta: yerel PostgreSQL → migration → (boşsa) başlangıç verisi → API → Expo.
-// Kullanım:  npm run dev              (bu bilgisayarda: web ve aynı ağdaki telefon)
-//            npm run dev -- --tunnel  (her yerden telefon; EXPO_TOKEN ortamda olmalı)
+// Tek komutla kapalı beta: yerel PostgreSQL → migration → (boşsa) başlangıç verisi → API → Expo (+ isteğe bağlı site).
+// Kullanım:  npm run dev                       (bu bilgisayarda: web ve aynı ağdaki telefon)
+//            npm run dev -- --tunnel           (her yerden telefon; EXPO_TOKEN ortamda olmalı)
+//            npm run dev -- --web              (site de açılır: http://localhost:3001)
+//            npm run dev -- --web --no-mobile  (yalnızca site; bellek az olduğunda)
 // Ctrl+C hepsini düzgün kapatır.
 import { spawn, spawnSync } from 'child_process';
 import crypto from 'crypto';
@@ -13,6 +15,8 @@ const API = path.join(ROOT, 'api');
 const MOBILE = path.join(ROOT, 'mobile');
 const ENV_FILE = path.join(API, '.env');
 const tunnel = process.argv.includes('--tunnel');
+const withWeb = process.argv.includes('--web');
+const noMobile = process.argv.includes('--no-mobile');
 const isWin = process.platform === 'win32';
 
 // 1) Gizli değerler: .env yoksa rastgele üretilir (yalnızca bu bilgisayarda kalır, git'e girmez).
@@ -78,7 +82,13 @@ run('npm', ['run', 'build'], API);
 run('node', [...nodeEnv, 'prisma/seed.ts'], API);
 start('API', 'node', ['--env-file=.env', 'dist/src/main.js'], { cwd: API });
 await waitPort(3000);
-start('Expo', 'npx', ['expo', 'start', ...(tunnel ? ['--tunnel'] : [])], {
-  cwd: MOBILE,
-  env: { ...process.env, EXPO_PUBLIC_API_PROXY: '1' },
-});
+if (withWeb) {
+  // Site API'ye sunucu tarafından bağlanır (tarayıcı API'yi görmez; CORS gerekmez).
+  start('Site', 'npm', ['run', 'dev'], { cwd: path.join(ROOT, 'web'), env: { ...process.env, API_URL: 'http://127.0.0.1:3000' } });
+}
+if (!noMobile) {
+  start('Expo', 'npx', ['expo', 'start', ...(tunnel ? ['--tunnel'] : [])], {
+    cwd: MOBILE,
+    env: { ...process.env, EXPO_PUBLIC_API_PROXY: '1' },
+  });
+}

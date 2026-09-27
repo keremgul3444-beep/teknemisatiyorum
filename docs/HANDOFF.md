@@ -1,10 +1,17 @@
-# Devir notu — teknemisatıyorum.com (2026-09-26)
+# Devir notu — teknemisatıyorum.com (2026-09-27)
 
 ## Proje
 Tekne alım-satım + broker + ekspertiz + (2. dalga: usta/kaptan/güvenli ödeme) platformu. Monorepo, npm workspaces:
 - `shared/` — zod şemaları, Akıllı Asistan kural tabanlı ayrıştırıcısı (`parseQuery`, `matchListings`), kur yardımcıları, TCKN doğrulama, seed ilanları. Test: `npm test -w shared` (30 test).
 - `api/` — NestJS 11 + Prisma 6 + PostgreSQL (gömülü; `embedded-postgres` ikilileri, `pg_ctl` ile başlatılır — Windows yönetici oturumunda `postgres` doğrudan başlamıyor). Test: `cd api && npx jest --runInBand` (~80 e2e test, her test dosyası ayrı şema).
 - `mobile/` — Expo SDK 57 + Expo Router (`src/app`). Demo modu (sahte zustand deposu) + gerçek mod (sunucu). Test: `npm test -w mobile` (93 test). Uçtan uca: `node mobile/scripts/demo-flows.mjs` (demo modunda 11/11 geçiyor; web sunucusu 8081'de açık olmalı).
+
+- `web/` — Next.js 16 (App Router) vitrin sitesi: iki dil (TR öneksiz, EN `/en`), SEO (başlık, schema.org, site haritası, 410), sitede giriş (HttpOnly çerez, BFF), Öne çıkar ve deneme ödemesi. Ara katman `src/proxy.ts` (Next 16'da middleware'in yeni adı). Test: `npm test -w web`. Kabul: `node web/scripts/web-acceptance.mjs` (6/6).
+
+## Web vitrini ve öne çıkarma (2026-09-27)
+- Tasarım: `docs/superpowers/specs/2026-09-27-web-vitrin-design.md`, plan: `docs/superpowers/plans/2026-09-27-web-vitrin.md`, karar kaydı: `.superpowers/sdd/2026-09-27-web-vitrin/progress.md`.
+- Ürünler (Vitrin 7/30, Acil 7/30, Üste taşı), siparişler, ödeme adaptörleri (`api/src/adapters/payments.ts`: deneme sanal POS + deneme mağaza makbuzu; `PAYMENTS_MODE=live` Aşama 2'de bağlanacak).
+- Hız (Lighthouse mobil, üretim derlemesi): ana sayfa Performans 96 / Erişilebilirlik 96 / SEO 100; ilan detayı 92 / 96 / 100.
 
 ## Belgeler
 - Tasarım: `docs/superpowers/specs/2026-09-26-arka-uc-dalga1-design.md`

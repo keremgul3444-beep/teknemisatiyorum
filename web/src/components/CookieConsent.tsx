@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { CONSENT_COOKIE, CONSENT_MAX_AGE, readConsent, serializeConsent } from '@/lib/consent';
 
-type Labels = { text: string; necessaryOnly: string; accept: string; more: string; moreHref: string };
+type Labels = { title: string; text: string; necessaryOnly: string; accept: string; more: string; moreHref: string };
 
 /**
  * Çerez izni çubuğu. Varsayılan ve öne çıkan seçenek "yalnızca zorunlu"; istatistik aracı seçilene kadar
@@ -22,7 +22,7 @@ export function CookieConsent({ labels }: { labels: Labels }) {
     setOpen(false);
   };
   return (
-    <div role="dialog" aria-live="polite" className="card" style={{ position: 'fixed', left: 16, right: 16, bottom: 16, zIndex: 50, maxWidth: 720, margin: '0 auto', boxShadow: '0 8px 30px rgba(0,0,0,.12)' }}>
+    <div role="dialog" aria-label={labels.title} aria-live="polite" className="card" style={{ position: 'fixed', left: 16, right: 16, bottom: 16, zIndex: 50, maxWidth: 720, margin: '0 auto', boxShadow: '0 8px 30px rgba(0,0,0,.12)' }}>
       <p className="small" style={{ marginBottom: 12 }}>{labels.text} <Link href={labels.moreHref}>{labels.more}</Link></p>
       <div className="row">
         <button className="btn" type="button" onClick={() => save(false)}>{labels.necessaryOnly}</button>

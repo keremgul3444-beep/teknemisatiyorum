@@ -22,6 +22,8 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 - [ ] Firma paneli (/firma)
 - [ ] Blog / içerik yazıları (SEO için değerli, ayrı içerik işi)
 - [ ] İstatistik aracı seçimi (Google Analytics ya da gizlilik dostu alternatif)
+- [ ] Canlı sunucuda hız ölçümünü (Lighthouse) tekrarla; yerel ölçüm: ana sayfa 96, ilan 92
+- [ ] Uygulamanın "Öne çıkar" ekranını uçtan uca tarayıcı testiyle dene (bu turda bellek yetersizliğinden uygulama önizlemesi açılmadı; aynı sunucu ucu kabul testinde denendi)
 
 ## Uygulama ve arka uç
 - [ ] Usta / kaptan / iş / güvenli ödeme arka ucu (2. dalga); sonra sitede usta-kaptan rehber sayfaları
