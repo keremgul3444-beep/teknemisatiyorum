@@ -823,7 +823,9 @@
     "listingSubmitted": "İlan onaya gönderildi: {{title}}",
     "marketingConsent": "Pazarlama izni değişti: {{value}}",
     "memberChanged": "Firma üyesi rolü: {{before}} → {{role}}",
-    "reportCompleted": "Ekspertiz raporu tamamlandı: {{score}}/100"
+    "reportCompleted": "Ekspertiz raporu tamamlandı: {{score}}/100",
+    "orderPaid": "Sipariş ödendi: {{product}} ({{channel}})",
+    "orderRefunded": "Sipariş iade edildi: {{product}}"
   },
   "errors": {
     "generic": "Bir şeyler ters gitti, tekrar dene.",
@@ -862,7 +864,9 @@
     "consent_required": "Bunun için önce ticari ileti izni vermelisin",
     "bad_width": "Geçersiz görsel boyutu",
     "bad_signature": "Ödeme bildirimi doğrulanamadı",
-    "bad_receipt": "Satın alma makbuzu geçersiz"
+    "bad_receipt": "Satın alma makbuzu geçersiz",
+    "amount_mismatch": "Ödeme tutarı siparişle uyuşmuyor",
+    "not_refundable": "Bu sipariş iade edilemez"
   },
   "soon": {
     "title": "Yakında",

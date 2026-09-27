@@ -823,7 +823,9 @@
     "listingSubmitted": "Listing submitted for review: {{title}}",
     "marketingConsent": "Marketing consent changed: {{value}}",
     "memberChanged": "Company member role: {{before}} → {{role}}",
-    "reportCompleted": "Survey report completed: {{score}}/100"
+    "reportCompleted": "Survey report completed: {{score}}/100",
+    "orderPaid": "Order paid: {{product}} ({{channel}})",
+    "orderRefunded": "Order refunded: {{product}}"
   },
   "errors": {
     "generic": "Something went wrong, please try again.",
@@ -862,7 +864,9 @@
     "consent_required": "You need to give commercial message consent first",
     "bad_width": "Invalid image width",
     "bad_signature": "Payment notification could not be verified",
-    "bad_receipt": "Invalid purchase receipt"
+    "bad_receipt": "Invalid purchase receipt",
+    "amount_mismatch": "Payment amount does not match the order",
+    "not_refundable": "This order can't be refunded"
   },
   "soon": {
     "title": "Coming soon",

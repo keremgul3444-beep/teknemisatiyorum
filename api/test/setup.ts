@@ -37,7 +37,7 @@ export async function createTestApp(opts: { controllers?: any[]; override?: (b: 
   const builder = Test.createTestingModule({ imports: [AppModule], controllers: opts.controllers ?? [] });
   opts.override?.(builder);
   const moduleRef = await builder.compile();
-  const app = configureApp(moduleRef.createNestApplication());
+  const app = configureApp(moduleRef.createNestApplication({ rawBody: true }));
   await app.init();
   const prisma = app.get(PrismaService);
   return {

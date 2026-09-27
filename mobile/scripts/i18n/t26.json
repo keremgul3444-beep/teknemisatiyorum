@@ -1,0 +1,2 @@
+{"tr":{"errors":{"amount_mismatch":"Ödeme tutarı siparişle uyuşmuyor","not_refundable":"Bu sipariş iade edilemez","listing_not_published":"İlan yayında değil"},"audit":{"orderPaid":"Sipariş ödendi: {{product}} ({{channel}})","orderRefunded":"Sipariş iade edildi: {{product}}"}},
+ "en":{"errors":{"amount_mismatch":"Payment amount does not match the order","not_refundable":"This order can't be refunded","listing_not_published":"Listing is not live"},"audit":{"orderPaid":"Order paid: {{product}} ({{channel}})","orderRefunded":"Order refunded: {{product}}"}}}

@@ -17,7 +17,7 @@ export function configureApp(app: INestApplication) {
 }
 
 async function bootstrap() {
-  const app = configureApp(await NestFactory.create(AppModule));
+  const app = configureApp(await NestFactory.create(AppModule, { rawBody: true }));
   // Kimlik tekliği kuralından önce doğrulanmış kullanıcıların izi doldurulur (tekrar çalışması zararsız).
   // Veritabanına o an ulaşılamasa da sunucu açılır; iş bir sonraki açılışta yeniden denenir.
   await backfillNationalIdHashes(app.get(PrismaService)).then((bf) => {
