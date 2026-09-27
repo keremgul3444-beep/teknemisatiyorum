@@ -21,16 +21,30 @@ export function jwtExpired(token: string, now = Date.now(), skewS = 30): boolean
   }
 }
 
-/** Ziyaretçinin IP adresi: önümüzdeki ara katmanın (canlıda yük dengeleyici) eklediği ilk halka. */
-export function clientIp(req: Request): string {
-  const xff = req.headers.get('x-forwarded-for');
-  return xff?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || '';
-}
+/** Sitenin önünde kaç güvenilir ara katman (yük dengeleyici) var; her biri X-Forwarded-For'un sonuna bir halka ekler. */
+const trustedHops = () => Math.max(1, Number(process.env.TRUSTED_PROXY_HOPS ?? 1) || 1);
 
-/** Girişten sonra dönülecek adres: yalnızca site içi yol (açık yönlendirme yok). */
+/**
+ * Ziyaretçinin IP adresi: sondan `hops`. halka — güvenilir ara katmanın eklediği gerçek adres. İstemcinin kendi
+ * yazdığı önceki halkalar yok sayılır (sahte IP ile giriş kodu ve asistan kotaları aşılamasın).
+ */
+export function clientIpFromHeader(xff: string | null, hops = trustedHops()): string {
+  const parts = (xff ?? '').split(',').map((x) => x.trim()).filter(Boolean);
+  return parts.length ? parts[Math.max(0, parts.length - hops)] : '';
+}
+export const clientIp = (req: Request, hops = trustedHops()) =>
+  clientIpFromHeader(req.headers.get('x-forwarded-for'), hops) || req.headers.get('x-real-ip') || '';
+
+/** Girişten sonra dönülecek adres: yalnızca site içi yol (açık yönlendirme yok; kontrol karakteri ve ters bölü reddedilir). */
 export function safeNext(next: string | undefined, locale: Locale): string {
-  if (next && /^\/(?![/\\])/.test(next) && !next.includes('://')) return next;
-  return localePath(locale, '/hesabim');
+  const fallback = localePath(locale, '/hesabim');
+  if (!next || !next.startsWith('/') || next.startsWith('//') || /[\u0000-\u001f\u007f\\]/.test(next)) return fallback;
+  try {
+    const u = new URL(next, 'http://site.invalid');
+    return u.origin === 'http://site.invalid' ? u.pathname + u.search : fallback;
+  } catch {
+    return fallback;
+  }
 }
 
 type Cookieable = { cookies: { set(name: string, value: string, o: ReturnType<typeof cookieOptions>): unknown } };
@@ -49,4 +63,26 @@ export function clearSession(res: Cookieable) {
 export function cookieValue(req: Request, name: string) {
   const m = (req.headers.get('cookie') ?? '').split(/;\s*/).find((c) => c.startsWith(`${name}=`));
   return m ? decodeURIComponent(m.slice(name.length + 1)) || undefined : undefined;
+}
+
+type Tokens = { accessToken: string; refreshToken: string };
+const inflight = new Map<string, Promise<Tokens | null>>();
+
+/**
+ * Yenileme anahtarıyla yeni anahtar çifti. Aynı süreçte aynı anahtarla eşzamanlı istekler tek uçuşu paylaşır
+ * (sunucu da 10 sn tolerans tanır): sekmeler ve ön yükleme yüzünden oturum düşmez.
+ */
+export function refreshTokens(apiUrl: string, rt: string): Promise<Tokens | null> {
+  let p = inflight.get(rt);
+  if (!p) {
+    p = fetch(`${apiUrl}/auth/refresh`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken: rt }), signal: AbortSignal.timeout(5000),
+    })
+      .then(async (r) => (r.ok ? ((await r.json()) as Tokens) : null))
+      .catch(() => null)
+      .finally(() => inflight.delete(rt));
+    inflight.set(rt, p);
+  }
+  return p;
 }

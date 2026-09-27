@@ -16,8 +16,11 @@ test('çerez bayrakları', () => {
   expect(cookieOptions(900, false).secure).toBe(false);
 });
 
-test('ziyaretçi IP adresi', () => {
-  expect(clientIp(new Request('http://x', { headers: { 'x-forwarded-for': '9.9.9.9, 10.0.0.1' } }))).toBe('9.9.9.9');
+test('ziyaretçi IP adresi: istemcinin yazdığı değil, önümüzdeki güvenilir ara katmanın eklediği halka', () => {
+  // Saldırgan "6.6.6.6" uydurdu; yük dengeleyici gerçek adresi (9.9.9.9) sona ekledi (1 güvenilir halka).
+  expect(clientIp(new Request('http://x', { headers: { 'x-forwarded-for': '6.6.6.6, 9.9.9.9' } }), 1)).toBe('9.9.9.9');
+  expect(clientIp(new Request('http://x', { headers: { 'x-forwarded-for': '6.6.6.6, 9.9.9.9, 10.0.0.2' } }), 2)).toBe('9.9.9.9');
+  expect(clientIp(new Request('http://x', { headers: { 'x-forwarded-for': '9.9.9.9' } }), 3)).toBe('9.9.9.9');
   expect(clientIp(new Request('http://x'))).toBe('');
 });
 
@@ -27,4 +30,8 @@ test('girişten sonra yalnızca site içi adrese dönülür (açık yönlendirme
   expect(safeNext('https://kotu.site', 'en')).toBe('/en/hesabim');
   expect(safeNext('/\\kotu.site', 'tr')).toBe('/hesabim');
   expect(safeNext(undefined, 'tr')).toBe('/hesabim');
+  // Sekme/satır sonu tarayıcıda silinir ve "//kotu.site" kalır: reddedilmeli.
+  expect(safeNext('/\t/kotu.site', 'tr')).toBe('/hesabim');
+  expect(safeNext('/\n/kotu.site', 'tr')).toBe('/hesabim');
+  expect(safeNext('/odeme/sonuc?order=abc', 'tr')).toBe('/odeme/sonuc?order=abc');
 });

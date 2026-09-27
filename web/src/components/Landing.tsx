@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { localePath, t, type Locale } from '@/i18n';
 import { apiGet } from '@/lib/api';
-import { apiListingsPath, cityFromSlug, citySlug, isBoatType, landingQuery } from '@/lib/queries';
+import { apiListingsPath, citySlug, isBoatType, landingQuery } from '@/lib/queries';
+import { resolveLanding } from '@/lib/landing';
 import { absUrl, breadcrumbJsonLd, pageMetadata, siteUrl } from '@/lib/seo';
 import type { SearchResult, SitemapData } from '@/lib/types';
 import { Breadcrumbs, JsonLd, ListingGrid, Section, Unavailable } from './bits';
@@ -11,11 +12,10 @@ import { Filters } from './Filters';
 /** Hazır arama sayfalarının ortak mantığı (`/satilik/[tip]` ve `/satilik/[tip]/[sehir]`). */
 async function resolve(locale: Locale, tip: string, sehir?: string) {
   if (!isBoatType(tip)) notFound();
-  const map = await apiGet<SitemapData>('/listings/sitemap', { revalidate: 300 }).catch(() => null);
-  const cities = [...new Set((map?.facets ?? []).map((f) => f.location).filter((c): c is string => !!c))];
-  const city = sehir ? cityFromSlug(sehir, cities) : null;
-  if (sehir && !city) notFound();
-  const count = map?.facets.find((f) => f.type === tip && f.location === (city ?? null))?.count ?? 0;
+  // API hatası yakalanmaz: yükselirse önbellekteki sayfa sunulur (geçici aksaklık 404/noindex'e dönüşmez).
+  const facts = resolveLanding(await apiGet<SitemapData>('/listings/sitemap', { revalidate: 300 }), tip, sehir);
+  if (facts.kind === 'notFound') notFound();
+  const { city, count } = facts;
   const typeName = t(locale, `boatType.${tip}`);
   const title = city ? t(locale, 'landing.titleCity', { type: typeName, city }) : t(locale, 'landing.title', { type: typeName });
   const path = city ? `/satilik/${tip}/${citySlug(city)}` : `/satilik/${tip}`;

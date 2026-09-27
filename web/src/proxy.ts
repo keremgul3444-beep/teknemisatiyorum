@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { securityHeaders } from '@/lib/security';
-import { ACCESS_COOKIE, clearSession, FRESH_TOKEN_HEADER, jwtExpired, REFRESH_COOKIE, setSession } from '@/lib/session';
+import { ACCESS_COOKIE, clearSession, FRESH_TOKEN_HEADER, jwtExpired, REFRESH_COOKIE, refreshTokens, setSession } from '@/lib/session';
 
 const API = () => process.env.API_URL ?? 'http://127.0.0.1:3000';
 
@@ -50,20 +50,14 @@ export async function proxy(req: NextRequest) {
     const at = req.cookies.get(ACCESS_COOKIE)?.value;
     const rt = req.cookies.get(REFRESH_COOKIE)?.value;
     if (!at || jwtExpired(at)) {
-      const r = rt
-        ? await fetch(`${API()}/auth/refresh`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ refreshToken: rt }), signal: AbortSignal.timeout(5000),
-          }).catch(() => null)
-        : null;
-      if (!r?.ok) {
+      refreshed = rt ? await refreshTokens(API(), rt) : null;
+      if (!refreshed) {
         const url = new URL(`${isEn ? '/en' : ''}/giris`, req.url);
         url.searchParams.set('next', pathname + search);
         const res = NextResponse.redirect(url);
         clearSession(res);
         return finish(res);
       }
-      refreshed = await r.json();
       requestHeaders.set(FRESH_TOKEN_HEADER, refreshed!.accessToken);
     }
   }

@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import { criterionLabel, queryChips, type Criterion, type ParsedQuery } from '@tms/shared';
 import { t, type Locale } from '@/i18n';
 import { apiSend } from '@/lib/api';
+import { clientIpFromHeader } from '@/lib/session';
 import type { ListingView } from '@/lib/types';
 import { ListingCard } from '@/components/ListingCard';
 import { ListingGrid, SearchBox, Section, Unavailable } from '@/components/bits';
@@ -20,7 +21,7 @@ export default async function Asistan({ params, searchParams }: P) {
   const { locale } = (await params) as { locale: Locale };
   const raw = (await searchParams).q;
   const q = (Array.isArray(raw) ? raw[0] : raw)?.trim().slice(0, 500) ?? '';
-  const ip = (await headers()).get('x-forwarded-for')?.split(',')[0]?.trim() ?? '';
+  const ip = clientIpFromHeader((await headers()).get('x-forwarded-for'));
   const r = q ? await apiSend<Result>('POST', '/assistant/search', { text: q }, { ip }).catch(() => null) : null;
   const tt = (key: string, p?: Record<string, unknown>) => t(locale, key, p as Record<string, string | number>);
   return (

@@ -30,3 +30,10 @@ test('kapalı sayfa noindex taşır; ana sayfa asıl adresi', () => {
   expect(pageMetadata({ title: 'x', description: 'y', path: '/', locale: 'en', siteUrl: SITE }).alternates?.canonical).toBe(`${SITE}/en`);
   expect(pageMetadata({ title: 'x', description: 'y', path: '/', locale: 'tr', siteUrl: SITE }).alternates?.canonical).toBe(SITE);
 });
+
+test('KVKK: bireysel satıcının adı Google verisine konmaz; firma adı konabilir', () => {
+  const j = JSON.stringify(listingJsonLd(l, 'tr', SITE));
+  expect(j).not.toContain('Deniz');
+  const firm = listingJsonLd({ ...l, seller: { ...l.seller, companyName: 'Mavi Koy Yatçılık' } }, 'tr', SITE) as any;
+  expect(firm.offers.seller).toEqual({ '@type': 'Organization', name: 'Mavi Koy Yatçılık' });
+});

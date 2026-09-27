@@ -59,7 +59,8 @@ export function listingJsonLd(l: ListingView, locale: Locale, site = siteUrl()) 
       availability: l.status === 'sold' ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
       itemCondition: 'https://schema.org/UsedCondition',
       areaServed: l.location,
-      seller: l.seller.companyName ? { '@type': 'Organization', name: l.seller.companyName } : { '@type': 'Person', name: l.seller.name ?? '—' },
+      // KVKK: bireysel satıcının adı Google verisine konmaz; yalnızca firma adı.
+      ...(l.seller.companyName ? { seller: { '@type': 'Organization', name: l.seller.companyName } } : {}),
     },
   };
 }
