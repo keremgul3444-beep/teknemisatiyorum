@@ -8,7 +8,7 @@ import { AuditService } from '../../common/audit.service';
 import { Errors } from '../../common/errors';
 import { MediaService } from '../media/media.service';
 import { ListingsService, MAX_PHOTOS } from './listings.service';
-import { listingInclude } from './listing.view';
+import { listingInclude, type ListingRow } from './listing.view';
 
 const draftSchema = z.object({
   brand: z.string().trim().min(1).max(60),
@@ -41,6 +41,7 @@ const searchQuery = z.object({
   }).pipe(parsedQuerySchema),
   sort: z.enum(['new', 'asc', 'desc']).default('new'),
   page: z.coerce.number().int().min(1).max(500).default(1),
+  urgent: z.enum(['1']).optional(),
 });
 
 @Controller()
@@ -55,8 +56,24 @@ export class ListingsController {
   @Public()
   @Get('listings')
   async search(@OptionalUser() u: AuthUser | undefined, @Query(new ZodPipe(searchQuery)) q: z.infer<typeof searchQuery>) {
-    const { rows, total } = await this.listings.search(q.q, q.sort, q.page);
-    return { items: await Promise.all(rows.map((l) => this.listings.view(l, u?.id))), total };
+    const { rows, total, featuredTop } = await this.listings.search(q.q, q.sort, q.page, { urgentOnly: q.urgent === '1' });
+    const view = (l: ListingRow) => this.listings.view(l, u?.id);
+    return { items: await Promise.all(rows.map(view)), total, featuredTop: await Promise.all(featuredTop.map(view)) };
+  }
+
+  // Sabit yollar `listings/:id`'den önce tanımlanır (yoksa "showcase" bir ilan kimliği sanılır).
+  @Public()
+  @Get('listings/showcase')
+  async showcase(@OptionalUser() u: AuthUser | undefined) {
+    const s = await this.listings.showcase();
+    const view = (l: ListingRow) => this.listings.view(l, u?.id);
+    return { featured: await Promise.all(s.featured.map(view)), urgent: await Promise.all(s.urgent.map(view)) };
+  }
+
+  @Public()
+  @Get('listings/sitemap')
+  sitemap() {
+    return this.listings.sitemap();
   }
 
   @Public()

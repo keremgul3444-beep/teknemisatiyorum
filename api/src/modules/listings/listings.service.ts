@@ -5,11 +5,21 @@ import { PrismaService } from '../../common/prisma.service';
 import { Errors } from '../../common/errors';
 import { FxService } from './fx.service';
 import { listingInclude, listingView, type ListingRow } from './listing.view';
+import { freshness, isActive } from '../promotions/promotion.rules';
 
 export const MAX_PHOTOS = 20;
 export type Sort = 'new' | 'asc' | 'desc';
 
-const asMatchable = (l: ListingRow) => ({ ...l, type: l.type as BoatType, equipment: l.equipment as Equipment[] });
+const shuffle = <T,>(a: T[]) => {
+  const b = [...a];
+  for (let i = b.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [b[i], b[j]] = [b[j], b[i]];
+  }
+  return b;
+};
+
+const asMatchable =(l: ListingRow) => ({ ...l, type: l.type as BoatType, equipment: l.equipment as Equipment[] });
 
 @Injectable()
 export class ListingsService {
@@ -64,11 +74,43 @@ export class ListingsService {
     return { exact, near, rates };
   }
 
-  async search(q: ParsedQuery, sort: Sort, page: number, pageSize = 20) {
-    const { rows, rates } = await this.match(q);
+  async search(q: ParsedQuery, sort: Sort, page: number, opts: { urgentOnly?: boolean; now?: Date } = {}, pageSize = 20) {
+    const now = opts.now ?? new Date();
+    const { rows: all, rates } = await this.match(q);
+    const rows = opts.urgentOnly ? all.filter((l) => isActive(l.urgentUntil, now)) : all;
     const tl = (l: ListingRow) => l.price * rates[l.currency];
     if (sort !== 'new') rows.sort((a, b) => (sort === 'asc' ? tl(a) - tl(b) : tl(b) - tl(a)));
-    else rows.sort((a, b) => (b.publishedAt?.getTime() ?? 0) - (a.publishedAt?.getTime() ?? 0));
-    return { rows: rows.slice((page - 1) * pageSize, page * pageSize), total: rows.length };
+    else rows.sort((a, b) => freshness(b) - freshness(a));
+    // Aramaya uyan vitrin ilanlarından en fazla 3'ü üstte (karışık); normal listede de yerlerinde kalırlar.
+    const featuredTop = shuffle(rows.filter((l) => isActive(l.featuredUntil, now))).slice(0, 3);
+    return { rows: rows.slice((page - 1) * pageSize, page * pageSize), total: rows.length, featuredTop };
+  }
+
+  /** Ana sayfa: ≤8 vitrin (karışık), ≤8 acil (en taze). */
+  async showcase(now = new Date()) {
+    const [featured, urgent] = await Promise.all([
+      this.prisma.listing.findMany({ where: { status: 'published', featuredUntil: { gt: now } }, include: listingInclude }),
+      this.prisma.listing.findMany({ where: { status: 'published', urgentUntil: { gt: now } }, include: listingInclude }),
+    ]);
+    return { featured: shuffle(featured).slice(0, 8), urgent: urgent.sort((a, b) => freshness(b) - freshness(a)).slice(0, 8) };
+  }
+
+  /** Site haritası ve hazır arama sayfaları: yayındaki ilanlar + tip ve tip×şehir sayıları. */
+  async sitemap() {
+    const rows = await this.prisma.listing.findMany({
+      where: { status: 'published' },
+      select: { id: true, brand: true, model: true, year: true, type: true, location: true, updatedAt: true },
+      orderBy: { updatedAt: 'desc' },
+    });
+    const counts = new Map<string, { type: string; location: string | null; count: number }>();
+    for (const r of rows) {
+      for (const location of [null, r.location]) {
+        const k = `${r.type}|${location ?? ''}`;
+        const c = counts.get(k) ?? { type: r.type, location, count: 0 };
+        c.count++;
+        counts.set(k, c);
+      }
+    }
+    return { listings: rows, facets: [...counts.values()] };
   }
 }
