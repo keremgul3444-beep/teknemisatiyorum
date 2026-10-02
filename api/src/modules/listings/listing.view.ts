@@ -9,22 +9,43 @@ export type ListingRow = Listing & {
   boat: { id: string; entries: LogbookEntry[]; _count: { entries: number } } | null;
   priceHistory: PriceHistory[];
 };
+/** İndirim hesabı için okunan fiyat geçmişi: haftada 3 değişiklikle 60 günlük pencere buna sığar. */
+export const PRICE_HISTORY_TAKE = 30;
 export const listingInclude = {
   photos: { orderBy: { order: 'asc' as const } },
   owner: { select: { id: true, name: true, createdAt: true, deletedAt: true, verifyLevel: true } },
-  boat: { select: { id: true, _count: { select: { entries: true } }, entries: { orderBy: { date: 'desc' as const }, take: 2 } } },
-  priceHistory: { orderBy: { at: 'desc' as const }, take: 1 },
+  boat: { select: { id: true, _count: { select: { entries: true } }, entries: { orderBy: { date: 'desc' as const }, take: 10 } } },
+  priceHistory: { orderBy: { at: 'desc' as const }, take: PRICE_HISTORY_TAKE },
 };
 
 /** "Fiyat düştü" bu kadar gün görünür. */
 export const PRICE_DROP_DAYS = 30;
+/** İndirim, son değişiklikten önceki bu kadar günde ilanın taşıdığı en düşük fiyata göre ölçülür. */
+export const PRICE_REF_DAYS = 60;
+/** Haftada en fazla bu kadar fiyat değişikliği; böylece referans penceresindeki tüm değişiklikler aşağıdaki sayıya sığar. */
+export const PRICE_CHANGES_PER_WEEK = 3;
 
-/** Son fiyat değişikliği bir indirimse ve tazeyse: önceki fiyat ve indirim anı; değilse null. */
+/**
+ * Son fiyat değişikliği gerçek bir indirimse ve tazeyse: önceki fiyat ve indirim anı; değilse null.
+ * "Önceki fiyat", son değişiklikten önceki 60 günde ilanın taşıdığı en düşük fiyattır: önce artırıp sonra
+ * indirerek (100.000 → 200.000 → 150.000) sahte "fiyat düştü" rozeti alınamaz.
+ */
 export function priceDropOf(l: Pick<ListingRow, 'price' | 'currency' | 'priceHistory'>, now = new Date()) {
   const h = l.priceHistory?.[0];
-  if (!h || h.currency !== l.currency || h.price <= l.price || now.getTime() - h.at.getTime() > PRICE_DROP_DAYS * 864e5) return null;
-  return { previousPrice: h.price, at: h.at.toISOString() };
+  if (!h || h.currency !== l.currency || now.getTime() - h.at.getTime() > PRICE_DROP_DAYS * 864e5) return null;
+  const from = h.at.getTime() - PRICE_REF_DAYS * 864e5;
+  const ref = l.priceHistory.filter((x) => x.at.getTime() >= from && x.currency === l.currency).map((x) => x.price);
+  const previousPrice = Math.min(...ref);
+  if (!(previousPrice > l.price)) return null;
+  return { previousPrice, at: h.at.toISOString() };
 }
+
+/**
+ * Yalnızca fiyat değişikliği yayındaki ilanı onaya düşürmez, ama ölçüsüz değişiklik düşürür: onaydan sonra
+ * fiyatı 1 TL'ye çekip yem ilan yapmak ya da iki katına çıkarıp sonra "indirim" göstermek denetimsiz olmasın.
+ */
+export const PRICE_ONLY_RANGE = { min: 0.5, max: 1.5 } as const;
+export const priceNeedsReview = (from: number, to: number) => to < from * PRICE_ONLY_RANGE.min || to > from * PRICE_ONLY_RANGE.max;
 
 /** İstemciye dönen ilan görünümü. Satıcının iletişim bilgisi bilerek yoktur; iletişim uygulama içi mesajla. */
 export type ListingStats = { views: number; favorites: number; messages: number };
@@ -50,7 +71,7 @@ export function listingView(l: ListingRow, viewerId?: string, companyName?: stri
       verified: !l.owner.deletedAt && l.owner.verifyLevel >= 2,
     },
     /** Bağlı teknenin karne özeti: kayıt sayısı ve en yeni iki kayıt. */
-    logbook: l.boat ? { count: l.boat._count.entries, latest: l.boat.entries.map(entryView), boatId: viewerId === l.ownerId ? l.boat.id : undefined } : null,
+    logbook: l.boat ? { count: l.boat._count.entries, latest: publicEntries(l, viewerId).map(entryView), boatId: viewerId === l.ownerId ? l.boat.id : undefined } : null,
     /** Öne çıkarma durumu; bitiş tarihleri yalnızca sahibine (ne zaman yenileyeceğini bilsin). */
     promo: promoView(l, viewerId),
     priceDrop: priceDropOf(l),
@@ -59,6 +80,16 @@ export function listingView(l: ListingRow, viewerId?: string, companyName?: stri
     ...(stats && viewerId === l.ownerId ? { stats } : {}),
     createdAt: l.createdAt, publishedAt: l.publishedAt,
   };
+}
+
+/**
+ * Karne kayıtları sahibinin serbest metnidir: başkalarına yalnızca doğrulanmış kayıtlar ve ilanın son onayından
+ * önce yazılanlar (moderatörün gördükleri) gösterilir. Onaydan sonra eklenen kayıt bir sonraki onaya kadar yalnızca sahibine görünür.
+ */
+export function publicEntries(l: Pick<ListingRow, 'ownerId' | 'publishedAt' | 'boat'>, viewerId?: string): LogbookEntry[] {
+  const entries = l.boat?.entries ?? [];
+  const seen = viewerId === l.ownerId ? entries : entries.filter((e) => e.verified || (!!l.publishedAt && e.createdAt <= l.publishedAt));
+  return seen.slice(0, 2);
 }
 
 function promoView(l: ListingRow, viewerId?: string, now = new Date()) {

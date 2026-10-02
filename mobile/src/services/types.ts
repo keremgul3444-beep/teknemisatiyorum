@@ -54,6 +54,8 @@ export interface Conversation {
   phoneShared: boolean; unread: boolean; messages: Message[];
   /** Gerçek modda: karşı tarafın paylaştığı numara ve son mesaj önizlemesi. */
   otherPhone?: string | null; preview?: string;
+  /** Engel: `me` ben engelledim (kaldırabilirim), `them` karşı taraf engelledi; ikisinde de yazılamaz. */
+  blocked?: 'me' | 'them' | null;
 }
 
 export interface SavedSearch { id: string; query: string; createdAt: string; newMatches: number }
@@ -87,6 +89,8 @@ export interface AdminListingInfo {
   year: number; price: number; currency: Currency; lengthM: number; type: BoatType; location: string; cabins: number;
   engine: string; engineHours: number | null; flag: Flag | null; tradeIn: boolean; negotiable: boolean; equipment: Equipment[];
   description: string; ownerVerifyLevel: number;
+  /** Yeniden gönderilen ilanda önceki red gerekçesi (ör. 'blurry'). */
+  previousRejectReason?: string | null;
 }
 /** İşlem kaydı dile bağlı metin değil, çeviri anahtarı + parametre taşır. */
 export interface AuditEntry { id: string; at: string; who: string; key: string; params?: Record<string, string> }

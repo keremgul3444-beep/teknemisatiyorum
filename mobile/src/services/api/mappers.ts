@@ -32,7 +32,7 @@ export interface ApiConversationRow {
   lastMessage: { text: string; at: string; mine: boolean } | null; unread: boolean;
 }
 export interface ApiThread {
-  id: string; subject: ApiConversationRow['subject']; otherName: string | null; otherPhone: string | null; iSharedPhone: boolean;
+  id: string; subject: ApiConversationRow['subject']; otherName: string | null; otherPhone: string | null; iSharedPhone: boolean; blocked?: 'me' | 'them' | null;
   messages: { id: string; text: string; at: string; mine: boolean }[];
 }
 
@@ -72,7 +72,7 @@ export const toConversation = (c: ApiConversationRow, prev?: Conversation): Conv
 });
 export const toThread = (t: ApiThread, prev?: Conversation): Conversation => ({
   id: t.id, withName: t.otherName ?? '—', subject: { kind: SUBJECT[t.subject.kind] ?? 'ilan', id: t.subject.id, title: t.subject.title },
-  phoneShared: t.iSharedPhone, unread: false, otherPhone: t.otherPhone, preview: prev?.preview,
+  phoneShared: t.iSharedPhone, unread: false, otherPhone: t.otherPhone, preview: prev?.preview, blocked: t.blocked ?? null,
   messages: t.messages.map((m) => ({ id: m.id, from: m.mine ? 'me' : 'them', text: m.text, at: hm(m.at) })),
 });
 
@@ -89,6 +89,7 @@ export interface ApiAdminListing {
   id: string; title: string; ownerName: string | null; photos?: string[]; version?: string; ownerVerifyLevel?: number;
   year?: number; price?: number; currency?: Currency; lengthM?: number; type?: string; location?: string; cabins?: number; engine?: string;
   engineHours?: number | null; flag?: string | null; tradeIn?: boolean; negotiable?: boolean; equipment?: string[]; description?: string;
+  previousRejectReason?: string | null;
 }
 export const toAdminListing = (x: ApiAdminListing): AdminItem => ({
   id: `l:${x.id}`, kind: 'ilan', title: x.title, who: x.ownerName ?? '—', status: 'bekliyor', refId: x.id, photos: (x.photos ?? []).map(absolute),
@@ -98,6 +99,7 @@ export const toAdminListing = (x: ApiAdminListing): AdminItem => ({
     location: x.location ?? '', cabins: x.cabins ?? 0, engine: x.engine ?? '', engineHours: x.engineHours ?? null,
     flag: (x.flag as Flag | null | undefined) ?? null, tradeIn: !!x.tradeIn, negotiable: !!x.negotiable,
     equipment: (x.equipment ?? []) as Equipment[], description: x.description ?? '', ownerVerifyLevel: x.ownerVerifyLevel ?? 0,
+    previousRejectReason: x.previousRejectReason ?? null,
   },
 });
 export const toAdminVerification = (x: { id: string; kind: string; userName: string | null; fileIds?: string[]; details?: Record<string, unknown> | null }): AdminItem =>

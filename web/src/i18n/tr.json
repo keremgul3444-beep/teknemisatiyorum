@@ -508,7 +508,16 @@
     "account_suspended": "Hesabın askıya alındı. Bilgi için iletisim@teknemisatiyorum.com adresine yaz.",
     "staff_protected": "Ekip üyelerinin hesabı buradan askıya alınamaz.",
     "already_suspended": "Bu hesap zaten askıda.",
-    "not_suspended": "Bu hesap askıda değil."
+    "not_suspended": "Bu hesap askıda değil.",
+    "blocked": "Bu sohbete mesaj gönderilemiyor.",
+    "message_limit": "Kısa sürede çok mesaj gönderdin. Biraz sonra yeniden dene.",
+    "awaiting_reply": "Karşı taraf henüz yanıt vermedi. Yanıt gelince yeniden yazabilirsin.",
+    "conversation_limit": "Bugün açabileceğin sohbet sınırına ulaştın. Yarın yeniden deneyebilirsin.",
+    "upload_limit": "Bugünkü yükleme sınırına ulaştın. Yarın yeniden deneyebilirsin.",
+    "storage_quota": "Dosya alanın doldu. Kullanmadığın taslakları silip yeniden dene.",
+    "image_too_large": "Fotoğrafın çözünürlüğü çok yüksek. Daha küçük bir fotoğraf seç.",
+    "too_many_drafts": "Yarım kalmış ilanların çok. Önce birini tamamla ya da sil.",
+    "price_change_limit": "Fiyatı bu hafta yeterince değiştirdin. Birkaç gün sonra yeniden deneyebilirsin."
   },
   "login": {
     "title": "Giriş yap",
@@ -579,7 +588,14 @@
       "offensive": "Kaldırma nedeni: uygunsuz içerik.",
       "rules": "Kaldırma nedeni: ilan kurallarına aykırı.",
       "account_suspended": "Kaldırma nedeni: hesap askıya alındı."
-    }
+    },
+    "block": "Engelle",
+    "unblock": "Engeli kaldır",
+    "blockConfirm": "Bu kişi sana bu sohbetten yazamayacak, sen de yazamayacaksın. Engellensin mi?",
+    "cancel": "Vazgeç",
+    "blockedByMe": "Bu kişiyi engelledin.",
+    "blockedByThem": "Bu sohbete artık mesaj gönderilemiyor.",
+    "paymentRisk": "Bu mesajda ödeme isteği var. Tekneyi görmeden ve sözleşme yapmadan kapora ya da havale gönderme."
   },
   "pay": {
     "devTitle": "Deneme ödemesi",

@@ -28,7 +28,8 @@ export class MediaController {
   @Get(':id')
   async get(@Param('id') id: string, @Query('w') w: string | undefined, @Res() res: Response) {
     const f = w === undefined ? await this.media.readPublic(id) : await this.media.readPublicWidth(id, Number(w));
-    res.type(f.mime).setHeader('Cache-Control', 'public, max-age=86400').send(f.data);
+    // Kısa önbellek: kaldırılan ilanın ya da silinen hesabın fotoğrafı CDN'de en geç bir saat kalır.
+    res.type(f.mime).setHeader('Cache-Control', 'public, max-age=3600').setHeader('X-Content-Type-Options', 'nosniff').send(f.data);
   }
 
   @Auth()
@@ -42,6 +43,9 @@ export class MediaController {
   @Get(':id/raw')
   async raw(@Param('id') id: string, @Query('exp') exp: string, @Query('sig') sig: string, @Res() res: Response) {
     const f = await this.media.readSigned(id, exp, sig);
-    res.type(f.mime).setHeader('Cache-Control', 'private, no-store').send(f.data);
+    // PDF tarayıcıda API adresinde açılmasın (gömülü betik): indirilir; içerik türü tahmin edilmez.
+    res.type(f.mime).setHeader('Cache-Control', 'private, no-store').setHeader('X-Content-Type-Options', 'nosniff')
+      .setHeader('Content-Disposition', f.mime === 'application/pdf' ? `attachment; filename="${id}.pdf"` : 'inline')
+      .setHeader('Content-Security-Policy', "default-src 'none'; sandbox").send(f.data);
   }
 }

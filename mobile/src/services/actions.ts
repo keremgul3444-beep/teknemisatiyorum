@@ -222,6 +222,12 @@ export const actions = {
     await api.post(`/conversations/${convId}/share-phone`);
     await actions.openConversation(convId);
   },
+  /** Karşı tarafı engelle ya da engeli kaldır: engelliyken iki taraf da yazamaz. */
+  async setBlocked(convId: string, blocked: boolean) {
+    if (!isApiMode()) return g().setBlocked(convId, blocked);
+    await api.post(`/conversations/${convId}/${blocked ? 'block' : 'unblock'}`);
+    await actions.openConversation(convId);
+  },
 
   // ——— Ekspertiz ve broker ———
   async bookExpertise(input: { packageId: string; listingId?: string; date: string; slot: string }) {

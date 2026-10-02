@@ -142,6 +142,9 @@ test('telefonunu görünür yapan satıcının numarası sohbette paylaşmadan g
   const c = await t.http().post('/conversations').set(buyer.auth).send({ subjectKind: 'listing', subjectId: id });
   expect((await t.http().get(`/conversations/${c.body.id}/messages`).set(buyer.auth)).body.otherPhone).toBeNull();
   await t.http().patch('/me').set(owner.auth).send({ prefs: { phoneVisible: true } }).expect(200);
+  // Boş sohbet açmak numarayı göstermez (numara toplama); alıcı yazınca görünür.
+  expect((await t.http().get(`/conversations/${c.body.id}/messages`).set(buyer.auth)).body.otherPhone).toBeNull();
+  await t.http().post(`/conversations/${c.body.id}/messages`).set(buyer.auth).send({ text: 'Merhaba, tekne hâlâ satılık mı?' }).expect(201);
   expect((await t.http().get(`/conversations/${c.body.id}/messages`).set(buyer.auth)).body.otherPhone).toBe(owner.user.phone);
 });
 

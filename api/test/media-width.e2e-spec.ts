@@ -19,8 +19,8 @@ test('izinli genişlikte WebP döner (önbellekten ikinci kez de); izinsiz geni�
     const r = await t.http().get(`/media/${id}?w=400`).buffer(true).parse(binary);
     expect(r.status).toBe(200);
     expect(r.headers['content-type']).toBe('image/webp');
-    // Uzun önbellek yok: hesabı silinen kişinin fotoğrafı en geç bir günde her yerden kalkmalı (KVKK).
-    expect(r.headers['cache-control']).toBe('public, max-age=86400');
+    // Uzun önbellek yok: hesabı silinen kişinin ya da kaldırılan ilanın fotoğrafı en geç bir saatte her yerden kalkmalı.
+    expect(r.headers['cache-control']).toBe('public, max-age=3600');
     expect((await sharp(r.body as Buffer).metadata()).width).toBe(400);
   }
   expect((await t.http().get(`/media/${id}?w=401`)).status).toBe(400);

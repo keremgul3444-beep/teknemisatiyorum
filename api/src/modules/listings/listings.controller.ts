@@ -8,7 +8,10 @@ import { AuditService } from '../../common/audit.service';
 import { Errors } from '../../common/errors';
 import { MediaService } from '../media/media.service';
 import { ListingsService, MAX_PHOTOS } from './listings.service';
-import { listingInclude, type ListingRow } from './listing.view';
+import { listingInclude, priceNeedsReview, PRICE_CHANGES_PER_WEEK, type ListingRow } from './listing.view';
+
+/** Kullanıcı başına açık (gönderilmemiş) taslak sınırı. */
+const MAX_OPEN_DRAFTS = 5;
 
 const draftSchema = z.object({
   brand: z.string().trim().min(1).max(60),
@@ -40,6 +43,8 @@ const patchSchema = draftSchema.partial().extend({
   flag: draftSchema.shape.flag.unwrap().optional(),
   tradeIn: draftSchema.shape.tradeIn.unwrap().optional(),
   negotiable: draftSchema.shape.negotiable.unwrap().optional(),
+  /** null: ilan firmadan çıkarılır, bireysel satıcı adıyla görünür. */
+  companyId: z.string().nullable().optional(),
 });
 /** Bu alanlardan biri değişirse ilan başka bir tekneyi anlatıyor olabilir. */
 const IDENTITY_FIELDS = ['brand', 'model', 'year', 'lengthM', 'boatId'] as const;
@@ -157,6 +162,8 @@ export class ListingsController {
   async create(@CurrentUser() u: AuthUser, @Body(new ZodPipe(draftSchema)) b: z.infer<typeof draftSchema>) {
     if (b.companyId) await this.assertMember(u.id, b.companyId);
     if (b.boatId) await this.assertOwnBoat(u.id, b.boatId);
+    // Yarım kalan taslaklar sınırsız birikmesin (her biri fotoğraf yükleme kapısı).
+    if ((await this.prisma.listing.count({ where: { ownerId: u.id, status: 'draft' } })) >= MAX_OPEN_DRAFTS) throw Errors.conflict('TOO_MANY_DRAFTS');
     const l = await this.prisma.listing.create({ data: { ...b, ownerId: u.id, status: 'draft', badges: [] }, include: listingInclude });
     return this.listings.view(l, u.id);
   }
@@ -168,10 +175,15 @@ export class ListingsController {
     if (['sold', 'removed'].includes(l.status)) throw Errors.conflict('LISTING_CLOSED');
     if (b.companyId) await this.assertMember(u.id, b.companyId);
     if (b.boatId) await this.assertOwnBoat(u.id, b.boatId);
-    // Yayındaki ya da reddedilmiş ilan düzenlenirse yeniden onaya düşer; yalnızca fiyat değişikliği onay istemez
-    // (indirim anında görünsün). Fiyat değişince önceki fiyat geçmişe yazılır; favorileyenler indirimden haber alır.
-    const priceOnly = Object.keys(b).every((k) => k === 'price');
+    // Yayındaki ya da reddedilmiş ilan düzenlenirse yeniden onaya düşer; ölçülü (yarıdan bir buçuk katına) fiyat
+    // değişikliği onay istemez (indirim anında görünsün). Fiyat değişince önceki fiyat geçmişe yazılır; favorileyenler
+    // gerçek indirimden haber alır. Haftada en fazla üç fiyat değişikliği.
     const priceChanged = b.price !== undefined && b.price !== l.price;
+    const priceOnly = Object.keys(b).every((k) => k === 'price') && !(priceChanged && priceNeedsReview(l.price, b.price!));
+    if (priceChanged) {
+      const recent = await this.prisma.priceHistory.count({ where: { listingId: id, at: { gt: new Date(Date.now() - 7 * 864e5) } } });
+      if (recent >= PRICE_CHANGES_PER_WEEK) throw Errors.tooMany('PRICE_CHANGE_LIMIT');
+    }
     const status = priceOnly ? l.status : l.status === 'published' || l.status === 'rejected' ? 'pending' : l.status;
     // Belge ve ekspertiz rozetleri belirli bir tekne içindir: tekne kimliği değişirse rozetler düşer.
     const identityChanged = IDENTITY_FIELDS.some((k) => b[k] !== undefined && b[k] !== l[k]);
@@ -180,8 +192,9 @@ export class ListingsController {
       this.prisma.listing.update({ where: { id }, data: { ...b, status, ...(badges.length !== l.badges.length ? { badges } : {}) } }),
       ...(priceChanged ? [this.prisma.priceHistory.create({ data: { listingId: id, price: l.price, currency: l.currency } })] : []),
     ]);
+    await this.audit.log(u.id, 'audit.listingEdited', { fields: Object.keys(b).sort().join(','), status }, 'listing', id);
     const updated = await this.prisma.listing.findUniqueOrThrow({ where: { id }, include: listingInclude });
-    if (priceChanged && b.price! < l.price && updated.status === 'published') await this.listings.notifyPriceDrop(updated, l.price);
+    if (priceChanged && b.price! < l.price && updated.status === 'published') await this.listings.notifyPriceDrop(updated);
     return this.listings.view(updated, u.id);
   }
 
@@ -192,12 +205,19 @@ export class ListingsController {
     // Satılmış ya da kaldırılmış ilan herkese açık kalabilir; denetimsiz görsel eklenemez.
     if (['sold', 'removed'].includes(l.status)) throw Errors.conflict('LISTING_CLOSED');
     await this.media.assertOwnPublic(u.id, b.fileIds);
-    // Zaten ekli fotoğrafların yeniden gönderilmesi (yarıda kalan gönderimin tekrarı) sınıra sayılmaz.
-    const fresh = b.fileIds.filter((f) => !l.photos.some((p) => p.fileId === f));
-    if (l.photos.length + fresh.length > MAX_PHOTOS) throw Errors.bad('TOO_MANY_PHOTOS', { max: MAX_PHOTOS });
-    await this.prisma.listingPhoto.createMany({ data: fresh.map((fileId, i) => ({ listingId: id, fileId, order: l.photos.length + i })) });
-    // Onaylanmış içerik denetimsiz değişmesin: yayındaki/reddedilmiş ilana fotoğraf eklenince yeniden onaya düşer.
-    if (fresh.length && (l.status === 'published' || l.status === 'rejected')) await this.prisma.listing.update({ where: { id }, data: { status: 'pending' } });
+    // Sayım ve ekleme aynı işlemde, ilan satırı kilitliyken: eşzamanlı iki istek 20 sınırını aşamaz.
+    const added = await this.prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM "Listing" WHERE id = ${id} FOR UPDATE`;
+      const current = await tx.listingPhoto.findMany({ where: { listingId: id }, select: { fileId: true } });
+      // Zaten ekli fotoğrafların yeniden gönderilmesi (yarıda kalan gönderimin tekrarı) sınıra sayılmaz.
+      const fresh = b.fileIds.filter((f) => !current.some((p) => p.fileId === f));
+      if (current.length + fresh.length > MAX_PHOTOS) throw Errors.bad('TOO_MANY_PHOTOS', { max: MAX_PHOTOS });
+      await tx.listingPhoto.createMany({ data: fresh.map((fileId, i) => ({ listingId: id, fileId, order: current.length + i })) });
+      // Onaylanmış içerik denetimsiz değişmesin: yayındaki/reddedilmiş ilana fotoğraf eklenince yeniden onaya düşer.
+      if (fresh.length && (l.status === 'published' || l.status === 'rejected')) await tx.listing.update({ where: { id }, data: { status: 'pending' } });
+      return fresh.length;
+    });
+    if (added) await this.audit.log(u.id, 'audit.listingPhotosChanged', { added: String(added) }, 'listing', id);
     return this.listings.view(await this.listings.getOwn(id, u.id), u.id);
   }
 
@@ -218,11 +238,13 @@ export class ListingsController {
     if (fresh.length) await this.media.assertOwnPublic(u.id, fresh);
     const changed = current.length !== b.fileIds.length || current.some((f, i) => f !== b.fileIds[i]);
     if (changed) {
-      await this.prisma.$transaction([
-        this.prisma.listingPhoto.deleteMany({ where: { listingId: id } }),
-        this.prisma.listingPhoto.createMany({ data: b.fileIds.map((fileId, order) => ({ listingId: id, fileId, order })) }),
-        ...(l.status === 'published' || l.status === 'rejected' ? [this.prisma.listing.update({ where: { id }, data: { status: 'pending' } })] : []),
-      ]);
+      await this.prisma.$transaction(async (tx) => {
+        await tx.$queryRaw`SELECT id FROM "Listing" WHERE id = ${id} FOR UPDATE`;
+        await tx.listingPhoto.deleteMany({ where: { listingId: id } });
+        await tx.listingPhoto.createMany({ data: b.fileIds.map((fileId, order) => ({ listingId: id, fileId, order })) });
+        if (l.status === 'published' || l.status === 'rejected') await tx.listing.update({ where: { id }, data: { status: 'pending' } });
+      });
+      await this.audit.log(u.id, 'audit.listingPhotosChanged', { count: String(b.fileIds.length) }, 'listing', id);
     }
     return this.listings.view(await this.listings.getOwn(id, u.id), u.id);
   }
@@ -245,15 +267,18 @@ export class ListingsController {
   async sold(@CurrentUser() u: AuthUser, @Param('id') id: string) {
     const l = await this.listings.getOwn(id, u.id);
     if (l.status !== 'published') throw Errors.conflict('LISTING_NOT_PUBLISHED');
-    return this.listings.view(await this.prisma.listing.update({ where: { id }, data: { status: 'sold' }, include: listingInclude }), u.id);
+    const updated = await this.prisma.listing.update({ where: { id }, data: { status: 'sold' }, include: listingInclude });
+    await this.audit.log(u.id, 'audit.listingSold', { title: `${l.brand} ${l.model}` }, 'listing', id);
+    return this.listings.view(updated, u.id);
   }
 
   @Auth({ level: 1 })
   @Delete('listings/:id')
   @HttpCode(204)
   async remove(@CurrentUser() u: AuthUser, @Param('id') id: string) {
-    await this.listings.getOwn(id, u.id);
+    const l = await this.listings.getOwn(id, u.id);
     await this.prisma.listing.update({ where: { id }, data: { status: 'removed' } });
+    await this.audit.log(u.id, 'audit.listingWithdrawn', { title: `${l.brand} ${l.model}`, from: l.status }, 'listing', id);
   }
 
   @Auth()

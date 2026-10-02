@@ -140,3 +140,17 @@ Kalan: B9 tamamlandı; B14 (erişilebilirlik ayrıntıları), C17–C19, C21, D 
 - E: Motor saati, bayrak, takas ve pazarlık aramaya girdi. Ortak sorgu şeması `maxEngineHours`, `flag`, `tradeIn`, `negotiable` alanlarını taşıyor; asistan "1000 saatin altında", "türk bayraklı", "takasa açık", "pazarlıklı" gibi ifadeleri anlıyor (Claude modu da aynı alanları dolduruyor). Motor saati girilmemiş ilan, motor saati sınırlı aramada eşleşmiyor.
 - Uygulamada filtre sayfasına en az/en çok fiyat, en çok motor saati, bayrak ve satış koşulları eklendi; karşılaştırmada motor saati (az olan iyi), bayrak ve koşullar satırları var. Sitede filtrelerde en az fiyat, en çok yıl, motor saati, bayrak, takas ve pazarlık (`?maxSaat=&bayrak=tr|yabanci&takas=1&pazarlik=1`).
 - D (arama belleği): Arama artık her istekte tam ilanları yüklemiyor. Önce yalnızca eşleştirme ve sıralama alanları okunuyor (yeni alanlar SQL tarafında süzülüyor), tam ilan yalnızca gösterilecek sayfa ve öne çıkanlar için yükleniyor. Asistanın tam eşleşme listesi 50 ile sınırlı.
+
+## D paketi ve düşük öncelikliler ile kapatılanlar (2026-10-02)
+
+- Fiyat oyunu: "fiyat düştü" artık son değişiklikten önceki 60 günün en düşük fiyatına göre ölçülüyor; artırıp indirmek rozet ve bildirim vermiyor. Yalnızca fiyat değişikliği, yarıdan aşağı ya da bir buçuk kattan yukarıysa yeniden onaya düşüyor (1 TL yem fiyat). Haftada en fazla 3 fiyat değişikliği (`PRICE_CHANGE_LIMIT`).
+- Karne: onaydan sonra yazılan doğrulanmamış kayıt, bir sonraki onaya kadar yalnızca sahibine görünüyor.
+- Medya: herkese açık dosya yalnızca kaldırılmamış bir ilanın fotoğrafıysa ya da 24 saatten yeniyse açılıyor. Bir haftalık bağlanmamış dosyalar günlük temizlikte siliniyor. Kullanıcı başına günde 100 yükleme ve 300 MB alan, en fazla 50 megapiksel görsel, en fazla 5 açık taslak. Herkese açık görsel önbelleği 1 saat.
+- Moderatörün başkasının korumalı belgesini açması denetim kaydına yazılıyor. İmzalı PDF indirme olarak veriliyor (`attachment`, `nosniff`, `sandbox`).
+- Mesajlaşma (migration `0010_messaging_guard`): engelleme ve engeli kaldırma (uygulama ve site), günde 20 yeni sohbet, saatte 60 mesaj, yanıt gelmeden en fazla 5 mesaj. "Telefonum görünsün" numarayı yalnızca sohbete yazmış kişiye açıyor. IBAN, kapora ve havale geçen gelen mesajın altında uyarı çıkıyor (`shared/src/safety.ts`).
+- L1: Yeniden gönderilen ilanda moderatör önceki red gerekçesini görüyor. Karar kaydı sürümü, fiyatı ve gerekçeyi tutuyor.
+- L3: Fotoğraf ekleme, ilan satırı kilitliyken tek işlemde yapılıyor; eşzamanlı isteklerle 20 sınırı aşılamıyor.
+- L4: "Ekspertizli" rozeti ve karne kaydı yalnızca ilan sahibinin yaptırdığı ekspertizden geliyor; rozet için en az 60 puan gerekiyor.
+- L5: Düzenleme, fotoğraf değişikliği, satıldı ve yayından kaldırma denetim kaydına yazılıyor.
+- L8: İlanın firma bağı `companyId: null` ile kaldırılabiliyor.
+- Açık kalanlar: kopya veya çalıntı fotoğraf tespiti, ilan süresi ve yenileme.

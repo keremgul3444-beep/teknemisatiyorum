@@ -638,7 +638,13 @@
     "phoneShared": "Telefon numaran bu sohbette paylaşıldı.",
     "safety": "Ödemeyi platform dışında yapma; güvenli ödeme seni korur.",
     "autoReply": "Teşekkürler, en kısa sürede dönüş yapacağım.",
-    "noMessages": "Sohbeti başlatmak için ilk mesajı yaz."
+    "noMessages": "Sohbeti başlatmak için ilk mesajı yaz.",
+    "block": "Engelle",
+    "unblock": "Engeli kaldır",
+    "blockConfirm": "Bu kişi sana bu sohbetten yazamayacak, sen de yazamayacaksın. Engellensin mi?",
+    "blockedByMe": "Bu kişiyi engelledin.",
+    "blockedByThem": "Bu sohbete artık mesaj gönderilemiyor.",
+    "paymentRisk": "Bu mesajda ödeme isteği var. Tekneyi görmeden ve sözleşme yapmadan kapora ya da havale gönderme."
   },
   "profile": {
     "guestTitle": "Hesabına giriş yap",
@@ -988,7 +994,8 @@
       "wrong_info": "Yanlış bilgi",
       "offensive": "Uygunsuz içerik",
       "rules": "Kural ihlali"
-    }
+    },
+    "previousReject": "Önceki red gerekçesi"
   },
   "audit": {
     "listingApproved": "İlan onaylandı: {{title}}",
@@ -1016,7 +1023,12 @@
     "listingRemoved": "İlan kaldırıldı: {{title}}",
     "reportsDismissed": "Bildirimler yoksayıldı: {{title}}",
     "userSuspended": "Hesap askıya alındı: {{name}}",
-    "userUnsuspended": "Hesabın askısı kaldırıldı: {{name}}"
+    "userUnsuspended": "Hesabın askısı kaldırıldı: {{name}}",
+    "listingEdited": "İlan düzenlendi: {{fields}}",
+    "listingPhotosChanged": "İlan fotoğrafları değişti",
+    "listingSold": "İlan satıldı olarak işaretlendi: {{title}}",
+    "listingWithdrawn": "İlan sahibi tarafından kaldırıldı: {{title}}",
+    "privateFileViewed": "Korumalı belge açıldı"
   },
   "errors": {
     "generic": "Bir şeyler ters gitti, tekrar dene.",
@@ -1066,7 +1078,16 @@
     "account_suspended": "Hesabın askıya alındı. Bilgi için iletisim@teknemisatiyorum.com adresine yaz.",
     "staff_protected": "Ekip üyelerinin hesabı buradan askıya alınamaz.",
     "already_suspended": "Bu hesap zaten askıda.",
-    "not_suspended": "Bu hesap askıda değil."
+    "not_suspended": "Bu hesap askıda değil.",
+    "blocked": "Bu sohbete mesaj gönderilemiyor.",
+    "message_limit": "Kısa sürede çok mesaj gönderdin. Biraz sonra yeniden dene.",
+    "awaiting_reply": "Karşı taraf henüz yanıt vermedi. Yanıt gelince yeniden yazabilirsin.",
+    "conversation_limit": "Bugün açabileceğin sohbet sınırına ulaştın. Yarın yeniden deneyebilirsin.",
+    "upload_limit": "Bugünkü yükleme sınırına ulaştın. Yarın yeniden deneyebilirsin.",
+    "storage_quota": "Dosya alanın doldu. Kullanmadığın taslakları silip yeniden dene.",
+    "image_too_large": "Fotoğrafın çözünürlüğü çok yüksek. Daha küçük bir fotoğraf seç.",
+    "too_many_drafts": "Yarım kalmış ilanların çok. Önce birini tamamla ya da sil.",
+    "price_change_limit": "Fiyatı bu hafta yeterince değiştirdin. Birkaç gün sonra yeniden deneyebilirsin."
   },
   "soon": {
     "title": "Yakında",

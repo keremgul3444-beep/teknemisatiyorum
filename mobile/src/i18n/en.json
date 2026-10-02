@@ -638,7 +638,13 @@
     "phoneShared": "Your phone number was shared in this conversation.",
     "safety": "Don't pay outside the platform; secure payment protects you.",
     "autoReply": "Thanks, I'll get back to you shortly.",
-    "noMessages": "Write the first message to start the conversation."
+    "noMessages": "Write the first message to start the conversation.",
+    "block": "Block",
+    "unblock": "Unblock",
+    "blockConfirm": "This person won’t be able to message you in this chat, and you won’t be able to message them. Block?",
+    "blockedByMe": "You blocked this person.",
+    "blockedByThem": "Messages can no longer be sent in this chat.",
+    "paymentRisk": "This message asks for a payment. Don’t send a deposit or transfer before seeing the boat and signing a contract."
   },
   "profile": {
     "guestTitle": "Log in to your account",
@@ -988,7 +994,8 @@
       "wrong_info": "Wrong details",
       "offensive": "Inappropriate",
       "rules": "Rule violation"
-    }
+    },
+    "previousReject": "Previous rejection reason"
   },
   "audit": {
     "listingApproved": "Listing approved: {{title}}",
@@ -1016,7 +1023,12 @@
     "listingRemoved": "Listing taken down: {{title}}",
     "reportsDismissed": "Reports dismissed: {{title}}",
     "userSuspended": "Account suspended: {{name}}",
-    "userUnsuspended": "Account reinstated: {{name}}"
+    "userUnsuspended": "Account reinstated: {{name}}",
+    "listingEdited": "Listing edited: {{fields}}",
+    "listingPhotosChanged": "Listing photos changed",
+    "listingSold": "Listing marked as sold: {{title}}",
+    "listingWithdrawn": "Listing withdrawn by owner: {{title}}",
+    "privateFileViewed": "Protected document opened"
   },
   "errors": {
     "generic": "Something went wrong, please try again.",
@@ -1066,7 +1078,16 @@
     "account_suspended": "Your account has been suspended. Write to iletisim@teknemisatiyorum.com for details.",
     "staff_protected": "Team accounts cannot be suspended here.",
     "already_suspended": "This account is already suspended.",
-    "not_suspended": "This account is not suspended."
+    "not_suspended": "This account is not suspended.",
+    "blocked": "Messages can’t be sent in this chat.",
+    "message_limit": "You sent many messages in a short time. Try again shortly.",
+    "awaiting_reply": "The other person hasn’t replied yet. You can write again once they do.",
+    "conversation_limit": "You reached today’s limit for new chats. Try again tomorrow.",
+    "upload_limit": "You reached today’s upload limit. Try again tomorrow.",
+    "storage_quota": "Your file space is full. Delete unused drafts and try again.",
+    "image_too_large": "This photo’s resolution is too high. Choose a smaller photo.",
+    "too_many_drafts": "You have too many unfinished listings. Finish or delete one first.",
+    "price_change_limit": "You’ve changed the price enough this week. Try again in a few days."
   },
   "soon": {
     "title": "Coming soon",

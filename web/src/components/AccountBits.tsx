@@ -88,3 +88,36 @@ export function ReplyForm({ conversationId, labels, errors }: { conversationId: 
     </form>
   );
 }
+
+/** Engelle / engeli kaldır: engellemeden önce bir kez onay ister. */
+export function BlockButton({ conversationId, blocked, labels, errors }: {
+  conversationId: string; blocked: boolean; labels: { block: string; unblock: string; confirm: string; cancel: string }; errors: Record<string, string>;
+}) {
+  const router = useRouter();
+  const [asking, setAsking] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const go = async (on: boolean) => {
+    setBusy(true); setError('');
+    const r = await fetch(`/api/messages/${encodeURIComponent(conversationId)}/block`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ on }) }).catch(() => null);
+    const j = r ? await r.json().catch(() => ({})) : {};
+    setBusy(false); setAsking(false);
+    if (!r?.ok) { setError(errors[String(j.messageKey ?? '').replace(/^errors\./, '')] ?? errors.generic); return; }
+    router.refresh();
+  };
+  if (blocked) return <button className="btn ghost small" type="button" disabled={busy} onClick={() => void go(false)}>{labels.unblock}</button>;
+  return (
+    <div style={{ display: 'grid', gap: 8 }}>
+      {asking ? (
+        <>
+          <p className="small" style={{ margin: 0 }}>{labels.confirm}</p>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="btn ghost small" type="button" onClick={() => setAsking(false)}>{labels.cancel}</button>
+            <button className="btn small" type="button" disabled={busy} onClick={() => void go(true)}>{labels.block}</button>
+          </div>
+        </>
+      ) : <button className="linklike small" type="button" onClick={() => setAsking(true)}>{labels.block}</button>}
+      {error ? <p className="small" role="alert" style={{ color: 'var(--c-danger)', margin: 0 }}>{error}</p> : null}
+    </div>
+  );
+}

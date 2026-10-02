@@ -57,3 +57,25 @@ test('fiyat yükselince ya da indirim 30 günden eskiyse rozet yok; başka alanl
   const mixed = await t.http().patch(`/listings/${l.id}`).set(owner.auth).send({ price: 60000, description: 'Yeni açıklama' });
   expect(mixed.body.status).toBe('pending');
 });
+
+test('fiyat oyunu: artırıp indirmek rozet ve bildirim vermez; yem fiyat onaya düşer; haftada en fazla üç değişiklik', async () => {
+  const owner = await loginAs(t, { level: 2 });
+  const buyer = await loginAs(t);
+  const l = await published(owner.user.id, { brand: 'Oyun' });
+  await t.http().put(`/favorites/${l.id}`).set(buyer.auth).expect(204);
+  await t.http().patch(`/listings/${l.id}`).set(owner.auth).send({ price: 140000 }).expect(200);
+  const fake = await t.http().patch(`/listings/${l.id}`).set(owner.auth).send({ price: 120000 });
+  expect(fake.body.status).toBe('published');
+  expect(fake.body.priceDrop).toBeNull();
+  expect((await t.http().get('/notifications').set(buyer.auth)).body.some((x: { key: string; params: { listingId: string } }) => x.key === 'notif.priceDrop' && x.params.listingId === l.id)).toBe(false);
+
+  const limit = await t.http().patch(`/listings/${l.id}`).set(owner.auth).send({ price: 110000 });
+  expect(limit.body.status).toBe('published');
+  const over = await t.http().patch(`/listings/${l.id}`).set(owner.auth).send({ price: 105000 });
+  expect(over.status).toBe(429);
+  expect(over.body.code).toBe('PRICE_CHANGE_LIMIT');
+
+  const bait = await published(owner.user.id, { brand: 'Yem' });
+  const r = await t.http().patch(`/listings/${bait.id}`).set(owner.auth).send({ price: 1 });
+  expect(r.body.status).toBe('pending');
+});

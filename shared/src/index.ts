@@ -9,3 +9,4 @@ export * from './assistant/serviceCategory';
 export * from './seed/listings';
 export * from './design';
 export * from './location';
+export * from './safety';

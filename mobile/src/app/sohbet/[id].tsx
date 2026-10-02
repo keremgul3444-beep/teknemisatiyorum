@@ -3,6 +3,7 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View 
 import { router, useIsFocused, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { paymentRisk } from '@tms/shared';
 import { colors, fonts, radius, space } from '@/theme';
 import { Button, Header, Icon, NotFound, T } from '@/components';
 import { actions, useConversation, type SubjectKind } from '@/services';
@@ -19,6 +20,7 @@ export default function Sohbet() {
   const c = useConversation(id);
   const [text, setText] = useState('');
   const [confirm, setConfirm] = useState(false);
+  const [confirmBlock, setConfirmBlock] = useState(false);
   const scroll = useRef<ScrollView>(null);
 
   useEffect(() => { if (id) attempt(() => actions.openConversation(id)); }, [id]);
@@ -29,9 +31,10 @@ export default function Sohbet() {
   useEffect(() => { setTimeout(() => scroll.current?.scrollToEnd({ animated: true }), 50); }, [c?.messages.length]);
   if (!c) return <NotFound />;
 
+  const blocked = c.blocked ?? null;
   const send = async () => {
     const msg = text.trim();
-    if (!msg) return;
+    if (!msg || blocked) return;
     setText('');
     await attempt(() => actions.sendMessage(c.id, msg));
     setTimeout(() => actions.demoReply(c.id, t('messages.autoReply')), 1500);
@@ -59,6 +62,15 @@ export default function Sohbet() {
               </View>
             </View>
           ) : null}
+          {confirmBlock ? (
+            <View style={{ backgroundColor: colors.surface, borderRadius: radius.button, padding: space(3), gap: space(2) }}>
+              <T variant="caption">{t('messages.blockConfirm')}</T>
+              <View style={{ flexDirection: 'row', gap: space(2) }}>
+                <View style={{ flex: 1 }}><Button small variant="ghost" title={t('common.cancel')} onPress={() => setConfirmBlock(false)} /></View>
+                <View style={{ flex: 1 }}><Button small title={t('messages.block')} onPress={async () => { await attempt(() => actions.setBlocked(c.id, true)); setConfirmBlock(false); }} /></View>
+              </View>
+            </View>
+          ) : null}
         </View>
 
         <ScrollView ref={scroll} contentContainerStyle={{ padding: space(4), gap: space(2) }}>
@@ -74,13 +86,30 @@ export default function Sohbet() {
               borderWidth: m.from === 'me' ? 0 : 1, borderColor: colors.line, paddingVertical: space(2), paddingHorizontal: space(3) }}>
               <T color={m.from === 'me' ? colors.white : colors.text}>{m.text}</T>
               <T variant="caption" color={m.from === 'me' ? colors.surface : colors.muted} style={{ fontSize: 10, alignSelf: 'flex-end' }}>{m.at}</T>
+              {m.from === 'them' && paymentRisk(m.text) ? (
+                <View accessibilityRole="alert" style={{ flexDirection: 'row', gap: space(1.5), marginTop: space(1.5), paddingTop: space(1.5), borderTopWidth: 1, borderColor: colors.line }}>
+                  <Icon name="shield" size={14} color={colors.danger} />
+                  <T variant="caption" color={colors.danger} style={{ flex: 1 }}>{t('messages.paymentRisk')}</T>
+                </View>
+              ) : null}
             </View>
           ))}
           {c.phoneShared ? (
             <T variant="caption" color={colors.primary} style={{ textAlign: 'center', marginTop: space(2) }}>{t('messages.phoneShared')}</T>
           ) : null}
+          {!blocked && !confirmBlock && c.messages.some((m) => m.from === 'them') ? (
+            <Pressable onPress={() => setConfirmBlock(true)} accessibilityRole="button" hitSlop={8} style={{ alignSelf: 'center', marginTop: space(3) }}>
+              <T variant="caption" color={colors.muted} style={{ textDecorationLine: 'underline' }}>{t('messages.block')}</T>
+            </Pressable>
+          ) : null}
         </ScrollView>
 
+        {blocked ? (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(3), padding: space(4), borderTopWidth: 1, borderColor: colors.line, backgroundColor: colors.card }}>
+            <T variant="caption" color={colors.muted} style={{ flex: 1 }}>{t(blocked === 'me' ? 'messages.blockedByMe' : 'messages.blockedByThem')}</T>
+            {blocked === 'me' ? <Button small variant="ghost" title={t('messages.unblock')} onPress={() => attempt(() => actions.setBlocked(c.id, false))} /> : null}
+          </View>
+        ) : (
         <View style={{ flexDirection: 'row', gap: space(2), padding: space(3), borderTopWidth: 1, borderColor: colors.line, backgroundColor: colors.card }}>
           <TextInput value={text} onChangeText={setText} placeholder={t('messages.placeholder')} placeholderTextColor={colors.muted} onSubmitEditing={send}
             style={{ flex: 1, backgroundColor: colors.bg, borderRadius: radius.pill, paddingHorizontal: space(4), paddingVertical: space(2.5), fontFamily: fonts.body, fontSize: 15, color: colors.text }} />
@@ -89,6 +118,7 @@ export default function Sohbet() {
             <Icon name="send" size={20} color={colors.white} />
           </Pressable>
         </View>
+        )}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

@@ -4,7 +4,7 @@ import { failures, MAX_LISTING_PHOTOS, normalizeLocation, type BoatType, type Eq
 import { PrismaService } from '../../common/prisma.service';
 import { Errors } from '../../common/errors';
 import { FxService } from './fx.service';
-import { listingInclude, listingView, priceDropOf, PRICE_DROP_DAYS, type ListingRow, type ListingStats } from './listing.view';
+import { listingInclude, listingView, priceDropOf, PRICE_DROP_DAYS, PRICE_HISTORY_TAKE, type ListingRow, type ListingStats } from './listing.view';
 import { NotificationsService } from '../notifications/notifications.module';
 import { freshness, isActive } from '../promotions/promotion.rules';
 
@@ -28,7 +28,7 @@ const MATCH_SELECT = {
   id: true, lengthM: true, year: true, price: true, currency: true, type: true, location: true, equipment: true,
   engineHours: true, flag: true, tradeIn: true, negotiable: true,
   publishedAt: true, bumpedAt: true, featuredUntil: true, urgentUntil: true,
-  priceHistory: { orderBy: { at: 'desc' as const }, take: 1 },
+  priceHistory: { orderBy: { at: 'desc' as const }, take: PRICE_HISTORY_TAKE },
 } satisfies Prisma.ListingSelect;
 type Slim = Prisma.ListingGetPayload<{ select: typeof MATCH_SELECT }>;
 const asMatchable = (l: Slim) => ({ ...l, status: 'published', type: l.type as BoatType, equipment: l.equipment as Equipment[] });
@@ -165,8 +165,11 @@ export class ListingsService {
     return { featured: shuffle(featured).slice(0, 8), urgent: urgent.sort((a, b) => freshness(b) - freshness(a)).slice(0, 8), priceDrops };
   }
 
-  /** Fiyat düşünce ilanı favorileyenlere (sahibi hariç) uygulama içi bildirim. */
-  async notifyPriceDrop(l: ListingRow, from: number) {
+  /** Gerçek bir indirimde ilanı favorileyenlere (sahibi hariç) uygulama içi bildirim; önceki fiyat referans fiyattır. */
+  async notifyPriceDrop(l: ListingRow) {
+    const drop = priceDropOf(l);
+    if (!drop) return;
+    const from = drop.previousPrice;
     const favs = await this.prisma.favorite.findMany({ where: { listingId: l.id, userId: { not: l.ownerId } }, select: { userId: true } });
     const params = { listingId: l.id, title: `${l.brand} ${l.model}`, from: String(from), to: String(l.price), currency: l.currency };
     await Promise.all(favs.map((f) => this.notifications.push(f.userId, 'notif.priceDrop', params)));

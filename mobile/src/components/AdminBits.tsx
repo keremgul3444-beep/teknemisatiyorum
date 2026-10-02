@@ -68,6 +68,9 @@ export function ApprovalRow({ item, onDecide, onOpenFile }: { item: AdminItem; o
         </ScrollView>
       ) : null}
       {item.listing ? <ListingFacts info={item.listing} /> : null}
+      {item.listing?.previousRejectReason ? (
+        <T variant="caption" color={colors.danger}>{t('admin.previousReject')}: {t(`admin.reasons.${item.listing.previousRejectReason}`, { defaultValue: item.listing.previousRejectReason })}</T>
+      ) : null}
       {item.details ? (
         <View style={{ gap: space(0.5) }}>
           {Object.entries(item.details).map(([k, v]) => (

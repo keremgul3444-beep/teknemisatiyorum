@@ -33,6 +33,7 @@ img { max-width: 100%; display: block; }
 .btn:hover { text-decoration: none; filter: brightness(1.15); }
 .btn.secondary { background: var(--c-surface); color: var(--c-text); }
 .btn.ghost { background: var(--c-card); color: var(--c-primary); border: 1px solid var(--c-line); }
+.linklike { background: none; border: 0; padding: 0; color: var(--c-muted); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; font-family: inherit; justify-self: start; }
 .btn[disabled] { opacity: .5; cursor: not-allowed; }
 .chip {
   display: inline-flex; align-items: center; min-height: 36px; padding: 0 14px; border-radius: var(--r-chip);

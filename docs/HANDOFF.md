@@ -47,6 +47,7 @@ Tekne alım-satım + broker + ekspertiz + (2. dalga: usta/kaptan/güvenli ödeme
 - Şikayet ve yaptırım (aynı gün): ilan bildirme, Yönetim > Bildirimler (kaldır / yoksay / satıcıyı askıya al), hesap askıya alma ve kaldırma, "Kaldırıldı" durumu. Migration `0009_reports_suspension`. Ayrıntı incelemede.
 - Güvenlik paketi (aynı gün): moderasyonda tam ilan + sürüm kilidi, satılmış ilana fotoğraf engeli, tekne kimliği değişince rozet düşmesi, "Reddedildi" durumu ve gerekçe, koşullu "Doğrulanmış", görüntülenme sayımı (site: `/api/views` → `POST /listings/:id/view`), satılmış ilanda düğmeler, karne `i18n:` önek açığı. Ayrıntı incelemede.
 - Arama (aynı gün): motor saati, bayrak, takas ve pazarlık filtrede, asistanda ve karşılaştırmada; arama önce hafif alanlarla süzüp yalnızca gösterilen sayfayı tam yüklüyor. Ayrıntı incelemede.
+- Kötüye kullanım korumaları (aynı gün): fiyat oyunu, karne görünürlüğü, medya kota ve erişimi, yetim dosya temizliği, mesaj engelleme ve sınırları, ödeme uyarısı, numara toplama, belge erişim kaydı, ekspertiz rozeti kuralı. Yeni migration `0010_messaging_guard`: yerelde `npx prisma migrate deploy` gerekir. Ayrıntı incelemede.
 - Not: `mobile/scripts/demo-flows.mjs` içindeki 1, 2, 4, 9. akışlar bu değişiklikten önce de geçmiyordu (yeni asistan kutusunda "Ara" düğmesi yok); script güncellenmeli.
 
 ## Kaldığımız yer (2026-10-02 akşamı)

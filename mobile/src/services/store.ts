@@ -38,6 +38,7 @@ export interface Actions {
   addBoat(input: BoatInput): string;
   sendMessage(convId: string, text: string, from?: 'me' | 'them'): void;
   sharePhone(convId: string): void;
+  setBlocked(convId: string, blocked: boolean): void;
   markRead(convId: string): void;
   startConversation(subject: { kind: SubjectKind; id: string; title: string }, withName: string): string;
   setAdminStatus(id: string, status: AdminStatus, reason?: RejectReason): void;
@@ -194,6 +195,9 @@ export const useStore = create<Data & Actions>((set, get) => {
     },
     sharePhone(convId) {
       set({ conversations: get().conversations.map((c) => (c.id === convId ? { ...c, phoneShared: true } : c)) });
+    },
+    setBlocked(convId, blocked) {
+      set({ conversations: get().conversations.map((c) => (c.id === convId ? { ...c, blocked: blocked ? 'me' : null } : c)) });
     },
     markRead(convId) {
       set({ conversations: get().conversations.map((c) => (c.id === convId ? { ...c, unread: false } : c)) });

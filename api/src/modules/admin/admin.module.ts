@@ -29,6 +29,8 @@ const listingDecisionBody = z.discriminatedUnion('decision', [
 const listingChanged = () => new AppError('LISTING_CHANGED', 'errors.listing_changed', 409);
 const versionRequired = () => new AppError('VERSION_REQUIRED', 'errors.version_required', 400);
 const reportBody = z.object({ score: z.number().int().min(0).max(100) });
+/** Bu puanın altındaki ekspertiz raporu ilana "ekspertizli" rozeti vermez. */
+export const EXPERTISE_BADGE_MIN_SCORE = 60;
 const alreadyDecided = () => new AppError('ALREADY_DECIDED', 'errors.already_decided', 409);
 /** Ekip üyesi kendi ilanına ya da belgesine karar veremez (çıkar çatışması). */
 const selfDecision = () => new AppError('SELF_DECISION', 'errors.self_decision', 403);
@@ -70,8 +72,14 @@ class AdminController {
       where: { status: 'pending' }, orderBy: { updatedAt: 'asc' },
       include: { owner: { select: { name: true, verifyLevel: true } }, photos: true },
     });
+    // Yeniden gönderilen ilanda önceki red gerekçesi (ilanda gönderimde silinir; kayıt denetim günlüğünde kalır).
+    const rejections = await this.prisma.auditLog.findMany({
+      where: { action: 'audit.listingRejected', targetType: 'listing', targetId: { in: rows.map((l) => l.id) } }, orderBy: { at: 'desc' },
+    });
+    const previousReason = (id: string) => (rejections.find((x) => x.targetId === id)?.params as { reason?: string } | null)?.reason ?? null;
     // Moderatör ilanın yayına çıkacak her şeyini görür: açıklama, konum, özellikler ve yeni alanlar dahil.
     return rows.map((l) => ({
+      previousRejectReason: previousReason(l.id),
       id: l.id, title: `${l.brand} ${l.model}`, year: l.year, price: l.price, currency: l.currency, ownerName: l.owner.name,
       ownerVerifyLevel: l.owner.verifyLevel,
       photoCount: l.photos.length, photos: [...l.photos].sort((a, b) => a.order - b.order).map((p) => `/media/${p.fileId}`), updatedAt: l.updatedAt,
@@ -105,7 +113,9 @@ class AdminController {
     }
     const title = `${l.brand} ${l.model}`;
     await this.notifications.push(l.ownerId, approve ? 'notif.listingApproved' : 'notif.listingRejected', { title, listingId: id, ...(approve ? {} : { reason: b.reason }) });
-    await this.audit.log(u.id, approve ? 'audit.listingApproved' : 'audit.listingRejected', { title }, 'listing', id);
+    // Kayıt hangi sürüme ve fiyata karar verildiğini de tutar (sonradan "onaylanan buydu" denetimi için).
+    await this.audit.log(u.id, approve ? 'audit.listingApproved' : 'audit.listingRejected',
+      { title, version: b.version, price: `${l.price} ${l.currency}`, ...(approve ? {} : { reason: b.reason ?? '' }) }, 'listing', id);
     return { id, status: approve ? 'published' : 'rejected' };
   }
 
@@ -203,8 +213,10 @@ class AdminController {
     const bk = await this.prisma.expertiseBooking.findUniqueOrThrow({ where: { id } });
     if (bk.listingId) {
       const l = await this.prisma.listing.findUnique({ where: { id: bk.listingId } });
-      if (l) {
-        if (!l.badges.includes('ekspertizli')) await this.prisma.listing.update({ where: { id: l.id }, data: { badges: [...l.badges, 'ekspertizli'] } });
+      // Rozet ve karne kaydı yalnızca ilan sahibinin yaptırdığı ekspertizden: alıcının raporu kendisinindir.
+      // Rozet ayrıca düşük puanlı raporda verilmez ("ekspertizli" bir güven işaretidir).
+      if (l && bk.userId === l.ownerId) {
+        if (b.score >= EXPERTISE_BADGE_MIN_SCORE && !l.badges.includes('ekspertizli')) await this.prisma.listing.update({ where: { id: l.id }, data: { badges: [...l.badges, 'ekspertizli'] } });
         if (l.boatId) await this.logbook.addVerified(l.boatId, { kind: 'ekspertiz', date: dateOnly(bk.date), title: `${I18N_PREFIX}logbook.expertiseReport`, byName: `${I18N_PREFIX}logbook.platformSurveyor`, sourceRef: id });
       }
     }
