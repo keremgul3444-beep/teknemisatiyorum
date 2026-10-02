@@ -43,6 +43,11 @@ export default async function Home({ params }: P) {
           <ListingGrid items={show.urgent} locale={locale} strip />
         </Section>
       ) : null}
+      {show?.priceDrops?.length ? (
+        <Section title={t(locale, 'home.priceDrops')} action={<Link href={`${p('/ilanlar')}?dusen=1`}>{t(locale, 'home.seeAll')}</Link>}>
+          <ListingGrid items={show.priceDrops} locale={locale} strip />
+        </Section>
+      ) : null}
       {latest?.items.length ? (
         <Section title={t(locale, 'home.latest')} action={<Link href={p('/ilanlar')}>{t(locale, 'home.seeAll')}</Link>}>
           <ListingGrid items={latest.items.slice(0, 8)} locale={locale} priorityFirst={!show?.featured.length} />

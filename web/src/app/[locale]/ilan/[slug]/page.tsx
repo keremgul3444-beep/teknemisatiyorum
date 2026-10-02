@@ -69,10 +69,10 @@ export default async function IlanDetay({ params }: P) {
           ) : null}
         </div>
         <div>
-          <PromoBadges promo={l.promo} locale={locale} />
+          <PromoBadges promo={l.promo} priceDrop={l.priceDrop} locale={locale} />
           <h1 style={{ marginTop: 8, marginBottom: 4 }}>{l.brand} {l.model}</h1>
           <p className="muted">{l.year} · {l.location} · {typeName}</p>
-          <PriceBlock locale={locale} price={l.price} currency={l.currency} rates={rates} />
+          <PriceBlock locale={locale} price={l.price} currency={l.currency} rates={rates} previous={l.priceDrop?.previousPrice} />
           {l.badges.length || l.status === 'sold' ? (
             <div className="row" style={{ margin: '12px 0 0' }}>
               {l.badges.map((b) => <span key={b} className="pill featured">{t(locale, `badge.${b}`, {})}</span>)}
@@ -116,11 +116,12 @@ function Spec({ k, v }: { k: string; v: string }) {
 }
 
 /** Fiyat ve diğer para birimlerindeki karşılığı (sunucunun kur tablosuyla). */
-function PriceBlock({ locale, price, currency, rates }: { locale: Locale; price: number; currency: Currency; rates: Rates | null }) {
+function PriceBlock({ locale, price, currency, rates, previous }: { locale: Locale; price: number; currency: Currency; rates: Rates | null; previous?: number }) {
   const others = (['TRY', 'EUR', 'USD'] as Currency[]).filter((c) => c !== currency);
   return (
     <div>
       <strong style={{ fontSize: 28, color: 'var(--c-primary)' }}>{formatPrice(price, currency, locale)}</strong>
+      {previous ? <s className="muted" style={{ marginLeft: 10, fontSize: 16 }} aria-label={t(locale, 'listing.previousPrice', { price: formatPrice(previous, currency, locale) })}>{formatPrice(previous, currency, locale)}</s> : null}
       {rates ? (
         <p className="muted small">≈ {others.map((c) => formatPrice(Math.round(toTRY(price, currency, rates) / rates[c]), c, locale)).join(' · ')}</p>
       ) : null}

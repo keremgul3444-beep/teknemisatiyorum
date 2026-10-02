@@ -59,7 +59,7 @@ export default function IlanDetay() {
             </View>
           </View>
           <View style={{ position: 'absolute', bottom: space(3), left: space(4), right: space(4), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-            <PromoBadges promo={l.promo} />
+            <PromoBadges promo={l.promo} priceDrop={l.priceDrop} />
             <View style={{ backgroundColor: colors.overlay, borderRadius: radius.pill, paddingHorizontal: space(2.5), paddingVertical: space(1) }}>
               <T variant="caption" color={colors.white} style={{ fontFamily: fonts.bodySemi }}>{page + 1}/{photoCount}</T>
             </View>
@@ -78,7 +78,14 @@ export default function IlanDetay() {
               <T variant="h1">{l.brand} {l.model}</T>
               <T variant="caption" color={colors.muted} style={{ fontSize: 14, lineHeight: 20 }}>{l.year} · {l.location} · {t(`boatType.${l.type}`)}</T>
             </View>
-            <T variant="h1" color={colors.primary} style={{ fontSize: 30, lineHeight: 36 }}>{formatPrice(l.price, l.currency, lang)}</T>
+            <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: space(2.5), flexWrap: 'wrap' }}>
+              <T variant="h1" color={colors.primary} style={{ fontSize: 30, lineHeight: 36 }}>{formatPrice(l.price, l.currency, lang)}</T>
+              {l.priceDrop ? (
+                <T variant="caption" color={colors.muted} style={{ fontSize: 15, textDecorationLine: 'line-through' }} accessibilityLabel={t('listing.previousPrice', { price: formatPrice(l.priceDrop.previousPrice, l.currency, lang) })}>
+                  {formatPrice(l.priceDrop.previousPrice, l.currency, lang)}
+                </T>
+              ) : null}
+            </View>
           </View>
 
           <View style={{ flexDirection: 'row', gap: space(2.5) }}>

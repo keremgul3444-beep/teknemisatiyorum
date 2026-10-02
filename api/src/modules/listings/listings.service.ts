@@ -4,7 +4,8 @@ import { failures, normalizeLocation, type BoatType, type Equipment, type Parsed
 import { PrismaService } from '../../common/prisma.service';
 import { Errors } from '../../common/errors';
 import { FxService } from './fx.service';
-import { listingInclude, listingView, type ListingRow } from './listing.view';
+import { listingInclude, listingView, priceDropOf, PRICE_DROP_DAYS, type ListingRow } from './listing.view';
+import { NotificationsService } from '../notifications/notifications.module';
 import { freshness, isActive } from '../promotions/promotion.rules';
 
 export const MAX_PHOTOS = 20;
@@ -23,7 +24,7 @@ const asMatchable =(l: ListingRow) => ({ ...l, type: l.type as BoatType, equipme
 
 @Injectable()
 export class ListingsService {
-  constructor(private readonly prisma: PrismaService, private readonly fx: FxService) {}
+  constructor(private readonly prisma: PrismaService, private readonly fx: FxService, private readonly notifications: NotificationsService) {}
 
   /** Sahibi değilse yalnızca yayındaki (ve satılmış) ilanlar görünür; aksi halde 404 (varlığı da sızdırılmaz). */
   async getVisible(id: string, viewerId?: string, staff = false) {
@@ -76,10 +77,10 @@ export class ListingsService {
     return { exact, near, rates };
   }
 
-  async search(q: ParsedQuery, sort: Sort, page: number, opts: { urgentOnly?: boolean; now?: Date } = {}, pageSize = 20) {
+  async search(q: ParsedQuery, sort: Sort, page: number, opts: { urgentOnly?: boolean; dropOnly?: boolean; now?: Date } = {}, pageSize = 20) {
     const now = opts.now ?? new Date();
     const { rows: all, rates } = await this.match(q);
-    const rows = opts.urgentOnly ? all.filter((l) => isActive(l.urgentUntil, now)) : all;
+    const rows = all.filter((l) => (!opts.urgentOnly || isActive(l.urgentUntil, now)) && (!opts.dropOnly || priceDropOf(l, now)));
     const tl = (l: ListingRow) => l.price * rates[l.currency];
     if (sort !== 'new') rows.sort((a, b) => (sort === 'asc' ? tl(a) - tl(b) : tl(b) - tl(a)));
     else rows.sort((a, b) => freshness(b) - freshness(a));
@@ -88,13 +89,23 @@ export class ListingsService {
     return { rows: rows.slice((page - 1) * pageSize, page * pageSize), total: rows.length, featuredTop };
   }
 
-  /** Ana sayfa: ≤8 vitrin (karışık), ≤8 acil (en taze). */
+  /** Ana sayfa: ≤8 vitrin (karışık), ≤8 acil (en taze), ≤8 fiyatı düşen (en yeni indirim). */
   async showcase(now = new Date()) {
-    const [featured, urgent] = await Promise.all([
+    const since = new Date(now.getTime() - PRICE_DROP_DAYS * 864e5);
+    const [featured, urgent, dropped] = await Promise.all([
       this.prisma.listing.findMany({ where: { status: 'published', featuredUntil: { gt: now } }, include: listingInclude }),
       this.prisma.listing.findMany({ where: { status: 'published', urgentUntil: { gt: now } }, include: listingInclude }),
+      this.prisma.listing.findMany({ where: { status: 'published', priceHistory: { some: { at: { gt: since } } } }, include: listingInclude }),
     ]);
-    return { featured: shuffle(featured).slice(0, 8), urgent: urgent.sort((a, b) => freshness(b) - freshness(a)).slice(0, 8) };
+    const priceDrops = dropped.filter((l) => priceDropOf(l, now)).sort((a, b) => b.priceHistory[0].at.getTime() - a.priceHistory[0].at.getTime()).slice(0, 8);
+    return { featured: shuffle(featured).slice(0, 8), urgent: urgent.sort((a, b) => freshness(b) - freshness(a)).slice(0, 8), priceDrops };
+  }
+
+  /** Fiyat düşünce ilanı favorileyenlere (sahibi hariç) uygulama içi bildirim. */
+  async notifyPriceDrop(l: ListingRow, from: number) {
+    const favs = await this.prisma.favorite.findMany({ where: { listingId: l.id, userId: { not: l.ownerId } }, select: { userId: true } });
+    const params = { listingId: l.id, title: `${l.brand} ${l.model}`, from: String(from), to: String(l.price), currency: l.currency };
+    await Promise.all(favs.map((f) => this.notifications.push(f.userId, 'notif.priceDrop', params)));
   }
 
   /** Site haritası ve hazır arama sayfaları: yayındaki ilanlar + tip ve tip×şehir sayıları. */

@@ -97,7 +97,8 @@
     "favRemoved": "Removed from favourites",
     "safety": "Safety: never pay a deposit outside the platform or for a boat you haven't seen.",
     "pending": "This listing is pending approval; everyone will see it once published.",
-    "share": "Share"
+    "share": "Share",
+    "previousPrice": "Previous price {{price}}"
   },
   "usta": {
     "freeSurvey": "Free inspection",
@@ -270,7 +271,9 @@
     "requestTitle": "Can't find it?",
     "requestBody": "Leave a request and we'll let you know when a match arrives.",
     "sellTitle": "Want to sell your boat?",
-    "sellBody": "List for free or let us sell it for you."
+    "sellBody": "List for free or let us sell it for you.",
+    "priceDropsTitle": "Price drops",
+    "priceDropsBody": "Listings reduced in the last 30 days."
   },
   "assistant": {
     "label": "SMART ASSISTANT",
@@ -333,7 +336,8 @@
     "min": "Min",
     "max": "Max",
     "showResults": "Show results",
-    "location": "Location: {{loc}}"
+    "location": "Location: {{loc}}",
+    "dropOnly": "Price drops"
   },
   "valuation": {
     "title": "What's my boat worth?",
@@ -908,7 +912,8 @@
     "listingRejected": "Your listing was rejected: {{title}}",
     "newMessage": "New message: {{title}}",
     "reportReady": "Your survey report is ready · {{score}}/100",
-    "searchMatch": "New listing for your saved search: {{title}}"
+    "searchMatch": "New listing for your saved search: {{title}}",
+    "priceDrop": "A favourite dropped its price: {{title}}"
   },
   "notifs": {
     "title": "Notifications",
@@ -939,6 +944,7 @@
     "activeUrgent": "Urgent · {{n}} days",
     "trialWarning": "No real price set — trial price applies",
     "showcase": "Featured",
-    "noProducts": "Promotion isn't available right now"
+    "noProducts": "Promotion isn't available right now",
+    "priceDrop": "Price drop"
   }
 }

@@ -2,7 +2,7 @@ import { BOAT_TYPES, EQUIPMENT, parsedQuerySchema, type BoatType, type Equipment
 import { slugPart } from './format';
 
 export type Sort = 'new' | 'asc' | 'desc';
-export type SearchState = { q: ParsedQuery; sort: Sort; page: number; urgent: boolean };
+export type SearchState = { q: ParsedQuery; sort: Sort; page: number; urgent: boolean; drop?: boolean };
 type SP = Record<string, string | undefined>;
 
 export const TYPE_SLUGS = Object.fromEntries(BOAT_TYPES.map((t) => [t, t])) as Record<BoatType, string>;
@@ -29,7 +29,7 @@ export function searchParamsToQuery(sp: SP): SearchState {
   }
   const sort: Sort = sp.sira === 'asc' || sp.sira === 'desc' ? sp.sira : 'new';
   const p = Number(sp.sayfa);
-  return { q: q as ParsedQuery, sort, page: Number.isInteger(p) && p >= 1 && p <= 500 ? p : 1, urgent: sp.acil === '1' };
+  return { q: q as ParsedQuery, sort, page: Number.isInteger(p) && p >= 1 && p <= 500 ? p : 1, urgent: sp.acil === '1', drop: sp.dusen === '1' };
 }
 
 export function queryToSearchParams(s: SearchState): Record<string, string> {
@@ -38,7 +38,7 @@ export function queryToSearchParams(s: SearchState): Record<string, string> {
     tip: q.type, sehir: q.location, para: q.currency,
     minBoy: q.minLength?.toString(), maxBoy: q.maxLength?.toString(), minYil: q.minYear?.toString(), maxYil: q.maxYear?.toString(),
     maxFiyat: q.maxPrice?.toString(), donanim: q.equipment.length ? q.equipment.join(',') : undefined,
-    sira: s.sort === 'new' ? undefined : s.sort, sayfa: s.page > 1 ? String(s.page) : undefined, acil: s.urgent ? '1' : undefined,
+    sira: s.sort === 'new' ? undefined : s.sort, sayfa: s.page > 1 ? String(s.page) : undefined, acil: s.urgent ? '1' : undefined, dusen: s.drop ? '1' : undefined,
   };
   return Object.fromEntries(Object.entries(out).filter((e): e is [string, string] => e[1] !== undefined));
 }
@@ -47,6 +47,7 @@ export function queryToSearchParams(s: SearchState): Record<string, string> {
 export function apiListingsPath(s: SearchState) {
   const p = new URLSearchParams({ q: JSON.stringify(s.q), sort: s.sort, page: String(s.page) });
   if (s.urgent) p.set('urgent', '1');
+  if (s.drop) p.set('drop', '1');
   return `/listings?${p.toString()}`;
 }
 

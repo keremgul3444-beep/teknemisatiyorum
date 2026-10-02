@@ -4,6 +4,8 @@ export interface SeedListing {
   id: string; brand: string; model: string; year: number; lengthM: number; price: number; currency: Currency;
   type: BoatType; location: string; equipment: Equipment[]; badges: BadgeKind[]; sellerId: string;
   logbookCount: number; description: string; status: ListingStatus; photoSeed: number; cabins: number; engine: string;
+  /** Son 30 günde indirim yapıldıysa önceki fiyat ve indirim anı. */
+  priceDrop?: { previousPrice: number; at: string } | null;
 }
 
 type Row = [string, string, number, number, number, Currency, BoatType, string, Equipment[], BadgeKind[], number, string];
@@ -43,5 +45,6 @@ export const makeListings = (): SeedListing[] =>
     id: `l${i + 1}`, brand, model, year, lengthM, price, currency, type, location,
     equipment: [...equipment], badges: [...badges], cabins, engine,
     sellerId: SELLERS[i % SELLERS.length], logbookCount: (i * 7) % 19, status: 'yayinda', photoSeed: i,
+    priceDrop: i % 6 === 1 ? { previousPrice: Math.round(price * 1.08), at: new Date(Date.now() - (i + 1) * 864e5).toISOString() } : null,
     description: `${year} model ${brand} ${model}, ${location}'da bağlı. Düzenli bakımları yapılmış, kışlamaları çekekte geçirilmiş; ilk sahibinden ya da tek elden devralınmış, ekspertize açıktır.`,
   }));

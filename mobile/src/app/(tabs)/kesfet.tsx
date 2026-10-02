@@ -73,6 +73,7 @@ export default function Kesfet() {
           contentContainerStyle={{ gap: space(3) }} renderItem={({ item }) => <ListingCard listing={item} width={280} />} />
       </Section>
 
+      <PromoCard icon="chart" title={t('home.priceDropsTitle')} body={t('home.priceDropsBody')} onPress={() => router.push({ pathname: '/ilanlar', params: { dusen: '1' } })} />
       <PromoCard icon="chart" title={t('home.valuationTitle')} body={t('home.valuationBody')} onPress={() => router.push('/degerleme')} />
       <PromoCard icon="bell" title={t('home.requestTitle')} body={t('home.requestBody')} onPress={() => router.push('/aramalar')} />
       <PromoCard icon="briefcase" title={t('home.sellTitle')} body={t('home.sellBody')} onPress={() => router.push('/broker')} />

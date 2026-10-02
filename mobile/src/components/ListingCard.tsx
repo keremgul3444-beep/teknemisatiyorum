@@ -23,7 +23,7 @@ export function ListingCard({ listing: l, compact, width, missing, disabled }: {
         <View style={{ position: 'absolute', top: space(3), left: space(3), flexDirection: 'row', flexWrap: 'wrap', gap: space(1.5) }}>
           {l.status === 'onay-bekliyor' ? <Badge kind="beklemede" onDark /> : l.badges.slice(0, compact ? 1 : 2).map((b) => <Badge key={b} kind={b} onDark />)}
         </View>
-        <View style={{ position: 'absolute', bottom: space(3), left: space(3) }}><PromoBadges promo={l.promo} /></View>
+        <View style={{ position: 'absolute', bottom: space(3), left: space(3) }}><PromoBadges promo={l.promo} priceDrop={l.priceDrop} /></View>
       </BoatImage>
       <View style={{ paddingHorizontal: space(0.5), gap: space(0.5) }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: space(2) }}>

@@ -50,7 +50,8 @@
     "servicesTitle": "Buy and sell with confidence",
     "expertiseBody": "An independent surveyor reports on the boat; the listing gets a \"surveyed\" badge.",
     "brokerBody": "Let a professional broker handle your sale: pricing, buyers, transfer.",
-    "logbookBody": "Maintenance and repair history travels with your boat as verified records."
+    "logbookBody": "Maintenance and repair history travels with your boat as verified records.",
+    "priceDrops": "Price drops"
   },
   "seo": {
     "pageTitle": "{{title}} | teknemisatıyorum",
@@ -82,7 +83,8 @@
       "bump": "Your listing jumps back to the top of \"newest\""
     },
     "trialPrice": "Trial price",
-    "buy": "Buy"
+    "buy": "Buy",
+    "priceDrop": "Price drop"
   },
   "boatType": {
     "motoryat": "Motor yacht",
@@ -155,7 +157,8 @@
     "sortDesc": "Price: high to low",
     "equipment": "Equipment",
     "urgentOnly": "Urgent only",
-    "apply": "Apply"
+    "apply": "Apply",
+    "dropOnly": "Price drops"
   },
   "listings": {
     "title": "Boats for sale",
@@ -187,7 +190,8 @@
     "description": "Description",
     "similar": "Similar listings",
     "type": "Type",
-    "location": "Location"
+    "location": "Location",
+    "previousPrice": "Previous price {{price}}"
   },
   "gone": {
     "title": "This listing is no longer live",

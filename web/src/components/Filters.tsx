@@ -57,6 +57,10 @@ export function Filters({ locale, state, action }: { locale: Locale; state: Sear
             </span>
           ))}
           <span className="chip">
+            <input type="checkbox" id="f-dusen" name="dusen" value="1" defaultChecked={!!state.drop} />
+            <span style={{ marginLeft: 6 }}><label htmlFor="f-dusen" style={{ display: 'inline', textTransform: 'none', letterSpacing: 0, fontWeight: 400, color: 'inherit', fontSize: 14 }}>{t(locale, 'filters.dropOnly')}</label></span>
+          </span>
+          <span className="chip">
             <input type="checkbox" id="f-acil" name="acil" value="1" defaultChecked={state.urgent} />
             <span style={{ marginLeft: 6 }}><label htmlFor="f-acil" style={{ display: 'inline', textTransform: 'none', letterSpacing: 0, fontWeight: 400, color: 'inherit', fontSize: 14 }}>{t(locale, 'filters.urgentOnly')}</label></span>
           </span>

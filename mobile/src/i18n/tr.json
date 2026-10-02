@@ -97,7 +97,8 @@
     "favRemoved": "Favorilerden çıkarıldı",
     "safety": "Güvenlik: kapora ya da ödemeyi platform dışında, görmediğin tekne için yapma.",
     "pending": "Bu ilan onay bekliyor; yayına alınınca herkes görebilecek.",
-    "share": "Paylaş"
+    "share": "Paylaş",
+    "previousPrice": "Önceki fiyat {{price}}"
   },
   "usta": {
     "freeSurvey": "Keşif ücretsiz",
@@ -270,7 +271,9 @@
     "requestTitle": "Aradığını bulamadın mı?",
     "requestBody": "Talep bırak, uygun tekne gelince haber verelim.",
     "sellTitle": "Tekneni satmak mı istiyorsun?",
-    "sellBody": "Ücretsiz ilan ver ya da satışı bize bırak."
+    "sellBody": "Ücretsiz ilan ver ya da satışı bize bırak.",
+    "priceDropsTitle": "Fiyatı düşenler",
+    "priceDropsBody": "Son 30 günde fiyatı inen ilanlar."
   },
   "assistant": {
     "label": "AKILLI ASİSTAN",
@@ -333,7 +336,8 @@
     "min": "En az",
     "max": "En çok",
     "showResults": "Sonuçları göster",
-    "location": "Konum: {{loc}}"
+    "location": "Konum: {{loc}}",
+    "dropOnly": "Fiyatı düşenler"
   },
   "valuation": {
     "title": "Teknem kaç eder?",
@@ -908,7 +912,8 @@
     "listingRejected": "İlanın reddedildi: {{title}}",
     "newMessage": "Yeni mesaj: {{title}}",
     "reportReady": "Ekspertiz raporun hazır · {{score}}/100",
-    "searchMatch": "Kayıtlı aramana yeni ilan: {{title}}"
+    "searchMatch": "Kayıtlı aramana yeni ilan: {{title}}",
+    "priceDrop": "Favorindeki ilanın fiyatı düştü: {{title}}"
   },
   "notifs": {
     "title": "Bildirimler",
@@ -939,6 +944,7 @@
     "activeUrgent": "Acil · {{n}} gün",
     "trialWarning": "Gerçek fiyat girilmedi — deneme fiyatı geçerli",
     "showcase": "Vitrin",
-    "noProducts": "Öne çıkarma şu an kullanılamıyor"
+    "noProducts": "Öne çıkarma şu an kullanılamıyor",
+    "priceDrop": "Fiyat düştü"
   }
 }

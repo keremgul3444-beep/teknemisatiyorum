@@ -11,6 +11,7 @@ export interface ApiListing {
   seller: { id: string; name: string | null; since: number; companyName: string | null };
   logbook: { count: number; latest: ApiEntry[]; boatId?: string } | null; isMine: boolean;
   promo?: Promo;
+  priceDrop?: { previousPrice: number; at: string } | null;
 }
 /** Öne çıkarma ürünü (fiyatlar kuruş; site ve uygulama ayrı). */
 export interface ApiProduct {
@@ -49,6 +50,7 @@ export function toListing(l: ApiListing): Listing {
     photoUrls: l.photos.map((p) => absolute(p.url)), isMine: l.isMine, boatId: l.logbook?.boatId ?? null,
     logbookLatest: l.logbook?.latest.map(toEntry) ?? [], rejectReason: l.rejectReason ?? null,
     promo: l.promo ?? { featured: false, urgent: false },
+    priceDrop: l.priceDrop ?? null,
   };
 }
 

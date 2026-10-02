@@ -6,7 +6,7 @@ import { Errors } from '../../common/errors';
 import { prefsOf, type Prefs } from '../users/user.view';
 
 /** Kapatılabilen bildirim türleri; listede olmayanlar (ilan onayı, belge sonucu…) hizmet bildirimidir, hep gider. */
-const PREF_OF: Record<string, keyof Prefs> = { 'notif.newMessage': 'notifyMessages', 'notif.searchMatch': 'notifyMatches' };
+const PREF_OF: Record<string, keyof Prefs> = { 'notif.newMessage': 'notifyMessages', 'notif.searchMatch': 'notifyMatches', 'notif.priceDrop': 'notifyMatches' };
 
 /** Uygulama içi bildirimler; `key` bir çeviri anahtarıdır. Telefona düşen bildirimler sonraki tur. */
 @Injectable()

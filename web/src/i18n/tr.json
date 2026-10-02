@@ -50,7 +50,8 @@
     "servicesTitle": "Güvenle al, sat",
     "expertiseBody": "Bağımsız eksper teknenin durumunu raporlar; ilan \"ekspertizli\" rozeti alır.",
     "brokerBody": "Satışını profesyonel broker yürütsün: fiyatlama, alıcı bulma, devir.",
-    "logbookBody": "Bakım ve onarım geçmişi doğrulanmış kayıtlarla teknenle birlikte el değiştirir."
+    "logbookBody": "Bakım ve onarım geçmişi doğrulanmış kayıtlarla teknenle birlikte el değiştirir.",
+    "priceDrops": "Fiyatı düşenler"
   },
   "seo": {
     "pageTitle": "{{title}} | teknemisatıyorum",
@@ -82,7 +83,8 @@
       "bump": "İlanın \"en yeni\" sıralamada yeniden en üste çıkar"
     },
     "trialPrice": "Deneme fiyatı",
-    "buy": "Satın al"
+    "buy": "Satın al",
+    "priceDrop": "Fiyat düştü"
   },
   "boatType": {
     "motoryat": "Motoryat",
@@ -155,7 +157,8 @@
     "sortDesc": "Önce pahalı",
     "equipment": "Donanım",
     "urgentOnly": "Sadece acil",
-    "apply": "Uygula"
+    "apply": "Uygula",
+    "dropOnly": "Fiyatı düşenler"
   },
   "listings": {
     "title": "Satılık tekne ilanları",
@@ -187,7 +190,8 @@
     "description": "Açıklama",
     "similar": "Benzer ilanlar",
     "type": "Tip",
-    "location": "Konum"
+    "location": "Konum",
+    "previousPrice": "Önceki fiyat {{price}}"
   },
   "gone": {
     "title": "Bu ilan artık yayında değil",

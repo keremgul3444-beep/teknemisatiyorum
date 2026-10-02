@@ -193,9 +193,12 @@ model Listing {
   featuredUntil DateTime?
   urgentUntil   DateTime?
   bumpedAt      DateTime?
+  /// Herkese açık sayfanın ilan sahibi dışındakilerce açılma sayısı (satıcı istatistiği).
+  viewCount     Int            @default(0)
   photos        ListingPhoto[]
   favorites     Favorite[]
   orders        Order[]
+  priceHistory  PriceHistory[]
 
   @@index([status])
   @@index([ownerId])
@@ -207,6 +210,18 @@ model ListingPhoto {
   listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
   fileId    String
   order     Int
+}
+
+/// Fiyat değişikliği kaydı: `price` değişiklikten ÖNCEKİ fiyat, `at` değişiklik anı. Son kayıt bugünkü fiyattan yüksekse "fiyat düştü".
+model PriceHistory {
+  id        String   @id @default(cuid())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  price     Float
+  currency  Currency
+  at        DateTime @default(now())
+
+  @@index([listingId, at])
 }
 
 model Favorite {

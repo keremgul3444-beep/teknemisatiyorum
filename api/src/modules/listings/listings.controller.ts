@@ -26,7 +26,13 @@ const draftSchema = z.object({
   companyId: z.string().optional(),
   boatId: z.string().optional(),
 });
-const patchSchema = draftSchema.partial();
+// Kısmi güncellemede varsayılanlar uygulanmaz: yalnızca fiyat gönderen istek donanımı/açıklamayı silmesin.
+const patchSchema = draftSchema.partial().extend({
+  equipment: draftSchema.shape.equipment.unwrap().optional(),
+  cabins: draftSchema.shape.cabins.unwrap().optional(),
+  engine: draftSchema.shape.engine.unwrap().optional(),
+  description: draftSchema.shape.description.unwrap().optional(),
+});
 const photosSchema = z.object({ fileIds: z.array(z.string().min(1)).min(1).transform((a) => [...new Set(a)]) });
 const mineQuery = z.object({ status: z.enum(['draft', 'pending', 'published', 'rejected', 'sold', 'removed']).optional() });
 const searchQuery = z.object({
@@ -42,6 +48,7 @@ const searchQuery = z.object({
   sort: z.enum(['new', 'asc', 'desc']).default('new'),
   page: z.coerce.number().int().min(1).max(500).default(1),
   urgent: z.enum(['1']).optional(),
+  drop: z.enum(['1']).optional(),
 });
 
 @Controller()
@@ -56,7 +63,7 @@ export class ListingsController {
   @Public()
   @Get('listings')
   async search(@OptionalUser() u: AuthUser | undefined, @Query(new ZodPipe(searchQuery)) q: z.infer<typeof searchQuery>) {
-    const { rows, total, featuredTop } = await this.listings.search(q.q, q.sort, q.page, { urgentOnly: q.urgent === '1' });
+    const { rows, total, featuredTop } = await this.listings.search(q.q, q.sort, q.page, { urgentOnly: q.urgent === '1', dropOnly: q.drop === '1' });
     const view = (l: ListingRow) => this.listings.view(l, u?.id);
     return { items: await Promise.all(rows.map(view)), total, featuredTop: await Promise.all(featuredTop.map(view)) };
   }
@@ -67,7 +74,7 @@ export class ListingsController {
   async showcase(@OptionalUser() u: AuthUser | undefined) {
     const s = await this.listings.showcase();
     const view = (l: ListingRow) => this.listings.view(l, u?.id);
-    return { featured: await Promise.all(s.featured.map(view)), urgent: await Promise.all(s.urgent.map(view)) };
+    return { featured: await Promise.all(s.featured.map(view)), urgent: await Promise.all(s.urgent.map(view)), priceDrops: await Promise.all(s.priceDrops.map(view)) };
   }
 
   @Public()
@@ -110,9 +117,17 @@ export class ListingsController {
     if (['sold', 'removed'].includes(l.status)) throw Errors.conflict('LISTING_CLOSED');
     if (b.companyId) await this.assertMember(u.id, b.companyId);
     if (b.boatId) await this.assertOwnBoat(u.id, b.boatId);
-    // Yayındaki ya da reddedilmiş ilan düzenlenirse yeniden onaya düşer.
-    const status = l.status === 'published' || l.status === 'rejected' ? 'pending' : l.status;
-    const updated = await this.prisma.listing.update({ where: { id }, data: { ...b, status }, include: listingInclude });
+    // Yayındaki ya da reddedilmiş ilan düzenlenirse yeniden onaya düşer; yalnızca fiyat değişikliği onay istemez
+    // (indirim anında görünsün). Fiyat değişince önceki fiyat geçmişe yazılır; favorileyenler indirimden haber alır.
+    const priceOnly = Object.keys(b).every((k) => k === 'price');
+    const priceChanged = b.price !== undefined && b.price !== l.price;
+    const status = priceOnly ? l.status : l.status === 'published' || l.status === 'rejected' ? 'pending' : l.status;
+    await this.prisma.$transaction([
+      this.prisma.listing.update({ where: { id }, data: { ...b, status } }),
+      ...(priceChanged ? [this.prisma.priceHistory.create({ data: { listingId: id, price: l.price, currency: l.currency } })] : []),
+    ]);
+    const updated = await this.prisma.listing.findUniqueOrThrow({ where: { id }, include: listingInclude });
+    if (priceChanged && b.price! < l.price && updated.status === 'published') await this.listings.notifyPriceDrop(updated, l.price);
     return this.listings.view(updated, u.id);
   }
 

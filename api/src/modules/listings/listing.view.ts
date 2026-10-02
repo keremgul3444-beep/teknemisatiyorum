@@ -1,4 +1,4 @@
-import type { Listing, ListingPhoto, LogbookEntry, User } from '@prisma/client';
+import type { Listing, ListingPhoto, LogbookEntry, PriceHistory, User } from '@prisma/client';
 import { entryView } from '../boats/logbook.service';
 import { env } from '../../config/env';
 import { isActive } from '../promotions/promotion.rules';
@@ -7,12 +7,24 @@ export type ListingRow = Listing & {
   photos: ListingPhoto[];
   owner: Pick<User, 'id' | 'name' | 'createdAt' | 'deletedAt'>;
   boat: { id: string; entries: LogbookEntry[]; _count: { entries: number } } | null;
+  priceHistory: PriceHistory[];
 };
 export const listingInclude = {
   photos: { orderBy: { order: 'asc' as const } },
   owner: { select: { id: true, name: true, createdAt: true, deletedAt: true } },
   boat: { select: { id: true, _count: { select: { entries: true } }, entries: { orderBy: { date: 'desc' as const }, take: 2 } } },
+  priceHistory: { orderBy: { at: 'desc' as const }, take: 1 },
 };
+
+/** "Fiyat düştü" bu kadar gün görünür. */
+export const PRICE_DROP_DAYS = 30;
+
+/** Son fiyat değişikliği bir indirimse ve tazeyse: önceki fiyat ve indirim anı; değilse null. */
+export function priceDropOf(l: Pick<ListingRow, 'price' | 'currency' | 'priceHistory'>, now = new Date()) {
+  const h = l.priceHistory?.[0];
+  if (!h || h.currency !== l.currency || h.price <= l.price || now.getTime() - h.at.getTime() > PRICE_DROP_DAYS * 864e5) return null;
+  return { previousPrice: h.price, at: h.at.toISOString() };
+}
 
 /** İstemciye dönen ilan görünümü. Satıcının iletişim bilgisi bilerek yoktur; iletişim uygulama içi mesajla. */
 export function listingView(l: ListingRow, viewerId?: string, companyName?: string | null) {
@@ -33,6 +45,7 @@ export function listingView(l: ListingRow, viewerId?: string, companyName?: stri
     logbook: l.boat ? { count: l.boat._count.entries, latest: l.boat.entries.map(entryView), boatId: viewerId === l.ownerId ? l.boat.id : undefined } : null,
     /** Öne çıkarma durumu; bitiş tarihleri yalnızca sahibine (ne zaman yenileyeceğini bilsin). */
     promo: promoView(l, viewerId),
+    priceDrop: priceDropOf(l),
     isMine: !!viewerId && viewerId === l.ownerId,
     createdAt: l.createdAt, publishedAt: l.publishedAt,
   };

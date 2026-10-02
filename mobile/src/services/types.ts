@@ -11,6 +11,8 @@ export interface Listing {
   photoUrls?: string[]; rawStatus?: string; isMine?: boolean; boatId?: string | null; logbookLatest?: LogEntry[]; rejectReason?: string | null;
   /** Öne çıkarma: vitrin/acil etkin mi; bitiş tarihleri yalnızca ilan sahibine gelir. */
   promo?: Promo;
+  /** Son 30 günde indirim yapıldıysa önceki fiyat ve indirim anı. */
+  priceDrop?: { previousPrice: number; at: string } | null;
 }
 export interface Promo { featured: boolean; urgent: boolean; featuredUntil?: string; urgentUntil?: string }
 export type ListingDraft = Pick<Listing, 'brand' | 'model' | 'year' | 'lengthM' | 'price' | 'currency' | 'type' | 'location' | 'equipment' | 'cabins' | 'engine' | 'description'>;

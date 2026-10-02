@@ -44,6 +44,7 @@ a.chip:hover { border-color: var(--c-primary); text-decoration: none; }
 .pill.featured { background: var(--c-white); color: var(--c-primary); border: 1px solid var(--c-line); }
 .pill.urgent { background: var(--c-accent-soft); color: var(--c-accent-text); }
 .pill.soon { background: var(--c-accent-soft); color: var(--c-accent-text); }
+.pill.drop { background: var(--c-success); color: var(--c-white); }
 .lcard .pill.featured { border: 0; }
 .input {
   width: 100%; min-height: 44px; padding: 10px 12px; border-radius: var(--r-button); border: 1px solid var(--c-line);

@@ -13,19 +13,21 @@ type Sort = 'new' | 'asc' | 'desc';
 
 export default function Ilanlar() {
   const { t } = useTranslation();
-  const params = useLocalSearchParams<{ konum?: string }>();
+  const params = useLocalSearchParams<{ konum?: string; dusen?: string }>();
   const [query, setQuery] = useState<ParsedQuery>({ equipment: [], location: params.konum });
+  const [dropOnly, setDropOnly] = useState(params.dusen === '1');
   const [sort, setSort] = useState<Sort>('new');
   const [view, setView] = useState<'list' | 'map'>('list');
   const [sheet, setSheet] = useState(false);
   const listings = useListings();
 
   const results = useMemo(() => {
-    const r = matchListings(listings, query).exact;
+    const all = matchListings(listings, query).exact;
+    const r = dropOnly ? all.filter((l) => l.priceDrop) : all;
     if (sort === 'new') return r;
     const dir = sort === 'asc' ? 1 : -1;
     return [...r].sort((a, b) => dir * (toTRY(a.price, a.currency) - toTRY(b.price, b.currency)));
-  }, [listings, query, sort]);
+  }, [listings, query, sort, dropOnly]);
   const withoutLocation = useMemo(() => matchListings(listings, { ...query, location: undefined }).exact, [listings, query]);
 
   return (
@@ -45,6 +47,7 @@ export default function Ilanlar() {
           {([['new', 'sortNew'], ['asc', 'sortPriceAsc'], ['desc', 'sortPriceDesc']] as const).map(([k, label]) => (
             <Chip key={k} label={t(`listings.${label}`)} selected={sort === k} onPress={() => setSort(k)} />
           ))}
+          <Chip label={t('listings.dropOnly')} selected={dropOnly} onPress={() => setDropOnly((v) => !v)} />
         </View>
       )}
 
