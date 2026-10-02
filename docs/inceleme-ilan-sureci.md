@@ -154,3 +154,10 @@ Kalan: B9 tamamlandı; B14 (erişilebilirlik ayrıntıları), C17–C19, C21, D 
 - L5: Düzenleme, fotoğraf değişikliği, satıldı ve yayından kaldırma denetim kaydına yazılıyor.
 - L8: İlanın firma bağı `companyId: null` ile kaldırılabiliyor.
 - Açık kalanlar: kopya veya çalıntı fotoğraf tespiti, ilan süresi ve yenileme.
+
+## B14 erişilebilirlik ile kapatılanlar (2026-10-02)
+
+- Zorunlu alanda ekran okuyucu yıldızı ve görünen etiketi ayrıca okumuyor; kutunun adı "Marka, zorunlu", hata ya da açıklama ipucu olarak okunuyor.
+- Belge yükleme kutusu düğme olarak ve durumuyla okunuyor ("Ruhsat, Eklendi").
+- Sihirbazda belge, gönderimden önce "İncelemede" değil "Eklendi" görünüyor; inceleme gönderimle başlıyor.
+- Fotoğraflar "Fotoğraf 1 / 5, kapak" diye okunuyor.

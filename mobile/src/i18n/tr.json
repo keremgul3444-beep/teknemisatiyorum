@@ -31,7 +31,8 @@
     "clear": "Temizle",
     "all": "Tümü",
     "send": "Gönder",
-    "prototype": "Prototip"
+    "prototype": "Prototip",
+    "added": "Eklendi"
   },
   "tabs": {
     "kesfet": "Keşfet",
@@ -454,7 +455,7 @@
     "moveRight": "Sağa al",
     "removePhoto": "Sil",
     "removeConfirm": "Bu fotoğraf silinsin mi?",
-    "photoLabel": "Fotoğraf {{n}}",
+    "photoLabel": "Fotoğraf {{n}} / {{total}}",
     "engineHours": "Motor saati",
     "engineHoursHint": "Alıcıların ilk sorduğu bilgi. Bilmiyorsan boş bırak.",
     "flag": "Bayrak",
@@ -487,7 +488,8 @@
     "editNothing": "Değişiklik yok",
     "editReviewNote": "Fiyat dışındaki değişiklikler onaya gider. Onaylanana kadar (genelde 2 saat) ilan yayında görünmez.",
     "verifyBanner": "İlanı yayınlamak için kimliğini doğrulaman gerekiyor. Şimdi doğrularsan sonda beklemezsin.",
-    "verifyBannerCta": "Kimliğini doğrula"
+    "verifyBannerCta": "Kimliğini doğrula",
+    "photoLabelCover": "Fotoğraf {{n}} / {{total}}, kapak"
   },
   "boatAdd": {
     "title": "Tekne ekle",

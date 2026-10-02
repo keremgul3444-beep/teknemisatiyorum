@@ -270,7 +270,7 @@ export default function IlanVer() {
           <View style={row}>
             {s.photos.map((p, i) => (
               <Pressable key={p.id} onPress={() => { setSelected(selected === p.id ? null : p.id); setConfirmRemove(false); }}
-                accessibilityRole="button" accessibilityLabel={t('wizard.photoLabel', { n: i + 1 })} accessibilityState={{ selected: selected === p.id }}
+                accessibilityRole="button" accessibilityLabel={t(i === 0 ? 'wizard.photoLabelCover' : 'wizard.photoLabel', { n: i + 1, total: s.photos.length })} accessibilityState={{ selected: selected === p.id }}
                 style={{ width: '31.5%', aspectRatio: 1, borderRadius: radius.button, overflow: 'hidden', borderWidth: selected === p.id ? 3 : 0, borderColor: colors.primary }}>
                 <View style={{ position: 'absolute', inset: 0 }}><BoatImage seed={p.seed} height={200} uri={p.uri} /></View>
                 {i === 0 ? (
@@ -384,7 +384,7 @@ export default function IlanVer() {
             <Icon name="lock" size={18} color={colors.primary} />
             <T variant="caption" style={{ flex: 1 }}>{t('wizard.docsPrivacy')}</T>
           </View>
-          <UploadBox label={t('wizard.docLabel')} state={s.doc ? 'incelemede' : 'bos'} onPress={async () => {
+          <UploadBox label={t('wizard.docLabel')} state={s.doc ? 'eklendi' : 'bos'} onPress={async () => {
             if (isApiMode()) {
               const uri = await pickImage();
               if (!uri) return;
@@ -393,7 +393,7 @@ export default function IlanVer() {
             update({ doc: true });
           }} />
           {/* Motor seri numarası ruhsatla birlikte incelenir; ruhsat yokken tek başına gönderilmez. */}
-          {s.doc ? <UploadBox label={t('wizard.engineDocLabel')} state={s.engineDoc ? 'incelemede' : 'bos'} onPress={async () => {
+          {s.doc ? <UploadBox label={t('wizard.engineDocLabel')} state={s.engineDoc ? 'eklendi' : 'bos'} onPress={async () => {
             if (isApiMode()) {
               const uri = await pickImage();
               if (!uri) return;

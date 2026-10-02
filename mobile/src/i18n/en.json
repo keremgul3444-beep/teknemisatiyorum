@@ -31,7 +31,8 @@
     "clear": "Clear",
     "all": "All",
     "send": "Send",
-    "prototype": "Prototype"
+    "prototype": "Prototype",
+    "added": "Added"
   },
   "tabs": {
     "kesfet": "Explore",
@@ -454,7 +455,7 @@
     "moveRight": "Move right",
     "removePhoto": "Delete",
     "removeConfirm": "Delete this photo?",
-    "photoLabel": "Photo {{n}}",
+    "photoLabel": "Photo {{n}} of {{total}}",
     "engineHours": "Engine hours",
     "engineHoursHint": "The first thing buyers ask. Leave empty if unknown.",
     "flag": "Flag",
@@ -487,7 +488,8 @@
     "editNothing": "No changes",
     "editReviewNote": "Changes other than the price go to review. Until approved (usually within 2 hours) the listing is not visible.",
     "verifyBanner": "You need to verify your ID to publish. Do it now so you are not held up at the end.",
-    "verifyBannerCta": "Verify ID"
+    "verifyBannerCta": "Verify ID",
+    "photoLabelCover": "Photo {{n}} of {{total}}, cover"
   },
   "boatAdd": {
     "title": "Add a boat",
