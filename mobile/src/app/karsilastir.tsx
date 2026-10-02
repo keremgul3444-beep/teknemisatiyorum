@@ -55,9 +55,10 @@ export default function Karsilastir() {
               ))}
             </View>
           ))}
-          <T variant="caption" color={colors.muted} style={{ marginTop: space(3) }}>{t('compare.legend')}</T>
         </View>
       </ScrollView>
+      {/* Açıklama yana kayan tablonun dışında: ekran genişliğinde sarar. */}
+      <T variant="caption" color={colors.muted} style={{ paddingHorizontal: space(5), paddingBottom: space(6) }}>{t('compare.legend')}</T>
     </Screen>
   );
 }
