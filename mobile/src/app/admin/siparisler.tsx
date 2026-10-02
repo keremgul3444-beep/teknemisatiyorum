@@ -24,7 +24,9 @@ export default function AdminSiparisler() {
     setListingId(''); setNote('');
     await orders.reload();
   });
-  const refund = (id: string) => attempt(async () => { await actions.adminRefund(id); await orders.reload(); });
+  // İade geri alınamaz: önce aynı kartta onay sorulur.
+  const [confirming, setConfirming] = useState<string | null>(null);
+  const refund = (id: string) => attempt(async () => { await actions.adminRefund(id); setConfirming(null); await orders.reload(); });
   const rows = orders.data ?? [];
   return (
     <AdminPage>
@@ -50,9 +52,18 @@ export default function AdminSiparisler() {
             </View>
             <View style={{ alignItems: 'flex-end', gap: space(1) }}>
               <T variant="h3">{formatKurus(o.amountKurus, currentLang())}</T>
-              {o.status === 'paid' ? <Button small variant="ghost" title={t('admin.refund')} onPress={() => refund(o.id)} /> : null}
+              {o.status === 'paid' && confirming !== o.id ? <Button small variant="ghost" title={t('admin.refund')} onPress={() => setConfirming(o.id)} /> : null}
             </View>
           </View>
+          {o.status === 'paid' && confirming === o.id ? (
+            <View style={{ gap: space(2), marginTop: space(2) }}>
+              <T variant="caption">{t('admin.refundConfirm')}</T>
+              <View style={{ flexDirection: 'row', gap: space(2) }}>
+                <View style={{ flex: 1 }}><Button small variant="ghost" title={t('common.cancel')} onPress={() => setConfirming(null)} /></View>
+                <View style={{ flex: 1 }}><Button small variant="danger" title={t('admin.refundYes')} onPress={() => refund(o.id)} /></View>
+              </View>
+            </View>
+          ) : null}
         </Card>
       ))}
     </AdminPage>

@@ -827,7 +827,9 @@
       "ios": "iPhone",
       "android": "Android",
       "manual": "Havale"
-    }
+    },
+    "refundConfirm": "Bu sipariş iade edilsin mi? Siparişle eklenen öne çıkarma süresi geri alınır. Bu işlem geri alınamaz.",
+    "refundYes": "Evet, iade et"
   },
   "audit": {
     "listingApproved": "İlan onaylandı: {{title}}",

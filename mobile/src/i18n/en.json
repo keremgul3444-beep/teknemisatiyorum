@@ -827,7 +827,9 @@
       "ios": "iPhone",
       "android": "Android",
       "manual": "Bank transfer"
-    }
+    },
+    "refundConfirm": "Refund this order? The promotion time added by it is taken back. This can't be undone.",
+    "refundYes": "Yes, refund"
   },
   "audit": {
     "listingApproved": "Listing approved: {{title}}",
