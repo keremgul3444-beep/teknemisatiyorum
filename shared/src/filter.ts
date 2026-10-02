@@ -17,7 +17,7 @@ export type Equipment = (typeof EQUIPMENT)[number];
 export type Flag = (typeof FLAGS)[number];
 export type UstaCategory = (typeof USTA_CATEGORIES)[number];
 export type BadgeKind = 'ekspertizli' | 'sahiplik' | 'broker' | 'belge';
-export type ListingStatus = 'yayinda' | 'onay-bekliyor' | 'satildi';
+export type ListingStatus = 'yayinda' | 'onay-bekliyor' | 'reddedildi' | 'satildi';
 
 const pos = z.number().finite().positive().max(1e9);
 const year = z.number().int().min(1900).max(2100);

@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { t } from 'i18next';
 import type {
   AdminItem, AdminStatus, AuditEntry, Boat, BoatInput, BrokerCase, CaptainBooking, Company, Conversation, ExpertiseBooking,
-  ExpertisePackage, Job, JobInput, Listing, ListingDraft, Provider, SavedSearch, Seller, SubjectKind,
+  ExpertisePackage, Job, JobInput, Listing, ListingDraft, Provider, RejectReason, SavedSearch, Seller, SubjectKind,
 } from './types';
 import { makeListings } from '@tms/shared';
 import { makeProviders } from '@/mocks/providers';
@@ -36,7 +36,7 @@ export interface Actions {
   sharePhone(convId: string): void;
   markRead(convId: string): void;
   startConversation(subject: { kind: SubjectKind; id: string; title: string }, withName: string): string;
-  setAdminStatus(id: string, status: AdminStatus): void;
+  setAdminStatus(id: string, status: AdminStatus, reason?: RejectReason): void;
   resetDemo(): void;
 }
 
@@ -75,7 +75,15 @@ export const useStore = create<Data & Actions>((set, get) => {
       };
       set({
         listings: [listing, ...get().listings],
-        adminItems: [{ id: nextId('a'), kind: 'ilan', title: `${d.brand} ${d.model}`, who: DEMO_USER.name, status: 'bekliyor', refId: id }, ...get().adminItems],
+        adminItems: [{
+          id: nextId('a'), kind: 'ilan', title: `${d.brand} ${d.model}`, who: DEMO_USER.name, status: 'bekliyor', refId: id,
+          // Moderatör demo modunda da ilanın tamamını görür.
+          listing: {
+            year: d.year, price: d.price, currency: d.currency, lengthM: d.lengthM, type: d.type, location: d.location, cabins: d.cabins,
+            engine: d.engine, engineHours: d.engineHours ?? null, flag: d.flag ?? null, tradeIn: !!d.tradeIn, negotiable: !!d.negotiable,
+            equipment: d.equipment, description: d.description, ownerVerifyLevel: 2,
+          },
+        }, ...get().adminItems],
       });
       return id;
     },
@@ -187,12 +195,13 @@ export const useStore = create<Data & Actions>((set, get) => {
       return id;
     },
 
-    setAdminStatus(id, status) {
+    setAdminStatus(id, status, reason = 'rules') {
       const item = get().adminItems.find((a) => a.id === id);
       if (!item) return;
       set({ adminItems: get().adminItems.map((a) => (a.id === id ? { ...a, status } : a)) });
-      if (item.kind === 'ilan' && item.refId && status === 'onaylandi') {
-        set({ listings: get().listings.map((l) => (l.id === item.refId ? { ...l, status: 'yayinda' } : l)) });
+      if (item.kind === 'ilan' && item.refId && status !== 'bekliyor') {
+        const next = status === 'onaylandi' ? { status: 'yayinda' as const, rejectReason: null } : { status: 'reddedildi' as const, rejectReason: reason };
+        set({ listings: get().listings.map((l) => (l.id === item.refId ? { ...l, ...next } : l)) });
       }
       if (item.kind === 'belge' && item.refId && status === 'onaylandi') {
         set({ providers: get().providers.map((p) => (p.id === item.refId ? { ...p, verified: true } : p)) });

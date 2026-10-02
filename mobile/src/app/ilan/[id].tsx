@@ -86,6 +86,13 @@ export default function IlanDetay() {
               <T variant="caption" color={colors.accentText} style={{ fontFamily: fonts.bodySemi }}>{t('listing.pending')}</T>
             </View>
           ) : null}
+          {l.status === 'reddedildi' && (l.isMine || l.sellerId === 'me') ? (
+            <View style={{ backgroundColor: colors.surface, borderRadius: radius.button, padding: space(3), gap: space(1), borderLeftWidth: 3, borderLeftColor: colors.danger }}>
+              <T variant="caption" color={colors.danger} style={{ fontFamily: fonts.bodyBold }}>{t('listing.rejectedTitle')}</T>
+              <T variant="caption">{t(`mine.rejectReasons.${l.rejectReason ?? 'rules'}`)}</T>
+              <T variant="caption" color={colors.muted}>{t('listing.rejectedBody')}</T>
+            </View>
+          ) : null}
           <View style={{ gap: space(2.5) }}>
             {l.badges.length ? <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space(1.5) }}>{l.badges.map((b) => <Badge key={b} kind={b} />)}</View> : null}
             <View style={{ gap: space(1) }}>
@@ -166,7 +173,7 @@ export default function IlanDetay() {
                   <T variant="h3">{seller?.name ?? '—'}</T>
                   <T variant="caption" color={colors.muted}>{seller?.companyId ? t('listing.company') : t('listing.memberSince', { year: seller?.since ?? 2024 })}</T>
                 </View>
-                <Badge kind="dogrulanmis" />
+                {seller?.verified ? <Badge kind="dogrulanmis" /> : null}
               </View>
             </Card>
           </Section>
@@ -177,10 +184,15 @@ export default function IlanDetay() {
         </View>
       </ScrollView>
       <View style={{ flexDirection: 'row', gap: space(3), padding: space(4), borderTopWidth: 1, borderColor: colors.line, backgroundColor: colors.card }}>
+        {/* Satılmış teknede alıcıya mesaj ve ekspertiz sunulmaz. */}
+        {l.status === 'satildi' && !(l.isMine || l.sellerId === 'me') ? (
+          <T variant="bodySemi" color={colors.muted} style={{ flex: 1, textAlign: 'center', paddingVertical: space(3) }}>{t('listing.soldNote')}</T>
+        ) : (<>
         <View style={{ flex: 1 }}><Button variant="ghost" icon="clipboard" title={t('listing.requestExpertise')} onPress={() => router.push({ pathname: '/ekspertiz', params: { ilan: l.id } })} /></View>
         <View style={{ flex: 1 }}>{l.isMine || l.sellerId === 'me'
           ? <Button variant="secondary" icon="anchor" title={t('profile.listings')} onPress={() => router.push('/profil/ilanlarim')} />
           : <Button icon="mail" title={t('listing.message')} onPress={message} />}</View>
+        </>)}
       </View>
     </SafeAreaView>
   );

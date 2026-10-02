@@ -65,8 +65,22 @@ export interface AdminItem {
   id: string; kind: 'ilan' | 'belge'; title: string; who: string; status: AdminStatus; refId?: string;
   /** Gerçek modda moderatörün görmesi gerekenler: ilan fotoğrafları, korumalı belge kimlikleri, pasaport bilgileri. */
   photos?: string[]; fileIds?: string[]; details?: Record<string, unknown> | null;
+  /** İlan kararı bu sürüme bağlanır; satıcı o arada değiştirirse sunucu kararı reddeder. */
+  version?: string;
+  /** Yayına çıkacak ilan içeriği (moderatör onaylamadan önce tamamını görür). */
+  listing?: AdminListingInfo;
+}
+export type RejectReason = 'blurry' | 'mismatch' | 'rules';
+export interface AdminListingInfo {
+  year: number; price: number; currency: Currency; lengthM: number; type: BoatType; location: string; cabins: number;
+  engine: string; engineHours: number | null; flag: Flag | null; tradeIn: boolean; negotiable: boolean; equipment: Equipment[];
+  description: string; ownerVerifyLevel: number;
 }
 /** İşlem kaydı dile bağlı metin değil, çeviri anahtarı + parametre taşır. */
 export interface AuditEntry { id: string; at: string; who: string; key: string; params?: Record<string, string> }
-export interface Seller { id: string; name: string; since: number; companyId?: string; companyName?: string | null }
+export interface Seller {
+  id: string; name: string; since: number; companyId?: string; companyName?: string | null;
+  /** Kimliğini doğrulattı mı; "Doğrulanmış" rozeti yalnızca bu durumda. */
+  verified?: boolean;
+}
 export type Role = 'bireysel' | 'usta' | 'kaptan' | 'kurumsal' | 'yonetici';

@@ -9,7 +9,7 @@ export default function AdminIlanlar() {
   return (
     <AdminPage>
       {items.length === 0 ? <EmptyState icon="check" title={t('admin.empty')} /> : items.map((i) => (
-        <ApprovalRow key={i.id} item={i} onDecide={(s) => attempt(() => actions.setAdminStatus(i.id, s))} />
+        <ApprovalRow key={i.id} item={i} onDecide={(s, r) => attempt(() => actions.setAdminStatus(i.id, s, r))} />
       ))}
     </AdminPage>
   );

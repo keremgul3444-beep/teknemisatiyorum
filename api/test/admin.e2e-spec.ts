@@ -76,15 +76,16 @@ describe('yönetim', () => {
     const l = await pendingListing(owner.user.id);
     const m = await moderator();
     const q = await t.http().get('/admin/queue?kind=listing').set(m.auth);
-    expect(q.body.map((x: { id: string }) => x.id)).toContain(l.id);
-    const r = await t.http().post(`/admin/listings/${l.id}/decision`).set(m.auth).send({ decision: 'approve' });
+    const item = q.body.find((x: { id: string }) => x.id === l.id);
+    expect(item).toBeTruthy();
+    const r = await t.http().post(`/admin/listings/${l.id}/decision`).set(m.auth).send({ decision: 'approve', version: item.version });
     expect(r.status).toBe(200);
     const row = await t.prisma.listing.findUnique({ where: { id: l.id } });
     expect(row).toMatchObject({ status: 'published' });
     expect(row!.publishedAt).toBeTruthy();
     expect(await t.prisma.notification.count({ where: { userId: owner.user.id, key: 'notif.listingApproved' } })).toBe(1);
     expect(await t.prisma.auditLog.count({ where: { action: 'audit.listingApproved', targetId: l.id } })).toBe(1);
-    const again = await t.http().post(`/admin/listings/${l.id}/decision`).set(m.auth).send({ decision: 'reject', reason: 'rules' });
+    const again = await t.http().post(`/admin/listings/${l.id}/decision`).set(m.auth).send({ decision: 'reject', reason: 'rules', version: item.version });
     expect(again.status).toBe(409);
     expect(again.body.code).toBe('ALREADY_DECIDED');
   });
@@ -94,8 +95,37 @@ describe('yönetim', () => {
     const l = await pendingListing(owner.user.id);
     const m = await moderator();
     expect((await t.http().post(`/admin/listings/${l.id}/decision`).set(m.auth).send({ decision: 'reject' })).status).toBe(400);
-    expect((await t.http().post(`/admin/listings/${l.id}/decision`).set(m.auth).send({ decision: 'reject', reason: 'rules' })).status).toBe(200);
-    expect((await t.prisma.listing.findUnique({ where: { id: l.id } }))!).toMatchObject({ status: 'rejected', rejectReason: 'rules' });
+    expect((await t.http().post(`/admin/listings/${l.id}/decision`).set(m.auth).send({ decision: 'reject', reason: 'mismatch', version: l.updatedAt.toISOString() })).status).toBe(200);
+    expect((await t.prisma.listing.findUnique({ where: { id: l.id } }))!).toMatchObject({ status: 'rejected', rejectReason: 'mismatch' });
+  });
+
+  test('kuyruk yayına çıkacak her şeyi taşır: açıklama, konum, yeni alanlar, satıcı seviyesi', async () => {
+    const owner = await loginAs(t, { level: 2 });
+    const l = await pendingListing(owner.user.id, { description: 'Kaporayı IBAN TR00 hesabına yatırın', engineHours: 850, flag: 'tr', tradeIn: true });
+    const m = await moderator();
+    const item = (await t.http().get('/admin/queue?kind=listing').set(m.auth)).body.find((x: { id: string }) => x.id === l.id);
+    expect(item).toMatchObject({
+      description: 'Kaporayı IBAN TR00 hesabına yatırın', location: 'Çeşme', lengthM: 12.4, type: 'yelkenli',
+      engineHours: 850, flag: 'tr', tradeIn: true, negotiable: false, ownerVerifyLevel: 2, version: l.updatedAt.toISOString(),
+    });
+  });
+
+  test('karar moderatörün gördüğü sürüme bağlı: satıcı arada değiştirirse onay yazılmaz', async () => {
+    const owner = await loginAs(t, { level: 2 });
+    const l = await pendingListing(owner.user.id);
+    const m = await moderator();
+    const seen = (await t.http().get('/admin/queue?kind=listing').set(m.auth)).body.find((x: { id: string }) => x.id === l.id).version;
+    // Moderatör bakarken satıcı açıklamaya iletişim bilgisi ekler.
+    await t.http().patch(`/listings/${l.id}`).set(owner.auth).send({ description: 'WhatsApp 0555 000 00 00' }).expect(200);
+    const r = await t.http().post(`/admin/listings/${l.id}/decision`).set(m.auth).send({ decision: 'approve', version: seen });
+    expect(r.status).toBe(409);
+    expect(r.body.code).toBe('LISTING_CHANGED');
+    expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } })).status).toBe('pending');
+    const noVersion = await t.http().post(`/admin/listings/${l.id}/decision`).set(m.auth).send({ decision: 'approve' });
+    expect(noVersion.status).toBe(400);
+    expect(noVersion.body.code).toBe('VERSION_REQUIRED');
+    const fresh = (await t.http().get('/admin/queue?kind=listing').set(m.auth)).body.find((x: { id: string }) => x.id === l.id).version;
+    expect((await t.http().post(`/admin/listings/${l.id}/decision`).set(m.auth).send({ decision: 'reject', reason: 'rules', version: fresh })).status).toBe(200);
   });
 
   test('ruhsat onayı ilana sahiplik rozeti; usta belgesi onayı seviye 3', async () => {

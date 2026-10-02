@@ -10,18 +10,23 @@ import { daysLeft } from '@/features/promo';
 export default function Ilanlarim() {
   const { t } = useTranslation();
   const mine = useListings().filter((l) => l.sellerId === 'me' || l.isMine);
-  const [tab, setTab] = useState<ListingStatus>(mine.some((l) => l.status === 'onay-bekliyor') ? 'onay-bekliyor' : 'yayinda');
+  // Önce satıcının ilgilenmesi gereken durum açılır: reddedilen, sonra onay bekleyen.
+  const [tab, setTab] = useState<ListingStatus>(mine.some((l) => l.status === 'reddedildi') ? 'reddedildi'
+    : mine.some((l) => l.status === 'onay-bekliyor') ? 'onay-bekliyor' : 'yayinda');
   const list = mine.filter((l) => l.status === tab);
   return (
     <Screen>
       <Header title={t('profile.listings')} />
       <Segmented value={tab} onChange={setTab} options={[
-        { key: 'yayinda', label: t('mine.live') }, { key: 'onay-bekliyor', label: t('mine.pending') }, { key: 'satildi', label: t('mine.sold') },
+        { key: 'yayinda', label: t('mine.live') }, { key: 'onay-bekliyor', label: t('mine.pending') },
+        ...(mine.some((l) => l.status === 'reddedildi') ? [{ key: 'reddedildi' as const, label: t('mine.rejected') }] : []),
+        { key: 'satildi', label: t('mine.sold') },
       ]} />
       {list.length === 0 ? <EmptyState icon="anchor" title={t('mine.empty')} actionLabel={t('mine.post')} onAction={() => router.push('/ilan-ver')} />
         : list.map((l) => (
           <View key={l.id} style={{ gap: space(2) }}>
             <ListingCard listing={l} />
+            {l.status === 'reddedildi' ? <T variant="caption" color={colors.danger}>{t(`mine.rejectReasons.${l.rejectReason ?? 'rules'}`)}</T> : null}
             {l.stats ? <StatsRow stats={l.stats} /> : null}
             {l.status === 'yayinda' && isApiMode() ? <PromoRow listing={l} /> : null}
           </View>

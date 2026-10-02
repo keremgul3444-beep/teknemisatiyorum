@@ -18,11 +18,11 @@ export const ADMIN_USERS: { name: string; role: Role; level: number; phone: stri
 ];
 
 export const makeSellers = (): Seller[] => [
-  { id: 'u1', name: 'Ahmet K.', since: 2021 },
-  { id: 'u2', name: 'Elif S.', since: 2023 },
-  { id: 'u3', name: 'Mert A.', since: 2022 },
+  { id: 'u1', name: 'Ahmet K.', since: 2021, verified: true },
+  { id: 'u2', name: 'Elif S.', since: 2023, verified: true },
+  { id: 'u3', name: 'Mert A.', since: 2022, verified: true },
   { id: 'u4', name: 'Canan T.', since: 2024 },
-  { id: 'u5', name: 'Oğuz B.', since: 2020 },
+  { id: 'u5', name: 'Oğuz B.', since: 2020, verified: true },
   { id: 'u6', name: 'Derya M.', since: 2025 },
   { id: 'c1', name: 'Mavi Koy Yatçılık', since: 2019, companyId: 'c1' },
   { id: 'c2', name: 'Ege Tekne Galerisi', since: 2020, companyId: 'c2' },

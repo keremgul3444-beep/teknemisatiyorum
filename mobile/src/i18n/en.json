@@ -46,7 +46,8 @@
     "broker": "Broker assured",
     "dogrulanmis": "Verified",
     "beklemede": "Pending approval",
-    "belge": "Documents match"
+    "belge": "Documents match",
+    "reddedildi": "Rejected"
   },
   "boatType": {
     "motoryat": "Motor yacht",
@@ -106,7 +107,10 @@
     "flagTr": "Turkish flag",
     "flagForeign": "Foreign flag",
     "tradeIn": "Open to trade-in",
-    "negotiable": "Price negotiable"
+    "negotiable": "Price negotiable",
+    "rejectedTitle": "Your listing was not published",
+    "rejectedBody": "Fix the issue and post the listing again.",
+    "soldNote": "This boat has been sold"
   },
   "usta": {
     "freeSurvey": "Free inspection",
@@ -744,7 +748,13 @@
     "views": "{{n}} views",
     "favorites": "{{n}} favourites",
     "messages": "{{n}} messages",
-    "transfer": "Transfer assistant"
+    "transfer": "Transfer assistant",
+    "rejected": "Rejected",
+    "rejectReasons": {
+      "blurry": "Reason: photos or document are not legible.",
+      "mismatch": "Reason: details do not match the photos or document.",
+      "rules": "Reason: content breaks listing rules (e.g. phone number, IBAN or another boat’s photos)."
+    }
   },
   "settings": {
     "title": "Settings",
@@ -857,7 +867,7 @@
     "reject": "Reject",
     "rejectReason": "Choose a rejection reason",
     "reasons": {
-      "blurry": "Document unreadable",
+      "blurry": "Photos or document not legible",
       "mismatch": "Details don't match",
       "rules": "Violates listing rules"
     },
@@ -920,7 +930,10 @@
       "manual": "Bank transfer"
     },
     "refundConfirm": "Refund this order? The promotion time added by it is taken back. This can't be undone.",
-    "refundYes": "Yes, refund"
+    "refundYes": "Yes, refund",
+    "sellerLevel": "Seller",
+    "sellerVerified": "ID verified",
+    "sellerUnverified": "ID not verified"
   },
   "audit": {
     "listingApproved": "Listing approved: {{title}}",
@@ -985,7 +998,9 @@
     "bad_receipt": "Invalid purchase receipt",
     "amount_mismatch": "Payment amount does not match the order",
     "not_refundable": "This order can't be refunded",
-    "receipt_used": "This purchase was already used"
+    "receipt_used": "This purchase was already used",
+    "listing_changed": "The seller changed this listing while you were reviewing it. Check the current version and decide again.",
+    "version_required": "Update the app: decisions cannot be sent without the listing version."
   },
   "soon": {
     "title": "Coming soon",

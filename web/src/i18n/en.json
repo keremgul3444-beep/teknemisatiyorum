@@ -199,7 +199,8 @@
     "flagTr": "Turkish flag",
     "flagForeign": "Foreign flag",
     "tradeIn": "Open to trade-in",
-    "negotiable": "Price negotiable"
+    "negotiable": "Price negotiable",
+    "soldNote": "This boat has been sold"
   },
   "gone": {
     "title": "This listing is no longer live",
@@ -475,7 +476,9 @@
     "bad_receipt": "Invalid purchase receipt",
     "amount_mismatch": "Payment amount does not match the order",
     "not_refundable": "This order can't be refunded",
-    "receipt_used": "This purchase was already used"
+    "receipt_used": "This purchase was already used",
+    "listing_changed": "The seller changed this listing while you were reviewing it. Check the current version and decide again.",
+    "version_required": "Update the app: decisions cannot be sent without the listing version."
   },
   "login": {
     "title": "Log in",

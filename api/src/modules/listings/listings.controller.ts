@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, HttpCode, Ip, Param, Patch, Post, Put, Query } from '@nestjs/common';
 import { z } from 'zod';
 import { BOAT_TYPES, CURRENCIES, EQUIPMENT, FLAGS, MAX_ENGINE_HOURS, normalizeLocation, parsedQuerySchema } from '@tms/shared';
 import { Auth, CurrentUser, OptionalUser, Public, type AuthUser } from '../../common/decorators';
@@ -41,6 +41,12 @@ const patchSchema = draftSchema.partial().extend({
   tradeIn: draftSchema.shape.tradeIn.unwrap().optional(),
   negotiable: draftSchema.shape.negotiable.unwrap().optional(),
 });
+/** Bu alanlardan biri değişirse ilan başka bir tekneyi anlatıyor olabilir. */
+const IDENTITY_FIELDS = ['brand', 'model', 'year', 'lengthM', 'boatId'] as const;
+/** Tekneye bağlı (belge/ekspertizle kazanılan) rozetler; satıcının kendi beyanına dayananlar değil. */
+const BOAT_BOUND_BADGES = ['sahiplik', 'belge', 'ekspertizli'];
+/** Bu başlıkla gelen okuma görüntülenme sayılmaz (sitenin ara katmanı ve sayfa önbelleği). */
+export const NO_COUNT_HEADER = 'x-tms-no-count';
 const photosSchema = z.object({ fileIds: z.array(z.string().min(1)).min(1).transform((a) => [...new Set(a)]) });
 const mineQuery = z.object({ status: z.enum(['draft', 'pending', 'published', 'rejected', 'sold', 'removed']).optional() });
 const searchQuery = z.object({
@@ -93,11 +99,21 @@ export class ListingsController {
 
   @Public()
   @Get('listings/:id')
-  async get(@OptionalUser() u: AuthUser | undefined, @Param('id') id: string) {
+  async get(@OptionalUser() u: AuthUser | undefined, @Param('id') id: string, @Ip() ip: string, @Headers(NO_COUNT_HEADER) noCount?: string) {
     const staff = !!u?.roles.some((r) => r === 'admin' || r === 'moderator');
     const l = await this.listings.getVisible(id, u?.id, staff);
-    this.listings.countView(l, u?.id);
+    // Sitenin ara katmanı ve sayfa önbelleği ilanı okurken sayılmaz; sitede görüntülenme ayrı uçtan (tarayıcıdan) gelir.
+    if (!noCount) this.listings.countView(l, u?.id, ip);
     return this.listings.view(l, u?.id);
+  }
+
+  /** Sitedeki ilan sayfası tarayıcıda açılınca bir kez çağrılır (botlar ve ön yüklemeler sayılmaz). Yanıt her zaman 204. */
+  @Public()
+  @Post('listings/:id/view')
+  @HttpCode(204)
+  async viewed(@OptionalUser() u: AuthUser | undefined, @Param('id') id: string, @Ip() ip: string) {
+    const l = await this.prisma.listing.findUnique({ where: { id }, select: { id: true, ownerId: true, status: true } });
+    if (l) this.listings.countView(l, u?.id, ip);
   }
 
   @Auth()
@@ -133,8 +149,11 @@ export class ListingsController {
     const priceOnly = Object.keys(b).every((k) => k === 'price');
     const priceChanged = b.price !== undefined && b.price !== l.price;
     const status = priceOnly ? l.status : l.status === 'published' || l.status === 'rejected' ? 'pending' : l.status;
+    // Belge ve ekspertiz rozetleri belirli bir tekne içindir: tekne kimliği değişirse rozetler düşer.
+    const identityChanged = IDENTITY_FIELDS.some((k) => b[k] !== undefined && b[k] !== l[k]);
+    const badges = identityChanged ? l.badges.filter((x) => !BOAT_BOUND_BADGES.includes(x)) : l.badges;
     await this.prisma.$transaction([
-      this.prisma.listing.update({ where: { id }, data: { ...b, status } }),
+      this.prisma.listing.update({ where: { id }, data: { ...b, status, ...(badges.length !== l.badges.length ? { badges } : {}) } }),
       ...(priceChanged ? [this.prisma.priceHistory.create({ data: { listingId: id, price: l.price, currency: l.currency } })] : []),
     ]);
     const updated = await this.prisma.listing.findUniqueOrThrow({ where: { id }, include: listingInclude });
@@ -146,6 +165,8 @@ export class ListingsController {
   @Post('listings/:id/photos')
   async photos(@CurrentUser() u: AuthUser, @Param('id') id: string, @Body(new ZodPipe(photosSchema)) b: z.infer<typeof photosSchema>) {
     const l = await this.listings.getOwn(id, u.id);
+    // Satılmış ya da kaldırılmış ilan herkese açık kalabilir; denetimsiz görsel eklenemez.
+    if (['sold', 'removed'].includes(l.status)) throw Errors.conflict('LISTING_CLOSED');
     await this.media.assertOwnPublic(u.id, b.fileIds);
     // Zaten ekli fotoğrafların yeniden gönderilmesi (yarıda kalan gönderimin tekrarı) sınıra sayılmaz.
     const fresh = b.fileIds.filter((f) => !l.photos.some((p) => p.fileId === f));

@@ -28,7 +28,7 @@ export function ListingCard({ listing: l, compact, width, missing, disabled, onP
         selected === undefined ? null : { borderWidth: 2, borderColor: selected ? colors.primary : colors.line, borderRadius: radius.card + 2, padding: space(1.5) }]}>
       <BoatImage seed={l.photoSeed} height={compact ? 120 : 176} rounded={radius.card} uri={l.photoUrls?.[0]}>
         <View style={{ position: 'absolute', top: space(3), left: space(3), flexDirection: 'row', flexWrap: 'wrap', gap: space(1.5) }}>
-          {l.status === 'onay-bekliyor' ? <Badge kind="beklemede" onDark /> : l.badges.slice(0, compact ? 1 : 2).map((b) => <Badge key={b} kind={b} onDark />)}
+          {l.status === 'onay-bekliyor' ? <Badge kind="beklemede" onDark /> : l.status === 'reddedildi' ? <Badge kind="reddedildi" onDark /> : l.badges.slice(0, compact ? 1 : 2).map((b) => <Badge key={b} kind={b} onDark />)}
         </View>
         <View style={{ position: 'absolute', bottom: space(3), left: space(3) }}><PromoBadges promo={l.promo} priceDrop={l.priceDrop} /></View>
         {selected ? (

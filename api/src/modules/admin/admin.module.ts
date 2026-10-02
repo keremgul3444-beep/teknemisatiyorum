@@ -17,6 +17,16 @@ const decisionBody = z.discriminatedUnion('decision', [
   z.object({ decision: z.literal('approve') }),
   z.object({ decision: z.literal('reject'), reason: z.enum(['blurry', 'mismatch', 'rules']) }),
 ]);
+/**
+ * İlan kararı, moderatörün gördüğü sürüme bağlanır (`version` = kuyruktaki `updatedAt`). Satıcı o arada ilanı
+ * değiştirdiyse karar yazılmaz; moderatör yeni hâlini görmeden yayına çıkamaz.
+ */
+const listingDecisionBody = z.discriminatedUnion('decision', [
+  z.object({ decision: z.literal('approve'), version: z.string().max(40).optional() }),
+  z.object({ decision: z.literal('reject'), reason: z.enum(['blurry', 'mismatch', 'rules']), version: z.string().max(40).optional() }),
+]);
+const listingChanged = () => new AppError('LISTING_CHANGED', 'errors.listing_changed', 409);
+const versionRequired = () => new AppError('VERSION_REQUIRED', 'errors.version_required', 400);
 const reportBody = z.object({ score: z.number().int().min(0).max(100) });
 const alreadyDecided = () => new AppError('ALREADY_DECIDED', 'errors.already_decided', 409);
 /** Ekip üyesi kendi ilanına ya da belgesine karar veremez (çıkar çatışması). */
@@ -54,27 +64,43 @@ class AdminController {
       const users = await this.prisma.user.findMany({ where: { id: { in: rows.map((r) => r.userId) } }, select: { id: true, name: true } });
       return rows.map((r) => ({ ...r, userName: users.find((x) => x.id === r.userId)?.name ?? null }));
     }
-    const rows = await this.prisma.listing.findMany({ where: { status: 'pending' }, orderBy: { updatedAt: 'asc' }, include: { owner: { select: { name: true } }, photos: true } });
+    const rows = await this.prisma.listing.findMany({
+      where: { status: 'pending' }, orderBy: { updatedAt: 'asc' },
+      include: { owner: { select: { name: true, verifyLevel: true } }, photos: true },
+    });
+    // Moderatör ilanın yayına çıkacak her şeyini görür: açıklama, konum, özellikler ve yeni alanlar dahil.
     return rows.map((l) => ({
       id: l.id, title: `${l.brand} ${l.model}`, year: l.year, price: l.price, currency: l.currency, ownerName: l.owner.name,
+      ownerVerifyLevel: l.owner.verifyLevel,
       photoCount: l.photos.length, photos: [...l.photos].sort((a, b) => a.order - b.order).map((p) => `/media/${p.fileId}`), updatedAt: l.updatedAt,
+      version: l.updatedAt.toISOString(),
+      brand: l.brand, model: l.model, lengthM: l.lengthM, type: l.type, location: l.location, cabins: l.cabins, engine: l.engine,
+      engineHours: l.engineHours, flag: l.flag, tradeIn: l.tradeIn, negotiable: l.negotiable, equipment: l.equipment,
+      description: l.description, badges: l.badges,
     }));
   }
 
   @Auth(STAFF)
   @Post('listings/:id/decision')
   @HttpCode(200)
-  async decideListing(@CurrentUser() u: AuthUser, @Param('id') id: string, @Body(new ZodPipe(decisionBody)) b: z.infer<typeof decisionBody>) {
+  async decideListing(@CurrentUser() u: AuthUser, @Param('id') id: string, @Body(new ZodPipe(listingDecisionBody)) b: z.infer<typeof listingDecisionBody>) {
     const l = await this.prisma.listing.findUnique({ where: { id } });
     if (!l) throw Errors.notFound();
     if (l.ownerId === u.id) throw selfDecision();
-    // Yarış güvenliği: yalnızca hâlâ bekleyen ilan için karar yazılır.
+    if (l.status !== 'pending') throw alreadyDecided();
+    if (!b.version) throw versionRequired();
+    if (b.version !== l.updatedAt.toISOString()) throw listingChanged();
+    // Yarış güvenliği: yalnızca hâlâ bekleyen ve moderatörün gördüğü sürümdeki ilan için karar yazılır.
     const approve = b.decision === 'approve';
     const r = await this.prisma.listing.updateMany({
-      where: { id, status: 'pending' },
+      where: { id, status: 'pending', updatedAt: l.updatedAt },
       data: approve ? { status: 'published', publishedAt: new Date(), rejectReason: null } : { status: 'rejected', rejectReason: b.reason },
     });
-    if (!r.count) throw alreadyDecided();
+    if (!r.count) {
+      // Başka moderatör aynı anda karar verdiyse "zaten karar verildi", satıcı değiştirdiyse "ilan değişti".
+      const now = await this.prisma.listing.findUnique({ where: { id }, select: { status: true } });
+      throw now?.status === 'pending' ? listingChanged() : alreadyDecided();
+    }
     const title = `${l.brand} ${l.model}`;
     await this.notifications.push(l.ownerId, approve ? 'notif.listingApproved' : 'notif.listingRejected', { title, listingId: id, ...(approve ? {} : { reason: b.reason }) });
     await this.audit.log(u.id, approve ? 'audit.listingApproved' : 'audit.listingRejected', { title }, 'listing', id);

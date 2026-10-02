@@ -9,7 +9,7 @@ export interface ApiListing {
   location: string; equipment: string[]; cabins: number; engine: string; description: string; status: string; badges: string[];
   engineHours?: number | null; flag?: string | null; tradeIn?: boolean; negotiable?: boolean;
   rejectReason?: string | null; photos: { id: string; url: string }[];
-  seller: { id: string; name: string | null; since: number; companyName: string | null };
+  seller: { id: string; name: string | null; since: number; companyName: string | null; verified?: boolean };
   logbook: { count: number; latest: ApiEntry[]; boatId?: string } | null; isMine: boolean;
   promo?: Promo;
   priceDrop?: { previousPrice: number; at: string } | null;
@@ -36,7 +36,7 @@ export interface ApiThread {
   messages: { id: string; text: string; at: string; mine: boolean }[];
 }
 
-const STATUS: Record<string, Listing['status']> = { published: 'yayinda', sold: 'satildi' };
+const STATUS: Record<string, Listing['status']> = { published: 'yayinda', sold: 'satildi', rejected: 'reddedildi' };
 /** İlanın fotoğraf yoksa prototipteki degrade görsele düşmesi için id'den kararlı bir tohum üretilir. */
 const seedOf = (id: string) => [...id].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7) % 1000;
 const hm = (iso: string) => new Date(iso).toTimeString().slice(0, 5);
@@ -57,7 +57,7 @@ export function toListing(l: ApiListing): Listing {
   };
 }
 
-export const toSeller = (l: ApiListing): Seller => ({ id: l.seller.id, name: l.seller.name ?? '—', since: l.seller.since, companyName: l.seller.companyName });
+export const toSeller = (l: ApiListing): Seller => ({ id: l.seller.id, name: l.seller.name ?? '—', since: l.seller.since, companyName: l.seller.companyName, verified: !!l.seller.verified });
 
 export const toBoat = (b: ApiBoat): Boat => ({
   id: b.id, name: b.name, brand: b.brand, model: b.model, year: b.year, lengthM: b.lengthM, photoSeed: seedOf(b.id), logbook: b.entries.map(toEntry),
@@ -84,8 +84,21 @@ export const toBooking = (b: { id: string; packageId: string; listingId: string 
 export const toBroker = (c: { id: string; boatName: string; step: number; askingPrice: number; currency: Currency; createdAt: string }): BrokerCase =>
   ({ id: c.id, boatName: c.boatName, step: c.step as BrokerCase['step'], askingEUR: c.currency === 'EUR' ? c.askingPrice : 0, createdAt: c.createdAt.slice(0, 10) });
 
-export const toAdminListing = (x: { id: string; title: string; ownerName: string | null; photos?: string[] }): AdminItem =>
-  ({ id: `l:${x.id}`, kind: 'ilan', title: x.title, who: x.ownerName ?? '—', status: 'bekliyor', refId: x.id, photos: (x.photos ?? []).map(absolute) });
+export interface ApiAdminListing {
+  id: string; title: string; ownerName: string | null; photos?: string[]; version?: string; ownerVerifyLevel?: number;
+  year?: number; price?: number; currency?: Currency; lengthM?: number; type?: string; location?: string; cabins?: number; engine?: string;
+  engineHours?: number | null; flag?: string | null; tradeIn?: boolean; negotiable?: boolean; equipment?: string[]; description?: string;
+}
+export const toAdminListing = (x: ApiAdminListing): AdminItem => ({
+  id: `l:${x.id}`, kind: 'ilan', title: x.title, who: x.ownerName ?? '—', status: 'bekliyor', refId: x.id, photos: (x.photos ?? []).map(absolute),
+  version: x.version,
+  listing: x.year === undefined ? undefined : {
+    year: x.year, price: x.price ?? 0, currency: x.currency ?? 'EUR', lengthM: x.lengthM ?? 0, type: (x.type ?? 'motoryat') as BoatType,
+    location: x.location ?? '', cabins: x.cabins ?? 0, engine: x.engine ?? '', engineHours: x.engineHours ?? null,
+    flag: (x.flag as Flag | null | undefined) ?? null, tradeIn: !!x.tradeIn, negotiable: !!x.negotiable,
+    equipment: (x.equipment ?? []) as Equipment[], description: x.description ?? '', ownerVerifyLevel: x.ownerVerifyLevel ?? 0,
+  },
+});
 export const toAdminVerification = (x: { id: string; kind: string; userName: string | null; fileIds?: string[]; details?: Record<string, unknown> | null }): AdminItem =>
   ({ id: `v:${x.id}`, kind: 'belge', title: x.kind, who: x.userName ?? '—', status: 'bekliyor', refId: x.id, fileIds: x.fileIds ?? [], details: x.details ?? null });
 export const toAudit = (a: { id: string; at: string; actorId: string | null; action: string; params: Record<string, string> | null }): AuditEntry =>

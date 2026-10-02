@@ -74,7 +74,8 @@ export async function proxy(req: NextRequest) {
 async function listingGone(pathname: string): Promise<boolean> {
   const m = LISTING.exec(pathname);
   if (!m) return false;
-  const r = await fetch(`${API()}/listings/${m[1]}`, { method: 'GET', signal: AbortSignal.timeout(3000) }).catch(() => null);
+  // Yalnızca varlık denetimi: görüntülenme sayılmaz (sayılsaydı botlar ve ön yüklemeler istatistiği şişirirdi).
+  const r = await fetch(`${API()}/listings/${m[1]}`, { method: 'GET', headers: { 'X-Tms-No-Count': '1' }, signal: AbortSignal.timeout(3000) }).catch(() => null);
   return r?.status === 404;
 }
 

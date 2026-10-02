@@ -199,7 +199,8 @@
     "flagTr": "Türk bayraklı",
     "flagForeign": "Yabancı bayraklı",
     "tradeIn": "Takasa açık",
-    "negotiable": "Pazarlık payı var"
+    "negotiable": "Pazarlık payı var",
+    "soldNote": "Bu tekne satıldı"
   },
   "gone": {
     "title": "Bu ilan artık yayında değil",
@@ -475,7 +476,9 @@
     "bad_receipt": "Satın alma makbuzu geçersiz",
     "amount_mismatch": "Ödeme tutarı siparişle uyuşmuyor",
     "not_refundable": "Bu sipariş iade edilemez",
-    "receipt_used": "Bu satın alma zaten kullanıldı"
+    "receipt_used": "Bu satın alma zaten kullanıldı",
+    "listing_changed": "Satıcı ilanı sen incelerken değiştirdi. Güncel hâlini görüp yeniden karar ver.",
+    "version_required": "Uygulamanı güncelle: karar ilan sürümü olmadan gönderilemez."
   },
   "login": {
     "title": "Giriş yap",

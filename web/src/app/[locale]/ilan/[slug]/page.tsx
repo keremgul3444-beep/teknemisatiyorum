@@ -8,6 +8,7 @@ import { apiListingsPath, citySlug, landingQuery } from '@/lib/queries';
 import { breadcrumbJsonLd, listingJsonLd, listingMetadata, siteUrl } from '@/lib/seo';
 import type { ListingView, SearchResult } from '@/lib/types';
 import { AppLink, Breadcrumbs, JsonLd, ListingGrid, Section } from '@/components/bits';
+import { ViewBeacon } from '@/components/ViewBeacon';
 import { PromoBadges } from '@/components/PromoBadges';
 
 export const revalidate = 60;
@@ -15,7 +16,7 @@ type P = { params: Promise<{ locale: string; slug: string }> };
 
 /** Yayında değilse (kaldırıldı/silindi) null: ara katman bu adresi zaten 410 sayfasına çevirir; burası yedek. */
 async function load(slug: string) {
-  return apiGet<ListingView>(`/listings/${encodeURIComponent(idFromSlug(slug))}`, { revalidate: 60 }).catch((e) => {
+  return apiGet<ListingView>(`/listings/${encodeURIComponent(idFromSlug(slug))}`, { revalidate: 60, noCount: true }).catch((e) => {
     if (e instanceof ApiError && e.status === 404) return null;
     throw e;
   });
@@ -52,6 +53,7 @@ export default async function IlanDetay({ params }: P) {
 
   return (
     <>
+      {l.status === 'published' ? <ViewBeacon id={l.id} /> : null}
       <JsonLd data={listingJsonLd(l, locale)} />
       <JsonLd data={breadcrumbJsonLd(crumbs.map((c) => ({ name: c.name, url: c.href ? `${site}${c.href}` : `${site}${localePath(locale, `/ilan/${slug}`)}` })))} />
       <Breadcrumbs items={crumbs} />
@@ -89,10 +91,15 @@ export default async function IlanDetay({ params }: P) {
             <div><strong>{l.year}</strong><span className="muted small">{t(locale, 'listing.year')}</span></div>
             <div><strong>{l.cabins || '—'}</strong><span className="muted small">{t(locale, 'listing.cabins')}</span></div>
           </div>
-          <div className="row" style={{ margin: '16px 0' }}>
-            <AppLink locale={locale} path={`ilan/${l.id}`}>{t(locale, 'listing.message')}</AppLink>
-            <AppLink locale={locale} path="ekspertiz" secondary>{t(locale, 'listing.requestSurvey')}</AppLink>
-          </div>
+          {/* Satılmış teknede alıcıya mesaj ve ekspertiz sunulmaz. */}
+          {l.status === 'sold' ? (
+            <p className="muted" style={{ margin: '16px 0' }}><strong>{t(locale, 'listing.soldNote')}</strong></p>
+          ) : (
+            <div className="row" style={{ margin: '16px 0' }}>
+              <AppLink locale={locale} path={`ilan/${l.id}`}>{t(locale, 'listing.message')}</AppLink>
+              <AppLink locale={locale} path={`ekspertiz?ilan=${encodeURIComponent(l.id)}`} secondary>{t(locale, 'listing.requestSurvey')}</AppLink>
+            </div>
+          )}
           <table className="card specs" style={{ padding: 0 }}>
             <tbody>
               <Spec k={t(locale, 'listing.type')} v={typeName} />
@@ -107,7 +114,7 @@ export default async function IlanDetay({ params }: P) {
           {l.logbook?.count ? (
             <div className="card" style={{ marginTop: 16 }}>
               <h3>{t(locale, 'listing.logbook', { n: l.logbook.count })}</h3>
-              <ul className="small">{l.logbook.latest.map((e) => <li key={e.id}>{e.date} · {e.title.startsWith('i18n:') ? t(locale, e.title.slice(5)) : e.title}</li>)}</ul>
+              <ul className="small">{l.logbook.latest.map((e) => <li key={e.id}>{e.date} · {logbookTitle(locale, e.title)}</li>)}</ul>
             </div>
           ) : null}
         </div>
@@ -116,6 +123,16 @@ export default async function IlanDetay({ params }: P) {
       {others.length ? <Section title={t(locale, 'listing.similar')}><ListingGrid items={others} locale={locale} /></Section> : null}
     </>
   );
+}
+
+/** Sunucunun yazdığı karne başlıkları yalnızca "logbook." anahtarları olabilir; geri kalan her şey kullanıcı metni olarak gösterilir. */
+function logbookTitle(locale: Locale, title: string): string {
+  if (!title.startsWith('i18n:logbook.')) return title;
+  try {
+    return t(locale, title.slice(5));
+  } catch {
+    return title;
+  }
 }
 
 function Spec({ k, v }: { k: string; v: string }) {

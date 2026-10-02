@@ -46,7 +46,8 @@
     "broker": "Broker güvencesi",
     "dogrulanmis": "Doğrulanmış",
     "beklemede": "Onay bekliyor",
-    "belge": "Belgeleri eşleşti"
+    "belge": "Belgeleri eşleşti",
+    "reddedildi": "Reddedildi"
   },
   "boatType": {
     "motoryat": "Motoryat",
@@ -106,7 +107,10 @@
     "flagTr": "Türk bayraklı",
     "flagForeign": "Yabancı bayraklı",
     "tradeIn": "Takasa açık",
-    "negotiable": "Pazarlık payı var"
+    "negotiable": "Pazarlık payı var",
+    "rejectedTitle": "İlanın yayına alınmadı",
+    "rejectedBody": "Sorunu düzeltip ilanı yeniden verebilirsin.",
+    "soldNote": "Bu tekne satıldı"
   },
   "usta": {
     "freeSurvey": "Keşif ücretsiz",
@@ -744,7 +748,13 @@
     "views": "{{n}} görüntülenme",
     "favorites": "{{n}} favori",
     "messages": "{{n}} mesaj",
-    "transfer": "Devir asistanı"
+    "transfer": "Devir asistanı",
+    "rejected": "Reddedildi",
+    "rejectReasons": {
+      "blurry": "Red nedeni: fotoğraflar ya da belge okunaksız.",
+      "mismatch": "Red nedeni: bilgiler fotoğraflarla ya da belgeyle uyuşmuyor.",
+      "rules": "Red nedeni: ilan kurallarına aykırı içerik var (ör. telefon, IBAN ya da başka bir teknenin fotoğrafı)."
+    }
   },
   "settings": {
     "title": "Ayarlar",
@@ -857,7 +867,7 @@
     "reject": "Reddet",
     "rejectReason": "Red gerekçesi seç",
     "reasons": {
-      "blurry": "Belge okunaksız",
+      "blurry": "Fotoğraf ya da belge okunaksız",
       "mismatch": "Bilgiler uyuşmuyor",
       "rules": "İlan kurallarına aykırı"
     },
@@ -920,7 +930,10 @@
       "manual": "Havale"
     },
     "refundConfirm": "Bu sipariş iade edilsin mi? Siparişle eklenen öne çıkarma süresi geri alınır. Bu işlem geri alınamaz.",
-    "refundYes": "Evet, iade et"
+    "refundYes": "Evet, iade et",
+    "sellerLevel": "Satıcı",
+    "sellerVerified": "Kimliği doğrulanmış",
+    "sellerUnverified": "Kimliği doğrulanmamış"
   },
   "audit": {
     "listingApproved": "İlan onaylandı: {{title}}",
@@ -985,7 +998,9 @@
     "bad_receipt": "Satın alma makbuzu geçersiz",
     "amount_mismatch": "Ödeme tutarı siparişle uyuşmuyor",
     "not_refundable": "Bu sipariş iade edilemez",
-    "receipt_used": "Bu satın alma zaten kullanıldı"
+    "receipt_used": "Bu satın alma zaten kullanıldı",
+    "listing_changed": "Satıcı ilanı sen incelerken değiştirdi. Güncel hâlini görüp yeniden karar ver.",
+    "version_required": "Uygulamanı güncelle: karar ilan sürümü olmadan gönderilemez."
   },
   "soon": {
     "title": "Yakında",

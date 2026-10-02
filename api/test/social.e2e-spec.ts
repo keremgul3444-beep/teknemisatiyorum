@@ -24,6 +24,16 @@ describe('tekneler ve karne', () => {
     expect(e.body).toMatchObject({ verified: false, date: '2026-04-02' });
   });
 
+  test('kullanıcı karne metni sistem metni önekiyle başlayamaz (platform yazısı taklidi)', async () => {
+    const a = await loginAs(t);
+    const b = await t.http().post('/boats').set(a.auth).send(boat);
+    const send = (title: string, byName = 'Kendim') => t.http().post(`/boats/${b.body.id}/logbook`).set(a.auth).send({ kind: 'bakim', date: '2026-04-02', title, byName });
+    expect((await send('i18n:badge.broker')).status).toBe(400);
+    expect((await send('  I18N:logbook.owner')).status).toBe(400);
+    expect((await send('Motor bakımı', 'i18n:logbook.platformSurveyor')).status).toBe(400);
+    expect((await send('Motor bakımı — i18n: notu')).status).toBe(201);
+  });
+
   test('platform kaydı doğrulanmış olarak eklenir', async () => {
     const a = await loginAs(t);
     const b = await t.http().post('/boats').set(a.auth).send(boat);

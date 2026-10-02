@@ -20,5 +20,8 @@ export const setLanguage = (lang: Lang) => changeLanguage(lang);
 export const currentLang = (): Lang => (i18n.language === 'en' ? 'en' : 'tr');
 export default i18n;
 
-/** Sunucunun yazdığı sistem metinleri 'i18n:' önekli çeviri anahtarıdır; kullanıcı metni olduğu gibi gösterilir. */
-export const tx = (t: (k: string) => string, s: string) => (s.startsWith('i18n:') ? t(s.slice(5)) : s);
+/**
+ * Sunucunun yazdığı karne metinleri 'i18n:logbook.' önekli çeviri anahtarıdır; kullanıcı metni olduğu gibi gösterilir.
+ * Önek yalnızca karne anahtarlarıyla sınırlı: kullanıcı "i18n:badge.broker" yazıp platform metni gösteremez.
+ */
+export const tx = (t: (k: string) => string, s: string) => (s.startsWith('i18n:logbook.') ? t(s.slice(5)) : s);

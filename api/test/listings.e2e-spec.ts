@@ -49,6 +49,36 @@ describe('taslak ve sahiplik', () => {
     expect((await t.http().post('/listings').set(a.auth).send({ ...draft, engineHours: 12.5 })).status).toBe(400);
   });
 
+  test('satılmış ilana fotoğraf eklenemez (denetimsiz görsel yayına çıkmasın)', async () => {
+    const a = await loginAs(t, { level: 2 });
+    const l = await published(a.user.id);
+    await t.prisma.listing.update({ where: { id: l.id }, data: { status: 'sold' } });
+    const r = await t.http().post(`/listings/${l.id}/photos`).set(a.auth).send({ fileIds: [await photo(a.auth)] });
+    expect(r.status).toBe(409);
+    expect(r.body.code).toBe('LISTING_CLOSED');
+    expect(await t.prisma.listingPhoto.count({ where: { listingId: l.id } })).toBe(0);
+  });
+
+  test('tekne kimliği değişince belge/ekspertiz rozetleri düşer; fiyat ve açıklama değişikliği rozeti korur', async () => {
+    const a = await loginAs(t, { level: 2 });
+    const l = await published(a.user.id);
+    await t.prisma.listing.update({ where: { id: l.id }, data: { badges: ['sahiplik', 'belge', 'ekspertizli', 'broker'] } });
+    await t.http().patch(`/listings/${l.id}`).set(a.auth).send({ price: 170000 }).expect(200);
+    await t.http().patch(`/listings/${l.id}`).set(a.auth).send({ description: 'Yeni yelken.', brand: draft.brand }).expect(200);
+    expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } })).badges).toEqual(['sahiplik', 'belge', 'ekspertizli', 'broker']);
+    await t.http().patch(`/listings/${l.id}`).set(a.auth).send({ model: 'Oceanis 46' }).expect(200);
+    expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } })).badges).toEqual(['broker']);
+  });
+
+  test('satıcının "doğrulanmış" bilgisi kimlik seviyesine bağlı', async () => {
+    const v = await loginAs(t, { level: 2 });
+    const u = await loginAs(t, { level: 1 });
+    const lv = await published(v.user.id);
+    const lu = await published(u.user.id);
+    expect((await t.http().get(`/listings/${lv.id}`)).body.seller.verified).toBe(true);
+    expect((await t.http().get(`/listings/${lu.id}`)).body.seller.verified).toBe(false);
+  });
+
   test('geçersiz alanlar reddedilir', async () => {
     const a = await loginAs(t);
     const r = await t.http().post('/listings').set(a.auth).send({ ...draft, lengthM: -3, type: 'uzay-gemisi' });

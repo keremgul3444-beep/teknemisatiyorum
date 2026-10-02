@@ -7,7 +7,7 @@ import { applyUser, syncAdmin, syncAll, syncListings, syncMine } from './api/syn
 import { toBoat, toListing, toThread, type AdminOrder, type ApiBoat, type ApiListing, type ApiProduct, type ApiThread, type ApiUser } from './api/mappers';
 import { ApiError } from './api/client';
 import { devReceipt } from '@/features/promo';
-import type { AdminStatus, BoatInput, Listing, ListingDraft, SubjectKind } from './types';
+import type { AdminStatus, BoatInput, Listing, ListingDraft, RejectReason, SubjectKind } from './types';
 import { useSession, type Prefs } from '@/session/role';
 import { resetRates } from './rates';
 import { createPublisher, type PublishExtra } from '@/features/publishListing';
@@ -202,13 +202,19 @@ export const actions = {
   },
 
   // ——— Yönetim ———
-  async setAdminStatus(itemId: string, status: AdminStatus) {
-    if (!isApiMode()) return g().setAdminStatus(itemId, status);
+  /** Moderatör kararı: red seçilen gerekçeyle gider; ilan kararı moderatörün gördüğü sürüme bağlıdır. */
+  async setAdminStatus(itemId: string, status: AdminStatus, reason: RejectReason = 'rules') {
+    if (!isApiMode()) return g().setAdminStatus(itemId, status, reason);
     const item = g().adminItems.find((a) => a.id === itemId);
     if (!item?.refId) return;
-    const body = status === 'onaylandi' ? { decision: 'approve' } : { decision: 'reject', reason: 'rules' };
-    await api.post(item.kind === 'ilan' ? `/admin/listings/${item.refId}/decision` : `/admin/verifications/${item.refId}/decision`, body);
-    await Promise.all([syncAdmin(), syncListings()]);
+    const decision = status === 'onaylandi' ? { decision: 'approve' } : { decision: 'reject', reason };
+    const body = item.kind === 'ilan' ? { ...decision, version: item.version } : decision;
+    try {
+      await api.post(item.kind === 'ilan' ? `/admin/listings/${item.refId}/decision` : `/admin/verifications/${item.refId}/decision`, body);
+    } finally {
+      // İlan değiştiyse (LISTING_CHANGED) moderatör güncel hâlini görsün diye kuyruk her durumda yenilenir.
+      await Promise.all([syncAdmin(), syncListings()]);
+    }
   },
   async advanceBroker(id: string) {
     if (!isApiMode()) return g().advanceBroker(id);

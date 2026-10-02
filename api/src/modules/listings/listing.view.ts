@@ -5,13 +5,13 @@ import { isActive } from '../promotions/promotion.rules';
 
 export type ListingRow = Listing & {
   photos: ListingPhoto[];
-  owner: Pick<User, 'id' | 'name' | 'createdAt' | 'deletedAt'>;
+  owner: Pick<User, 'id' | 'name' | 'createdAt' | 'deletedAt' | 'verifyLevel'>;
   boat: { id: string; entries: LogbookEntry[]; _count: { entries: number } } | null;
   priceHistory: PriceHistory[];
 };
 export const listingInclude = {
   photos: { orderBy: { order: 'asc' as const } },
-  owner: { select: { id: true, name: true, createdAt: true, deletedAt: true } },
+  owner: { select: { id: true, name: true, createdAt: true, deletedAt: true, verifyLevel: true } },
   boat: { select: { id: true, _count: { select: { entries: true } }, entries: { orderBy: { date: 'desc' as const }, take: 2 } } },
   priceHistory: { orderBy: { at: 'desc' as const }, take: 1 },
 };
@@ -45,6 +45,8 @@ export function listingView(l: ListingRow, viewerId?: string, companyName?: stri
       name: l.owner.deletedAt ? null : l.owner.name,
       since: l.owner.createdAt.getFullYear(),
       companyName: companyName ?? null,
+      /** Satıcı kimliğini doğrulattı mı (seviye 2+); "Doğrulanmış" rozeti yalnızca bu durumda gösterilir. */
+      verified: !l.owner.deletedAt && l.owner.verifyLevel >= 2,
     },
     /** Bağlı teknenin karne özeti: kayıt sayısı ve en yeni iki kayıt. */
     logbook: l.boat ? { count: l.boat._count.entries, latest: l.boat.entries.map(entryView), boatId: viewerId === l.ownerId ? l.boat.id : undefined } : null,

@@ -75,6 +75,20 @@ Motor saati, bayrak, takas ve pazarlık şu an yalnızca ilan sayfasında görü
 - Fotoğraf sınırı (20) sunucu ve uygulamada tek kaynaktan geliyor.
 - Satır sonları: önceki commit Windows satır sonlu (CRLF) 6 dosyayı LF'ye çevirmişti, geri alındı.
 
+## Güvenlik paketi ile kapatılanlar (2026-10-02)
+
+- A1: Onay kuyruğu ilanın tamamını taşıyor (açıklama, konum, özellikler, yeni alanlar, satıcının kimlik seviyesi); uygulamadaki moderasyon kartında görünüyor.
+- A2: Karar `version` (kuyruktaki `updatedAt`) ister; satıcı arada değiştirdiyse 409 `LISTING_CHANGED`, sürümsüz karar 400 `VERSION_REQUIRED`. Uygulama sürümü gönderiyor, hata olursa kuyruğu yeniliyor.
+- A3: Satılmış ya da kaldırılmış ilana fotoğraf eklenemiyor (409 `LISTING_CLOSED`).
+- A4: Marka, model, yıl, boy ya da bağlı tekne değişince `sahiplik`, `belge`, `ekspertizli` rozetleri düşüyor (`broker` kalıyor).
+- B6, B7: Reddedilen ilan uygulamada "Reddedildi" sekmesinde, gerekçesiyle; ilan sayfasında satıcıya kırmızı not. Moderatörün seçtiği gerekçe sunucuya gidiyor.
+- B8: "Doğrulanmış" rozeti yalnızca kimliği doğrulanmış (seviye 2+) satıcıda; API `seller.verified` döndürüyor.
+- C15: Görüntülenme: site ara katmanı ve sayfa önbelleği `X-Tms-No-Count` ile saymıyor; sitede gerçek ziyaret tarayıcıdan `POST /api/views` → `POST /listings/:id/view` ile bir kez sayılıyor. Aynı kişi (hesap ya da IP) 30 dakika içinde tekrar sayılmıyor, satıcı hiç sayılmıyor.
+- C16: Satılmış ilanda uygulamada ve sitede mesaj/ekspertiz düğmeleri yerine "Bu tekne satıldı"; sitedeki ekspertiz bağlantısı ilan kimliğini taşıyor.
+- C20: Karne başlığı ve yazar adı `i18n:` ile başlayamıyor; uygulama ve site yalnızca `i18n:logbook.` anahtarlarını çeviriyor.
+
+Kalan: A5 (şikayet, yaptırım), B9–B14, C17–C19, C21, D ve E maddeleri.
+
 ## Önerilen sıra
 
 1. **Güvenlik paketi:**

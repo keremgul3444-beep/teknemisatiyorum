@@ -22,6 +22,9 @@ const shuffle = <T,>(a: T[]) => {
 
 const asMatchable =(l: ListingRow) => ({ ...l, type: l.type as BoatType, equipment: l.equipment as Equipment[] });
 
+/** Aynı kişinin aynı ilanı yeniden açması bu süre içinde tekrar sayılmaz. */
+export const VIEW_DEDUPE_MS = 30 * 60 * 1000;
+
 @Injectable()
 export class ListingsService {
   constructor(private readonly prisma: PrismaService, private readonly fx: FxService, private readonly notifications: NotificationsService) {}
@@ -45,11 +48,20 @@ export class ListingsService {
     return listingView(l, viewerId, company?.name, stats);
   }
 
-  /** İlan sahibi dışındaki herkese açık görüntülemeyi sayar (yanıtı bekletmez). */
-  countView(l: ListingRow, viewerId?: string) {
+  /**
+   * İlan sahibi dışındaki herkese açık görüntülemeyi sayar (yanıtı bekletmez). Aynı kişi (hesap ya da IP)
+   * aynı ilanı 30 dakika içinde yeniden açarsa sayılmaz: yenilemeler ve geri dönüşler istatistiği şişirmesin.
+   */
+  countView(l: Pick<ListingRow, 'id' | 'ownerId' | 'status'>, viewerId?: string, ip?: string, now = Date.now()) {
     if (l.ownerId === viewerId || l.status !== 'published') return;
+    const key = `${l.id}:${viewerId ?? `ip:${ip ?? '?'}`}`;
+    const seen = this.recentViews.get(key);
+    if (seen && now - seen < VIEW_DEDUPE_MS) return;
+    if (this.recentViews.size > 50_000) this.recentViews.clear();
+    this.recentViews.set(key, now);
     this.prisma.listing.update({ where: { id: l.id }, data: { viewCount: { increment: 1 } } }).catch(() => undefined);
   }
+  private readonly recentViews = new Map<string, number>();
 
   /** İlanlarım için: görüntülenme, favori ve sohbet sayıları (iki toplu sorgu). */
   async statsFor(rows: ListingRow[]) {

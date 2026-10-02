@@ -13,11 +13,14 @@ const boatBody = z.object({
   year: z.number().int().min(1900).max(2100),
   lengthM: z.number().positive().max(200),
 });
+/** Kullanıcı metni sistem metni önekiyle başlayamaz: "i18n:badge.broker" gibi bir başlık platform yazısı gibi görünmesin. */
+const userText = (max: number) => z.string().trim().min(1).max(max)
+  .refine((s) => !s.toLowerCase().startsWith(I18N_PREFIX), { message: 'reserved_prefix' });
 const entryBody = z.object({
   kind: z.enum(['bakim', 'onarim', 'ekspertiz', 'sahiplik']),
   date: z.iso.date(),
-  title: z.string().trim().min(1).max(120),
-  byName: z.string().trim().min(1).max(80),
+  title: userText(120),
+  byName: userText(80),
 });
 
 @Controller('boats')
