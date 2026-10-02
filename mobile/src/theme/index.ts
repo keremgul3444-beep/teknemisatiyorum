@@ -1,12 +1,12 @@
 export { colors, radius, gradients } from '@tms/shared';
 export const fonts = {
-  heading: 'SpaceGrotesk_700Bold', headingMedium: 'SpaceGrotesk_500Medium',
-  body: 'Inter_400Regular', bodySemi: 'Inter_600SemiBold', bodyBold: 'Inter_700Bold',
+  heading: 'BricolageGrotesque_800ExtraBold', headingMedium: 'BricolageGrotesque_600SemiBold',
+  body: 'Figtree_400Regular', bodySemi: 'Figtree_600SemiBold', bodyBold: 'Figtree_700Bold',
 } as const;
 export const space = (n: number) => n * 4;
 export const type = {
-  h1: { fontFamily: fonts.heading, fontSize: 28, lineHeight: 32 },
-  h2: { fontFamily: fonts.heading, fontSize: 20, lineHeight: 26 },
+  h1: { fontFamily: fonts.heading, fontSize: 28, lineHeight: 32, letterSpacing: -0.5 },
+  h2: { fontFamily: fonts.heading, fontSize: 20, lineHeight: 26, letterSpacing: -0.2 },
   h3: { fontFamily: fonts.bodyBold, fontSize: 16, lineHeight: 22 },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 21 },
   bodySemi: { fontFamily: fonts.bodySemi, fontSize: 15, lineHeight: 21 },

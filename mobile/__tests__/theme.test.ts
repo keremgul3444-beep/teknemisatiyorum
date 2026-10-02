@@ -1,7 +1,8 @@
-import { colors, radius, space } from '@/theme';
-test('tema değerleri tasarım belgesiyle aynı', () => {
-  expect(colors).toMatchObject({ bg: '#F4EFE6', card: '#FFFCF6', primary: '#0F6E68', text: '#1D2B2A',
-    muted: '#5B625B', surface: '#E7DFD0', line: '#E2D9C8', success: '#2E7D4F', warning: '#C98A1B', danger: '#B3261E' });
-  expect(radius).toMatchObject({ card: 18, button: 12, chip: 14 });
+import { colors, fonts, radius, space } from '@/theme';
+test('tema değerleri tasarım belgesiyle aynı ("Liman")', () => {
+  expect(colors).toMatchObject({ bg: '#F6F8FA', card: '#FFFFFF', primary: '#0B3B5C', accent: '#F2652B', text: '#0E1B26', muted: '#556270' });
+  expect(radius).toMatchObject({ card: 20, button: 14, chip: 999 });
+  expect(fonts.heading).toBe('BricolageGrotesque_800ExtraBold');
+  expect(fonts.body).toBe('Figtree_400Regular');
   expect(space(4)).toBe(16);
 });

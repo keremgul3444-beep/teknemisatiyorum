@@ -9,7 +9,7 @@ test('ekran ve bileşenlerde sabit yazı tipi adı ya da sayısal köşe yarıç
   ['src/app', 'src/components'].forEach((d) => walk(path.join(__dirname, '..', d)));
   const offenders = files.flatMap((f) => fs.readFileSync(f, 'utf8').split('\n')
     .map((line, i) => ({ line, i }))
-    .filter(({ line }) => /'Inter_\w+'|"Inter_\w+"|borderRadius: \d/.test(line))
+    .filter(({ line }) => /['"](Figtree|BricolageGrotesque|Inter|SpaceGrotesk)_\w+['"]|borderRadius: \d/.test(line))
     .map(({ i }) => `${path.relative(process.cwd(), f)}:${i + 1}`));
   expect(offenders).toEqual([]);
 });

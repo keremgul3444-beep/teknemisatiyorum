@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { notFound } from 'next/navigation';
-import { Inter, Space_Grotesk } from 'next/font/google';
+import { Bricolage_Grotesque, Figtree } from 'next/font/google';
 import { cssVariables } from '@tms/shared';
 import { isLocale, localePath, LOCALES, t, type Locale } from '@/i18n';
 import { CookieConsent } from '@/components/CookieConsent';
@@ -9,8 +9,8 @@ import { Footer } from '@/components/Footer';
 import '../globals.css';
 
 // Yazı tipleri önceden yüklenmez: yavaş bağlantıda ilk görselle yarışmasın (metin önce sistem yazı tipiyle çizilir).
-const body = Inter({ subsets: ['latin', 'latin-ext'], variable: '--font-body', display: 'swap', preload: false });
-const heading = Space_Grotesk({ subsets: ['latin', 'latin-ext'], variable: '--font-heading', display: 'swap', preload: false });
+const body = Figtree({ subsets: ['latin', 'latin-ext'], variable: '--font-body', display: 'swap', preload: false });
+const heading = Bricolage_Grotesque({ subsets: ['latin', 'latin-ext'], weight: ['600', '800'], variable: '--font-heading', display: 'swap', preload: false });
 
 export const generateStaticParams = () => LOCALES.map((locale) => ({ locale }));
 

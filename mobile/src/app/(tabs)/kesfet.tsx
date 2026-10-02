@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FlatList, Pressable, TextInput, View } from 'react-native';
+import { FlatList, Pressable, ScrollView, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { colors, fonts, radius, space } from '@/theme';
@@ -28,31 +28,43 @@ export default function Kesfet() {
 
   return (
     <Screen>
-      <View style={{ gap: space(1), marginTop: space(2) }}>
-        <T variant="caption" color={colors.muted}>{loggedIn ? t('home.helloName', { name }) : t('home.hello')} 👋</T>
-        <T variant="h1">{t('home.title')}</T>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(3), marginTop: space(2) }}>
+        <View style={{ flex: 1, gap: space(0.5) }}>
+          <T variant="caption" color={colors.muted} style={{ fontSize: 13, fontFamily: fonts.bodySemi }}>{loggedIn ? t('home.helloName', { name }) : t('home.hello')}</T>
+          <T variant="h1">{t('home.title')}</T>
+        </View>
+        <Pressable onPress={() => router.push('/profil/bildirimler')} accessibilityRole="button" accessibilityLabel={t('profile.notifications')} hitSlop={4}
+          style={{ width: 44, height: 44, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center' }}>
+          <Icon name="bell" size={20} color={colors.text} />
+        </Pressable>
       </View>
 
-      <View style={{ backgroundColor: colors.card, borderRadius: radius.card, borderWidth: 1.5, borderColor: colors.primary, padding: space(3.5), gap: space(2) }}>
-        <T variant="label" color={colors.primary}>✦ {t('assistant.label')}</T>
-        <TextInput value={q} onChangeText={setQ} onSubmitEditing={() => ask(q)} placeholder={t('assistant.placeholder')} placeholderTextColor={colors.muted}
-          multiline returnKeyType="search" blurOnSubmit
-          style={{ fontFamily: fonts.body, fontSize: 15, color: colors.text, minHeight: 44, textAlignVertical: 'top' }} />
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <T variant="caption" color={colors.muted}>{t('assistant.hint')}</T>
-          <Pressable onPress={() => ask(q || t('assistant.ex1'))} style={{ backgroundColor: colors.primary, borderRadius: radius.button - 2, paddingVertical: space(2), paddingHorizontal: space(4) }}>
-            <T variant="bodySemi" color={colors.white}>{t('assistant.search')}</T>
+      {/* Asistan: tek satır, solda işaret, sağda ara düğmesi. */}
+      <View style={{ gap: space(1.5) }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(2.5), minHeight: 56, paddingLeft: space(4), paddingRight: space(1.5),
+          borderRadius: radius.button + 2, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line }}>
+          <Icon name="sparkle" size={20} color={colors.primary} />
+          <TextInput value={q} onChangeText={setQ} onSubmitEditing={() => ask(q)} placeholder={t('assistant.placeholder')} placeholderTextColor={colors.muted}
+            returnKeyType="search" accessibilityLabel={t('assistant.label')}
+            style={{ flex: 1, fontFamily: fonts.body, fontSize: 15, color: colors.text, paddingVertical: space(3) }} />
+          <Pressable onPress={() => ask(q || t('assistant.ex1'))} accessibilityRole="button" accessibilityLabel={t('assistant.search')}
+            style={{ width: 44, height: 44, borderRadius: radius.button, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }}>
+            <Icon name="search" size={20} color={colors.white} />
           </Pressable>
         </View>
+        <T variant="caption" color={colors.muted} style={{ paddingHorizontal: space(1) }}>{t('assistant.hint')}</T>
       </View>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space(2) }}>
+      {/* Örnek aramalar tek satırda yana kayar; ekranın üstünü kaplamaz. */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -space(5) }}
+        contentContainerStyle={{ gap: space(2), paddingHorizontal: space(5) }}>
         {(['ex1', 'ex2', 'ex3'] as const).map((k) => <Chip key={k} label={t(`assistant.${k}`)} onPress={() => ask(t(`assistant.${k}`))} />)}
-      </View>
+      </ScrollView>
 
       <View style={{ flexDirection: 'row', gap: space(2) }}>
         {CATS.map((c) => (
           <Pressable key={c.k} onPress={() => router.push(c.to)}
-            style={{ flex: 1, backgroundColor: colors.surface, borderRadius: radius.chip, paddingVertical: space(3), alignItems: 'center', gap: space(1.5) }}>
+            accessibilityRole="button"
+            style={({ pressed }) => ({ flex: 1, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.line, borderRadius: radius.lg - 6, paddingVertical: space(3), alignItems: 'center', gap: space(1.5), opacity: pressed ? 0.8 : 1 })}>
             <Icon name={c.icon} size={22} color={colors.primary} />
             <T variant="caption" style={{ fontFamily: fonts.bodySemi }}>{t(`home.${c.k}`)}</T>
           </Pressable>

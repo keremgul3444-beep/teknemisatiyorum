@@ -16,13 +16,17 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.muted,
-        tabBarStyle: { backgroundColor: colors.card, borderTopColor: colors.line, height: 64, paddingTop: 6 },
+        tabBarStyle: { backgroundColor: colors.card, borderTopColor: colors.line, height: 68, paddingTop: 8 },
         tabBarLabelStyle: { fontFamily: fonts.bodySemi, fontSize: 11 },
-        tabBarLabel: t(`tabs.${route.name}`),
+        // Ortadaki "İlan ver" düğmesi yazısız (büyük düğme yazının üstüne biner); ekran okuyucu adını yine okur.
+        tabBarLabel: route.name === 'ekle' ? () => null : t(`tabs.${route.name}`),
+        tabBarAccessibilityLabel: t(`tabs.${route.name}`),
         tabBarIcon: ({ color }) =>
+          // "İlan ver" her zaman görünür ve ayrışır: turuncu, büyük düğme.
           route.name === 'ekle' ? (
-            <View style={{ width: 28, height: 28, borderRadius: radius.chip, backgroundColor: colors.primary, alignItems: "center", justifyContent: "center" }}>
-              <Icon name="plus" size={22} color={colors.white} />
+            <View style={{ width: 48, height: 48, marginTop: 4, borderRadius: radius.button + 2, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center',
+              boxShadow: `0 4px 10px ${colors.accent}59` }}>
+              <Icon name="plus" size={24} color={colors.white} />
             </View>
           ) : (
             <View>

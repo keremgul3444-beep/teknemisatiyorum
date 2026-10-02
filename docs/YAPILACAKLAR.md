@@ -37,6 +37,8 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 
 ## Web/öne çıkarma — incelemeden ertelenen küçük maddeler
 - [ ] Fiyatlar kuruşlu girilebilirse gösterim de kuruşlu olsun (şu an tam liraya yuvarlanıyor; yönetim ekranı tam lira giriyor)
+- [ ] Site: `/favicon.ico` isteği dil sayfasına düşüyor (geliştirmede "Çeviri yok: favicon.ico…" hatası, ziyaretçi yine 404 görür). Gerçek site simgesi eklenince çözülür
+- [ ] Yeni tasarım dili ("Liman") ana ekran, kart, menü ve renklerde uygulandı; ilan detayı ve ilan verme adımları için ayrı tasarım turu (gerçek fotoğraflarla)
 - [ ] Canlıda ters vekil (reverse proxy) Host başlığını korumalı ve TRUSTED_PROXY_HOPS doğru ayarlanmalı
 
 ## Canlıya çıkış altyapısı

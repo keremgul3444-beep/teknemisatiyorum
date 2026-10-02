@@ -13,6 +13,13 @@ Tekne alım-satım + broker + ekspertiz + (2. dalga: usta/kaptan/güvenli ödeme
 - Ürünler (Vitrin 7/30, Acil 7/30, Üste taşı), siparişler, ödeme adaptörleri (`api/src/adapters/payments.ts`: deneme sanal POS + deneme mağaza makbuzu; `PAYMENTS_MODE=live` Aşama 2'de bağlanacak).
 - Hız (Lighthouse mobil, üretim derlemesi): ana sayfa Performans 96 / Erişilebilirlik 96 / SEO 100; ilan detayı 92 / 96 / 100.
 
+## Tasarım dili: "Liman" (2026-10-02)
+- Eski "Kıyı Sıcak" (krem zemin, yeşil) yerine kullanıcının seçtiği "Liman": açık zemin `#F6F8FA`, beyaz kart, lacivert ana renk `#0B3B5C`, turuncu vurgu `#F2652B` (yalnızca "İlan ver" düğmesi gibi tek tük yerlerde; turuncu üstüne beyaz yazı yazılmaz, `accentText`/`accentSoft` kullanılır).
+- Yazı tipleri: başlık Bricolage Grotesque, metin Figtree (uygulamada `@expo-google-fonts/*`, sitede `next/font`).
+- Tek kaynak `shared/src/design.ts`; okunabilirlik (WCAG AA) `shared/__tests__/design.test.ts` ile korunuyor.
+- Çizimler (3 yön, A seçildi): https://claude.ai/artifact/MCeVtkeNAFdAKFfyrf2mVT
+- İlan kartı çerçevesiz (yuvarlak köşeli fotoğraf, bilgi altında); alt menüde turuncu "İlan ver" düğmesi; ana ekranda tek satır asistan kutusu.
+
 ## Belgeler
 - Tasarım: `docs/superpowers/specs/2026-09-26-arka-uc-dalga1-design.md`
 - Plan (13 görev): `docs/superpowers/plans/2026-09-26-arka-uc-dalga1.md`

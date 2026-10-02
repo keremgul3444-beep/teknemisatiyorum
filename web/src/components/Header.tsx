@@ -9,7 +9,7 @@ export function Header({ locale }: { locale: Locale }) {
     <header className="site-header">
       <nav className="container" aria-label={t(locale, 'nav.menu')}>
         <Link className="logo" href={p('/')}>{t(locale, 'site.name')}</Link>
-        <Link href={p('/ilanlar')}>{t(locale, 'nav.listings')}</Link>
+        <Link className="hide-xs" href={p('/ilanlar')}>{t(locale, 'nav.listings')}</Link>
         <Link className="hide-mobile" href={p('/ekspertiz')}>{t(locale, 'nav.expertise')}</Link>
         <Link className="hide-mobile" href={p('/broker')}>{t(locale, 'nav.broker')}</Link>
         <Link className="hide-mobile" href={p('/usta')}>{t(locale, 'nav.usta')}</Link>

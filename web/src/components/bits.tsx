@@ -35,9 +35,12 @@ export function Unavailable({ locale }: { locale: Locale }) {
 /** Asistan arama kutusu — JavaScript gerektirmez (düz form). */
 export function SearchBox({ locale, defaultValue }: { locale: Locale; defaultValue?: string }) {
   return (
-    <form action={localePath(locale, '/asistan')} method="get" className="row" role="search" style={{ flexWrap: 'nowrap' }}>
+    <form action={localePath(locale, '/asistan')} method="get" className="search" role="search">
       <label htmlFor="q" style={{ position: 'absolute', left: -9999 }}>{t(locale, 'home.search')}</label>
-      <input id="q" name="q" className="input" defaultValue={defaultValue} placeholder={t(locale, 'home.searchPlaceholder')} maxLength={500} required />
+      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--c-primary)', flexShrink: 0 }}>
+        <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z" />
+      </svg>
+      <input id="q" name="q" defaultValue={defaultValue} placeholder={t(locale, 'home.searchPlaceholder')} maxLength={500} required />
       <button className="btn" type="submit">{t(locale, 'home.search')}</button>
     </form>
   );

@@ -1,14 +1,20 @@
-/** "Kıyı Sıcak" tasarım dili — uygulama ve site aynı değerleri kullanır (tek kaynak). */
+/**
+ * "Liman" tasarım dili — uygulama ve site aynı değerleri kullanır (tek kaynak).
+ * Açık zemin, lacivert ana renk, turuncu vurgu (yalnızca "İlan ver" ve eşleşme gibi tek tük yerlerde).
+ * Turuncu üstüne beyaz yazı okunmaz: turuncu yazı gerekiyorsa `accentText` + `accentSoft` kullanılır.
+ */
 export const colors = {
-  bg: '#F4EFE6', card: '#FFFCF6', primary: '#0F6E68', primarySoft: '#5FA8A0', text: '#1D2B2A',
-  muted: '#5B625B', surface: '#E7DFD0', line: '#E2D9C8', success: '#2E7D4F', warning: '#C98A1B',
-  danger: '#B3261E', white: '#FFFFFF', overlay: 'rgba(29,43,42,0.45)',
+  bg: '#F6F8FA', card: '#FFFFFF', primary: '#0B3B5C', primarySoft: '#8DA6BA', text: '#0E1B26',
+  muted: '#556270', surface: '#EEF2F6', line: '#E3E8EE', success: '#1E7A4C', warning: '#9A5B00',
+  danger: '#C2281E', white: '#FFFFFF', overlay: 'rgba(14,27,38,0.45)',
+  accent: '#F2652B', accentSoft: '#FFF1EA', accentText: '#B23F0E',
 } as const;
-export const radius = { card: 18, button: 12, chip: 14, sm: 8, xs: 4, lg: 24, pill: 999 } as const;
-export const fontFamilies = { heading: 'Space Grotesk', body: 'Inter' } as const;
+export const radius = { card: 20, button: 14, chip: 999, sm: 10, xs: 4, lg: 24, pill: 999 } as const;
+export const fontFamilies = { heading: 'Bricolage Grotesque', body: 'Figtree' } as const;
+/** Fotoğrafı olmayan ilanın yer tutucusu: gökyüzü → deniz. */
 export const gradients: [string, string][] = [
-  ['#5FA8A0', '#0F6E68'], ['#7FB7C9', '#1F5E7A'], ['#9DB8A0', '#3E6B4F'],
-  ['#C9B48A', '#7A5A2E'], ['#8FA9C4', '#2F4C6E'], ['#6FB3A8', '#1D4D4A'],
+  ['#BFD9EA', '#2F6F98'], ['#CFE3DA', '#2C7A6B'], ['#C9D7E6', '#3E6E8E'],
+  ['#D8E6EE', '#5A8FA8'], ['#B9CCE0', '#2B4F73'], ['#D3E2E8', '#3F7488'],
 ];
 
 const kebab = (s: string) => s.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);

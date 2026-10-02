@@ -2,8 +2,8 @@ import '@/i18n';
 import { Stack } from 'expo-router';
 import { View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
-import { SpaceGrotesk_500Medium, SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
+import { useFonts, Figtree_400Regular, Figtree_600SemiBold, Figtree_700Bold } from '@expo-google-fonts/figtree';
+import { BricolageGrotesque_600SemiBold, BricolageGrotesque_800ExtraBold } from '@expo-google-fonts/bricolage-grotesque';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { colors } from '@/theme';
 import { DemoToastHost } from '@/components';
@@ -15,7 +15,7 @@ import { attempt } from '@/services/errors';
 export default function RootLayout() {
   const mode = useMode((s) => s.mode);
   useEffect(() => { if (mode === 'api') attempt(() => syncAll()); }, [mode]);
-  const [loaded] = useFonts({ Inter_400Regular, Inter_600SemiBold, Inter_700Bold, SpaceGrotesk_500Medium, SpaceGrotesk_700Bold });
+  const [loaded] = useFonts({ Figtree_400Regular, Figtree_600SemiBold, Figtree_700Bold, BricolageGrotesque_600SemiBold, BricolageGrotesque_800ExtraBold });
   if (!loaded) return <View style={{ flex: 1, backgroundColor: colors.bg }} />;
   return (
     <SafeAreaProvider>
