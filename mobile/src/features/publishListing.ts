@@ -1,6 +1,10 @@
 import type { ListingDraft } from '@/services/types';
 
-export interface PublishExtra { photoUris?: string[]; broker?: boolean; ownershipUri?: string }
+export interface PublishExtra {
+  photoUris?: string[]; broker?: boolean;
+  /** Ruhsat/bağlama kütüğü fotoğrafı; yanında motor seri numarası fotoğrafı ve son haneleri verilirse "belgeleri eşleşti" için birlikte gönderilir. */
+  ownershipUri?: string; engineDocUri?: string; engineSerialLast4?: string;
+}
 interface Deps {
   post: (path: string, body?: unknown) => Promise<unknown>;
   patch: (path: string, body?: unknown) => Promise<unknown>;
@@ -38,7 +42,10 @@ export function createPublisher(deps: Deps) {
 
     if (!st.submitted) { await deps.post(`/listings/${id}/submit`); st.submitted = true; }
     if (extra.ownershipUri && !st.ownership) {
-      await deps.post('/verification/requests', { kind: 'ruhsat', fileIds: [await deps.upload(extra.ownershipUri, 'private')], listingId: id });
+      const fileIds = [await deps.upload(extra.ownershipUri, 'private')];
+      if (extra.engineDocUri) fileIds.push(await deps.upload(extra.engineDocUri, 'private'));
+      const details = extra.engineSerialLast4 ? { engineSerialLast4: extra.engineSerialLast4 } : undefined;
+      await deps.post('/verification/requests', { kind: 'ruhsat', fileIds, listingId: id, ...(details ? { details } : {}) });
       st.ownership = true;
     }
     if (extra.broker && !st.broker) {

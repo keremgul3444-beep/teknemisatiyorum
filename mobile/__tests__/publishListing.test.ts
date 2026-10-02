@@ -31,6 +31,15 @@ test('gönderim yarıda kalırsa yeniden denemede yeni taslak açılmaz, fotoğr
   expect(f.deps.upload).toHaveBeenCalledTimes(2);
 });
 
+test('ruhsat + motor seri no fotoğrafı tek başvuruda, seri numarasının son haneleriyle gider', async () => {
+  const f = fakeApi();
+  const publish = createPublisher(f.deps);
+  await publish(draft, { ownershipUri: 'ruhsat', engineDocUri: 'motor', engineSerialLast4: 'A7Q2' });
+  expect(f.deps.post).toHaveBeenCalledWith('/verification/requests', { kind: 'ruhsat', fileIds: ['F-ruhsat', 'F-motor'], listingId: 'L1', details: { engineSerialLast4: 'A7Q2' } });
+  await publish(draft, { ownershipUri: 'ruhsat' });
+  expect(f.deps.post).toHaveBeenLastCalledWith('/verification/requests', { kind: 'ruhsat', fileIds: ['F-ruhsat'], listingId: 'L2' });
+});
+
 test('başarılı gönderimden sonra yeni ilan yeni taslak açar', async () => {
   const f = fakeApi();
   const publish = createPublisher(f.deps);

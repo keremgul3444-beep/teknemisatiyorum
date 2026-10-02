@@ -134,7 +134,8 @@
     "sahiplik": "Ownership verified",
     "broker": "Broker assured",
     "dogrulanmis": "Verified",
-    "beklemede": "Pending approval"
+    "beklemede": "Pending approval",
+    "belge": "Documents match"
   },
   "logbook": {
     "boatAdded": "Boat added",

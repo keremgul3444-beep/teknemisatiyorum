@@ -17,8 +17,11 @@ const identityBody = z.union([
 ]);
 const requestBody = z.object({
   kind: z.enum(['usta', 'kaptan', 'eksper', 'firma', 'ruhsat']),
+  /** Ruhsat başvurusunda ikinci dosya motor seri numarası fotoğrafıdır; ikisi birlikte onaylanınca "belgeleri eşleşti" rozeti. */
   fileIds: z.array(z.string().min(1)).min(1).max(5),
   listingId: z.string().optional(),
+  /** Moderatörün fotoğrafla karşılaştıracağı motor seri numarasının son haneleri (tamamı istenmez). */
+  details: z.object({ engineSerialLast4: z.string().trim().regex(/^[A-Za-z0-9]{2,6}$/) }).optional(),
 });
 
 const tcknInUse = () => new AppError('TCKN_IN_USE', 'errors.tckn_in_use', 409);
@@ -74,7 +77,7 @@ export class VerificationController {
       const own = await this.prisma.listing.count({ where: { id: b.listingId, ownerId: u.id } });
       if (!own) throw Errors.notFound();
     }
-    const r = await this.prisma.verificationRequest.create({ data: { userId: u.id, kind: b.kind, fileIds: b.fileIds, listingId: b.listingId } });
+    const r = await this.prisma.verificationRequest.create({ data: { userId: u.id, kind: b.kind, fileIds: b.fileIds, listingId: b.listingId, details: b.details } });
     return { id: r.id, kind: r.kind, status: r.status, createdAt: r.createdAt };
   }
 

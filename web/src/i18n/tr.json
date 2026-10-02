@@ -134,7 +134,8 @@
     "sahiplik": "Sahipliği doğrulandı",
     "broker": "Broker güvencesi",
     "dogrulanmis": "Doğrulanmış",
-    "beklemede": "Onay bekliyor"
+    "beklemede": "Onay bekliyor",
+    "belge": "Belgeleri eşleşti"
   },
   "logbook": {
     "boatAdded": "Tekne eklendi",

@@ -31,6 +31,8 @@ Tekne alım-satım + broker + ekspertiz + (2. dalga: usta/kaptan/güvenli ödeme
 - Satıcı istatistikleri: `Listing.viewCount` (sahibi dışındaki herkese açık görüntülemeler, yanıt bekletilmez), `/me/listings` satırlarında `stats {views, favorites, messages}`; uygulamada İlanlarım, sitede Hesabım > İlanlarım.
 - Paylaşım: ilan görünümünde `webUrl` (`WEB_URL/ilan/<id>`, site asıl adrese yönlendirir); uygulamada gerçek paylaşım sayfası (`Share.share`). Uygulamada site adresi `EXPO_PUBLIC_WEB_URL` (varsayılan https://teknemisatiyorum.com).
 - Düzeltme: PATCH /listings/:id artık göndermediğin alanları varsayılana sıfırlamıyor.
+- Karşılaştırma (uygulama): Favoriler > Karşılaştır, 2–3 ilan, `features/compare.ts` en iyi değeri işaretler.
+- Belgeler eşleşti rozeti: ruhsat başvurusuna ikinci dosya (motor seri no fotoğrafı) + `details.engineSerialLast4`; moderatör onaylayınca `sahiplik` + `belge` rozeti. Devir asistanı (`devir.tsx`): resmî adımlar (noter, Umurbey randevu, 15 gün e-Devlet tescil), belge listesi, bağlantılar, sonunda `POST /listings/:id/sold` ile satıldı; İlanlarım'dan ulaşılır.
 - Anlık bildirim: `PushToken` tablosu (`PUT/DELETE /me/push-token`), `adapters/push.ts` (Expo Push servisi — ücretsiz; `PUSH_MODE=expo`, varsayılan `off` = bellek), metinler `push.texts.ts` (uygulamanın notif.* çevirileriyle aynı, kullanıcının dilinde). Her uygulama içi bildirim aynı anda telefona da gider; kayıtsız cihazın jetonu silinir; aynı jeton başka hesapla girişte o hesaba geçer; çıkışta silinir. Uygulama: `features/push.ts` (izin, jeton, bildirime dokununca ekran), `_layout.tsx` dinleyici, `app.json` expo-notifications eklentisi.
 
 ## Belgeler

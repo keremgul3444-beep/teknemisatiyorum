@@ -81,7 +81,7 @@ class AdminController {
     return { id, status: approve ? 'published' : 'rejected' };
   }
 
-  /** Belge onayı etkileri: kimlik → seviye 2, mesleki belge → seviye 3, ruhsat → ilana "sahiplik" rozeti. */
+  /** Belge onayı etkileri: kimlik → seviye 2, mesleki belge → seviye 3, ruhsat → ilana "sahiplik" rozeti (+ motor seri no fotoğrafı da varsa "belge"). */
   @Auth(STAFF)
   @Post('verifications/:id/decision')
   @HttpCode(200)
@@ -102,7 +102,10 @@ class AdminController {
       if (v.kind === 'identity') await tx.user.update({ where: { id: v.userId }, data: { verifyLevel: Math.max(2, user.verifyLevel) } });
       else if (v.kind === 'ruhsat' && v.listingId) {
         const l = await tx.listing.findUnique({ where: { id: v.listingId } });
-        if (l && !l.badges.includes('sahiplik')) await tx.listing.update({ where: { id: l.id }, data: { badges: [...l.badges, 'sahiplik'] } });
+        // Ruhsat + motor seri numarası fotoğrafı birlikte onaylandıysa belgeler eşleşmiş sayılır.
+        const granted = v.fileIds.length >= 2 ? ['sahiplik', 'belge'] : ['sahiplik'];
+        const badges = l ? [...l.badges, ...granted.filter((b) => !l.badges.includes(b))] : [];
+        if (l && badges.length !== l.badges.length) await tx.listing.update({ where: { id: l.id }, data: { badges } });
       } else if (v.kind !== 'ruhsat') await tx.user.update({ where: { id: v.userId }, data: { verifyLevel: 3 } });
     });
     await this.notifications.push(v.userId, approve ? 'notif.docApproved' : 'notif.docRejected', { kind: v.kind, ...(approve ? {} : { reason: b.reason }) });

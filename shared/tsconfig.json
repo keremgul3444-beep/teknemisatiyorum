@@ -1,1 +1,19 @@
-{ "compilerOptions": { "target": "ES2022", "module": "node16", "moduleResolution": "node16", "strict": true, "esModuleInterop": true, "skipLibCheck": true, "types": ["jest", "node"] }, "include": ["src", "__tests__"] }
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "node16",
+    "moduleResolution": "node16",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "types": [
+      "jest",
+      "node"
+    ]
+  },
+  "include": [
+    "src",
+    "__tests__"
+  ],
+  "extends": "expo/tsconfig.base"
+}

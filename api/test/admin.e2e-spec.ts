@@ -102,12 +102,16 @@ describe('yönetim', () => {
     const owner = await loginAs(t, { level: 2 });
     const l = await pendingListing(owner.user.id, { status: 'published' });
     const f = await t.http().post('/media').set(owner.auth).field('visibility', 'private').attach('file', await jpegWithExif(300, 200), 'r.jpg');
-    const vr = await t.http().post('/verification/requests').set(owner.auth).send({ kind: 'ruhsat', fileIds: [f.body.id], listingId: l.id });
+    const fm = await t.http().post('/media').set(owner.auth).field('visibility', 'private').attach('file', await jpegWithExif(300, 200), 'motor.jpg');
+    const vr = await t.http().post('/verification/requests').set(owner.auth).send({ kind: 'ruhsat', fileIds: [f.body.id, fm.body.id], listingId: l.id, details: { engineSerialLast4: 'A7Q2' } });
+    expect(vr.status).toBe(201);
+    expect((await t.http().post('/verification/requests').set(owner.auth).send({ kind: 'ruhsat', fileIds: [f.body.id], listingId: l.id, details: { engineSerialLast4: 'çok uzun seri' } })).status).toBe(400);
     const f2 = await t.http().post('/media').set(owner.auth).field('visibility', 'private').attach('file', await jpegWithExif(300, 200), 'u.jpg');
     const vr2 = await t.http().post('/verification/requests').set(owner.auth).send({ kind: 'usta', fileIds: [f2.body.id] });
     const m = await moderator();
     expect((await t.http().post(`/admin/verifications/${vr.body.id}/decision`).set(m.auth).send({ decision: 'approve' })).status).toBe(200);
-    expect((await t.prisma.listing.findUnique({ where: { id: l.id } }))!.badges).toContain('sahiplik');
+    expect((await t.prisma.listing.findUnique({ where: { id: l.id } }))!.badges).toEqual(expect.arrayContaining(['sahiplik', 'belge']));
+    expect((await t.prisma.verificationRequest.findUnique({ where: { id: vr.body.id } }))!.details).toEqual({ engineSerialLast4: 'A7Q2' });
     await t.http().post(`/admin/verifications/${vr2.body.id}/decision`).set(m.auth).send({ decision: 'approve' }).expect(200);
     expect((await t.prisma.user.findUnique({ where: { id: owner.user.id } }))!.verifyLevel).toBe(3);
     // moderatör belgeyi imzalı bağlantıyla açabilir

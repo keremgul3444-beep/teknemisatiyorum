@@ -45,7 +45,8 @@
     "sahiplik": "Ownership verified",
     "broker": "Broker assured",
     "dogrulanmis": "Verified",
-    "beklemede": "Pending approval"
+    "beklemede": "Pending approval",
+    "belge": "Documents match"
   },
   "boatType": {
     "motoryat": "Motor yacht",
@@ -400,15 +401,18 @@
     "location": "Where is the boat?",
     "broker": "Let us sell it (broker service)",
     "brokerHint": "We handle valuation, professional photos and buyer meetings.",
-    "docsTitle": "Proof of ownership",
-    "docsHint": "Upload the registration certificate so your listing earns the \"Ownership verified\" badge.",
+    "docsTitle": "Documents",
+    "docsHint": "Upload the registration (bağlama kütüğü) document so the listing gets the \"Ownership verified\" badge. Add a photo of the engine serial number to also get \"Documents match\".",
     "docLabel": "Registration certificate",
     "preview": "Preview",
     "publish": "Publish",
     "doneTitle": "Your listing was submitted for review",
     "doneBody": "Usually reviewed within 2 hours. Everyone can see it once approved.",
     "goMine": "Go to my listings",
-    "goHome": "Back to Explore"
+    "goHome": "Back to Explore",
+    "engineDocLabel": "Engine serial number photo",
+    "engineSerial": "Engine serial no (last 4)",
+    "engineSerialHint": "A moderator compares it with the photo; the full number is not required."
   },
   "boatAdd": {
     "title": "Add a boat",
@@ -625,9 +629,9 @@
   },
   "transfer": {
     "title": "Transfer assistant",
-    "subtitle": "Step by step after the sale",
+    "subtitle": "Official steps after the sale",
     "progress": "{{done}}/{{total}} steps done",
-    "what": "What's needed?",
+    "what": "What is needed?",
     "s1": "Draft sales contract",
     "s1b": "Parties' IDs, boat details, price and payment method are recorded.",
     "s2": "Notary appointment",
@@ -639,7 +643,38 @@
     "s5": "Update insurance",
     "s5b": "The policy is reissued to the new owner or a new one is taken out.",
     "s6": "Logbook transfer",
-    "s6b": "The Boat Logbook is moved to the new owner's account in the app."
+    "s6b": "The Boat Logbook is moved to the new owner's account in the app.",
+    "markSold": "Mark listing as sold",
+    "soldDone": "Listing marked as sold",
+    "step": {
+      "docs": "Prepare documents",
+      "contract": "Sale contract at the notary",
+      "payment": "Pay via bank transfer",
+      "port": "Sale application at the port authority",
+      "register": "New owner registers within 15 days",
+      "insurance": "Update insurance",
+      "logbook": "Hand over the logbook"
+    },
+    "stepBody": {
+      "docs": "For the port authority and notary: IDs, original registration certificate, photos of the boat and engine serial number, passport photo.",
+      "contract": "A registered boat is sold with an official contract signed by buyer and seller at the notary: parties, boat details, price and payment terms.",
+      "payment": "Pay by bank transfer, noting the boat name and registration number. Never pay a deposit outside the platform.",
+      "port": "The seller books an appointment in the Umurbey system: Registry Transactions > Vessel Sale Application, then visits the port authority with the documents.",
+      "register": "Within 15 days of the sale the new owner registers the certificate in their name via e-Devlet or at the port authority.",
+      "insurance": "Issue the policy in the new owner's name or buy a new one; keep the boat insured.",
+      "logbook": "The logbook is transferred to the new owner's account in the app; the maintenance history travels with the boat."
+    },
+    "doc": {
+      "id": "IDs (buyer and seller)",
+      "license": "Registration certificate (original)",
+      "boatPhotos": "Boat photos",
+      "engineSerial": "Engine serial number photo",
+      "photo": "Passport photo"
+    },
+    "link": {
+      "port": "Book at Umurbey",
+      "register": "Open e-Devlet"
+    }
   },
   "mine": {
     "live": "Live",
@@ -660,7 +695,8 @@
     "paymentsEmpty": "No payments yet",
     "views": "{{n}} views",
     "favorites": "{{n}} favourites",
-    "messages": "{{n}} messages"
+    "messages": "{{n}} messages",
+    "transfer": "Transfer assistant"
   },
   "settings": {
     "title": "Settings",

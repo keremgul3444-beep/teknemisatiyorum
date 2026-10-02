@@ -4,7 +4,7 @@ import { colors, radius, space, fonts } from '@/theme';
 import { T } from './T';
 import { Icon } from './Icon';
 
-export type BadgeName = 'ekspertizli' | 'sahiplik' | 'broker' | 'dogrulanmis' | 'beklemede';
+export type BadgeName = 'ekspertizli' | 'sahiplik' | 'broker' | 'belge' | 'dogrulanmis' | 'beklemede';
 
 /** Güven rozeti ("Liman"): hap biçimli; fotoğraf üstünde beyaz, sayfada çerçeveli. Bekleyen: turuncu nokta. */
 export function Badge({ kind, onDark }: { kind: BadgeName; onDark?: boolean }) {

@@ -45,7 +45,8 @@
     "sahiplik": "Sahipliği doğrulandı",
     "broker": "Broker güvencesi",
     "dogrulanmis": "Doğrulanmış",
-    "beklemede": "Onay bekliyor"
+    "beklemede": "Onay bekliyor",
+    "belge": "Belgeleri eşleşti"
   },
   "boatType": {
     "motoryat": "Motoryat",
@@ -400,15 +401,18 @@
     "location": "Tekne nerede?",
     "broker": "Satışı bize bırak (broker hizmeti)",
     "brokerHint": "Değerleme, profesyonel çekim ve alıcı görüşmelerini biz yürütürüz.",
-    "docsTitle": "Sahiplik belgesi",
-    "docsHint": "Ruhsat ya da bağlama kütüğü yükle; ilanın \"Sahipliği doğrulandı\" rozeti alsın.",
+    "docsTitle": "Belgeler",
+    "docsHint": "Ruhsat ya da bağlama kütüğü belgesini yükle; ilanın \"Sahipliği doğrulandı\" rozeti alsın. Motor seri numarasının fotoğrafını da eklersen \"Belgeleri eşleşti\" rozeti verilir.",
     "docLabel": "Ruhsat / bağlama kütüğü",
     "preview": "Önizleme",
     "publish": "Yayınla",
     "doneTitle": "İlanın onaya gönderildi",
     "doneBody": "Genelde 2 saat içinde incelenir. Onaylanınca herkes görebilir.",
     "goMine": "İlanlarıma git",
-    "goHome": "Keşfet'e dön"
+    "goHome": "Keşfet'e dön",
+    "engineDocLabel": "Motor seri numarası fotoğrafı",
+    "engineSerial": "Motor seri no (son 4 hane)",
+    "engineSerialHint": "Moderatör fotoğrafla karşılaştırır; numaranın tamamı istenmez."
   },
   "boatAdd": {
     "title": "Tekne ekle",
@@ -625,7 +629,7 @@
   },
   "transfer": {
     "title": "Devir asistanı",
-    "subtitle": "Satış sonrası adım adım",
+    "subtitle": "Satış sonrası resmî adımlar",
     "progress": "{{done}}/{{total}} adım tamamlandı",
     "what": "Ne gerekir?",
     "s1": "Satış sözleşmesi taslağı",
@@ -639,7 +643,38 @@
     "s5": "Sigortanın güncellenmesi",
     "s5b": "Poliçe yeni sahip adına düzenlenir ya da yenisi yapılır.",
     "s6": "Karne devri",
-    "s6b": "Tekne Karnesi uygulamada yeni sahibin hesabına aktarılır."
+    "s6b": "Tekne Karnesi uygulamada yeni sahibin hesabına aktarılır.",
+    "markSold": "İlanı satıldı olarak işaretle",
+    "soldDone": "İlan satıldı olarak işaretlendi",
+    "step": {
+      "docs": "Belgeleri hazırla",
+      "contract": "Noterde satış sözleşmesi",
+      "payment": "Ödeme banka üzerinden",
+      "port": "Liman başkanlığına satış başvurusu",
+      "register": "Yeni malik 15 gün içinde tescil",
+      "insurance": "Sigortayı güncelle",
+      "logbook": "Karneyi yeni sahibe devret"
+    },
+    "stepBody": {
+      "docs": "Liman başkanlığı ve noter için: kimlikler, bağlama kütüğü ruhsatnamesinin aslı, teknenin ve motor seri numarasının fotoğrafı, vesikalık fotoğraf.",
+      "contract": "Bağlama kütüğüne kayıtlı teknenin satışı resmî sözleşmeyle yapılır; alıcı ve satıcı noterde imzalar. Sözleşmede taraf bilgileri, tekne bilgileri, bedel ve ödeme şekli yazılır.",
+      "payment": "Bedeli banka havalesiyle, açıklamasına tekne adı ve ruhsat numarası yazarak öde. Platform dışında kapora verme.",
+      "port": "Satıcı Umurbey sisteminden randevu alır: Bağlama Kütüğü İşlemleri > Gemi Satış Başvurusu. Belgelerle liman başkanlığına gidilir.",
+      "register": "Satıştan sonra 15 gün içinde yeni malik ruhsatnameyi kendi adına e-Devlet'ten ya da liman başkanlığında tescil ettirir.",
+      "insurance": "Poliçe yeni sahip adına düzenlenir ya da yenisi yapılır; tekne sigortasız kalmasın.",
+      "logbook": "Tekne Karnesi uygulamada yeni sahibin hesabına aktarılır; bakım geçmişi tekneyle gider."
+    },
+    "doc": {
+      "id": "Kimlik (alıcı ve satıcı)",
+      "license": "Bağlama kütüğü ruhsatnamesi (aslı)",
+      "boatPhotos": "Tekne fotoğrafları",
+      "engineSerial": "Motor seri numarası fotoğrafı",
+      "photo": "Vesikalık fotoğraf"
+    },
+    "link": {
+      "port": "Umurbey'den randevu al",
+      "register": "e-Devlet'i aç"
+    }
   },
   "mine": {
     "live": "Yayında",
@@ -660,7 +695,8 @@
     "paymentsEmpty": "Henüz ödeme yok",
     "views": "{{n}} görüntülenme",
     "favorites": "{{n}} favori",
-    "messages": "{{n}} mesaj"
+    "messages": "{{n}} mesaj",
+    "transfer": "Devir asistanı"
   },
   "settings": {
     "title": "Ayarlar",

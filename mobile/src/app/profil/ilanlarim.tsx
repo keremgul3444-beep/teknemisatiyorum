@@ -57,6 +57,7 @@ function PromoRow({ listing: l }: { listing: Listing }) {
         {f ? <T variant="caption" color={colors.primary}>{t('promo.activeFeatured', { n: f })}</T> : null}
         {u ? <T variant="caption" color={colors.danger}>{t('promo.activeUrgent', { n: u })}</T> : null}
       </View>
+      <Button small variant="ghost" icon="doc" title={t('mine.transfer')} onPress={() => router.push({ pathname: '/devir', params: { ilan: l.id } })} />
       <Button small variant="secondary" icon="sparkle" title={t('promo.cta')} onPress={() => router.push(`/profil/one-cikar/${l.id}`)} />
     </View>
   );

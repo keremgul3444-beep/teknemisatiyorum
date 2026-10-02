@@ -9,7 +9,7 @@ export type Currency = (typeof CURRENCIES)[number];
 export type BoatType = (typeof BOAT_TYPES)[number];
 export type Equipment = (typeof EQUIPMENT)[number];
 export type UstaCategory = (typeof USTA_CATEGORIES)[number];
-export type BadgeKind = 'ekspertizli' | 'sahiplik' | 'broker';
+export type BadgeKind = 'ekspertizli' | 'sahiplik' | 'broker' | 'belge';
 export type ListingStatus = 'yayinda' | 'onay-bekliyor' | 'satildi';
 
 const pos = z.number().finite().positive().max(1e9);

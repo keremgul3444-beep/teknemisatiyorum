@@ -33,6 +33,9 @@ export default function IlanVer() {
   const [done, setDone] = useState(false);
   const [uris, setUris] = useState<Record<number, string>>({});
   const [docUri, setDocUri] = useState<string | null>(null);
+  const [engineDoc, setEngineDoc] = useState(false);
+  const [engineDocUri, setEngineDocUri] = useState<string | null>(null);
+  const [engineSerial, setEngineSerial] = useState('');
   const [busy, setBusy] = useState(false);
   // Değerleme, karne ya da ilanlarım gibi her giriş noktasında aynı kimlik kapısı geçerli.
   useEffect(() => { requireLevel(2); }, []);
@@ -73,7 +76,7 @@ export default function IlanVer() {
           <View style={{ flex: 2 }}><Button title={t('wizard.publish')} loading={busy} onPress={async () => {
             if (!requireLevel(2)) return;
             setBusy(true);
-            const id = await attempt(() => actions.createListing(draft, { photoUris: photos.map((i) => uris[i]).filter(Boolean), broker, ownershipUri: docUri ?? undefined }));
+            const id = await attempt(() => actions.createListing(draft, { photoUris: photos.map((i) => uris[i]).filter(Boolean), broker, ownershipUri: docUri ?? undefined, engineDocUri: engineDocUri ?? undefined, engineSerialLast4: engineSerial.trim() || undefined }));
             setBusy(false);
             if (id) setDone(true);
           }} /></View>
@@ -182,6 +185,20 @@ export default function IlanVer() {
             }
             setDoc(true);
           }} />
+          <UploadBox label={t('wizard.engineDocLabel')} state={engineDoc ? 'incelemede' : 'bos'} onPress={async () => {
+            if (isApiMode()) {
+              const uri = await pickImage();
+              if (!uri) return;
+              setEngineDocUri(uri);
+            }
+            setEngineDoc(true);
+          }} />
+          {engineDoc ? (
+            <>
+              <Field label={t('wizard.engineSerial')} value={engineSerial} onChangeText={(v) => setEngineSerial(v.replace(/[^A-Za-z0-9]/g, '').slice(0, 6).toUpperCase())} maxLength={6} />
+              <T variant="caption" color={colors.muted}>{t('wizard.engineSerialHint')}</T>
+            </>
+          ) : null}
         </Section>
       ) : null}
     </Screen>

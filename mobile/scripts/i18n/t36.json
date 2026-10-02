@@ -1,0 +1,41 @@
+{"tr":{
+  "badge":{"belge":"Belgeleri eşleşti"},
+  "wizard":{"docsTitle":"Belgeler","docsHint":"Ruhsat ya da bağlama kütüğü belgesini yükle; ilanın \"Sahipliği doğrulandı\" rozeti alsın. Motor seri numarasının fotoğrafını da eklersen \"Belgeleri eşleşti\" rozeti verilir.","engineDocLabel":"Motor seri numarası fotoğrafı","engineSerial":"Motor seri no (son 4 hane)","engineSerialHint":"Moderatör fotoğrafla karşılaştırır; numaranın tamamı istenmez."},
+  "mine":{"transfer":"Devir asistanı"},
+  "transfer":{
+    "title":"Devir asistanı","subtitle":"Satış sonrası resmî adımlar","progress":"{{done}}/{{total}} adım tamamlandı","what":"Ne gerekir?",
+    "markSold":"İlanı satıldı olarak işaretle","soldDone":"İlan satıldı olarak işaretlendi",
+    "step":{"docs":"Belgeleri hazırla","contract":"Noterde satış sözleşmesi","payment":"Ödeme banka üzerinden","port":"Liman başkanlığına satış başvurusu","register":"Yeni malik 15 gün içinde tescil","insurance":"Sigortayı güncelle","logbook":"Karneyi yeni sahibe devret"},
+    "stepBody":{
+      "docs":"Liman başkanlığı ve noter için: kimlikler, bağlama kütüğü ruhsatnamesinin aslı, teknenin ve motor seri numarasının fotoğrafı, vesikalık fotoğraf.",
+      "contract":"Bağlama kütüğüne kayıtlı teknenin satışı resmî sözleşmeyle yapılır; alıcı ve satıcı noterde imzalar. Sözleşmede taraf bilgileri, tekne bilgileri, bedel ve ödeme şekli yazılır.",
+      "payment":"Bedeli banka havalesiyle, açıklamasına tekne adı ve ruhsat numarası yazarak öde. Platform dışında kapora verme.",
+      "port":"Satıcı Umurbey sisteminden randevu alır: Bağlama Kütüğü İşlemleri > Gemi Satış Başvurusu. Belgelerle liman başkanlığına gidilir.",
+      "register":"Satıştan sonra 15 gün içinde yeni malik ruhsatnameyi kendi adına e-Devlet'ten ya da liman başkanlığında tescil ettirir.",
+      "insurance":"Poliçe yeni sahip adına düzenlenir ya da yenisi yapılır; tekne sigortasız kalmasın.",
+      "logbook":"Tekne Karnesi uygulamada yeni sahibin hesabına aktarılır; bakım geçmişi tekneyle gider."
+    },
+    "doc":{"id":"Kimlik (alıcı ve satıcı)","license":"Bağlama kütüğü ruhsatnamesi (aslı)","boatPhotos":"Tekne fotoğrafları","engineSerial":"Motor seri numarası fotoğrafı","photo":"Vesikalık fotoğraf"},
+    "link":{"port":"Umurbey'den randevu al","register":"e-Devlet'i aç"}
+  }
+},"en":{
+  "badge":{"belge":"Documents match"},
+  "wizard":{"docsTitle":"Documents","docsHint":"Upload the registration (bağlama kütüğü) document so the listing gets the \"Ownership verified\" badge. Add a photo of the engine serial number to also get \"Documents match\".","engineDocLabel":"Engine serial number photo","engineSerial":"Engine serial no (last 4)","engineSerialHint":"A moderator compares it with the photo; the full number is not required."},
+  "mine":{"transfer":"Transfer assistant"},
+  "transfer":{
+    "title":"Transfer assistant","subtitle":"Official steps after the sale","progress":"{{done}}/{{total}} steps done","what":"What is needed?",
+    "markSold":"Mark listing as sold","soldDone":"Listing marked as sold",
+    "step":{"docs":"Prepare documents","contract":"Sale contract at the notary","payment":"Pay via bank transfer","port":"Sale application at the port authority","register":"New owner registers within 15 days","insurance":"Update insurance","logbook":"Hand over the logbook"},
+    "stepBody":{
+      "docs":"For the port authority and notary: IDs, original registration certificate, photos of the boat and engine serial number, passport photo.",
+      "contract":"A registered boat is sold with an official contract signed by buyer and seller at the notary: parties, boat details, price and payment terms.",
+      "payment":"Pay by bank transfer, noting the boat name and registration number. Never pay a deposit outside the platform.",
+      "port":"The seller books an appointment in the Umurbey system: Registry Transactions > Vessel Sale Application, then visits the port authority with the documents.",
+      "register":"Within 15 days of the sale the new owner registers the certificate in their name via e-Devlet or at the port authority.",
+      "insurance":"Issue the policy in the new owner's name or buy a new one; keep the boat insured.",
+      "logbook":"The logbook is transferred to the new owner's account in the app; the maintenance history travels with the boat."
+    },
+    "doc":{"id":"IDs (buyer and seller)","license":"Registration certificate (original)","boatPhotos":"Boat photos","engineSerial":"Engine serial number photo","photo":"Passport photo"},
+    "link":{"port":"Book at Umurbey","register":"Open e-Devlet"}
+  }
+}}

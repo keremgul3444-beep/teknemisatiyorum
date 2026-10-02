@@ -10,7 +10,7 @@ import { devReceipt } from '@/features/promo';
 import type { AdminStatus, BoatInput, Listing, ListingDraft, SubjectKind } from './types';
 import { useSession, type Prefs } from '@/session/role';
 import { resetRates } from './rates';
-import { createPublisher } from '@/features/publishListing';
+import { createPublisher, type PublishExtra } from '@/features/publishListing';
 import { getPushToken } from '@/features/push';
 
 /** Bu cihazın sunucuya bıraktığı bildirim jetonu; çıkışta silinir. */
@@ -107,7 +107,7 @@ export const actions = {
   },
 
   // ——— İlanlar ———
-  async createListing(d: ListingDraft, extra: { photoUris?: string[]; broker?: boolean; ownershipUri?: string } = {}) {
+  async createListing(d: ListingDraft, extra: PublishExtra = {}) {
     if (!isApiMode()) {
       const id = g().createListing(d);
       if (extra.broker) g().applyBroker({ boatName: `${d.brand} ${d.model}`, askingEUR: d.currency === 'EUR' ? d.price : 0 });
@@ -116,6 +116,12 @@ export const actions = {
     const id = await publishListing(d, extra);
     await syncMine();
     return id;
+  },
+  /** Devir asistanının sonunda: ilan satıldı (yayından kalkar, İlanlarım > Satıldı'da durur). */
+  async markSold(id: string) {
+    if (!isApiMode()) return g().markSold(id);
+    await api.post(`/listings/${id}/sold`);
+    await syncMine();
   },
   async loadListing(id: string) {
     if (!isApiMode()) return;

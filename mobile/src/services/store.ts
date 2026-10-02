@@ -18,6 +18,7 @@ export interface Data {
 
 export interface Actions {
   createListing(d: ListingDraft): string;
+  markSold(id: string): void;
   toggleFavorite(id: string): void;
   saveSearch(query: string): string;
   createJob(input: JobInput): string;
@@ -77,6 +78,10 @@ export const useStore = create<Data & Actions>((set, get) => {
         adminItems: [{ id: nextId('a'), kind: 'ilan', title: `${d.brand} ${d.model}`, who: DEMO_USER.name, status: 'bekliyor', refId: id }, ...get().adminItems],
       });
       return id;
+    },
+
+    markSold(id) {
+      set({ listings: get().listings.map((l) => (l.id === id ? { ...l, status: 'satildi' } : l)) });
     },
 
     toggleFavorite(id) {
