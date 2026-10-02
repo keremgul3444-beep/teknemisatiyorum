@@ -19,6 +19,10 @@ Tekne alım-satım + broker + ekspertiz + (2. dalga: usta/kaptan/güvenli ödeme
 - Tek kaynak `shared/src/design.ts`; okunabilirlik (WCAG AA) `shared/__tests__/design.test.ts` ile korunuyor.
 - Çizimler (3 yön, A seçildi): https://claude.ai/artifact/MCeVtkeNAFdAKFfyrf2mVT
 - İlan kartı çerçevesiz (yuvarlak köşeli fotoğraf, bilgi altında); alt menüde turuncu "İlan ver" düğmesi; ana ekranda tek satır asistan kutusu.
+- Ortak bileşenler: `AssistantInput` (asistan kutusu; ana ekran, asistan, hizmetler), `Badge` hap biçimli + ikonlu, `StatusLine`/`Bullet` (metin içine ✓ • gibi işaret yazılmaz, ikon kullanılır), `Section` başlığı 19 px + sağda "Tümü ›". Emoji ve metin işareti yok.
+- İlan detayı (uygulama ve site): fotoğraf, rozetler, başlık, fiyat, üç büyük rakam (boy/yıl/kabin), özellik listesi, donanım, açıklama, karne, satıcı.
+- Site simgesi: `web/src/app/icon.svg` → `favicon.ico` (32 px, PNG gömülü) ve `public/icon.png` (512 px, schema.org logosu). Üretim: scratch betiği sharp ile çizdi; SVG değişirse yeniden üretilmeli.
+- `npx expo lint` 0 uyarı; tasarım dışı kalan tek iş gerçek fotoğraflar ve mağaza simgesi.
 
 ## Belgeler
 - Tasarım: `docs/superpowers/specs/2026-09-26-arka-uc-dalga1-design.md`

@@ -33,7 +33,7 @@ export default function Onboarding() {
         scrollEventThrottle={32}
         renderItem={({ item }) => (
           <View style={{ width, paddingHorizontal: space(6), gap: space(6), justifyContent: 'center' }}>
-            <BoatImage seed={item.seed} height={260} rounded={24} />
+            <BoatImage seed={item.seed} height={260} rounded={radius.lg} />
             <View style={{ gap: space(3) }}>
               <T variant="h1">{t(`onboarding.${item.k}t`)}</T>
               <T color={colors.muted}>{t(`onboarding.${item.k}b`)}</T>
@@ -44,7 +44,7 @@ export default function Onboarding() {
       <View style={{ padding: space(6), gap: space(5) }}>
         <View style={{ flexDirection: 'row', gap: space(2), justifyContent: 'center' }}>
           {PAGES.map((p, i) => (
-            <View key={p.k} style={{ width: i === page ? 22 : 8, height: 8, borderRadius: radius.xs, backgroundColor: i === page ? colors.primary : colors.surface }} />
+            <View key={p.k} style={{ width: i === page ? 22 : 8, height: 8, borderRadius: radius.pill, backgroundColor: i === page ? colors.primary : colors.line }} />
           ))}
         </View>
         <Button title={t('onboarding.start')} onPress={finish} />

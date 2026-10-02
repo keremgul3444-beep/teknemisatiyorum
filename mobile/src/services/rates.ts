@@ -1,5 +1,4 @@
-import { DEMO_RATES, toTRY as toTRYWith, toEUR as toEURWith, type Rates } from '@tms/shared';
-import type { Currency } from '@tms/shared';
+import { DEMO_RATES, toTRY as toTRYWith, toEUR as toEURWith, type Currency, type Rates } from '@tms/shared';
 
 export { DEMO_RATES, formatPrice, type Rates } from '@tms/shared';
 

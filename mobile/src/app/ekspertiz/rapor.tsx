@@ -2,7 +2,7 @@ import { View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { useTranslation } from 'react-i18next';
 import { colors, radius, space, fonts } from '@/theme';
-import { Button, Card, Header, Icon, Screen, T, showDemoToast } from '@/components';
+import { Bullet, Button, Card, Header, Icon, Screen, T, showDemoToast } from '@/components';
 
 type Level = 'good' | 'attention' | 'defect';
 const SECTIONS: { k: string; level: Level }[] = [
@@ -45,9 +45,7 @@ export default function Rapor() {
             </View>
           </View>
           {[1, 2].map((n) => (
-            <View key={n} style={{ flexDirection: 'row', gap: space(2) }}>
-              <T color={colors.muted}>•</T><T variant="caption" style={{ flex: 1 }}>{t(`expertise.items.${s.k}${n}`)}</T>
-            </View>
+            <Bullet key={n} text={t(`expertise.items.${s.k}${n}`)} />
           ))}
           <View style={{ height: 70, borderRadius: radius.sm, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: space(2) }}>
             <Icon name="camera" size={18} color={colors.muted} /><T variant="caption" color={colors.muted}>{t('expertise.photo')}</T>

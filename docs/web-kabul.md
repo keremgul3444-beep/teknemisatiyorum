@@ -1,6 +1,6 @@
 # Web vitrini kabul testi
 
-Çalıştırma: 2026-09-27 10:07 · Betik: `web/scripts/web-acceptance.mjs` · Gerçek sunucu · Chrome 390×844
+Çalıştırma: 2026-10-02 17:08 · Betik: `web/scripts/web-acceptance.mjs` · Gerçek sunucu · Chrome 390×844
 
 ## ✓ 1. Site iki dilde açılır; tüm sayfa türleri gerçek veriyle çalışır — geçti
 
@@ -37,12 +37,3 @@ Yönetim uçları (uygulamanın Siparişler/Fiyatlar ekranlarının çağırdı�
 İmzasız POST /payments/web/callback → 400; aynı deneme makbuzu ikinci kez → 409 RECEIPT_USED.
 
 ![kriter 6](web-shots/kriter-6.jpg)
-
-## Hız ölçümü (Lighthouse, mobil, üretim derlemesi)
-
-| Sayfa | Performans | Erişilebilirlik | SEO |
-|---|---|---|---|
-| Ana sayfa | 96 | 96 | 100 |
-| İlan detayı | 92 | 96 | 100 |
-
-Raporlar: `web-shots/lh-home.json`, `web-shots/lh-listing.json`. Ölçüm bu bilgisayarda (bellek az) yapıldı; canlı sunucuda yeniden ölçülmeli.

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { colors, space } from '@/theme';
-import { AdminPage, Button, Card, EmptyState, Field, T } from '@/components';
+import { AdminPage, Button, Card, EmptyState, Field, StatusLine, T } from '@/components';
 import { actions, useExpertiseBookings, useExpertisePackages } from '@/services';
 import { useRemote } from '@/services/useRemote';
 import { attempt } from '@/services/errors';
@@ -38,7 +38,7 @@ export default function AdminEkspertiz() {
         <Card>
           <T variant="h3">{t('expertise.reportBoat')}</T>
           <T variant="caption" color={colors.muted}>{t('expertise.reportMeta', { date: '2026-09-18' })} · 82/100</T>
-          <T variant="caption" color={colors.success}>✓ {t('admin.status.onaylandi')}</T>
+          <StatusLine text={t('admin.status.onaylandi')} />
         </Card>
       ) : null}
       {rows.length === 0 ? <EmptyState icon="clipboard" title={t('admin.noBookings')} /> : rows.map((b) => (
@@ -46,7 +46,7 @@ export default function AdminEkspertiz() {
           <T variant="h3">{b.title}</T>
           <T variant="caption" color={colors.muted}>{b.meta}</T>
           {b.who ? <T variant="caption" color={colors.muted}>{t('admin.by', { who: b.who })}</T> : null}
-          {b.done ? <T variant="caption" color={colors.success}>✓ {t('admin.reportDone', { score: b.score ?? 0 })}</T>
+          {b.done ? <StatusLine text={t('admin.reportDone', { score: b.score ?? 0 })} />
             : <T variant="caption" color={colors.warning}>{t('admin.reportPending')}</T>}
           {!b.done && remote.data ? <ReportForm onSubmit={(s) => report(b.id, s)} /> : null}
         </Card>

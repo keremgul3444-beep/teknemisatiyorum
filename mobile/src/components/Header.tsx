@@ -17,7 +17,7 @@ export function Header({ title, back = true, right, subtitle }: { title: string;
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(3) }}>
       {back ? (
         <Pressable accessibilityLabel={t('common.back')} hitSlop={12} onPress={goBack}
-          style={{ width: 38, height: 38, borderRadius: radius.pill, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.line }}>
+          style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.line }}>
           <Icon name="back" size={20} />
         </Pressable>
       ) : null}

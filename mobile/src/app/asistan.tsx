@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, TextInput, View, Pressable } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { colors, fonts, radius, space } from '@/theme';
-import { Button, Chip, EmptyState, Header, Icon, ListingCard, QueryChips, Screen, Section, T, showDemoToast } from '@/components';
+import { colors, space } from '@/theme';
+import { AssistantInput, Button, Chip, EmptyState, Header, Icon, ListingCard, QueryChips, Screen, Section, T, showDemoToast } from '@/components';
 import { actions, useListings, type AssistantResult } from '@/services';
-import { isEmptyQuery } from '@tms/shared';
-import { criterionLabel } from '@tms/shared';
+import { criterionLabel, isEmptyQuery } from '@tms/shared';
 import { requireLevel } from '@/session/role';
 import { attempt } from '@/services/errors';
 
@@ -39,12 +38,8 @@ export default function Asistan() {
   return (
     <Screen footer={!empty ? <Button icon="bell" title={t('assistant.save')} onPress={save} /> : undefined}>
       <Header title={t('assistant.title')} />
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(2), backgroundColor: colors.card, borderRadius: radius.button, borderWidth: 1.5, borderColor: colors.primary, paddingLeft: space(3) }}>
-        <T color={colors.primary}>✦</T>
-        <TextInput value={draft} onChangeText={setDraft} onSubmitEditing={() => setQ(draft)} returnKeyType="search" placeholder={t('assistant.placeholder')}
-          placeholderTextColor={colors.muted} style={{ flex: 1, paddingVertical: space(3), fontFamily: fonts.body, fontSize: 15, color: colors.text }} />
-        <Pressable onPress={() => setQ(draft)} style={{ padding: space(3) }}><Icon name="search" size={20} color={colors.primary} /></Pressable>
-      </View>
+      <AssistantInput value={draft} onChangeText={setDraft} onSubmit={() => setQ(draft)} placeholder={t('assistant.placeholder')}
+        label={t('assistant.label')} buttonLabel={t('assistant.search')} />
 
       {loading ? <ActivityIndicator color={colors.primary} style={{ marginTop: space(8) }} /> : empty ? (
         <>

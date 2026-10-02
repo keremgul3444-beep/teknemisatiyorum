@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { FlatList, Pressable, ScrollView, TextInput, View } from 'react-native';
+import { FlatList, Pressable, ScrollView, View } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { colors, fonts, radius, space } from '@/theme';
-import { Card, Chip, Icon, ListingCard, Screen, Section, T } from '@/components';
+import { AssistantInput, Card, Chip, Icon, ListingCard, Screen, Section, T } from '@/components';
 import { actions, useListings } from '@/services';
 import { useRemote } from '@/services/useRemote';
 import { useSession } from '@/session/role';
@@ -39,19 +39,9 @@ export default function Kesfet() {
         </Pressable>
       </View>
 
-      {/* Asistan: tek satır, solda işaret, sağda ara düğmesi. */}
       <View style={{ gap: space(1.5) }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(2.5), minHeight: 56, paddingLeft: space(4), paddingRight: space(1.5),
-          borderRadius: radius.button + 2, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line }}>
-          <Icon name="sparkle" size={20} color={colors.primary} />
-          <TextInput value={q} onChangeText={setQ} onSubmitEditing={() => ask(q)} placeholder={t('assistant.placeholder')} placeholderTextColor={colors.muted}
-            returnKeyType="search" accessibilityLabel={t('assistant.label')}
-            style={{ flex: 1, fontFamily: fonts.body, fontSize: 15, color: colors.text, paddingVertical: space(3) }} />
-          <Pressable onPress={() => ask(q || t('assistant.ex1'))} accessibilityRole="button" accessibilityLabel={t('assistant.search')}
-            style={{ width: 44, height: 44, borderRadius: radius.button, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name="search" size={20} color={colors.white} />
-          </Pressable>
-        </View>
+        <AssistantInput value={q} onChangeText={setQ} onSubmit={() => ask(q || t('assistant.ex1'))} placeholder={t('assistant.placeholder')}
+          label={t('assistant.label')} buttonLabel={t('assistant.search')} />
         <T variant="caption" color={colors.muted} style={{ paddingHorizontal: space(1) }}>{t('assistant.hint')}</T>
       </View>
       {/* Örnek aramalar tek satırda yana kayar; ekranın üstünü kaplamaz. */}

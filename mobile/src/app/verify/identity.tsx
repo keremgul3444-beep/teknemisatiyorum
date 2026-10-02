@@ -3,7 +3,6 @@ import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { colors, space } from '@/theme';
 import { Button, Field, Header, Icon, Screen, Segmented, SuccessView, T, UploadBox, goBack } from '@/components';
-import { useSession } from '@/session/role';
 import { actions, isApiMode } from '@/services';
 import { attempt } from '@/services/errors';
 import { pickImage } from '@/services/pickImage';

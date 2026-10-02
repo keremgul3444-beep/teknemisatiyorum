@@ -4,7 +4,6 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { colors, space, radius, fonts } from '@/theme';
 import { Button, Header, Screen, T, showDemoToast } from '@/components';
-import { useSession } from '@/session/role';
 import { actions, isApiMode } from '@/services';
 import { attempt } from '@/services/errors';
 import { OTP_RESEND_SECONDS, takeDevCode } from '@/features/otp';

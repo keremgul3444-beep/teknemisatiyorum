@@ -61,7 +61,7 @@ export default async function IlanDetay({ params }: P) {
             <img src={mediaUrl(first.id, 1600)} srcSet={`${mediaUrl(first.id, 800)} 800w, ${mediaUrl(first.id, 1600)} 1600w`}
               sizes="(max-width: 700px) 100vw, 600px" width={1600} height={1200} alt={title} fetchPriority="high"
               style={{ width: '100%', height: 'auto', borderRadius: 'var(--r-card)', aspectRatio: '4 / 3', objectFit: 'cover' }} />
-          ) : <div className="card" style={{ aspectRatio: '4 / 3' }} />}
+          ) : <div className="card" style={{ aspectRatio: '4 / 3', background: 'linear-gradient(180deg, #BFD9EA 0 62%, #2F6F98 62% 100%)' }} aria-hidden="true" />}
           {rest.length ? (
             <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', marginTop: 12 }}>
               {rest.map((p) => <img key={p.id} src={mediaUrl(p.id, 400)} width={400} height={300} alt={title} loading="lazy" decoding="async" style={{ borderRadius: 'var(--r-sm)', aspectRatio: '4 / 3', objectFit: 'cover' }} />)}
@@ -70,22 +70,28 @@ export default async function IlanDetay({ params }: P) {
         </div>
         <div>
           <PromoBadges promo={l.promo} locale={locale} />
-          <h1 style={{ marginTop: 8 }}>{title}</h1>
-          <p className="muted">{l.lengthM.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US')} m · {l.location} · {typeName}</p>
+          <h1 style={{ marginTop: 8, marginBottom: 4 }}>{l.brand} {l.model}</h1>
+          <p className="muted">{l.year} · {l.location} · {typeName}</p>
           <PriceBlock locale={locale} price={l.price} currency={l.currency} rates={rates} />
-          <div className="row" style={{ margin: '16px 0' }}>
-            {l.badges.map((b) => <span key={b} className="chip">{t(locale, `badge.${b}`, {})}</span>)}
-            {l.status === 'sold' ? <span className="chip">{t(locale, 'listing.sold')}</span> : null}
+          {l.badges.length || l.status === 'sold' ? (
+            <div className="row" style={{ margin: '12px 0 0' }}>
+              {l.badges.map((b) => <span key={b} className="pill featured">{t(locale, `badge.${b}`, {})}</span>)}
+              {l.status === 'sold' ? <span className="pill urgent">{t(locale, 'listing.sold')}</span> : null}
+            </div>
+          ) : null}
+          <div className="facts">
+            <div><strong>{l.lengthM.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US')} m</strong><span className="muted small">{t(locale, 'listing.length')}</span></div>
+            <div><strong>{l.year}</strong><span className="muted small">{t(locale, 'listing.year')}</span></div>
+            <div><strong>{l.cabins || '—'}</strong><span className="muted small">{t(locale, 'listing.cabins')}</span></div>
           </div>
           <div className="row" style={{ margin: '16px 0' }}>
             <AppLink locale={locale} path={`ilan/${l.id}`}>{t(locale, 'listing.message')}</AppLink>
             <AppLink locale={locale} path="ekspertiz" secondary>{t(locale, 'listing.requestSurvey')}</AppLink>
           </div>
-          <table className="card" style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <table className="card specs" style={{ padding: 0 }}>
             <tbody>
-              <Spec k={t(locale, 'listing.year')} v={String(l.year)} />
-              <Spec k={t(locale, 'listing.length')} v={`${l.lengthM} m`} />
-              {l.cabins ? <Spec k={t(locale, 'listing.cabins')} v={String(l.cabins)} /> : null}
+              <Spec k={t(locale, 'listing.type')} v={typeName} />
+              <Spec k={t(locale, 'listing.location')} v={l.location} />
               {l.engine ? <Spec k={t(locale, 'listing.engine')} v={l.engine} /> : null}
               {l.equipment.length ? <Spec k={t(locale, 'listing.equipment')} v={l.equipment.map((e) => t(locale, `equipment.${e}`)).join(', ')} /> : null}
               {l.seller.companyName ? <Spec k={t(locale, 'listing.company')} v={l.seller.companyName} /> : null}
@@ -106,7 +112,7 @@ export default async function IlanDetay({ params }: P) {
 }
 
 function Spec({ k, v }: { k: string; v: string }) {
-  return <tr><th scope="row" style={{ textAlign: 'left', padding: '6px 8px', fontWeight: 600 }}>{k}</th><td style={{ padding: '6px 8px' }}>{v}</td></tr>;
+  return <tr><th scope="row">{k}</th><td>{v}</td></tr>;
 }
 
 /** Fiyat ve diğer para birimlerindeki karşılığı (sunucunun kur tablosuyla). */

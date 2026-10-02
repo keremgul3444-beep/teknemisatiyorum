@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { colors, fonts, radius, space } from '@/theme';
-import { Button, Card, Field, Header, Icon, Screen, Section, T, showDemoToast } from '@/components';
+import { Button, Card, Field, Header, Icon, Screen, Section, StatusLine, T, showDemoToast } from '@/components';
 import { currentLang } from '@/i18n';
 import { demoOnly } from '@/components/DemoOnly';
 
@@ -36,7 +36,7 @@ function HizmetPaneli() {
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(3) }}>
               <Icon name="wrench" size={18} color={colors.primary} />
               <T style={{ flex: 1 }}>{t(`panel.${r}`)}</T>
-              {sent.includes(r) ? <T variant="caption" color={colors.success}>✓ {t('panel.sent')}</T>
+              {sent.includes(r) ? <StatusLine text={t('panel.sent')} />
                 : <Button small title={t('panel.giveOffer')} onPress={() => setOpen(open === r ? null : r)} />}
             </View>
             {open === r ? (

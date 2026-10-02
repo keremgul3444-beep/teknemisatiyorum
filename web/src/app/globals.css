@@ -41,8 +41,10 @@ img { max-width: 100%; display: block; }
 a.chip:hover { border-color: var(--c-primary); text-decoration: none; }
 .chip.on { background: var(--c-primary); border-color: var(--c-primary); color: var(--c-white); }
 .pill { display: inline-block; padding: 4px 10px; border-radius: var(--r-pill); font-size: 12px; font-weight: 700; }
-.pill.featured { background: var(--c-white); color: var(--c-primary); }
+.pill.featured { background: var(--c-white); color: var(--c-primary); border: 1px solid var(--c-line); }
 .pill.urgent { background: var(--c-accent-soft); color: var(--c-accent-text); }
+.pill.soon { background: var(--c-accent-soft); color: var(--c-accent-text); }
+.lcard .pill.featured { border: 0; }
 .input {
   width: 100%; min-height: 44px; padding: 10px 12px; border-radius: var(--r-button); border: 1px solid var(--c-line);
   background: var(--c-card); color: var(--c-text); font: 16px var(--font-body), sans-serif;
@@ -57,6 +59,16 @@ label { display: block; font-size: 13px; font-weight: 600; color: var(--c-muted)
 .search:focus-within { border-color: var(--c-primary); background: var(--c-card); }
 .search input { flex: 1; min-width: 0; border: 0; background: transparent; font: 16px var(--font-body), sans-serif; color: var(--c-text); outline: none; }
 .search .btn { min-height: 44px; }
+
+/* İlan detayı: üç büyük rakam (boy, yıl, kabin) ve özellik listesi. */
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 16px 0; }
+.facts > div { background: var(--c-card); border: 1px solid var(--c-line); border-radius: var(--r-card); padding: 14px 12px; display: grid; gap: 2px; }
+.facts strong { font-family: var(--font-heading), system-ui, sans-serif; font-weight: 800; font-size: 22px; line-height: 1.2; letter-spacing: -0.01em; }
+.specs { width: 100%; border-collapse: collapse; }
+.specs th, .specs td { padding: 10px 16px; border-top: 1px solid var(--c-line); font-size: 15px; }
+.specs tr:first-child th, .specs tr:first-child td { border-top: 0; }
+.specs th { text-align: left; font-weight: 500; color: var(--c-muted); width: 40%; }
+.specs td { font-weight: 600; }
 
 /* İlan kartı: çerçevesiz; fotoğraf köşeleri yuvarlak, bilgi altında. */
 .lcard { display: block; color: inherit; min-width: 0; }

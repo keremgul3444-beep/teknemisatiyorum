@@ -36,7 +36,7 @@ export default function Mesajlar() {
                     {last?.text ?? c.preview ?? t('messages.noMessages')}
                   </T>
                 </View>
-                {c.unread ? <View style={{ width: 10, height: 10, borderRadius: radius.xs, backgroundColor: colors.primary }} /> : null}
+                {c.unread ? <View style={{ width: 10, height: 10, borderRadius: radius.pill, backgroundColor: colors.accent }} /> : null}
               </View>
             </Card>
           );

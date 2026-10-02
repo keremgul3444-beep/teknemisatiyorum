@@ -2,20 +2,26 @@ import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { colors, radius, space, fonts } from '@/theme';
 import { T } from './T';
+import { Icon } from './Icon';
 
 export type BadgeName = 'ekspertizli' | 'sahiplik' | 'broker' | 'dogrulanmis' | 'beklemede';
+
+/** Güven rozeti ("Liman"): hap biçimli; fotoğraf üstünde beyaz, sayfada çerçeveli. Bekleyen: turuncu nokta. */
 export function Badge({ kind, onDark }: { kind: BadgeName; onDark?: boolean }) {
   const { t } = useTranslation();
   const pending = kind === 'beklemede';
+  const fg = pending ? colors.warning : onDark ? colors.primary : colors.text;
   return (
     <View style={{
-      backgroundColor: onDark ? colors.white : pending ? colors.surface : colors.card, opacity: onDark ? 0.95 : 1,
-      borderWidth: onDark ? 0 : 1, borderColor: colors.line, borderRadius: radius.sm,
-      paddingHorizontal: space(2), paddingVertical: space(1), alignSelf: 'flex-start',
+      flexDirection: 'row', alignItems: 'center', gap: space(1),
+      backgroundColor: onDark ? colors.white : pending ? colors.surface : colors.card,
+      borderWidth: onDark ? 0 : 1, borderColor: colors.line, borderRadius: radius.pill,
+      paddingHorizontal: space(2.5), paddingVertical: space(1), alignSelf: 'flex-start',
     }}>
-      <T variant="caption" color={pending ? colors.warning : colors.text} style={{ fontFamily: fonts.bodyBold, fontSize: 11 }}>
-        {pending ? '• ' : '✓ '}{t(`badge.${kind}`)}
-      </T>
+      {pending
+        ? <View style={{ width: 6, height: 6, borderRadius: radius.pill, backgroundColor: colors.warning }} />
+        : <Icon name="check" size={12} color={fg} />}
+      <T variant="caption" color={fg} style={{ fontFamily: fonts.bodyBold, fontSize: 11, lineHeight: 14 }}>{t(`badge.${kind}`)}</T>
     </View>
   );
 }

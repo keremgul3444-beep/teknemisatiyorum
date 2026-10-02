@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Pressable, TextInput, View } from 'react-native';
+import { View } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { colors, fonts, radius, space } from '@/theme';
-import { Card, Icon, Screen, Section, T } from '@/components';
+import { colors, radius, space } from '@/theme';
+import { AssistantInput, Card, Icon, Screen, Section, T } from '@/components';
 import { useJobs } from '@/services';
 import { detectCategory } from '@tms/shared';
 
@@ -38,13 +38,10 @@ export default function Hizmetler() {
         ))}
       </View>
 
-      <View style={{ backgroundColor: colors.card, borderRadius: radius.card, borderWidth: 1.5, borderColor: colors.primary, padding: space(3.5), gap: space(2) }}>
-        <T variant="label" color={colors.primary}>✦ {t('services.askTitle').toLocaleUpperCase('tr-TR')}</T>
-        <TextInput value={text} onChangeText={setText} placeholder={t('services.askPh')} placeholderTextColor={colors.muted} onSubmitEditing={ask}
-          style={{ fontFamily: fonts.body, fontSize: 15, color: colors.text, paddingVertical: space(1) }} />
-        <Pressable onPress={ask} style={{ alignSelf: 'flex-end', backgroundColor: colors.primary, borderRadius: radius.button - 2, paddingVertical: space(2), paddingHorizontal: space(4) }}>
-          <T variant="bodySemi" color={colors.white}>{t('services.askGo')}</T>
-        </Pressable>
+      <View style={{ gap: space(2) }}>
+        <T variant="h2" style={{ fontSize: 19, lineHeight: 24 }}>{t('services.askTitle')}</T>
+        <AssistantInput value={text} onChangeText={setText} onSubmit={ask} placeholder={t('services.askPh')}
+          label={t('services.askTitle')} buttonLabel={t('services.askGo')} icon="send" />
       </View>
 
       <Section title={t('services.ongoing')}>

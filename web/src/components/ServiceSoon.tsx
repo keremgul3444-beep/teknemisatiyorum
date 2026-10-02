@@ -7,7 +7,7 @@ import { AppLink } from './bits';
 export function ServiceSoon({ locale, kind }: { locale: Locale; kind: 'usta' | 'kaptan' }) {
   return (
     <>
-      <p><span className="pill featured">{t(locale, 'pages.soon')}</span></p>
+      <p><span className="pill soon">{t(locale, 'pages.soon')}</span></p>
       {kind === 'usta' ? (
         <div className="row" style={{ margin: '16px 0' }}>
           {USTA_CATEGORIES.map((c) => <span key={c} className="chip">{t(locale, `ustaCat.${c}`)}</span>)}

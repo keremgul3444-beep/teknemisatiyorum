@@ -28,7 +28,7 @@ export default function Login() {
       </View>
       <T variant="label" color={colors.muted}>{t('auth.phone').toLocaleUpperCase('tr-TR')}</T>
       <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.card, borderWidth: 1, borderColor: colors.line, borderRadius: radius.button }}>
-        <T variant="bodySemi" style={{ paddingHorizontal: space(3), borderRightWidth: 1, borderColor: colors.line, paddingVertical: space(3) }}>🇹🇷 +90</T>
+        <T variant="bodySemi" style={{ paddingHorizontal: space(3), borderRightWidth: 1, borderColor: colors.line, paddingVertical: space(3) }}>+90</T>
         <TextInput value={phone} onChangeText={setPhone} keyboardType="phone-pad" placeholder="5xx xxx xx xx" placeholderTextColor={colors.muted} maxLength={13}
           style={{ flex: 1, padding: space(3), fontFamily: fonts.body, fontSize: 16, color: colors.text }} />
       </View>

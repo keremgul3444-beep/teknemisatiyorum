@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import i18n from 'i18next';
+import { t } from 'i18next';
 import type {
   AdminItem, AdminStatus, AuditEntry, Boat, BoatInput, BrokerCase, CaptainBooking, Company, Conversation, ExpertiseBooking,
   ExpertisePackage, Job, JobInput, Listing, ListingDraft, Provider, SavedSearch, Seller, SubjectKind,
@@ -156,7 +156,7 @@ export const useStore = create<Data & Actions>((set, get) => {
       set({
         boats: [...get().boats, {
           ...input, id, photoSeed: counter,
-          logbook: [{ id: nextId('lg'), date: today(), kind: 'sahiplik', title: i18n.t('logbook.boatAdded'), by: i18n.t('logbook.owner'), verified: false }],
+          logbook: [{ id: nextId('lg'), date: today(), kind: 'sahiplik', title: t('logbook.boatAdded'), by: t('logbook.owner'), verified: false }],
         }],
       });
       return id;

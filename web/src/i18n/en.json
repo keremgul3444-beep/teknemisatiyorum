@@ -185,7 +185,9 @@
     "company": "Company",
     "logbook": "Boat Logbook · {{n}} records",
     "description": "Description",
-    "similar": "Similar listings"
+    "similar": "Similar listings",
+    "type": "Type",
+    "location": "Location"
   },
   "gone": {
     "title": "This listing is no longer live",

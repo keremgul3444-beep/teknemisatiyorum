@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react';
-import { FlatList, Pressable, View, useWindowDimensions } from 'react-native';
+import { FlatList, Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { colors, fonts, radius, space } from '@/theme';
-import { Avatar, Badge, BoatImage, Button, Card, Chip, Icon, NotFound, Section, T, goBack, showDemoToast } from '@/components';
+import { Avatar, Badge, BoatImage, Button, Card, Chip, Icon, NotFound, PromoBadges, Section, T, goBack, showDemoToast } from '@/components';
 import { actions, formatPrice, useFavorites, useListing, useSeller } from '@/services';
-import { currentLang } from '@/i18n';
+import { currentLang, tx } from '@/i18n';
 import { requireLevel } from '@/session/role';
 import { attempt } from '@/services/errors';
-import { tx } from '@/i18n';
 
+/** İlan detayı ("Liman"): fotoğraf üstte, başlık ve fiyat, büyük rakamlı üç özellik, sonra ayrıntılar. */
 export default function IlanDetay() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -25,6 +24,7 @@ export default function IlanDetay() {
   if (!l) return <NotFound />;
   const lang = currentLang();
   const galleryW = Math.min(width, 600);
+  const photoCount = l.photoUrls?.length || 4;
 
   const message = async () => {
     if (!requireLevel(1)) return;
@@ -36,10 +36,12 @@ export default function IlanDetay() {
     await attempt(() => actions.toggleFavorite(l.id));
     showDemoToast(fav ? t('listing.favRemoved') : t('listing.favAdded'));
   };
+  // Üç büyük rakam: alıcının ilk baktığı ölçüler.
+  const facts: [string, string][] = [
+    [t('listing.length'), `${l.lengthM.toLocaleString(lang)} m`], [t('listing.year'), String(l.year)], [t('listing.cabins'), String(l.cabins)],
+  ];
   const specs: [string, string][] = [
-    [t('listing.length'), `${l.lengthM.toLocaleString(lang)} m`], [t('listing.year'), String(l.year)],
-    [t('listing.type'), t(`boatType.${l.type}`)], [t('listing.cabins'), String(l.cabins)],
-    [t('listing.engine'), l.engine], [t('listing.location'), l.location],
+    [t('listing.type'), t(`boatType.${l.type}`)], [t('listing.engine'), l.engine], [t('listing.location'), l.location],
   ];
 
   return (
@@ -48,7 +50,7 @@ export default function IlanDetay() {
         <View>
           <FlatList horizontal pagingEnabled data={l.photoUrls?.length ? l.photoUrls.map((_, i) => i) : [0, 1, 2, 3]} keyExtractor={(i) => String(i)} showsHorizontalScrollIndicator={false}
             onScroll={(e) => setPage(Math.round(e.nativeEvent.contentOffset.x / galleryW))} scrollEventThrottle={32}
-            style={{ width: galleryW }} renderItem={({ item }) => <View style={{ width: galleryW }}><BoatImage seed={l.photoSeed + item} height={280} uri={l.photoUrls?.[item]} /></View>} />
+            style={{ width: galleryW }} renderItem={({ item }) => <View style={{ width: galleryW }}><BoatImage seed={l.photoSeed + item} height={300} uri={l.photoUrls?.[item]} /></View>} />
           <View style={{ position: 'absolute', top: space(3), left: space(4), right: space(4), flexDirection: 'row', justifyContent: 'space-between' }}>
             <RoundBtn icon="back" label={t('common.back')} onPress={goBack} />
             <View style={{ flexDirection: 'row', gap: space(2) }}>
@@ -56,29 +58,47 @@ export default function IlanDetay() {
               <RoundBtn icon="heart" label={t('profile.favorites')} filled={fav} onPress={toggleFav} />
             </View>
           </View>
-          <View style={{ position: 'absolute', bottom: space(3), right: space(4), backgroundColor: colors.overlay, borderRadius: radius.sm, paddingHorizontal: space(2), paddingVertical: space(0.5) }}>
-            <T variant="caption" color={colors.white}>{page + 1}/{l.photoUrls?.length || 4}</T>
+          <View style={{ position: 'absolute', bottom: space(3), left: space(4), right: space(4), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <PromoBadges promo={l.promo} />
+            <View style={{ backgroundColor: colors.overlay, borderRadius: radius.pill, paddingHorizontal: space(2.5), paddingVertical: space(1) }}>
+              <T variant="caption" color={colors.white} style={{ fontFamily: fonts.bodySemi }}>{page + 1}/{photoCount}</T>
+            </View>
           </View>
         </View>
 
         <View style={{ padding: space(5), gap: space(5) }}>
-          {l.status === 'onay-bekliyor' ? <Card><T color={colors.warning}>{t('listing.pending')}</T></Card> : null}
-          <View style={{ gap: space(2) }}>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space(1.5) }}>{l.badges.map((b) => <Badge key={b} kind={b} />)}</View>
-            <T variant="h1">{l.brand} {l.model}</T>
-            <T variant="h1" color={colors.primary} style={{ fontSize: 26 }}>{formatPrice(l.price, l.currency, lang)}</T>
+          {l.status === 'onay-bekliyor' ? (
+            <View style={{ backgroundColor: colors.accentSoft, borderRadius: radius.button, padding: space(3) }}>
+              <T variant="caption" color={colors.accentText} style={{ fontFamily: fonts.bodySemi }}>{t('listing.pending')}</T>
+            </View>
+          ) : null}
+          <View style={{ gap: space(2.5) }}>
+            {l.badges.length ? <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space(1.5) }}>{l.badges.map((b) => <Badge key={b} kind={b} />)}</View> : null}
+            <View style={{ gap: space(1) }}>
+              <T variant="h1">{l.brand} {l.model}</T>
+              <T variant="caption" color={colors.muted} style={{ fontSize: 14, lineHeight: 20 }}>{l.year} · {l.location} · {t(`boatType.${l.type}`)}</T>
+            </View>
+            <T variant="h1" color={colors.primary} style={{ fontSize: 30, lineHeight: 36 }}>{formatPrice(l.price, l.currency, lang)}</T>
+          </View>
+
+          <View style={{ flexDirection: 'row', gap: space(2.5) }}>
+            {facts.map(([k, v]) => (
+              <View key={k} style={{ flex: 1, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.line, borderRadius: radius.card, paddingVertical: space(3.5), paddingHorizontal: space(3), gap: space(0.5) }}>
+                <T variant="h2" numberOfLines={1} style={{ fontSize: 22, lineHeight: 28 }}>{v}</T>
+                <T variant="caption" color={colors.muted}>{k}</T>
+              </View>
+            ))}
           </View>
 
           <Section title={t('listing.specs')}>
-            <Card>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                {specs.map(([k, v]) => (
-                  <View key={k} style={{ width: '50%', paddingVertical: space(2) }}>
-                    <T variant="caption" color={colors.muted}>{k}</T>
-                    <T variant="bodySemi">{v}</T>
-                  </View>
-                ))}
-              </View>
+            <Card padded={false}>
+              {specs.map(([k, v], i) => (
+                <View key={k} style={{ flexDirection: 'row', justifyContent: 'space-between', gap: space(3), paddingVertical: space(3), paddingHorizontal: space(4),
+                  borderTopWidth: i ? 1 : 0, borderColor: colors.line }}>
+                  <T variant="caption" color={colors.muted} style={{ fontSize: 14, lineHeight: 20 }}>{k}</T>
+                  <T variant="bodySemi" numberOfLines={1} style={{ flexShrink: 1, textAlign: 'right' }}>{v}</T>
+                </View>
+              ))}
             </Card>
           </Section>
 
@@ -93,8 +113,10 @@ export default function IlanDetay() {
           <Section title={t('listing.logbook')}>
             <Card onPress={l.isMine && l.boatId ? () => router.push(`/teknelerim/${l.boatId}`) : undefined}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(3) }}>
-                <Icon name="logbook" size={24} color={colors.primary} />
-                <View style={{ flex: 1 }}>
+                <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon name="logbook" size={22} color={colors.primary} />
+                </View>
+                <View style={{ flex: 1, gap: space(0.5) }}>
                   {l.logbookCount ? (
                     <>
                       <T variant="h3">{t('listing.logbookCount', { count: l.logbookCount })}</T>
@@ -109,7 +131,7 @@ export default function IlanDetay() {
                     </>
                   ) : <T color={colors.muted}>{t('listing.logbookEmpty')}</T>}
                 </View>
-                {l.isMine && l.boatId ? <T variant="caption" color={colors.primary} style={{ fontFamily: fonts.bodySemi }}>{t('listing.logbookSee')} →</T> : null}
+                {l.isMine && l.boatId ? <Icon name="chevron" size={18} color={colors.muted} /> : null}
               </View>
             </Card>
           </Section>
@@ -142,10 +164,12 @@ export default function IlanDetay() {
   );
 }
 
+/** Fotoğraf üstündeki yuvarlak düğme: 44 px dokunma alanı. */
 function RoundBtn({ icon, onPress, filled, label }: { icon: string; onPress: () => void; filled?: boolean; label: string }) {
   return (
-    <Pressable onPress={onPress} hitSlop={8} accessibilityLabel={label} style={{ width: 40, height: 40, borderRadius: radius.pill, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center' }}>
-      <Icon name={icon} size={20} color={filled ? colors.danger : colors.text} filled={filled} />
+    <Pressable onPress={onPress} hitSlop={4} accessibilityRole="button" accessibilityLabel={label}
+      style={({ pressed }) => ({ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.85 : 1 })}>
+      <Icon name={icon} size={20} color={filled ? colors.accent : colors.text} filled={filled} />
     </Pressable>
   );
 }

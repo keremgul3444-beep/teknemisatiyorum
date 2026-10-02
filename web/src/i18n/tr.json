@@ -185,7 +185,9 @@
     "company": "Firma",
     "logbook": "Tekne Karnesi · {{n}} kayıt",
     "description": "Açıklama",
-    "similar": "Benzer ilanlar"
+    "similar": "Benzer ilanlar",
+    "type": "Tip",
+    "location": "Konum"
   },
   "gone": {
     "title": "Bu ilan artık yayında değil",
