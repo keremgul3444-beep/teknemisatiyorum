@@ -27,6 +27,7 @@ Tekne alım-satım + broker + ekspertiz + (2. dalga: usta/kaptan/güvenli ödeme
 - Demo fotoğrafları: `shared/assets/boats/` (16 kare, MINOA'nın gerçek çekimleri, 1200×900 JPEG; ilk 8 dış çekim). Uygulama demo modunda `mobile/src/assets/boatPhotos.ts` ile (Metro `../shared`'ı izler), sunucu seed'i her ilana 4 fotoğraf (kapak + 3 iç mekân) yükler. Veritabanı yalnızca boşken seed'lenir: eski degrade görselleri görmek istemiyorsanız `api/.data/pg` ve `api/storage` silinip `npm run dev` yeniden çalıştırılır.
 
 ## Belgeler
+- Rakip araştırması (2026-10-02): `docs/arastirma-rakip-uygulamalar.md` — Boat Trader/YachtWorld/Boat24/Yachtall/sahibinden özellik karşılaştırması ve öncelik sırası.
 - Tasarım: `docs/superpowers/specs/2026-09-26-arka-uc-dalga1-design.md`
 - Plan (13 görev): `docs/superpowers/plans/2026-09-26-arka-uc-dalga1.md`
 - Karar kaydı (git dışı): `.superpowers/sdd/2026-09-26-arka-uc-dalga1/progress.md` — `Ruling:` satırları plandan sapmaları açıklar.
