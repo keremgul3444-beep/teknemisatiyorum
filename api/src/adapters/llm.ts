@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import Anthropic from '@anthropic-ai/sdk';
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
 import { z } from 'zod';
-import { BOAT_TYPES, CURRENCIES, EQUIPMENT } from '@tms/shared';
+import { BOAT_TYPES, CURRENCIES, EQUIPMENT, FLAGS } from '@tms/shared';
 import { env } from '../config/env';
 
 export const LLM_CLIENT = Symbol('LLM_CLIENT');
@@ -24,6 +24,10 @@ const LlmFilter = z.object({
   equipment: z.array(z.enum(EQUIPMENT)),
   type: z.enum(BOAT_TYPES).nullable(),
   location: z.string().nullable(),
+  maxEngineHours: z.number().nullable(),
+  flag: z.enum(FLAGS).nullable(),
+  tradeIn: z.boolean().nullable(),
+  negotiable: z.boolean().nullable(),
 });
 
 const SYSTEM = [
@@ -34,6 +38,8 @@ const SYSTEM = [
   'Konum yalnızca verilen listeden biri olabilir; listede yoksa null.',
   'Tip anahtarları: motoryat, yelkenli, gulet, surat (sürat teknesi), balikci (balıkçı), katamaran.',
   'Donanım anahtarları: jenerator, branda, klima, radar, otopilot, bowThruster (baş pervane), teak (tik güverte), tender (bot).',
+  'maxEngineHours: motor saati üst sınırı ("1000 saat altı" = 1000). flag: tr (Türk bayraklı) ya da foreign (yabancı bayraklı).',
+  'tradeIn yalnızca takas istenirse true, negotiable yalnızca pazarlık istenirse true; aksi hâlde null.',
   'Asla ilan, tekne adı ya da fiyat uydurma; yalnızca filtre üret. Metin İngilizce de olabilir.',
 ].join('\n');
 
@@ -60,7 +66,7 @@ export class ClaudeLlmClient implements LlmClient {
       this.log.warn(`Beklenmeyen yanıt: ${response.stop_reason}`);
       throw new Error(`LLM yanıtı kullanılamadı: ${response.stop_reason}`);
     }
-    // null alanlar "belirtilmedi" demektir; paylaşılan şema undefined bekler.
-    return Object.fromEntries(Object.entries(response.parsed_output).filter(([, v]) => v !== null));
+    // null alanlar "belirtilmedi" demektir; paylaşılan şema undefined bekler. Takas/pazarlık yalnızca istenince (true) taşınır.
+    return Object.fromEntries(Object.entries(response.parsed_output).filter(([, v]) => v !== null && v !== false));
   }
 }

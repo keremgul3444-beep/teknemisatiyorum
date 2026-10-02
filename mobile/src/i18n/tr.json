@@ -320,14 +320,23 @@
       "yearExact": "{{n}} model",
       "priceMax": "≤ {{p}}",
       "priceMin": "≥ {{p}}",
-      "priceRange": "{{a}} – {{b}}"
+      "priceRange": "{{a}} – {{b}}",
+      "hoursMax": "≤ {{n}} motor saati",
+      "flagTr": "Türk bayraklı",
+      "flagForeign": "Yabancı bayraklı",
+      "tradeIn": "Takasa açık",
+      "negotiable": "Pazarlık payı var"
     },
     "crit": {
       "length": "Boy",
       "year": "Yıl",
       "price": "Bütçe",
       "type": "Tip",
-      "location": "Konum"
+      "location": "Konum",
+      "engineHours": "motor saati",
+      "flag": "bayrak",
+      "tradeIn": "takas",
+      "negotiable": "pazarlık"
     }
   },
   "listings": {
@@ -352,7 +361,10 @@
     "max": "En çok",
     "showResults": "Sonuçları göster",
     "location": "Konum: {{loc}}",
-    "dropOnly": "Fiyatı düşenler"
+    "dropOnly": "Fiyatı düşenler",
+    "fHours": "Motor saati",
+    "fFlag": "Bayrak",
+    "fTerms": "Satış koşulları"
   },
   "valuation": {
     "title": "Teknem kaç eder?",
@@ -1123,7 +1135,10 @@
       "location": "Konum",
       "equipment": "Donanım",
       "badges": "Güven",
-      "logbook": "Karne kaydı"
+      "logbook": "Karne kaydı",
+      "engineHours": "Motor saati",
+      "flag": "Bayrak",
+      "terms": "Koşullar"
     }
   },
   "report": {

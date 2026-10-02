@@ -20,7 +20,20 @@ const shuffle = <T,>(a: T[]) => {
   return b;
 };
 
-const asMatchable =(l: ListingRow) => ({ ...l, type: l.type as BoatType, equipment: l.equipment as Equipment[] });
+/**
+ * Eşleştirme için yeterli sütunlar: arama önce yalnızca bunları okur, tam ilan (fotoğraf, sahip, karne) yalnızca
+ * gösterilecek sayfa için yüklenir. Binlerce ilanda bellek ve süre ilan sayısıyla değil sayfa boyuyla büyür.
+ */
+const MATCH_SELECT = {
+  id: true, lengthM: true, year: true, price: true, currency: true, type: true, location: true, equipment: true,
+  engineHours: true, flag: true, tradeIn: true, negotiable: true,
+  publishedAt: true, bumpedAt: true, featuredUntil: true, urgentUntil: true,
+  priceHistory: { orderBy: { at: 'desc' as const }, take: 1 },
+} satisfies Prisma.ListingSelect;
+type Slim = Prisma.ListingGetPayload<{ select: typeof MATCH_SELECT }>;
+const asMatchable = (l: Slim) => ({ ...l, status: 'published', type: l.type as BoatType, equipment: l.equipment as Equipment[] });
+/** Asistanın tam eşleşme listesi en fazla bu kadar ilan döndürür (yanıt boyutu sınırsız büyümesin). */
+export const MAX_ASSISTANT_EXACT = 50;
 
 /** Aynı kişinin aynı ilanı yeniden açması bu süre içinde tekrar sayılmaz. */
 export const VIEW_DEDUPE_MS = 30 * 60 * 1000;
@@ -75,8 +88,16 @@ export class ListingsService {
     return new Map<string, ListingStats>(rows.map((l) => [l.id, { views: l.viewCount, favorites: f.get(l.id) ?? 0, messages: c.get(l.id) ?? 0 }]));
   }
 
-  /** Veritabanında kaba süzme + fiyat/donanım için ortak `failures` kuralı (kur tablosuyla). */
-  async match(q: ParsedQuery, extraWhere: Prisma.ListingWhereInput = {}) {
+  /** Seçilen kimliklerin tam kayıtları, verilen sırayla. */
+  private async full(ids: string[]): Promise<ListingRow[]> {
+    if (!ids.length) return [];
+    const rows = await this.prisma.listing.findMany({ where: { id: { in: ids } }, include: listingInclude });
+    const byId = new Map(rows.map((r) => [r.id, r]));
+    return ids.map((id) => byId.get(id)).filter((r): r is ListingRow => !!r);
+  }
+
+  /** Veritabanında kaba süzme (tip, konum, yıl, boy, yeni alanlar) + fiyat/donanım için ortak `failures` kuralı (kur tablosuyla). */
+  private async matchSlim(q: ParsedQuery, extraWhere: Prisma.ListingWhereInput = {}) {
     // Kayıtlardaki konum tek biçimde; aranan da aynı biçime getirilir ("bodrum" → "Bodrum").
     if (q.location) q = { ...q, location: normalizeLocation(q.location) };
     const where: Prisma.ListingWhereInput = {
@@ -86,37 +107,50 @@ export class ListingsService {
       ...(q.location ? { location: q.location } : {}),
       ...(q.minYear !== undefined || q.maxYear !== undefined ? { year: { gte: q.minYear, lte: q.maxYear } } : {}),
       ...(q.minLength !== undefined || q.maxLength !== undefined ? { lengthM: { gte: q.minLength, lte: q.maxLength } } : {}),
+      ...(q.maxEngineHours !== undefined ? { engineHours: { lte: q.maxEngineHours } } : {}),
+      ...(q.flag ? { flag: q.flag } : {}),
+      ...(q.tradeIn ? { tradeIn: true } : {}),
+      ...(q.negotiable ? { negotiable: true } : {}),
     };
-    // Beta ölçeği için fiyat süzmesi bellekte; ilan sayısı birkaç bini aşınca kurla çarpılmış fiyat sütununa (SQL) taşınmalı.
-    const rows = await this.prisma.listing.findMany({ where, include: listingInclude, orderBy: { year: 'desc' } });
+    const rows = await this.prisma.listing.findMany({ where, select: MATCH_SELECT, orderBy: { year: 'desc' } });
     const rates = await this.fx.rates();
     return { rows: rows.filter((l) => failures(asMatchable(l), q, rates).length === 0), rates };
   }
 
-  /** Asistan için: tam eşleşenler + tek kriteri eksik yakın sonuçlar (yayındaki tüm ilanlar üzerinde). */
+  /** Kayıtlı aramalar için: aramaya uyan ilanların tam kayıtları. */
+  async match(q: ParsedQuery, extraWhere: Prisma.ListingWhereInput = {}) {
+    const { rows, rates } = await this.matchSlim(q, extraWhere);
+    return { rows: await this.full(rows.map((r) => r.id)), rates };
+  }
+
+  /** Asistan için: tam eşleşenler (en fazla MAX_ASSISTANT_EXACT) + tek kriteri eksik yakın sonuçlar (yayındaki tüm ilanlar üzerinde). */
   async matchWithNear(q: ParsedQuery, limitNear = 5) {
     const rates = await this.fx.rates();
-    const rows = await this.prisma.listing.findMany({ where: { status: 'published' }, include: listingInclude, orderBy: { year: 'desc' } });
-    const exact: ListingRow[] = [];
-    const near: { listing: ListingRow; missing: Criterion[] }[] = [];
+    const rows = await this.prisma.listing.findMany({ where: { status: 'published' }, select: MATCH_SELECT, orderBy: { year: 'desc' } });
+    const exactIds: string[] = [];
+    const nearSlim: { id: string; missing: Criterion[] }[] = [];
     for (const l of rows) {
       const f = failures(asMatchable(l), q, rates);
-      if (f.length === 0) exact.push(l);
-      else if (f.length === 1 && near.length < limitNear) near.push({ listing: l, missing: f });
+      if (f.length === 0) { if (exactIds.length < MAX_ASSISTANT_EXACT) exactIds.push(l.id); }
+      else if (f.length === 1 && nearSlim.length < limitNear) nearSlim.push({ id: l.id, missing: f });
     }
+    const [exact, nearRows] = await Promise.all([this.full(exactIds), this.full(nearSlim.map((n) => n.id))]);
+    const near = nearRows.map((listing, i) => ({ listing, missing: nearSlim[i].missing }));
     return { exact, near, rates };
   }
 
   async search(q: ParsedQuery, sort: Sort, page: number, opts: { urgentOnly?: boolean; dropOnly?: boolean; now?: Date } = {}, pageSize = 20) {
     const now = opts.now ?? new Date();
-    const { rows: all, rates } = await this.match(q);
+    const { rows: all, rates } = await this.matchSlim(q);
     const rows = all.filter((l) => (!opts.urgentOnly || isActive(l.urgentUntil, now)) && (!opts.dropOnly || priceDropOf(l, now)));
-    const tl = (l: ListingRow) => l.price * rates[l.currency];
+    const tl = (l: Slim) => l.price * rates[l.currency];
     if (sort !== 'new') rows.sort((a, b) => (sort === 'asc' ? tl(a) - tl(b) : tl(b) - tl(a)));
     else rows.sort((a, b) => freshness(b) - freshness(a));
     // Aramaya uyan vitrin ilanlarından en fazla 3'ü üstte (karışık); normal listede de yerlerinde kalırlar.
-    const featuredTop = shuffle(rows.filter((l) => isActive(l.featuredUntil, now))).slice(0, 3);
-    return { rows: rows.slice((page - 1) * pageSize, page * pageSize), total: rows.length, featuredTop };
+    const featuredIds = shuffle(rows.filter((l) => isActive(l.featuredUntil, now))).slice(0, 3).map((l) => l.id);
+    const pageIds = rows.slice((page - 1) * pageSize, page * pageSize).map((l) => l.id);
+    const [pageRows, featuredTop] = await Promise.all([this.full(pageIds), this.full(featuredIds)]);
+    return { rows: pageRows, total: rows.length, featuredTop };
   }
 
   /** Ana sayfa: ≤8 vitrin (karışık), ≤8 acil (en taze), ≤8 fiyatı düşen (en yeni indirim). */

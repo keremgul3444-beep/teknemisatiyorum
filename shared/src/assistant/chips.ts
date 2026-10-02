@@ -21,6 +21,10 @@ export function queryChips(q: ParsedQuery, t: TFunction, lang: 'tr' | 'en'): str
   else if (q.maxPrice !== undefined) out.push(t('assistant.chip.priceMax', { p: formatPrice(q.maxPrice, cur, lang) }));
   else if (q.minPrice !== undefined) out.push(t('assistant.chip.priceMin', { p: formatPrice(q.minPrice, cur, lang) }));
   if (q.location) out.push(q.location);
+  if (q.maxEngineHours !== undefined) out.push(t('assistant.chip.hoursMax', { n: q.maxEngineHours }));
+  if (q.flag) out.push(t(q.flag === 'tr' ? 'assistant.chip.flagTr' : 'assistant.chip.flagForeign'));
+  if (q.tradeIn) out.push(t('assistant.chip.tradeIn'));
+  if (q.negotiable) out.push(t('assistant.chip.negotiable'));
   q.equipment.forEach((e) => out.push(t(`equipment.${e}`)));
   return out;
 }
@@ -47,6 +51,10 @@ export function queryToText(q: ParsedQuery): string {
   if (q.maxPrice !== undefined) parts.push(`${q.maxPrice} ${cur} altı`);
   else if (q.minPrice !== undefined) parts.push(`${q.minPrice} ${cur} üstü`);
   if (q.location) parts.push(q.location);
+  if (q.maxEngineHours !== undefined) parts.push(`${q.maxEngineHours} motor saati altı`);
+  if (q.flag) parts.push(q.flag === 'tr' ? 'türk bayraklı' : 'yabancı bayraklı');
+  if (q.tradeIn) parts.push('takas');
+  if (q.negotiable) parts.push('pazarlık');
   q.equipment.forEach((e) => parts.push(EQUIP_WORD[e]));
   return parts.join(' ');
 }

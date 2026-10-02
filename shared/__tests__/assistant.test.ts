@@ -1,5 +1,6 @@
 import { parseQuery, isEmptyQuery } from '../src/assistant/parse';
-import { matchListings } from '../src/assistant/match';
+import { failures, matchListings } from '../src/assistant/match';
+import { queryToText } from '../src/assistant/chips';
 import { makeListings } from '../src/seed/listings';
 
 describe('parseQuery', () => {
@@ -93,5 +94,30 @@ describe('para birimsiz fiyat', () => {
   });
   test('çıplak sayı fiyat sayılmaz', () => {
     expect(parseQuery('12 metre').maxPrice).toBeUndefined();
+  });
+});
+
+describe('motor saati, bayrak, takas, pazarlık', () => {
+  test('ayrıştırılır; "2000 saat" yıl sanılmaz', () => {
+    expect(parseQuery('2015 sonrası 1000 saat altı yelkenli')).toMatchObject({ minYear: 2015, maxEngineHours: 1000, type: 'yelkenli' });
+    expect(parseQuery('motor saati 1.500e kadar türk bayraklı')).toMatchObject({ maxEngineHours: 1500, flag: 'tr' });
+    expect(parseQuery('2000 saatten az motoryat')).toMatchObject({ maxEngineHours: 2000, type: 'motoryat' });
+    expect(parseQuery('2000 saatten az motoryat').minYear).toBeUndefined();
+    expect(parseQuery('yabancı bayraklı takaslı pazarlıklı gulet')).toMatchObject({ flag: 'foreign', tradeIn: true, negotiable: true, type: 'gulet' });
+    expect(parseQuery('under 800 hours catamaran')).toMatchObject({ maxEngineHours: 800, type: 'katamaran' });
+  });
+
+  test('eşleştirme: motor saati yazılmamış ilan motor saati kriterini karşılamaz; tek eksik "yakın" sonuçta görünür', () => {
+    const base = { lengthM: 12, year: 2018, price: 100000, currency: 'EUR' as const, type: 'yelkenli' as const, location: 'Bodrum', equipment: [], status: 'yayinda' };
+    const q = { equipment: [], maxEngineHours: 1000, tradeIn: true as const };
+    expect(failures({ ...base, engineHours: 800, tradeIn: true }, q)).toEqual([]);
+    expect(failures({ ...base, engineHours: null, tradeIn: true }, q)).toEqual(['engineHours']);
+    expect(failures({ ...base, engineHours: 1200, tradeIn: false }, q)).toEqual(['engineHours', 'tradeIn']);
+    expect(failures({ ...base, flag: 'foreign' }, { equipment: [], flag: 'tr' })).toEqual(['flag']);
+  });
+
+  test('kayıtlı arama metni geri okunabilir', () => {
+    const q = { equipment: [], maxEngineHours: 1500, flag: 'tr' as const, tradeIn: true as const, negotiable: true as const, type: 'motoryat' as const };
+    expect(parseQuery(queryToText(q))).toMatchObject(q);
   });
 });

@@ -115,14 +115,23 @@
       "yearExact": "{{n}} model",
       "priceMax": "≤ {{p}}",
       "priceMin": "≥ {{p}}",
-      "priceRange": "{{a}} – {{b}}"
+      "priceRange": "{{a}} – {{b}}",
+      "hoursMax": "≤ {{n}} engine hours",
+      "flagTr": "Turkish flag",
+      "flagForeign": "Foreign flag",
+      "tradeIn": "Open to trade-in",
+      "negotiable": "Price negotiable"
     },
     "crit": {
       "length": "Length",
       "year": "Year",
       "price": "Budget",
       "type": "Type",
-      "location": "Location"
+      "location": "Location",
+      "engineHours": "engine hours",
+      "flag": "flag",
+      "tradeIn": "trade-in",
+      "negotiable": "negotiable"
     },
     "title": "Smart Assistant",
     "exact": "Exact matches ({{n}})",
@@ -160,7 +169,11 @@
     "equipment": "Equipment",
     "urgentOnly": "Urgent only",
     "apply": "Apply",
-    "dropOnly": "Price drops"
+    "dropOnly": "Price drops",
+    "maxYear": "Max year",
+    "minPrice": "Min price",
+    "maxHours": "Max engine hours",
+    "flag": "Flag"
   },
   "listings": {
     "title": "Boats for sale",

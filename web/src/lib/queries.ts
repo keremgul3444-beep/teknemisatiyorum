@@ -17,7 +17,10 @@ const num = (v?: string) => (v !== undefined && v !== '' && /^\d+(\.\d+)?$/.test
 export function searchParamsToQuery(sp: SP): SearchState {
   const raw: Record<string, unknown> = {
     type: sp.tip, location: sp.sehir, currency: sp.para,
-    minLength: num(sp.minBoy), maxLength: num(sp.maxBoy), minYear: num(sp.minYil), maxYear: num(sp.maxYil), maxPrice: num(sp.maxFiyat),
+    minLength: num(sp.minBoy), maxLength: num(sp.maxBoy), minYear: num(sp.minYil), maxYear: num(sp.maxYil),
+    minPrice: num(sp.minFiyat), maxPrice: num(sp.maxFiyat), maxEngineHours: num(sp.maxSaat),
+    flag: sp.bayrak === 'tr' ? 'tr' : sp.bayrak === 'yabanci' ? 'foreign' : undefined,
+    tradeIn: sp.takas === '1' ? true : undefined, negotiable: sp.pazarlik === '1' ? true : undefined,
   };
   const q: Record<string, unknown> = {
     equipment: (sp.donanim ?? '').split(',').filter((e): e is Equipment => (EQUIPMENT as readonly string[]).includes(e)),
@@ -37,7 +40,10 @@ export function queryToSearchParams(s: SearchState): Record<string, string> {
   const out: SP = {
     tip: q.type, sehir: q.location, para: q.currency,
     minBoy: q.minLength?.toString(), maxBoy: q.maxLength?.toString(), minYil: q.minYear?.toString(), maxYil: q.maxYear?.toString(),
-    maxFiyat: q.maxPrice?.toString(), donanim: q.equipment.length ? q.equipment.join(',') : undefined,
+    minFiyat: q.minPrice?.toString(), maxFiyat: q.maxPrice?.toString(), maxSaat: q.maxEngineHours?.toString(),
+    bayrak: q.flag === 'tr' ? 'tr' : q.flag === 'foreign' ? 'yabanci' : undefined,
+    takas: q.tradeIn ? '1' : undefined, pazarlik: q.negotiable ? '1' : undefined,
+    donanim: q.equipment.length ? q.equipment.join(',') : undefined,
     sira: s.sort === 'new' ? undefined : s.sort, sayfa: s.page > 1 ? String(s.page) : undefined, acil: s.urgent ? '1' : undefined, dusen: s.drop ? '1' : undefined,
   };
   return Object.fromEntries(Object.entries(out).filter((e): e is [string, string] => e[1] !== undefined));

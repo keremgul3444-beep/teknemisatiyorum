@@ -115,14 +115,23 @@
       "yearExact": "{{n}} model",
       "priceMax": "≤ {{p}}",
       "priceMin": "≥ {{p}}",
-      "priceRange": "{{a}} – {{b}}"
+      "priceRange": "{{a}} – {{b}}",
+      "hoursMax": "≤ {{n}} motor saati",
+      "flagTr": "Türk bayraklı",
+      "flagForeign": "Yabancı bayraklı",
+      "tradeIn": "Takasa açık",
+      "negotiable": "Pazarlık payı var"
     },
     "crit": {
       "length": "Boy",
       "year": "Yıl",
       "price": "Bütçe",
       "type": "Tip",
-      "location": "Konum"
+      "location": "Konum",
+      "engineHours": "motor saati",
+      "flag": "bayrak",
+      "tradeIn": "takas",
+      "negotiable": "pazarlık"
     },
     "title": "Akıllı Asistan",
     "exact": "Tam uyan ({{n}})",
@@ -160,7 +169,11 @@
     "equipment": "Donanım",
     "urgentOnly": "Sadece acil",
     "apply": "Uygula",
-    "dropOnly": "Fiyatı düşenler"
+    "dropOnly": "Fiyatı düşenler",
+    "maxYear": "En fazla yıl",
+    "minPrice": "En az fiyat",
+    "maxHours": "En fazla motor saati",
+    "flag": "Bayrak"
   },
   "listings": {
     "title": "Satılık tekne ilanları",

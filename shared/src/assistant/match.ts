@@ -2,7 +2,7 @@ import type { Equipment, MatchableListing } from '../filter';
 import { DEMO_RATES, toTRY, type Rates } from '../rates';
 import { isEmptyQuery, type ParsedQuery } from './parse';
 
-export type Criterion = 'length' | 'year' | 'price' | 'type' | 'location' | `equipment:${Equipment}`;
+export type Criterion = 'length' | 'year' | 'price' | 'type' | 'location' | 'engineHours' | 'flag' | 'tradeIn' | 'negotiable' | `equipment:${Equipment}`;
 export interface MatchResult<L extends MatchableListing = MatchableListing> { exact: L[]; near: { listing: L; missing: Criterion[] }[] }
 
 export function failures(l: MatchableListing, q: ParsedQuery, rates: Rates = DEMO_RATES): Criterion[] {
@@ -14,6 +14,10 @@ export function failures(l: MatchableListing, q: ParsedQuery, rates: Rates = DEM
   if ((q.minPrice !== undefined && price < toTRY(q.minPrice, cur, rates)) || (q.maxPrice !== undefined && price > toTRY(q.maxPrice, cur, rates))) f.push('price');
   if (q.type && l.type !== q.type) f.push('type');
   if (q.location && l.location !== q.location) f.push('location');
+  if (q.maxEngineHours !== undefined && (l.engineHours == null || l.engineHours > q.maxEngineHours)) f.push('engineHours');
+  if (q.flag && l.flag !== q.flag) f.push('flag');
+  if (q.tradeIn && !l.tradeIn) f.push('tradeIn');
+  if (q.negotiable && !l.negotiable) f.push('negotiable');
   q.equipment.forEach((e) => { if (!l.equipment.includes(e)) f.push(`equipment:${e}`); });
   return f;
 }

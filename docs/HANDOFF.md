@@ -46,6 +46,7 @@ Tekne alım-satım + broker + ekspertiz + (2. dalga: usta/kaptan/güvenli ödeme
 - Satıcı ilan yönetimi (aynı gün): sihirbazın düzenleme modu (`/ilan-ver?id=`), İlanlarım'da Düzenle / Fiyat / Yayından kaldır, reddedileni düzeltip yeniden gönderme, `PUT /listings/:id/photos`, yarım yayını sürdürme, klavye. Not: bu kapsayıcıda Metro dosya değişikliklerini izlemiyor; tarayıcıda denemeden önce `expo start --clear` yeniden başlatılmalı.
 - Şikayet ve yaptırım (aynı gün): ilan bildirme, Yönetim > Bildirimler (kaldır / yoksay / satıcıyı askıya al), hesap askıya alma ve kaldırma, "Kaldırıldı" durumu. Migration `0009_reports_suspension`. Ayrıntı incelemede.
 - Güvenlik paketi (aynı gün): moderasyonda tam ilan + sürüm kilidi, satılmış ilana fotoğraf engeli, tekne kimliği değişince rozet düşmesi, "Reddedildi" durumu ve gerekçe, koşullu "Doğrulanmış", görüntülenme sayımı (site: `/api/views` → `POST /listings/:id/view`), satılmış ilanda düğmeler, karne `i18n:` önek açığı. Ayrıntı incelemede.
+- Arama (aynı gün): motor saati, bayrak, takas ve pazarlık filtrede, asistanda ve karşılaştırmada; arama önce hafif alanlarla süzüp yalnızca gösterilen sayfayı tam yüklüyor. Ayrıntı incelemede.
 - Not: `mobile/scripts/demo-flows.mjs` içindeki 1, 2, 4, 9. akışlar bu değişiklikten önce de geçmiyordu (yeni asistan kutusunda "Ara" düğmesi yok); script güncellenmeli.
 
 ## Kaldığımız yer (2026-10-02 akşamı)

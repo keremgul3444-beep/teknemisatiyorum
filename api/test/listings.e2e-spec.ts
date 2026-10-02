@@ -180,6 +180,24 @@ describe('arama ve kurlar', () => {
     expect(r2.body.items).toHaveLength(0);
   });
 
+  test('motor saati, bayrak, takas ve pazarlıkla süzülür; sayfa ve toplam doğru', async () => {
+    const a = await loginAs(t);
+    const mk = (over: object) => t.prisma.listing.create({
+      data: { ...draft, brand: 'SaatTest', location: 'Didim', ownerId: a.user.id, currency: 'EUR', status: 'published', publishedAt: new Date(), badges: [], ...over },
+    });
+    const ok = await mk({ engineHours: 800, flag: 'tr', tradeIn: true, negotiable: true });
+    await mk({ engineHours: 1500, flag: 'tr', tradeIn: true, negotiable: true }); // saat fazla
+    await mk({ engineHours: null, flag: 'tr', tradeIn: true, negotiable: true }); // saat belirtilmemiş
+    await mk({ engineHours: 500, flag: 'foreign', tradeIn: true, negotiable: true }); // bayrak
+    await mk({ engineHours: 500, flag: 'tr', tradeIn: false, negotiable: true }); // takas yok
+    const q = (o: object) => encodeURIComponent(JSON.stringify({ location: 'Didim', equipment: [], ...o }));
+    const r = await t.http().get(`/listings?q=${q({ maxEngineHours: 1000, flag: 'tr', tradeIn: true, negotiable: true })}`);
+    expect(r.body.items.map((l: { id: string }) => l.id)).toEqual([ok.id]);
+    expect(r.body.total).toBe(1);
+    expect((await t.http().get(`/listings?q=${q({})}`)).body.total).toBe(5);
+    expect((await t.http().get(`/listings?q=${q({ maxEngineHours: -1 })}`)).status).toBe(400);
+  });
+
   test('kur tablosunu yalnızca yönetici değiştirir', async () => {
     const a = await loginAs(t, { level: 3 });
     expect((await t.http().put('/admin/fx/EUR').set(a.auth).send({ rateToTry: 1 })).status).toBe(403);

@@ -72,6 +72,15 @@ export function parseQuery(input: string): ParsedQuery {
     text = blank(text, pm.index, ctxEnd);
   }
 
+  // 1b) Motor saati — yıldan önce ("2000 saat" model yılı sanılmasın). "1000 saat altı", "motor saati 1500'e kadar", "max 800 hours".
+  const hm = /motor saati\s*(?:en fazla|max\.?)?\s*(\d+(?:[.,]\d{3})*)|(\d+(?:[.,]\d{3})*)\s*(?:motor\s*)?(?:saat\S*|hours?|hrs?)(?![a-zçğıöşü])/.exec(text);
+  if (hm) {
+    q.maxEngineHours = Math.round(toNumber(hm[1] ?? hm[2]));
+    const end = hm.index + hm[0].length;
+    const ctx = after(text, end, "kadar|altı\\S*|az|max|under|or less", 14);
+    text = blank(text, hm.index, ctx ? end + ctx[0].length : end);
+  }
+
   // 2) Yıl — önce "2010-2015" gibi aralık
   const yr = /(19[5-9]\d|20[0-4]\d)\s*[-–]\s*(19[5-9]\d|20[0-4]\d)(?!\d)/.exec(text);
   if (yr) {
@@ -141,6 +150,12 @@ export function parseQuery(input: string): ParsedQuery {
   // 6) Konum
   const loc = LOCATIONS.find((l) => text.includes(l.toLocaleLowerCase('tr-TR')));
   if (loc) q.location = loc;
+
+  // 7) Bayrak, takas, pazarlık
+  if (/yabanc[ıi] bayrak|foreign flag/.test(text)) q.flag = 'foreign';
+  else if (/t[üu]rk bayrak|tr bayrak|turkish flag/.test(text)) q.flag = 'tr';
+  if (/takas|trade[- ]?in/.test(text)) q.tradeIn = true;
+  if (/pazarl[ıi]k|negotiable/.test(text)) q.negotiable = true;
 
   return q;
 }

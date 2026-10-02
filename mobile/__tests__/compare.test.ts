@@ -30,3 +30,16 @@ test('tek ilan ya da boş alanlarda çökmez', () => {
   expect(rows.every((r) => r.best === null)).toBe(true);
   expect(rows.find((r) => r.key === 'engine')!.values).toEqual(['—']);
 });
+
+test('motor saati azı iyi; bayrak ve satış koşulları gösterilir', () => {
+  const rows = compareRows([
+    L({ id: 'a', engineHours: 1200, flag: 'tr', tradeIn: true, negotiable: true }),
+    L({ id: 'b', engineHours: 400, flag: 'foreign', tradeIn: false, negotiable: false }),
+    L({ id: 'c', engineHours: null, flag: null }),
+  ], i18n.t, 'tr');
+  const by = Object.fromEntries(rows.map((r) => [r.key, r]));
+  expect(by.engineHours.best).toBe(1);
+  expect(by.engineHours.values).toEqual(['1.200 saat', '400 saat', '—']);
+  expect(by.flag.values).toEqual(['Türk bayraklı', 'Yabancı bayraklı', '—']);
+  expect(by.terms.values).toEqual(['Takasa açık, Pazarlık payı var', '—', '—']);
+});

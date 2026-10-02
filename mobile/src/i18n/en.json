@@ -320,14 +320,23 @@
       "yearExact": "{{n}} model",
       "priceMax": "≤ {{p}}",
       "priceMin": "≥ {{p}}",
-      "priceRange": "{{a}} – {{b}}"
+      "priceRange": "{{a}} – {{b}}",
+      "hoursMax": "≤ {{n}} engine hours",
+      "flagTr": "Turkish flag",
+      "flagForeign": "Foreign flag",
+      "tradeIn": "Open to trade-in",
+      "negotiable": "Price negotiable"
     },
     "crit": {
       "length": "Length",
       "year": "Year",
       "price": "Budget",
       "type": "Type",
-      "location": "Location"
+      "location": "Location",
+      "engineHours": "engine hours",
+      "flag": "flag",
+      "tradeIn": "trade-in",
+      "negotiable": "negotiable"
     }
   },
   "listings": {
@@ -352,7 +361,10 @@
     "max": "Max",
     "showResults": "Show results",
     "location": "Location: {{loc}}",
-    "dropOnly": "Price drops"
+    "dropOnly": "Price drops",
+    "fHours": "Engine hours",
+    "fFlag": "Flag",
+    "fTerms": "Sale terms"
   },
   "valuation": {
     "title": "What's my boat worth?",
@@ -1123,7 +1135,10 @@
       "location": "Location",
       "equipment": "Equipment",
       "badges": "Trust",
-      "logbook": "Logbook entries"
+      "logbook": "Logbook entries",
+      "engineHours": "Engine hours",
+      "flag": "Flag",
+      "terms": "Terms"
     }
   },
   "report": {

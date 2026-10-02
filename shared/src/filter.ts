@@ -42,6 +42,12 @@ export const parsedQuerySchema = z.object({
   equipment: z.array(z.enum(EQUIPMENT)).max(8).default([]),
   type: z.enum(BOAT_TYPES).optional(),
   location: z.string().max(40).optional(),
+  /** Motor saati en fazla; motor saati yazılmamış ilan bu kriteri karşılamaz (yakın sonuçlarda "motor saati" eksik görünür). */
+  maxEngineHours: z.number().int().min(0).max(MAX_ENGINE_HOURS).optional(),
+  flag: z.enum(FLAGS).optional(),
+  /** Yalnızca takasa açık / pazarlık payı olan ilanlar (true verilirse). */
+  tradeIn: z.literal(true).optional(),
+  negotiable: z.literal(true).optional(),
 });
 export type ParsedQuery = z.infer<typeof parsedQuerySchema>;
 
@@ -49,4 +55,5 @@ export type ParsedQuery = z.infer<typeof parsedQuerySchema>;
 export interface MatchableListing {
   lengthM: number; year: number; price: number; currency: Currency; type: BoatType;
   location: string; equipment: Equipment[]; status: string;
+  engineHours?: number | null; flag?: string | null; tradeIn?: boolean; negotiable?: boolean;
 }

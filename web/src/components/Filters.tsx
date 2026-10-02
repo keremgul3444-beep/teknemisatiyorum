@@ -31,6 +31,14 @@ export function Filters({ locale, state, action }: { locale: Locale; state: Sear
         <input id="f-minyil" name="minYil" className="input" inputMode="numeric" defaultValue={q.minYear ?? ''} />
       </div>
       <div>
+        <label htmlFor="f-maxyil">{t(locale, 'filters.maxYear')}</label>
+        <input id="f-maxyil" name="maxYil" className="input" inputMode="numeric" defaultValue={q.maxYear ?? ''} />
+      </div>
+      <div>
+        <label htmlFor="f-minfiyat">{t(locale, 'filters.minPrice')}</label>
+        <input id="f-minfiyat" name="minFiyat" className="input" inputMode="numeric" defaultValue={q.minPrice ?? ''} />
+      </div>
+      <div>
         <label htmlFor="f-maxfiyat">{t(locale, 'filters.maxPrice')}</label>
         <div className="row" style={{ flexWrap: 'nowrap', gap: 6 }}>
           <input id="f-maxfiyat" name="maxFiyat" className="input" inputMode="numeric" defaultValue={q.maxPrice ?? ''} />
@@ -38,6 +46,18 @@ export function Filters({ locale, state, action }: { locale: Locale; state: Sear
             {CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
+      </div>
+      <div>
+        <label htmlFor="f-maxsaat">{t(locale, 'filters.maxHours')}</label>
+        <input id="f-maxsaat" name="maxSaat" className="input" inputMode="numeric" defaultValue={q.maxEngineHours ?? ''} />
+      </div>
+      <div>
+        <label htmlFor="f-bayrak">{t(locale, 'filters.flag')}</label>
+        <select id="f-bayrak" name="bayrak" className="input" defaultValue={q.flag === 'tr' ? 'tr' : q.flag === 'foreign' ? 'yabanci' : ''}>
+          <option value="">{t(locale, 'filters.any')}</option>
+          <option value="tr">{t(locale, 'listing.flagTr')}</option>
+          <option value="yabanci">{t(locale, 'listing.flagForeign')}</option>
+        </select>
       </div>
       <div>
         <label htmlFor="f-sira">{t(locale, 'filters.sort')}</label>
@@ -56,6 +76,14 @@ export function Filters({ locale, state, action }: { locale: Locale; state: Sear
               <span style={{ marginLeft: 6 }}><label htmlFor={`eq-${e}`} style={{ display: 'inline', textTransform: 'none', letterSpacing: 0, fontWeight: 400, color: 'inherit', fontSize: 14 }}>{t(locale, `equipment.${e}`)}</label></span>
             </span>
           ))}
+          <span className="chip">
+            <input type="checkbox" id="f-takas" name="takas" value="1" defaultChecked={!!q.tradeIn} />
+            <span style={{ marginLeft: 6 }}><label htmlFor="f-takas" style={{ display: 'inline', textTransform: 'none', letterSpacing: 0, fontWeight: 400, color: 'inherit', fontSize: 14 }}>{t(locale, 'listing.tradeIn')}</label></span>
+          </span>
+          <span className="chip">
+            <input type="checkbox" id="f-pazarlik" name="pazarlik" value="1" defaultChecked={!!q.negotiable} />
+            <span style={{ marginLeft: 6 }}><label htmlFor="f-pazarlik" style={{ display: 'inline', textTransform: 'none', letterSpacing: 0, fontWeight: 400, color: 'inherit', fontSize: 14 }}>{t(locale, 'listing.negotiable')}</label></span>
+          </span>
           <span className="chip">
             <input type="checkbox" id="f-dusen" name="dusen" value="1" defaultChecked={!!state.drop} />
             <span style={{ marginLeft: 6 }}><label htmlFor="f-dusen" style={{ display: 'inline', textTransform: 'none', letterSpacing: 0, fontWeight: 400, color: 'inherit', fontSize: 14 }}>{t(locale, 'filters.dropOnly')}</label></span>

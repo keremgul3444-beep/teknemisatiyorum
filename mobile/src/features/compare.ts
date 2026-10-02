@@ -26,6 +26,11 @@ export function compareRows(listings: Listing[], t: TFunction, lang: 'tr' | 'en'
     row('type', listings.map((l) => t(`boatType.${l.type}`))),
     row('cabins', listings.map((l) => String(l.cabins)), listings.map((l) => l.cabins)),
     row('engine', listings.map((l) => l.engine || '—')),
+    // Motor saati: az olan iyi; bilinmeyen değer vurgulanmaz.
+    row('engineHours', listings.map((l) => (l.engineHours != null ? t('listing.engineHoursValue', { hours: l.engineHours.toLocaleString(lang) }) : '—')),
+      listings.map((l) => l.engineHours ?? null), 'min'),
+    row('flag', listings.map((l) => (l.flag ? t(l.flag === 'tr' ? 'listing.flagTr' : 'listing.flagForeign') : '—'))),
+    row('terms', listings.map((l) => [l.tradeIn ? t('listing.tradeIn') : '', l.negotiable ? t('listing.negotiable') : ''].filter(Boolean).join(', ') || '—')),
     row('location', listings.map((l) => l.location)),
     row('equipment', listings.map((l) => (l.equipment.length ? l.equipment.map((e) => t(`equipment.${e}`)).join(', ') : '—')), listings.map((l) => l.equipment.length)),
     row('badges', listings.map((l) => (l.badges.length ? l.badges.map((b) => t(`badge.${b}`)).join(', ') : '—')), listings.map((l) => l.badges.length)),

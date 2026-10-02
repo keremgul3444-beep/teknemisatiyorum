@@ -134,3 +134,9 @@ Kalan: B9 tamamlandı; B14 (erişilebilirlik ayrıntıları), C17–C19, C21, D 
    - Klavye düzeltmesi.
 4. **Site:** siteden iletişim, galeri, güvenlik uyarısı ve satıcı kartı, telefonda düzen.
 5. **Arama:** yeni alanlarla filtre, karşılaştırma ve kart.
+
+## Arama paketi ile kapatılanlar (2026-10-02)
+
+- E: Motor saati, bayrak, takas ve pazarlık aramaya girdi. Ortak sorgu şeması `maxEngineHours`, `flag`, `tradeIn`, `negotiable` alanlarını taşıyor; asistan "1000 saatin altında", "türk bayraklı", "takasa açık", "pazarlıklı" gibi ifadeleri anlıyor (Claude modu da aynı alanları dolduruyor). Motor saati girilmemiş ilan, motor saati sınırlı aramada eşleşmiyor.
+- Uygulamada filtre sayfasına en az/en çok fiyat, en çok motor saati, bayrak ve satış koşulları eklendi; karşılaştırmada motor saati (az olan iyi), bayrak ve koşullar satırları var. Sitede filtrelerde en az fiyat, en çok yıl, motor saati, bayrak, takas ve pazarlık (`?maxSaat=&bayrak=tr|yabanci&takas=1&pazarlik=1`).
+- D (arama belleği): Arama artık her istekte tam ilanları yüklemiyor. Önce yalnızca eşleştirme ve sıralama alanları okunuyor (yeni alanlar SQL tarafında süzülüyor), tam ilan yalnızca gösterilecek sayfa ve öne çıkanlar için yükleniyor. Asistanın tam eşleşme listesi 50 ile sınırlı.
