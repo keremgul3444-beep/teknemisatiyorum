@@ -22,7 +22,8 @@ Tekne alım-satım + broker + ekspertiz + (2. dalga: usta/kaptan/güvenli ödeme
 - Ortak bileşenler: `AssistantInput` (asistan kutusu; ana ekran, asistan, hizmetler), `Badge` hap biçimli + ikonlu, `StatusLine`/`Bullet` (metin içine ✓ • gibi işaret yazılmaz, ikon kullanılır), `Section` başlığı 19 px + sağda "Tümü ›". Emoji ve metin işareti yok.
 - İlan detayı (uygulama ve site): fotoğraf, rozetler, başlık, fiyat, üç büyük rakam (boy/yıl/kabin), özellik listesi, donanım, açıklama, karne, satıcı.
 - Site simgesi: `web/src/app/icon.svg` → `favicon.ico` (32 px, PNG gömülü) ve `public/icon.png` (512 px, schema.org logosu). Üretim: scratch betiği sharp ile çizdi; SVG değişirse yeniden üretilmeli.
-- `npx expo lint` 0 uyarı; tasarım dışı kalan tek iş gerçek fotoğraflar ve mağaza simgesi.
+- `npx expo lint` 0 uyarı.
+- Demo fotoğrafları: `shared/assets/boats/` (16 kare, MINOA'nın gerçek çekimleri, 1200×900 JPEG; ilk 8 dış çekim). Uygulama demo modunda `mobile/src/assets/boatPhotos.ts` ile (Metro `../shared`'ı izler), sunucu seed'i her ilana 4 fotoğraf (kapak + 3 iç mekân) yükler. Veritabanı yalnızca boşken seed'lenir: eski degrade görselleri görmek istemiyorsanız `api/.data/pg` ve `api/storage` silinip `npm run dev` yeniden çalıştırılır.
 
 ## Belgeler
 - Tasarım: `docs/superpowers/specs/2026-09-26-arka-uc-dalga1-design.md`

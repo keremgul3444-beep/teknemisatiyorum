@@ -50,7 +50,7 @@ export default function IlanDetay() {
         <View>
           <FlatList horizontal pagingEnabled data={l.photoUrls?.length ? l.photoUrls.map((_, i) => i) : [0, 1, 2, 3]} keyExtractor={(i) => String(i)} showsHorizontalScrollIndicator={false}
             onScroll={(e) => setPage(Math.round(e.nativeEvent.contentOffset.x / galleryW))} scrollEventThrottle={32}
-            style={{ width: galleryW }} renderItem={({ item }) => <View style={{ width: galleryW }}><BoatImage seed={l.photoSeed + item} height={300} uri={l.photoUrls?.[item]} /></View>} />
+            style={{ width: galleryW }} renderItem={({ item }) => <View style={{ width: galleryW }}><BoatImage seed={l.photoSeed} frame={item} height={300} uri={l.photoUrls?.[item]} /></View>} />
           <View style={{ position: 'absolute', top: space(3), left: space(4), right: space(4), flexDirection: 'row', justifyContent: 'space-between' }}>
             <RoundBtn icon="back" label={t('common.back')} onPress={goBack} />
             <View style={{ flexDirection: 'row', gap: space(2) }}>

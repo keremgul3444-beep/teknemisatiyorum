@@ -64,7 +64,7 @@ export default async function IlanDetay({ params }: P) {
           ) : <div className="card" style={{ aspectRatio: '4 / 3', background: 'linear-gradient(180deg, #BFD9EA 0 62%, #2F6F98 62% 100%)' }} aria-hidden="true" />}
           {rest.length ? (
             <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', marginTop: 12 }}>
-              {rest.map((p) => <img key={p.id} src={mediaUrl(p.id, 400)} width={400} height={300} alt={title} loading="lazy" decoding="async" style={{ borderRadius: 'var(--r-sm)', aspectRatio: '4 / 3', objectFit: 'cover' }} />)}
+              {rest.map((p) => <img key={p.id} src={mediaUrl(p.id, 400)} width={400} height={300} alt={title} loading="lazy" decoding="async" style={{ width: '100%', height: 'auto', borderRadius: 'var(--r-sm)', aspectRatio: '4 / 3', objectFit: 'cover' }} />)}
             </div>
           ) : null}
         </div>
