@@ -10,8 +10,9 @@ const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace
 const SHOTS = path.join(ROOT, 'docs', 'demo-shots');
 fs.mkdirSync(SHOTS, { recursive: true });
 
-const browser = await chromium.launch({ channel: 'chrome', headless: true });
-const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH, headless: true } : { channel: 'chrome', headless: true });
+// Akışlar Türkçe metinle yazıldı; uygulama dili tarayıcı dilinden gelir.
+const page = await browser.newPage({ viewport: { width: 390, height: 844 }, locale: 'tr-TR' });
 const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));
 page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
@@ -48,7 +49,9 @@ const exact = (s) => vis(page.getByText(s, { exact: true }));
 const click = async (s, ex = false) => { await (ex ? exact(s) : text(s)).click(); await page.waitForTimeout(350); };
 const see = async (s, timeout = 5000) => { await text(s).waitFor({ timeout }); };
 const fillPh = async (ph, value) => { await vis(page.getByPlaceholder(ph, { exact: false })).fill(value); await page.waitForTimeout(150); };
-const byLabel = (l) => vis(page.getByLabel(l, { exact: true }));
+// Zorunlu alanların erişilebilir adı "Etiket, zorunlu" biçimindedir.
+const reEsc = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const byLabel = (l) => vis(page.getByLabel(new RegExp(`^${reEsc(l)}(, zorunlu)?$`)));
 const tab = async (name) => {
   for (let i = 0; i < 6; i++) {
     const t = await top(page.getByRole('tab', { name, exact: true }), 1500).catch(() => null);
@@ -60,6 +63,9 @@ const tab = async (name) => {
   }
   throw new Error(`Sekme bulunamadı: ${name}`);
 };
+// Asistan kutusunun düğmesi yalnızca simge; erişilebilir adıyla (assistant.search) tıklanır.
+const SEARCH_LABEL = 'Ara';
+const submitSearch = async () => { await (await top(page.getByRole('button', { name: SEARCH_LABEL, exact: true }))).click(); await page.waitForTimeout(350); };
 const shot = (name) => page.screenshot({ path: path.join(SHOTS, `${name}.jpg`), type: 'jpeg', quality: 70 });
 
 const results = [];
@@ -101,7 +107,7 @@ await see('Teknen için her şey');
 
 await flow(1, 'Asistanla arama → ilan → mesaj', 'Keşfet\'te asistana sorgu yazılır, 3 tam eşleşme görülür, ilan açılır, satıcıya mesaj atılır ve otomatik yanıt gelir.', async () => {
   await fillPh('Ne aradığını yaz:', '12 metreye kadar jeneratörlü brandalı 2015 sonrası');
-  await click('Ara', true);
+  await submitSearch();
   await see('Tam eşleşen (3)');
   await click('Galeon 360 Fly · 2020');
   await see('Özellikler');
@@ -116,7 +122,7 @@ await flow(1, 'Asistanla arama → ilan → mesaj', 'Keşfet\'te asistana sorgu 
 await flow(2, 'Sonuçsuz aramayı talebe çevirme', 'Eşleşmesi olmayan bir sorgu aranır, "Bu aramayı kaydet" ile kaydedilir ve kayıtlı aramalarda görünür.', async () => {
   await tab('Keşfet');
   await fillPh('Ne aradığını yaz:', '40 metre katamaran 2024 sonrası');
-  await click('Ara', true);
+  await submitSearch();
   await see('Birebir eşleşen ilan yok');
   await click('Bu aramayı kaydet');
   await see('Arama kaydedildi');
@@ -164,7 +170,7 @@ await flow(3, 'İlan verme (kimlik doğrulama dahil)', 'Ekle → İlan ver; kiml
 await flow(4, 'Usta işi → güvenli ödeme → karne', 'Hizmetler\'de dert yazılır, talep açılır, 3 teklif karşılaştırılıp biri kabul edilir, güvenli ödeme yapılır, iş onaylanır, değerlendirilir ve karneye düşer.', async () => {
   await tab('Hizmetler');
   await fillPh('motorum su', 'motorum su alıyor');
-  await click('Talep oluştur');
+  await (await top(page.getByRole('button', { name: 'Talep oluştur', exact: true }))).click(); await page.waitForTimeout(350);
   await see('Hizmet talebi');
   await click('Talebi gönder');
   await see('Gelen teklifler (3)');
@@ -255,7 +261,7 @@ await flow(9, 'Roller ve yönetim onayı', 'Demo rol değiştirici ile usta, kur
   await page.waitForTimeout(400);
   await tab('Keşfet');
   await fillPh('Ne aradığını yaz:', 'Bodrum yelkenli');
-  await click('Ara', true);
+  await submitSearch();
   await see('Bavaria Cruiser 41');
 });
 

@@ -48,7 +48,7 @@ Tekne alım-satım + broker + ekspertiz + (2. dalga: usta/kaptan/güvenli ödeme
 - Güvenlik paketi (aynı gün): moderasyonda tam ilan + sürüm kilidi, satılmış ilana fotoğraf engeli, tekne kimliği değişince rozet düşmesi, "Reddedildi" durumu ve gerekçe, koşullu "Doğrulanmış", görüntülenme sayımı (site: `/api/views` → `POST /listings/:id/view`), satılmış ilanda düğmeler, karne `i18n:` önek açığı. Ayrıntı incelemede.
 - Arama (aynı gün): motor saati, bayrak, takas ve pazarlık filtrede, asistanda ve karşılaştırmada; arama önce hafif alanlarla süzüp yalnızca gösterilen sayfayı tam yüklüyor. Ayrıntı incelemede.
 - Kötüye kullanım korumaları (aynı gün): fiyat oyunu, karne görünürlüğü, medya kota ve erişimi, yetim dosya temizliği, mesaj engelleme ve sınırları, ödeme uyarısı, numara toplama, belge erişim kaydı, ekspertiz rozeti kuralı. Yeni migration `0010_messaging_guard`: yerelde `npx prisma migrate deploy` gerekir. Ayrıntı incelemede.
-- Not: `mobile/scripts/demo-flows.mjs` içindeki 1, 2, 4, 9. akışlar bu değişiklikten önce de geçmiyordu (yeni asistan kutusunda "Ara" düğmesi yok); script güncellenmeli.
+- Demo akışları (`mobile/scripts/demo-flows.mjs`) güncellendi: 11/11 geçiyor. Tarayıcı dili `tr-TR` sabit; Chrome yoksa `CHROMIUM_PATH=… node scripts/demo-flows.mjs`.
 
 ## Kaldığımız yer (2026-10-02 akşamı)
 - Son commit: ac150d2. Bugün: Liman tasarımı her yerde, MINOA fotoğrafları, mağaza simgesi/açılış, rakip araştırması ve ondan 6 özellik (fiyat düştü, satıcı istatistikleri, paylaşım, anlık bildirim, karşılaştırma, belge rozeti + Devir asistanı).

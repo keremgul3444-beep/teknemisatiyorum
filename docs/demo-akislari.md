@@ -1,6 +1,6 @@
 # Demo akışları — doğrulama sonucu
 
-Çalıştırma: 2026-09-26 11:15 · Betik: `mobile/scripts/demo-flows.mjs` · Tarayıcı: Chrome (390×844)
+Çalıştırma: 2026-10-02 22:43 · Betik: `mobile/scripts/demo-flows.mjs` · Tarayıcı: Chrome (390×844)
 
 **Sonuç: 11/11 akış geçti.**
 
