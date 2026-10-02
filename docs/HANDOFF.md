@@ -35,6 +35,12 @@ Tekne alım-satım + broker + ekspertiz + (2. dalga: usta/kaptan/güvenli ödeme
 - Belgeler eşleşti rozeti: ruhsat başvurusuna ikinci dosya (motor seri no fotoğrafı) + `details.engineSerialLast4`; moderatör onaylayınca `sahiplik` + `belge` rozeti. Devir asistanı (`devir.tsx`): resmî adımlar (noter, Umurbey randevu, 15 gün e-Devlet tescil), belge listesi, bağlantılar, sonunda `POST /listings/:id/sold` ile satıldı; İlanlarım'dan ulaşılır.
 - Anlık bildirim: `PushToken` tablosu (`PUT/DELETE /me/push-token`), `adapters/push.ts` (Expo Push servisi — ücretsiz; `PUSH_MODE=expo`, varsayılan `off` = bellek), metinler `push.texts.ts` (uygulamanın notif.* çevirileriyle aynı, kullanıcının dilinde). Her uygulama içi bildirim aynı anda telefona da gider; kayıtsız cihazın jetonu silinir; aynı jeton başka hesapla girişte o hesaba geçer; çıkışta silinir. Uygulama: `features/push.ts` (izin, jeton, bildirime dokununca ekran), `_layout.tsx` dinleyici, `app.json` expo-notifications eklentisi.
 
+## Kaldığımız yer (2026-10-02 akşamı)
+- Son commit: ac150d2. Bugün: Liman tasarımı her yerde, MINOA fotoğrafları, mağaza simgesi/açılış, rakip araştırması ve ondan 6 özellik (fiyat düştü, satıcı istatistikleri, paylaşım, anlık bildirim, karşılaştırma, belge rozeti + Devir asistanı).
+- Sıradaki aday: kısa ilan videosu (≤60 sn, sunucuda süre/boyut sınırı, ilan sayfasında oynatma). Sonra siteden mesajlaşma/favoriler. Finansman/sigorta yönlendirmesi ortak bulununca.
+- Claude API anahtarı yok (kullanıcının kredisi claude.ai/code oturumları için); asistan kural tabanlı çalışmaya devam ediyor.
+- Çalıştırma: `scripts/baslat.bat` (çift tık) ya da `npm run dev -- --web`; bellek azsa Expo ve siteyi aynı anda açma.
+
 ## Belgeler
 - Rakip araştırması (2026-10-02): `docs/arastirma-rakip-uygulamalar.md` — Boat Trader/YachtWorld/Boat24/Yachtall/sahibinden özellik karşılaştırması ve öncelik sırası.
 - Tasarım: `docs/superpowers/specs/2026-09-26-arka-uc-dalga1-design.md`
