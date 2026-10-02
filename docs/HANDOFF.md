@@ -31,6 +31,7 @@ Tekne alım-satım + broker + ekspertiz + (2. dalga: usta/kaptan/güvenli ödeme
 - Satıcı istatistikleri: `Listing.viewCount` (sahibi dışındaki herkese açık görüntülemeler, yanıt bekletilmez), `/me/listings` satırlarında `stats {views, favorites, messages}`; uygulamada İlanlarım, sitede Hesabım > İlanlarım.
 - Paylaşım: ilan görünümünde `webUrl` (`WEB_URL/ilan/<id>`, site asıl adrese yönlendirir); uygulamada gerçek paylaşım sayfası (`Share.share`). Uygulamada site adresi `EXPO_PUBLIC_WEB_URL` (varsayılan https://teknemisatiyorum.com).
 - Düzeltme: PATCH /listings/:id artık göndermediğin alanları varsayılana sıfırlamıyor.
+- Anlık bildirim: `PushToken` tablosu (`PUT/DELETE /me/push-token`), `adapters/push.ts` (Expo Push servisi — ücretsiz; `PUSH_MODE=expo`, varsayılan `off` = bellek), metinler `push.texts.ts` (uygulamanın notif.* çevirileriyle aynı, kullanıcının dilinde). Her uygulama içi bildirim aynı anda telefona da gider; kayıtsız cihazın jetonu silinir; aynı jeton başka hesapla girişte o hesaba geçer; çıkışta silinir. Uygulama: `features/push.ts` (izin, jeton, bildirime dokununca ekran), `_layout.tsx` dinleyici, `app.json` expo-notifications eklentisi.
 
 ## Belgeler
 - Rakip araştırması (2026-10-02): `docs/arastirma-rakip-uygulamalar.md` — Boat Trader/YachtWorld/Boat24/Yachtall/sahibinden özellik karşılaştırması ve öncelik sırası.

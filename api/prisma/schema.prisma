@@ -80,6 +80,8 @@ model User {
   deletedAt       DateTime?
 
   sessions Session[]
+
+  pushTokens   PushToken[]
   listings Listing[]
   boats    Boat[]
 }
@@ -359,6 +361,19 @@ model AuditLog {
   at         DateTime @default(now())
 
   @@index([at])
+}
+
+/// Anlık bildirim jetonu (Expo Push); aynı jeton başka hesapla giriş yapılırsa o hesaba taşınır.
+model PushToken {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token      String   @unique
+  platform   String
+  createdAt  DateTime @default(now())
+  lastSeenAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model Notification {

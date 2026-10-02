@@ -24,6 +24,8 @@ const schema = z.object({
   PAYMENT_WEBHOOK_SECRET: z.string().min(32, 'PAYMENT_WEBHOOK_SECRET en az 32 karakter olmalı'),
   /** Sitenin adresi (ödeme dönüş ve deneme ödeme sayfası için). */
   WEB_URL: z.string().default('http://localhost:3001'),
+  /** Anlık bildirim: expo = Expo Push servisi (telefona), off = yalnızca uygulama içi (geliştirme ve test). */
+  PUSH_MODE: z.enum(['expo', 'off']).default('off'),
   /** Express "trust proxy": yalnızca bu ara katmandan gelen X-Forwarded-For'a güvenilir. */
   TRUST_PROXY: z.string().default('loopback'),
 });

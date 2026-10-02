@@ -9,7 +9,8 @@
     "db": "tsx scripts/db.ts",
     "test": "jest --runInBand",
     "typecheck": "tsc --noEmit",
-    "prisma": "prisma"
+    "prisma": "prisma",
+    "lint": "expo lint"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.128.0",

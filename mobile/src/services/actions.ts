@@ -11,6 +11,10 @@ import type { AdminStatus, BoatInput, Listing, ListingDraft, SubjectKind } from 
 import { useSession, type Prefs } from '@/session/role';
 import { resetRates } from './rates';
 import { createPublisher } from '@/features/publishListing';
+import { getPushToken } from '@/features/push';
+
+/** Bu cihazın sunucuya bıraktığı bildirim jetonu; çıkışta silinir. */
+let pushToken: string | null = null;
 
 const g = () => useStore.getState();
 const SUBJECT_TO_API: Partial<Record<SubjectKind, string>> = { ilan: 'listing', broker: 'broker' };
@@ -54,6 +58,15 @@ export const actions = {
     applyUser(r.user);
     await syncMine();
     await syncAdmin();
+    await actions.registerPush();
+  },
+  /** Giriş sonrası ve her açılışta: izin varsa cihaz jetonu sunucuya bırakılır (sessizce; hata giriş akışını bozmaz). */
+  async registerPush() {
+    if (!isApiMode() || !useSession.getState().loggedIn) return;
+    const t = await getPushToken();
+    if (!t) return;
+    pushToken = t.token;
+    await api.put('/me/push-token', t).catch(() => undefined);
   },
   async verifyIdentity(input: { tckn: string; firstName: string; lastName: string; birthYear: number } | { passport: string; nationality: string; firstName: string; lastName: string; birthYear: number; fileUri: string }) {
     if (!isApiMode()) {
@@ -77,6 +90,8 @@ export const actions = {
   },
   async logout() {
     if (!isApiMode()) return useSession.getState().logout();
+    // Çıkan hesaba bu telefona bildirim gelmesin.
+    if (pushToken) { await api.del(`/me/push-token/${encodeURIComponent(pushToken)}`).catch(() => undefined); pushToken = null; }
     await api.post('/auth/logout').catch(() => undefined);
     await api.logoutLocal();
     // Ekran önce çıkışa geçer; misafir verisinin yüklenmesi ağ hatası verse bile oturum açık görünmez.
