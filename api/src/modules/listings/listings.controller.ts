@@ -87,7 +87,9 @@ export class ListingsController {
   @Get('listings/:id')
   async get(@OptionalUser() u: AuthUser | undefined, @Param('id') id: string) {
     const staff = !!u?.roles.some((r) => r === 'admin' || r === 'moderator');
-    return this.listings.view(await this.listings.getVisible(id, u?.id, staff), u?.id);
+    const l = await this.listings.getVisible(id, u?.id, staff);
+    this.listings.countView(l, u?.id);
+    return this.listings.view(l, u?.id);
   }
 
   @Auth()
@@ -97,7 +99,8 @@ export class ListingsController {
       where: { ownerId: u.id, status: q.status ?? { not: 'removed' } },
       include: listingInclude, orderBy: { updatedAt: 'desc' }, take: 200,
     });
-    return Promise.all(rows.map((l) => this.listings.view(l, u.id)));
+    const stats = await this.listings.statsFor(rows);
+    return Promise.all(rows.map((l) => this.listings.view(l, u.id, stats.get(l.id))));
   }
 
   /** Taslak için seviye 1 yeter; onaya göndermek seviye 2 ister (aşağıda, sunucuda). */

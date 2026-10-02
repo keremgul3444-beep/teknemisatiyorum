@@ -657,7 +657,10 @@
     "held": "Güvencede",
     "released": "Aktarıldı",
     "awaiting": "Ödeme bekliyor",
-    "paymentsEmpty": "Henüz ödeme yok"
+    "paymentsEmpty": "Henüz ödeme yok",
+    "views": "{{n}} görüntülenme",
+    "favorites": "{{n}} favori",
+    "messages": "{{n}} mesaj"
   },
   "settings": {
     "title": "Ayarlar",

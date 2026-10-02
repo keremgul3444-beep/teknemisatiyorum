@@ -27,9 +27,13 @@ export function priceDropOf(l: Pick<ListingRow, 'price' | 'currency' | 'priceHis
 }
 
 /** İstemciye dönen ilan görünümü. Satıcının iletişim bilgisi bilerek yoktur; iletişim uygulama içi mesajla. */
-export function listingView(l: ListingRow, viewerId?: string, companyName?: string | null) {
+export type ListingStats = { views: number; favorites: number; messages: number };
+
+export function listingView(l: ListingRow, viewerId?: string, companyName?: string | null, stats?: ListingStats) {
   return {
     id: l.id,
+    /** Sitedeki ilan sayfası (paylaşım için); site kısa adresi asıl adrese yönlendirir. */
+    webUrl: `${env().WEB_URL}/ilan/${l.id}`,
     brand: l.brand, model: l.model, year: l.year, lengthM: l.lengthM, type: l.type,
     price: l.price, currency: l.currency, location: l.location, equipment: l.equipment,
     cabins: l.cabins, engine: l.engine, description: l.description,
@@ -47,6 +51,8 @@ export function listingView(l: ListingRow, viewerId?: string, companyName?: stri
     promo: promoView(l, viewerId),
     priceDrop: priceDropOf(l),
     isMine: !!viewerId && viewerId === l.ownerId,
+    /** Satıcı istatistikleri: yalnızca ilan sahibine (İlanlarım). */
+    ...(stats && viewerId === l.ownerId ? { stats } : {}),
     createdAt: l.createdAt, publishedAt: l.publishedAt,
   };
 }

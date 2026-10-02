@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { colors, space } from '@/theme';
-import { Button, EmptyState, Header, ListingCard, Screen, Segmented, T } from '@/components';
+import { Button, EmptyState, Header, Icon, ListingCard, Screen, Segmented, T } from '@/components';
 import { isApiMode, useListings, type Listing, type ListingStatus } from '@/services';
 import { daysLeft } from '@/features/promo';
 
@@ -22,10 +22,27 @@ export default function Ilanlarim() {
         : list.map((l) => (
           <View key={l.id} style={{ gap: space(2) }}>
             <ListingCard listing={l} />
+            {l.stats ? <StatsRow stats={l.stats} /> : null}
             {l.status === 'yayinda' && isApiMode() ? <PromoRow listing={l} /> : null}
           </View>
         ))}
     </Screen>
+  );
+}
+
+/** Satıcı istatistikleri: görüntülenme, favori, mesaj. */
+function StatsRow({ stats }: { stats: NonNullable<Listing['stats']> }) {
+  const { t } = useTranslation();
+  const items: [string, string][] = [['eye', t('mine.views', { n: stats.views })], ['heart', t('mine.favorites', { n: stats.favorites })], ['mail', t('mine.messages', { n: stats.messages })]];
+  return (
+    <View style={{ flexDirection: 'row', gap: space(4), flexWrap: 'wrap' }}>
+      {items.map(([icon, label]) => (
+        <View key={icon} style={{ flexDirection: 'row', alignItems: 'center', gap: space(1.5) }}>
+          <Icon name={icon} size={16} color={colors.muted} />
+          <T variant="caption" color={colors.muted}>{label}</T>
+        </View>
+      ))}
+    </View>
   );
 }
 

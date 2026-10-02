@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FlatList, Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
+import { FlatList, Pressable, ScrollView, Share, View, useWindowDimensions } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -7,6 +7,7 @@ import { colors, fonts, radius, space } from '@/theme';
 import { Avatar, Badge, BoatImage, Button, Card, Chip, Icon, NotFound, PromoBadges, Section, T, goBack, showDemoToast } from '@/components';
 import { actions, formatPrice, useFavorites, useListing, useSeller } from '@/services';
 import { currentLang, tx } from '@/i18n';
+import { WEB_URL } from '@/services/mode';
 import { requireLevel } from '@/session/role';
 import { attempt } from '@/services/errors';
 
@@ -31,6 +32,12 @@ export default function IlanDetay() {
     const conv = await attempt(() => actions.startConversation({ kind: 'ilan', id: l.id, title: `${l.brand} ${l.model} · ${l.year}` }, seller?.name ?? t('listing.seller')));
     if (conv) router.push(`/sohbet/${conv}`);
   };
+  // Gerçek paylaşım: sitedeki ilan adresi (kısa adres asıl adrese yönlenir).
+  const share = () => {
+    const url = l.webUrl ?? `${WEB_URL}/ilan/${l.id}`;
+    const message = `${l.brand} ${l.model} · ${l.year} · ${formatPrice(l.price, l.currency, lang)}\n${url}`;
+    Share.share({ message, url, title: `${l.brand} ${l.model}` }).catch(() => undefined);
+  };
   const toggleFav = async () => {
     if (!requireLevel(1)) return;
     await attempt(() => actions.toggleFavorite(l.id));
@@ -54,7 +61,7 @@ export default function IlanDetay() {
           <View style={{ position: 'absolute', top: space(3), left: space(4), right: space(4), flexDirection: 'row', justifyContent: 'space-between' }}>
             <RoundBtn icon="back" label={t('common.back')} onPress={goBack} />
             <View style={{ flexDirection: 'row', gap: space(2) }}>
-              <RoundBtn icon="share" label={t('listing.share')} onPress={() => showDemoToast(t('demo.linkCopied'))} />
+              <RoundBtn icon="share" label={t('listing.share')} onPress={share} />
               <RoundBtn icon="heart" label={t('profile.favorites')} filled={fav} onPress={toggleFav} />
             </View>
           </View>

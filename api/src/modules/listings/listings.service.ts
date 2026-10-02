@@ -4,7 +4,7 @@ import { failures, normalizeLocation, type BoatType, type Equipment, type Parsed
 import { PrismaService } from '../../common/prisma.service';
 import { Errors } from '../../common/errors';
 import { FxService } from './fx.service';
-import { listingInclude, listingView, priceDropOf, PRICE_DROP_DAYS, type ListingRow } from './listing.view';
+import { listingInclude, listingView, priceDropOf, PRICE_DROP_DAYS, type ListingRow, type ListingStats } from './listing.view';
 import { NotificationsService } from '../notifications/notifications.module';
 import { freshness, isActive } from '../promotions/promotion.rules';
 
@@ -40,9 +40,27 @@ export class ListingsService {
     return l;
   }
 
-  async view(l: ListingRow, viewerId?: string) {
+  async view(l: ListingRow, viewerId?: string, stats?: ListingStats) {
     const company = l.companyId ? await this.prisma.company.findUnique({ where: { id: l.companyId } }) : null;
-    return listingView(l, viewerId, company?.name);
+    return listingView(l, viewerId, company?.name, stats);
+  }
+
+  /** İlan sahibi dışındaki herkese açık görüntülemeyi sayar (yanıtı bekletmez). */
+  countView(l: ListingRow, viewerId?: string) {
+    if (l.ownerId === viewerId || l.status !== 'published') return;
+    this.prisma.listing.update({ where: { id: l.id }, data: { viewCount: { increment: 1 } } }).catch(() => undefined);
+  }
+
+  /** İlanlarım için: görüntülenme, favori ve sohbet sayıları (iki toplu sorgu). */
+  async statsFor(rows: ListingRow[]) {
+    const ids = rows.map((l) => l.id);
+    const [favs, convs] = await Promise.all([
+      this.prisma.favorite.groupBy({ by: ['listingId'], where: { listingId: { in: ids } }, _count: { _all: true } }),
+      this.prisma.conversation.groupBy({ by: ['subjectId'], where: { subjectKind: 'listing', subjectId: { in: ids } }, _count: { _all: true } }),
+    ]);
+    const f = new Map(favs.map((x) => [x.listingId, x._count._all]));
+    const c = new Map(convs.map((x) => [x.subjectId, x._count._all]));
+    return new Map<string, ListingStats>(rows.map((l) => [l.id, { views: l.viewCount, favorites: f.get(l.id) ?? 0, messages: c.get(l.id) ?? 0 }]));
   }
 
   /** Veritabanında kaba süzme + fiyat/donanım için ortak `failures` kuralı (kur tablosuyla). */

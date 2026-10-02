@@ -657,7 +657,10 @@
     "held": "Protected",
     "released": "Released",
     "awaiting": "Awaiting payment",
-    "paymentsEmpty": "No payments yet"
+    "paymentsEmpty": "No payments yet",
+    "views": "{{n}} views",
+    "favorites": "{{n}} favourites",
+    "messages": "{{n}} messages"
   },
   "settings": {
     "title": "Settings",

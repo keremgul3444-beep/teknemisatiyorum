@@ -38,6 +38,7 @@ const P: Record<string, string> = {
   chart: 'M4 20V4M4 20h16M8 16v-5M12 16V8M16 16v-3',
   info: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 11v6M12 7h.01',
   briefcase: 'M4 8h16v12H4zM9 8V5h6v3M4 13h16',
+  eye: 'M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
 };
 
 export function Icon({ name, size = 22, color = colors.text, filled = false }: { name: string; size?: number; color?: string; filled?: boolean }) {

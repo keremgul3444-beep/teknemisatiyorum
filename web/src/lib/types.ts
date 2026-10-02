@@ -10,6 +10,8 @@ export type ListingView = {
   promo: { featured: boolean; urgent: boolean; featuredUntil?: string; urgentUntil?: string };
   /** Son 30 günde indirim yapıldıysa önceki fiyat ve indirim anı. */
   priceDrop?: { previousPrice: number; at: string } | null;
+  /** Satıcı istatistikleri (yalnızca /me/listings). */
+  stats?: { views: number; favorites: number; messages: number };
   publishedAt?: string | null;
 };
 export type SearchResult = { items: ListingView[]; total: number; featuredTop: ListingView[] };

@@ -36,6 +36,7 @@ export default async function HesabimIlanlar({ params }: P) {
                 <div>
                   <strong>{live ? <Link href={localePath(locale, `/ilan/${listingSlug(l)}`)}>{l.brand} {l.model} · {l.year}</Link> : `${l.brand} ${l.model} · ${l.year}`}</strong>
                   <div className="muted small">{formatPrice(l.price, l.currency, locale)} · {t(locale, `account.status.${l.status}`, {})}</div>
+                  {l.stats ? <div className="muted small">{t(locale, 'account.stats', { v: l.stats.views, f: l.stats.favorites, m: l.stats.messages })}</div> : null}
                   <div className="row small" style={{ marginTop: 6 }}>
                     <PromoBadges promo={l.promo} priceDrop={l.priceDrop} locale={locale} />
                     {f ? <span>{t(locale, 'account.featuredLeft', { n: f })}</span> : null}

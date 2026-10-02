@@ -19,6 +19,8 @@ function resolveApiUrl(): string {
 }
 
 export const API_URL = resolveApiUrl();
+/** Sitenin adresi: ilan paylaşım bağlantıları bu alan adına gider. */
+export const WEB_URL = (process.env.EXPO_PUBLIC_WEB_URL ?? 'https://teknemisatiyorum.com').replace(/\/$/, '');
 
 /** Sunucunun döndürdüğü göreli bağlantıyı (ör. /media/…) tam adrese çevirir. */
 export const absolute = (url: string) => (url.startsWith('/') ? `${API_URL}${url}` : url);

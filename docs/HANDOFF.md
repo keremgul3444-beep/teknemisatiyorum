@@ -26,6 +26,12 @@ Tekne alım-satım + broker + ekspertiz + (2. dalga: usta/kaptan/güvenli ödeme
 - Mağaza simgesi ve açılış ekranı: `mobile/assets/*` aynı "Liman" işaretinden üretildi (iOS 1024 saydamsız, Android uyarlanabilir ön yüz/arka plan/tek renk, açılış 1024 saydam, favicon 48); `expo-splash-screen` eklentisi `app.json`'da (zemin `#F6F8FA`, görsel 200 px). Simgeyi değiştirmek için scratch betiği yeniden çalıştırmak yerine `web/src/app/icon.svg` ile aynı yolları kullanan küçük bir sharp betiği yeterli.
 - Demo fotoğrafları: `shared/assets/boats/` (16 kare, MINOA'nın gerçek çekimleri, 1200×900 JPEG; ilk 8 dış çekim). Uygulama demo modunda `mobile/src/assets/boatPhotos.ts` ile (Metro `../shared`'ı izler), sunucu seed'i her ilana 4 fotoğraf (kapak + 3 iç mekân) yükler. Veritabanı yalnızca boşken seed'lenir: eski degrade görselleri görmek istemiyorsanız `api/.data/pg` ve `api/storage` silinip `npm run dev` yeniden çalıştırılır.
 
+## Rakip araştırmasından ilk adımlar (2026-10-02)
+- Fiyat düştü: `PriceHistory` (değişiklikten önceki fiyat), ilan görünümünde `priceDrop` (30 gün), arama `drop=1`, vitrin `priceDrops`, favorileyenlere `notif.priceDrop`. Yalnızca fiyat değişikliği yeniden onaya düşmez.
+- Satıcı istatistikleri: `Listing.viewCount` (sahibi dışındaki herkese açık görüntülemeler, yanıt bekletilmez), `/me/listings` satırlarında `stats {views, favorites, messages}`; uygulamada İlanlarım, sitede Hesabım > İlanlarım.
+- Paylaşım: ilan görünümünde `webUrl` (`WEB_URL/ilan/<id>`, site asıl adrese yönlendirir); uygulamada gerçek paylaşım sayfası (`Share.share`). Uygulamada site adresi `EXPO_PUBLIC_WEB_URL` (varsayılan https://teknemisatiyorum.com).
+- Düzeltme: PATCH /listings/:id artık göndermediğin alanları varsayılana sıfırlamıyor.
+
 ## Belgeler
 - Rakip araştırması (2026-10-02): `docs/arastirma-rakip-uygulamalar.md` — Boat Trader/YachtWorld/Boat24/Yachtall/sahibinden özellik karşılaştırması ve öncelik sırası.
 - Tasarım: `docs/superpowers/specs/2026-09-26-arka-uc-dalga1-design.md`

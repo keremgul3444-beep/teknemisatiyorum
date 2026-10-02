@@ -517,7 +517,8 @@
       "amount": "Tutar",
       "status": "Durum",
       "date": "Tarih"
-    }
+    },
+    "stats": "{{v}} görüntülenme · {{f}} favori · {{m}} mesaj"
   },
   "pay": {
     "devTitle": "Deneme ödemesi",
