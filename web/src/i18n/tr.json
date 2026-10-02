@@ -84,7 +84,8 @@
     },
     "trialPrice": "Deneme fiyatı",
     "buy": "Satın al",
-    "priceDrop": "Fiyat düştü"
+    "priceDrop": "Fiyat düştü",
+    "unavailable": "Öne çıkarma seçenekleri şu an yüklenemedi. Biraz sonra yeniden dene."
   },
   "boatType": {
     "motoryat": "Motoryat",
@@ -201,7 +202,16 @@
     "tradeIn": "Takasa açık",
     "negotiable": "Pazarlık payı var",
     "soldNote": "Bu tekne satıldı",
-    "report": "Şüpheli bir durum mu var? İlanı bildir (uygulamada)"
+    "report": "Şüpheli bir durum mu var? İlanı bildir (uygulamada)",
+    "photoAlt": "{{title}} · fotoğraf {{n}}/{{total}}",
+    "favAdd": "Favorilere ekle",
+    "favRemove": "Favorilerde",
+    "logbookVerified": "doğrulanmış",
+    "logbookWhat": "Tekne Karnesi nedir?",
+    "memberSince": "{{year}} yılından beri üye",
+    "sellerVerified": "Kimliği doğrulanmış",
+    "sellerAnon": "Satıcı",
+    "safety": "Güvenlik: kapora ya da ödemeyi platform dışında, görmediğin tekne için yapma. Devirde ödemeyi banka havalesiyle, açıklamaya tekne adı ve ruhsat numarasını yazarak yap."
   },
   "gone": {
     "title": "Bu ilan artık yayında değil",
@@ -536,7 +546,27 @@
       "status": "Durum",
       "date": "Tarih"
     },
-    "stats": "{{v}} görüntülenme · {{f}} favori · {{m}} mesaj"
+    "stats": "{{v}} görüntülenme · {{f}} favori · {{m}} mesaj",
+    "messages": "Mesajlar",
+    "messagesBody": "İlanlar hakkındaki yazışmaların",
+    "noMessages": "Henüz mesajın yok.",
+    "you": "Sen: ",
+    "unread": "Yeni",
+    "replyPh": "Yanıtını yaz",
+    "closedNote": "Bu ilan artık yayında değil.",
+    "fixInApp": "Düzeltip yeniden göndermek için uygulamada İlanlarım'ı aç.",
+    "rejectReasons": {
+      "blurry": "Red nedeni: fotoğraflar ya da belge okunaksız.",
+      "mismatch": "Red nedeni: bilgiler fotoğraflarla ya da belgeyle uyuşmuyor.",
+      "rules": "Red nedeni: ilan kurallarına aykırı içerik var."
+    },
+    "removedReasons": {
+      "scam": "Kaldırma nedeni: dolandırıcılık şüphesi.",
+      "wrong_info": "Kaldırma nedeni: bilgiler ya da fotoğraflar yanlış.",
+      "offensive": "Kaldırma nedeni: uygunsuz içerik.",
+      "rules": "Kaldırma nedeni: ilan kurallarına aykırı.",
+      "account_suspended": "Kaldırma nedeni: hesap askıya alındı."
+    }
   },
   "pay": {
     "devTitle": "Deneme ödemesi",
@@ -559,5 +589,22 @@
       "refunded": "Bu sipariş iade edildi.",
       "cancelled": "Bu sipariş zaman aşımına uğradı; yeniden satın alabilirsin."
     }
+  },
+  "gallery": {
+    "open": "Fotoğrafı büyüt",
+    "close": "Kapat",
+    "prev": "Önceki fotoğraf",
+    "next": "Sonraki fotoğraf",
+    "counter": "{{n}} / {{total}}"
+  },
+  "contact": {
+    "title": "Satıcıya mesaj gönder",
+    "placeholder": "Satıcıya sorunu yaz",
+    "send": "Gönder",
+    "sent": "Mesajın satıcıya iletildi. Yanıtı burada ve uygulamada görürsün.",
+    "openThread": "Sohbeti aç",
+    "login": "Giriş yap",
+    "loginHint": "Mesaj göndermek için telefonunla giriş yapman yeterli.",
+    "suggestion": "Merhaba, {{title}} ile ilgileniyorum. Tekneyi ne zaman görebilirim?"
   }
 }

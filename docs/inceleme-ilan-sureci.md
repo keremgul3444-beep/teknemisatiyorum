@@ -109,6 +109,18 @@ Kalan: B9–B14, C17–C19, C21, D ve E maddeleri. Sitede bildirme şimdilik uyg
 
 Kalan: B9 tamamlandı; B14 (erişilebilirlik ayrıntıları), C17–C19, C21, D ve E maddeleri.
 
+## Site paketi ile kapatılanlar (2026-10-02)
+
+- C17: Siteden satıcıya mesaj (`/api/messages` → sohbet aç + mesaj; giriş yoksa girişe yönlendirir, yazılan metin sekmede saklanır ve dönünce geri gelir). Hesabım > Mesajlar: gelen kutusu ve sohbet sayfası, yanıt kutusu; satıcı numarasını paylaştıysa arama bağlantısı. Favoriye ekle/çıkar (`/api/favorites`).
+- C18: Galeri: kapak + tek satırlık kaydırılabilir küçük resim şeridi, tam ekran görüntüleyici (ok tuşları, Esc, ileri/geri), sıralı alt metinler ("… fotoğraf 3/12"); JavaScript yoksa küçük resimler büyük fotoğrafa bağlantı.
+- C19: Satıcı kartı (bireysel satıcıda kısaltılmış ad "Deniz Y.", üyelik yılı, "Kimliği doğrulanmış"), kapora uyarısı, ilanı bildirme bağlantısı.
+- C21: Telefonda fiyat ve iletişim küçük resimlerin altında kalmıyor; 332 px altı taşma giderildi.
+- Karne kaydında "doğrulanmış" işareti ve "Tekne Karnesi nedir?" bağlantısı.
+- Yapısal veri: model, productID/sku, kategori, ölçülü özellikler (boy MTR, motor saati HUR, kabin, motor, bayrak, takas, pazarlık), priceValidUntil.
+- Hesabım > İlanlarım: red ve kaldırma gerekçeleri, satılmış/kaldırılmış için doğru not; Öne çıkar sayfası ürünler yüklenemezse boş ızgara yerine uyarı.
+- Kısa paylaşım adresi (`/ilan/<kimlik>`) kalkan ilanda da 410.
+- BFF: `relay` artık GET/PUT/DELETE ve aynı istekte yenilenmiş anahtarla ikinci çağrıyı destekliyor.
+
 ## Önerilen sıra
 
 1. **Güvenlik paketi:**

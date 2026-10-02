@@ -1,14 +1,17 @@
 import type { Metadata } from 'next';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { toTRY, type Currency, type Rates } from '@tms/shared';
-import { localePath, t, type Locale } from '@/i18n';
+import { localePath, t, tDict, type Locale } from '@/i18n';
 import { ApiError, apiGet } from '@/lib/api';
-import { formatPrice, idFromSlug, listingSlug, mediaUrl } from '@/lib/format';
+import { formatPrice, idFromSlug, listingSlug } from '@/lib/format';
 import { apiListingsPath, citySlug, landingQuery } from '@/lib/queries';
 import { breadcrumbJsonLd, listingJsonLd, listingMetadata, siteUrl } from '@/lib/seo';
 import type { ListingView, SearchResult } from '@/lib/types';
 import { AppLink, Breadcrumbs, JsonLd, ListingGrid, Section, appHref } from '@/components/bits';
 import { ViewBeacon } from '@/components/ViewBeacon';
+import { Gallery } from '@/components/Gallery';
+import { ContactBox } from '@/components/ContactBox';
+import { FavoriteButton } from '@/components/FavoriteButton';
 import { PromoBadges } from '@/components/PromoBadges';
 
 export const revalidate = 60;
@@ -48,8 +51,11 @@ export default async function IlanDetay({ params }: P) {
     { name: `${l.brand} ${l.model}` },
   ];
   const others = (similar?.items ?? []).filter((x) => x.id !== l.id).slice(0, 4);
-  const [first, ...rest] = l.photos;
   const title = `${l.brand} ${l.model} · ${l.year}`;
+  const alts = l.photos.map((_, i) => t(locale, 'listing.photoAlt', { title, n: i + 1, total: l.photos.length }));
+  const here = localePath(locale, `/ilan/${listingSlug(l)}`);
+  const loginHref = `${localePath(locale, '/giris')}?next=${encodeURIComponent(here)}`;
+  const live = l.status === 'published';
 
   return (
     <>
@@ -57,18 +63,14 @@ export default async function IlanDetay({ params }: P) {
       <JsonLd data={listingJsonLd(l, locale)} />
       <JsonLd data={breadcrumbJsonLd(crumbs.map((c) => ({ name: c.name, url: c.href ? `${site}${c.href}` : `${site}${localePath(locale, `/ilan/${slug}`)}` })))} />
       <Breadcrumbs items={crumbs} />
-      <article className="section" style={{ display: 'grid', gap: 24, gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
+      <article className="section listing-grid">
         <div>
-          {first ? (
-            <img src={mediaUrl(first.id, 1600)} srcSet={`${mediaUrl(first.id, 800)} 800w, ${mediaUrl(first.id, 1600)} 1600w`}
-              sizes="(max-width: 700px) 100vw, 600px" width={1600} height={1200} alt={title} fetchPriority="high"
-              style={{ width: '100%', height: 'auto', borderRadius: 'var(--r-card)', aspectRatio: '4 / 3', objectFit: 'cover' }} />
+          {l.photos.length ? (
+            <Gallery photos={l.photos} alt={alts} labels={{
+              open: t(locale, 'gallery.open'), close: t(locale, 'gallery.close'), prev: t(locale, 'gallery.prev'), next: t(locale, 'gallery.next'),
+              counter: t(locale, 'gallery.counter', { n: '{{n}}', total: '{{total}}' }),
+            }} />
           ) : <div className="card" style={{ aspectRatio: '4 / 3', background: 'linear-gradient(180deg, #BFD9EA 0 62%, #2F6F98 62% 100%)' }} aria-hidden="true" />}
-          {rest.length ? (
-            <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', marginTop: 12 }}>
-              {rest.map((p) => <img key={p.id} src={mediaUrl(p.id, 400)} width={400} height={300} alt={title} loading="lazy" decoding="async" style={{ width: '100%', height: 'auto', borderRadius: 'var(--r-sm)', aspectRatio: '4 / 3', objectFit: 'cover' }} />)}
-            </div>
-          ) : null}
         </div>
         <div>
           <PromoBadges promo={l.promo} priceDrop={l.priceDrop} locale={locale} />
@@ -95,12 +97,18 @@ export default async function IlanDetay({ params }: P) {
           {l.status === 'sold' ? (
             <p className="muted" style={{ margin: '16px 0' }}><strong>{t(locale, 'listing.soldNote')}</strong></p>
           ) : (
-            <div className="row" style={{ margin: '16px 0' }}>
-              <AppLink locale={locale} path={`ilan/${l.id}`}>{t(locale, 'listing.message')}</AppLink>
-              <AppLink locale={locale} path={`ekspertiz?ilan=${encodeURIComponent(l.id)}`} secondary>{t(locale, 'listing.requestSurvey')}</AppLink>
+            <div style={{ display: 'grid', gap: 12, margin: '16px 0' }}>
+              <ContactBox listingId={l.id} errors={tDict(locale, 'errors')} loginHref={loginHref} threadHref={localePath(locale, '/hesabim/mesajlar')}
+                suggestion={t(locale, 'contact.suggestion', { title })} labels={{
+                title: t(locale, 'contact.title'), placeholder: t(locale, 'contact.placeholder'), send: t(locale, 'contact.send'),
+                sent: t(locale, 'contact.sent'), openThread: t(locale, 'contact.openThread'), login: t(locale, 'contact.login'), loginHint: t(locale, 'contact.loginHint'),
+              }} />
+              <div className="row">
+                <FavoriteButton id={l.id} loginHref={loginHref} labels={{ add: t(locale, 'listing.favAdd'), remove: t(locale, 'listing.favRemove') }} />
+                <AppLink locale={locale} path={`ekspertiz?ilan=${encodeURIComponent(l.id)}`} secondary>{t(locale, 'listing.requestSurvey')}</AppLink>
+              </div>
             </div>
           )}
-          {l.status === 'published' ? <p className="small"><a href={appHref(`bildir/${encodeURIComponent(l.id)}`)}>{t(locale, 'listing.report')}</a></p> : null}
           <table className="card specs" style={{ padding: 0 }}>
             <tbody>
               <Spec k={t(locale, 'listing.type')} v={typeName} />
@@ -115,9 +123,24 @@ export default async function IlanDetay({ params }: P) {
           {l.logbook?.count ? (
             <div className="card" style={{ marginTop: 16 }}>
               <h3>{t(locale, 'listing.logbook', { n: l.logbook.count })}</h3>
-              <ul className="small">{l.logbook.latest.map((e) => <li key={e.id}>{e.date} · {logbookTitle(locale, e.title)}</li>)}</ul>
+              <ul className="small">{l.logbook.latest.map((e) => (
+                <li key={e.id}>{e.date} · {logbookTitle(locale, e.title)}{e.verified ? <strong> · {t(locale, 'listing.logbookVerified')}</strong> : null}</li>
+              ))}</ul>
+              <a className="small" href={localePath(locale, '/tekne-karnesi')}>{t(locale, 'listing.logbookWhat')}</a>
             </div>
           ) : null}
+          <div className="card" style={{ marginTop: 16, display: 'grid', gap: 12 }}>
+            <div className="seller">
+              <span className="avatar" aria-hidden="true">{initials(l.seller.companyName ?? l.seller.name)}</span>
+              <div style={{ flex: 1 }}>
+                <strong>{l.seller.companyName ?? shortName(l.seller.name) ?? t(locale, 'listing.sellerAnon')}</strong>
+                <div className="muted small">{t(locale, 'listing.memberSince', { year: l.seller.since })}</div>
+              </div>
+              {l.seller.verified ? <span className="pill featured">{t(locale, 'listing.sellerVerified')}</span> : null}
+            </div>
+            <p className="notice" style={{ margin: 0 }}><span aria-hidden="true">!</span>{t(locale, 'listing.safety')}</p>
+            {live ? <a className="small" href={appHref(`bildir/${encodeURIComponent(l.id)}`)}>{t(locale, 'listing.report')}</a> : null}
+          </div>
         </div>
       </article>
       {l.description ? <Section title={t(locale, 'listing.description')}><p style={{ whiteSpace: 'pre-line' }}>{l.description}</p></Section> : null}
@@ -125,6 +148,14 @@ export default async function IlanDetay({ params }: P) {
     </>
   );
 }
+
+/** Bireysel satıcının adı kısaltılır (ör. "Deniz Y."); soyadın tamamı sayfada ve arama motorlarında görünmez. */
+function shortName(name: string | null): string | null {
+  const parts = (name ?? '').trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return null;
+  return parts.length === 1 ? parts[0] : `${parts[0]} ${parts[parts.length - 1][0].toLocaleUpperCase('tr-TR')}.`;
+}
+const initials = (name: string | null) => (name ?? '?').trim().split(/\s+/).slice(0, 2).map((w) => w[0]?.toLocaleUpperCase('tr-TR') ?? '').join('') || '?';
 
 /** Sunucunun yazdığı karne başlıkları yalnızca "logbook." anahtarları olabilir; geri kalan her şey kullanıcı metni olarak gösterilir. */
 function logbookTitle(locale: Locale, title: string): string {

@@ -42,3 +42,14 @@ test('site işaretlemesinde Google\'ın artık kullanmadığı arama kutusu yok'
   expect(websiteJsonLd(SITE)).not.toHaveProperty('potentialAction');
   expect(websiteJsonLd(SITE)).toMatchObject({ '@type': 'WebSite', url: SITE });
 });
+
+test('ölçülü özellikler ve kimlik yapısal veride; fiyat geçerlilik tarihi var', () => {
+  const j = listingJsonLd({ ...l, engineHours: 850, flag: 'tr', cabins: 3, negotiable: true }, 'tr', SITE, new Date('2026-10-02T00:00:00Z')) as any;
+  expect(j).toMatchObject({ model: 'Oceanis 38', productID: 'ck9', sku: 'ck9', category: 'Yelkenli' });
+  const props = Object.fromEntries(j.additionalProperty.map((p: any) => [p.name, p]));
+  expect(props.Boy).toMatchObject({ value: 11.5, unitCode: 'MTR' });
+  expect(props['Motor saati']).toMatchObject({ value: 850, unitCode: 'HUR' });
+  expect(props.Bayrak.value).toBe('Türk bayraklı');
+  expect(props['Pazarlık payı var'].value).toBe(true);
+  expect(j.offers.priceValidUntil).toBe('2026-11-01');
+});

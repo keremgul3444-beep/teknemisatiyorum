@@ -6,7 +6,9 @@ export type ListingView = {
   location: string; equipment: string[]; cabins?: number; engine?: string; description: string; status: string; badges: string[];
   engineHours?: number | null; flag?: 'tr' | 'foreign' | null; tradeIn?: boolean; negotiable?: boolean;
   photos: { id: string; url: string }[];
-  seller: { id: string; name: string | null; since: number; companyName: string | null };
+  seller: { id: string; name: string | null; since: number; companyName: string | null; verified?: boolean };
+  /** Yalnızca ilan sahibine: red ve moderatörün kaldırma gerekçesi. */
+  rejectReason?: string | null; removedReason?: string | null;
   logbook?: { count: number; latest: { id: string; title: string; date: string; kind: string; verified: boolean }[] } | null;
   promo: { featured: boolean; urgent: boolean; featuredUntil?: string; urgentUntil?: string };
   /** Son 30 günde indirim yapıldıysa önceki fiyat ve indirim anı. */

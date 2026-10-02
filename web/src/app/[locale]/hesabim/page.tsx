@@ -22,6 +22,7 @@ export default async function Hesabim({ params }: P) {
       <p className="muted">{me.phone} · {t(locale, 'account.level', { n: me.verifyLevel })}</p>
       <div className="grid">
         <Link className="card" href={p('/hesabim/ilanlar')}><h3>{t(locale, 'account.listings')}</h3><p className="muted small">{t(locale, 'account.listingsBody')}</p></Link>
+        <Link className="card" href={p('/hesabim/mesajlar')}><h3>{t(locale, 'account.messages')}</h3><p className="muted small">{t(locale, 'account.messagesBody')}</p></Link>
         <Link className="card" href={p('/hesabim/siparisler')}><h3>{t(locale, 'account.orders')}</h3><p className="muted small">{t(locale, 'account.ordersBody')}</p></Link>
       </div>
       <div style={{ marginTop: 24 }}><LogoutButton label={t(locale, 'account.logout')} to={p('/')} /></div>

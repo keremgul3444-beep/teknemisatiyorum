@@ -22,15 +22,17 @@ export default async function OneCikar({ params }: P) {
   const mine = await authedGet<ListingView[]>(locale, '/me/listings?status=published', `/hesabim/ilanlar/${id}/one-cikar`);
   const l = mine.find((x) => x.id === id);
   if (!l) notFound();
-  const products = await apiGet<Product[]>('/products', { revalidate: 60 }).catch(() => []);
+  const products = await apiGet<Product[]>('/products', { revalidate: 60 }).catch(() => null);
   const errors = tDict(locale, 'errors');
   return (
     <section className="section">
       <h1>{t(locale, 'promo.title')}</h1>
       <p className="muted">{l.brand} {l.model} · {l.year}</p>
       <p>{t(locale, 'promo.intro')}</p>
+      {/* Ürünler alınamazsa boş ızgara yerine açık bir uyarı gösterilir. */}
+      {!products?.length ? <p className="banner" role="status">{t(locale, 'promo.unavailable')}</p> : null}
       <div className="grid">
-        {products.map((p) => (
+        {(products ?? []).map((p) => (
           <div key={p.code} className="card" style={{ display: 'grid', gap: 8 }}>
             <h3>{t(locale, `promo.product.${p.code}`, {})}</h3>
             <p className="muted small">{t(locale, `promo.kindHint.${p.kind}`)}</p>

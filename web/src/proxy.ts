@@ -8,7 +8,8 @@ const API = () => process.env.API_URL ?? 'http://127.0.0.1:3000';
 const PRIVATE = /^\/(en\/)?(giris|hesabim|odeme)(\/|$)/;
 /** Oturum gerektiren sayfalar (giriş sayfası hariç). */
 const NEEDS_SESSION = /^\/(en\/)?(hesabim|odeme)(\/|$)/;
-const LISTING = /^\/(?:en\/)?ilan\/[^/]*-([a-z0-9]{8,40})$/;
+// Uzun adres (marka-model-yıl-…-kimlik) ve paylaşımdaki kısa adres (/ilan/kimlik): kalkan ilan ikisinde de 410.
+const LISTING = /^\/(?:en\/)?ilan\/(?:[^/]*-)?([a-z0-9]{8,40})$/;
 
 /**
  * Dil yönlendirmesi + güvenlik başlıkları + girişli sayfalarda oturum yenileme.

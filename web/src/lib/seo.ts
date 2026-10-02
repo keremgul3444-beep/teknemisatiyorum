@@ -43,12 +43,31 @@ export function listingMetadata(l: ListingView, locale: Locale, site = siteUrl()
   return pageMetadata({ title, description, path: `/ilan/${listingSlug(l)}`, locale, siteUrl: site, image });
 }
 
-export function listingJsonLd(l: ListingView, locale: Locale, site = siteUrl()) {
+/** Ölçülü özellikler schema.org PropertyValue olarak (UN/CEFACT birim kodları: MTR metre, HUR saat). */
+function listingProperties(l: ListingView, locale: Locale) {
+  const p = (name: string, value: string | number | boolean, unitCode?: string) => ({ '@type': 'PropertyValue', name, value, ...(unitCode ? { unitCode } : {}) });
+  return [
+    p(t(locale, 'listing.length'), l.lengthM, 'MTR'),
+    ...(l.cabins ? [p(t(locale, 'listing.cabins'), l.cabins)] : []),
+    ...(l.engine ? [p(t(locale, 'listing.engine'), l.engine)] : []),
+    ...(l.engineHours != null ? [p(t(locale, 'listing.engineHours'), l.engineHours, 'HUR')] : []),
+    ...(l.flag ? [p(t(locale, 'listing.flag'), t(locale, l.flag === 'tr' ? 'listing.flagTr' : 'listing.flagForeign'))] : []),
+    ...(l.tradeIn ? [p(t(locale, 'listing.tradeIn'), true)] : []),
+    ...(l.negotiable ? [p(t(locale, 'listing.negotiable'), true)] : []),
+  ];
+}
+
+export function listingJsonLd(l: ListingView, locale: Locale, site = siteUrl(), now = new Date()) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: `${l.brand} ${l.model} (${l.year})`,
     brand: { '@type': 'Brand', name: l.brand },
+    model: l.model,
+    productID: l.id,
+    sku: l.id,
+    category: t(locale, `boatType.${l.type}`),
+    additionalProperty: listingProperties(l, locale),
     image: l.photos.map((p) => `${site}/media/${p.id}?w=1600`),
     description: clip(l.description || `${l.brand} ${l.model}`, 500),
     offers: {
@@ -57,6 +76,8 @@ export function listingJsonLd(l: ListingView, locale: Locale, site = siteUrl()) 
       priceCurrency: l.currency,
       url: absUrl(site, locale, `/ilan/${listingSlug(l)}`),
       availability: l.status === 'sold' ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
+      // Fiyatın geçerlilik süresi (Google ürün sonuçları uyarı vermesin): sayfa her gün yenilenir, 30 gün ileri.
+      priceValidUntil: new Date(now.getTime() + 30 * 864e5).toISOString().slice(0, 10),
       itemCondition: 'https://schema.org/UsedCondition',
       areaServed: l.location,
       // KVKK: bireysel satıcının adı Google verisine konmaz; yalnızca firma adı.

@@ -84,7 +84,8 @@
     },
     "trialPrice": "Trial price",
     "buy": "Buy",
-    "priceDrop": "Price drop"
+    "priceDrop": "Price drop",
+    "unavailable": "Promotion options could not be loaded right now. Please try again shortly."
   },
   "boatType": {
     "motoryat": "Motor yacht",
@@ -201,7 +202,16 @@
     "tradeIn": "Open to trade-in",
     "negotiable": "Price negotiable",
     "soldNote": "This boat has been sold",
-    "report": "Something wrong? Report this listing (in the app)"
+    "report": "Something wrong? Report this listing (in the app)",
+    "photoAlt": "{{title}} · photo {{n}}/{{total}}",
+    "favAdd": "Save",
+    "favRemove": "Saved",
+    "logbookVerified": "verified",
+    "logbookWhat": "What is the Boat Logbook?",
+    "memberSince": "Member since {{year}}",
+    "sellerVerified": "ID verified",
+    "sellerAnon": "Seller",
+    "safety": "Safety: never pay a deposit or any money outside the platform for a boat you have not seen. At transfer, pay by bank transfer with the boat name and registration number in the reference."
   },
   "gone": {
     "title": "This listing is no longer live",
@@ -536,7 +546,27 @@
       "status": "Status",
       "date": "Date"
     },
-    "stats": "{{v}} views · {{f}} favourites · {{m}} messages"
+    "stats": "{{v}} views · {{f}} favourites · {{m}} messages",
+    "messages": "Messages",
+    "messagesBody": "Your conversations about listings",
+    "noMessages": "No messages yet.",
+    "you": "You: ",
+    "unread": "New",
+    "replyPh": "Write your reply",
+    "closedNote": "This listing is no longer live.",
+    "fixInApp": "To fix and resubmit, open My listings in the app.",
+    "rejectReasons": {
+      "blurry": "Reason: photos or document not legible.",
+      "mismatch": "Reason: details do not match the photos or document.",
+      "rules": "Reason: content breaks listing rules."
+    },
+    "removedReasons": {
+      "scam": "Reason: suspected scam.",
+      "wrong_info": "Reason: wrong details or photos.",
+      "offensive": "Reason: inappropriate content.",
+      "rules": "Reason: breaks listing rules.",
+      "account_suspended": "Reason: account suspended."
+    }
   },
   "pay": {
     "devTitle": "Trial payment",
@@ -559,5 +589,22 @@
       "refunded": "This order was refunded.",
       "cancelled": "This order timed out; you can buy again."
     }
+  },
+  "gallery": {
+    "open": "Enlarge photo",
+    "close": "Close",
+    "prev": "Previous photo",
+    "next": "Next photo",
+    "counter": "{{n}} / {{total}}"
+  },
+  "contact": {
+    "title": "Message the seller",
+    "placeholder": "Write your question to the seller",
+    "send": "Send",
+    "sent": "Your message was sent to the seller. You will see the reply here and in the app.",
+    "openThread": "Open conversation",
+    "login": "Log in",
+    "loginHint": "Log in with your phone to send a message.",
+    "suggestion": "Hello, I am interested in the {{title}}. When could I see the boat?"
   }
 }

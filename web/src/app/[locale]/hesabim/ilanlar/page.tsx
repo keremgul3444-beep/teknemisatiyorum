@@ -36,6 +36,8 @@ export default async function HesabimIlanlar({ params }: P) {
                 <div>
                   <strong>{live ? <Link href={localePath(locale, `/ilan/${listingSlug(l)}`)}>{l.brand} {l.model} · {l.year}</Link> : `${l.brand} ${l.model} · ${l.year}`}</strong>
                   <div className="muted small">{formatPrice(l.price, l.currency, locale)} · {t(locale, `account.status.${l.status}`, {})}</div>
+                  {l.status === 'rejected' && l.rejectReason ? <div className="small" style={{ color: 'var(--c-danger)' }}>{t(locale, `account.rejectReasons.${l.rejectReason}`, {})}</div> : null}
+                  {l.status === 'removed' && l.removedReason ? <div className="small" style={{ color: 'var(--c-danger)' }}>{t(locale, `account.removedReasons.${l.removedReason}`, {})}</div> : null}
                   {l.stats ? <div className="muted small">{t(locale, 'account.stats', { v: l.stats.views, f: l.stats.favorites, m: l.stats.messages })}</div> : null}
                   <div className="row small" style={{ marginTop: 6 }}>
                     <PromoBadges promo={l.promo} priceDrop={l.priceDrop} locale={locale} />
@@ -45,7 +47,7 @@ export default async function HesabimIlanlar({ params }: P) {
                 </div>
                 {live
                   ? <Link className="btn" href={localePath(locale, `/hesabim/ilanlar/${l.id}/one-cikar`)}>{t(locale, 'account.promote')}</Link>
-                  : <span className="muted small">{t(locale, 'account.notPublished')}</span>}
+                  : <span className="muted small">{t(locale, l.status === 'sold' || l.status === 'removed' ? 'account.closedNote' : l.status === 'rejected' ? 'account.fixInApp' : 'account.notPublished')}</span>}
               </div>
             );
           })}
