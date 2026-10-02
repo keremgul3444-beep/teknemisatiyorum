@@ -37,7 +37,6 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 
 ## Web/öne çıkarma — incelemeden ertelenen küçük maddeler
 - [ ] Fiyatlar kuruşlu girilebilirse gösterim de kuruşlu olsun (şu an tam liraya yuvarlanıyor; yönetim ekranı tam lira giriyor)
-- [ ] Mağaza simgesi ve açılış ekranı (`mobile/assets`) hâlâ eski renklerde; yeni "Liman" simgesiyle (`web/src/app/icon.svg`) değiştirilmeli
 - [ ] Demo fotoğrafları MINOA'nın tek teknesinden; ilanlar farklı markalar olduğu için canlıya çıkmadan önce demo ilanlar ya kaldırılmalı ya da kendi fotoğraflarıyla değiştirilmeli
 - [ ] Canlıda ters vekil (reverse proxy) Host başlığını korumalı ve TRUSTED_PROXY_HOPS doğru ayarlanmalı
 
