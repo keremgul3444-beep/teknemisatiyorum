@@ -949,5 +949,27 @@
     "showcase": "Vitrin",
     "noProducts": "Öne çıkarma şu an kullanılamıyor",
     "priceDrop": "Fiyat düştü"
+  },
+  "compare": {
+    "title": "Karşılaştır",
+    "cta": "Karşılaştır ({{n}})",
+    "select": "En fazla {{max}} ilan seç.",
+    "needTwo": "Karşılaştırmak için en az iki ilan gerekir",
+    "hint": "Favorilerinden 2–3 ilan seçip yan yana gör.",
+    "count": "{{n}} ilan",
+    "best": "en iyi",
+    "legend": "Yeşil değer o satırın en iyisi (en düşük fiyat, en yeni yıl, en uzun boy, en çok kabin/donanım/karne kaydı).",
+    "row": {
+      "price": "Fiyat",
+      "year": "Yıl",
+      "length": "Boy",
+      "type": "Tip",
+      "cabins": "Kabin",
+      "engine": "Motor",
+      "location": "Konum",
+      "equipment": "Donanım",
+      "badges": "Güven",
+      "logbook": "Karne kaydı"
+    }
   }
 }

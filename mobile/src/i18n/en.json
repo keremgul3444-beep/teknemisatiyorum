@@ -949,5 +949,27 @@
     "showcase": "Featured",
     "noProducts": "Promotion isn't available right now",
     "priceDrop": "Price drop"
+  },
+  "compare": {
+    "title": "Compare",
+    "cta": "Compare ({{n}})",
+    "select": "Pick up to {{max}} listings.",
+    "needTwo": "Pick at least two listings to compare",
+    "hint": "Choose 2–3 favourites and see them side by side.",
+    "count": "{{n}} listings",
+    "best": "best",
+    "legend": "Green marks the best value in that row (lowest price, newest year, longest, most cabins/equipment/logbook entries).",
+    "row": {
+      "price": "Price",
+      "year": "Year",
+      "length": "Length",
+      "type": "Type",
+      "cabins": "Cabins",
+      "engine": "Engine",
+      "location": "Location",
+      "equipment": "Equipment",
+      "badges": "Trust",
+      "logbook": "Logbook entries"
+    }
   }
 }
