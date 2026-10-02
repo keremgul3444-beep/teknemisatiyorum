@@ -48,8 +48,15 @@ export default function IlanDetay() {
     [t('listing.length'), `${l.lengthM.toLocaleString(lang)} m`], [t('listing.year'), String(l.year)], [t('listing.cabins'), String(l.cabins)],
   ];
   const specs: [string, string][] = [
-    [t('listing.type'), t(`boatType.${l.type}`)], [t('listing.engine'), l.engine], [t('listing.location'), l.location],
+    [t('listing.type'), t(`boatType.${l.type}`)],
+    // Boş bırakılan isteğe bağlı alanlar satır olarak gösterilmez (eski demo ilanları "—" taşır).
+    ...(l.engine && l.engine !== '—' ? [[t('listing.engine'), l.engine] as [string, string]] : []),
+    ...(l.engineHours != null ? [[t('listing.engineHours'), t('listing.engineHoursValue', { hours: l.engineHours.toLocaleString(lang) })] as [string, string]] : []),
+    ...(l.flag ? [[t('listing.flag'), t(l.flag === 'tr' ? 'listing.flagTr' : 'listing.flagForeign')] as [string, string]] : []),
+    [t('listing.location'), l.location],
   ];
+  // Fiyatın altında: satıcının pazarlık ve takas tercihi.
+  const terms = [l.negotiable ? t('listing.negotiable') : null, l.tradeIn ? t('listing.tradeIn') : null].filter(Boolean).join(' · ');
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -93,6 +100,7 @@ export default function IlanDetay() {
                 </T>
               ) : null}
             </View>
+            {terms ? <T variant="caption" color={colors.muted} style={{ fontFamily: fonts.bodySemi }}>{terms}</T> : null}
           </View>
 
           <View style={{ flexDirection: 'row', gap: space(2.5) }}>
@@ -122,7 +130,7 @@ export default function IlanDetay() {
             </Section>
           ) : null}
 
-          <Section title={t('listing.description')}><T color={colors.muted}>{l.description}</T></Section>
+          {l.description && l.description !== '—' ? <Section title={t('listing.description')}><T color={colors.muted}>{l.description}</T></Section> : null}
 
           <Section title={t('listing.logbook')}>
             <Card onPress={l.isMine && l.boatId ? () => router.push(`/teknelerim/${l.boatId}`) : undefined}>

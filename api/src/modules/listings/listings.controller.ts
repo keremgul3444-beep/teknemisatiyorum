@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Query } from '@nestjs/common';
 import { z } from 'zod';
-import { BOAT_TYPES, CURRENCIES, EQUIPMENT, normalizeLocation, parsedQuerySchema } from '@tms/shared';
+import { BOAT_TYPES, CURRENCIES, EQUIPMENT, FLAGS, MAX_ENGINE_HOURS, normalizeLocation, parsedQuerySchema } from '@tms/shared';
 import { Auth, CurrentUser, OptionalUser, Public, type AuthUser } from '../../common/decorators';
 import { ZodPipe } from '../../common/zod.pipe';
 import { PrismaService } from '../../common/prisma.service';
@@ -23,6 +23,10 @@ const draftSchema = z.object({
   cabins: z.number().int().min(0).max(50).default(0),
   engine: z.string().trim().max(80).default(''),
   description: z.string().trim().max(4000).default(''),
+  engineHours: z.number().int().min(0).max(MAX_ENGINE_HOURS).nullable().default(null),
+  flag: z.enum(FLAGS).nullable().default(null),
+  tradeIn: z.boolean().default(false),
+  negotiable: z.boolean().default(false),
   companyId: z.string().optional(),
   boatId: z.string().optional(),
 });
@@ -32,6 +36,10 @@ const patchSchema = draftSchema.partial().extend({
   cabins: draftSchema.shape.cabins.unwrap().optional(),
   engine: draftSchema.shape.engine.unwrap().optional(),
   description: draftSchema.shape.description.unwrap().optional(),
+  engineHours: draftSchema.shape.engineHours.unwrap().optional(),
+  flag: draftSchema.shape.flag.unwrap().optional(),
+  tradeIn: draftSchema.shape.tradeIn.unwrap().optional(),
+  negotiable: draftSchema.shape.negotiable.unwrap().optional(),
 });
 const photosSchema = z.object({ fileIds: z.array(z.string().min(1)).min(1).transform((a) => [...new Set(a)]) });
 const mineQuery = z.object({ status: z.enum(['draft', 'pending', 'published', 'rejected', 'sold', 'removed']).optional() });

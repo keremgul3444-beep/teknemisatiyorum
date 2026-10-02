@@ -11,6 +11,7 @@ import type { AdminStatus, BoatInput, Listing, ListingDraft, SubjectKind } from 
 import { useSession, type Prefs } from '@/session/role';
 import { resetRates } from './rates';
 import { createPublisher, type PublishExtra } from '@/features/publishListing';
+import { clearAllListingDrafts } from '@/features/listingDraftStore';
 import { getPushToken } from '@/features/push';
 
 /** Bu cihazın sunucuya bıraktığı bildirim jetonu; çıkışta silinir. */
@@ -89,6 +90,7 @@ export const actions = {
     await api.post('/verification/requests', { kind, fileIds });
   },
   async logout() {
+    await clearAllListingDrafts();
     if (!isApiMode()) return useSession.getState().logout();
     // Çıkan hesaba bu telefona bildirim gelmesin.
     if (pushToken) { await api.del(`/me/push-token/${encodeURIComponent(pushToken)}`).catch(() => undefined); pushToken = null; }
@@ -99,6 +101,7 @@ export const actions = {
     await syncAll();
   },
   async deleteAccount() {
+    await clearAllListingDrafts();
     if (isApiMode()) {
       await api.del('/me');
       await api.logoutLocal();

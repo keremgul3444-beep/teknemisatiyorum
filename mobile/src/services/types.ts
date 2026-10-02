@@ -1,4 +1,4 @@
-import type { BadgeKind, BoatType, Currency, Equipment, ListingStatus, UstaCategory } from '@tms/shared';
+import type { BadgeKind, BoatType, Currency, Equipment, Flag, ListingStatus, UstaCategory } from '@tms/shared';
 export type { BadgeKind, BoatType, Currency, Equipment, ListingStatus, UstaCategory } from '@tms/shared';
 export { USTA_CATEGORIES } from '@tms/shared';
 
@@ -7,6 +7,8 @@ export interface Listing {
   id: string; brand: string; model: string; year: number; lengthM: number; price: number; currency: Currency;
   type: BoatType; location: string; equipment: Equipment[]; badges: BadgeKind[]; sellerId: string;
   logbookCount: number; description: string; status: ListingStatus; photoSeed: number; cabins: number; engine: string;
+  /** Motor saati ve bayrak (null = belirtilmedi); takasa açık, pazarlık payı var. Eski kayıtlarda alan olmayabilir. */
+  engineHours?: number | null; flag?: Flag | null; tradeIn?: boolean; negotiable?: boolean;
   /** Gerçek modda: sunucudaki fotoğraflar, ham durum (draft/pending/rejected…), ilan sahibi mi, bağlı tekne ve karne özeti. */
   photoUrls?: string[]; rawStatus?: string; isMine?: boolean; boatId?: string | null; logbookLatest?: LogEntry[]; rejectReason?: string | null;
   /** Öne çıkarma: vitrin/acil etkin mi; bitiş tarihleri yalnızca ilan sahibine gelir. */
@@ -17,7 +19,8 @@ export interface Listing {
   webUrl?: string; stats?: { views: number; favorites: number; messages: number };
 }
 export interface Promo { featured: boolean; urgent: boolean; featuredUntil?: string; urgentUntil?: string }
-export type ListingDraft = Pick<Listing, 'brand' | 'model' | 'year' | 'lengthM' | 'price' | 'currency' | 'type' | 'location' | 'equipment' | 'cabins' | 'engine' | 'description'>;
+export type ListingDraft = Pick<Listing, 'brand' | 'model' | 'year' | 'lengthM' | 'price' | 'currency' | 'type' | 'location' | 'equipment' | 'cabins' | 'engine' | 'description'
+  | 'engineHours' | 'flag' | 'tradeIn' | 'negotiable'>;
 
 export type ProviderKind = 'usta' | 'kaptan' | 'eksper';
 

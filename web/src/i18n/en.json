@@ -192,7 +192,14 @@
     "similar": "Similar listings",
     "type": "Type",
     "location": "Location",
-    "previousPrice": "Previous price {{price}}"
+    "previousPrice": "Previous price {{price}}",
+    "engineHours": "Engine hours",
+    "engineHoursValue": "{{hours}} h",
+    "flag": "Flag",
+    "flagTr": "Turkish flag",
+    "flagForeign": "Foreign flag",
+    "tradeIn": "Open to trade-in",
+    "negotiable": "Price negotiable"
   },
   "gone": {
     "title": "This listing is no longer live",

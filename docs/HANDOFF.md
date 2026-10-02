@@ -35,6 +35,14 @@ Tekne alım-satım + broker + ekspertiz + (2. dalga: usta/kaptan/güvenli ödeme
 - Belgeler eşleşti rozeti: ruhsat başvurusuna ikinci dosya (motor seri no fotoğrafı) + `details.engineSerialLast4`; moderatör onaylayınca `sahiplik` + `belge` rozeti. Devir asistanı (`devir.tsx`): resmî adımlar (noter, Umurbey randevu, 15 gün e-Devlet tescil), belge listesi, bağlantılar, sonunda `POST /listings/:id/sold` ile satıldı; İlanlarım'dan ulaşılır.
 - Anlık bildirim: `PushToken` tablosu (`PUT/DELETE /me/push-token`), `adapters/push.ts` (Expo Push servisi — ücretsiz; `PUSH_MODE=expo`, varsayılan `off` = bellek), metinler `push.texts.ts` (uygulamanın notif.* çevirileriyle aynı, kullanıcının dilinde). Her uygulama içi bildirim aynı anda telefona da gider; kayıtsız cihazın jetonu silinir; aynı jeton başka hesapla girişte o hesaba geçer; çıkışta silinir. Uygulama: `features/push.ts` (izin, jeton, bildirime dokununca ekran), `_layout.tsx` dinleyici, `app.json` expo-notifications eklentisi.
 
+## İlan verme iyileştirmeleri — 1. paket (2026-10-02)
+- Otomatik taslak: sihirbaz her değişikliği bu cihazda hesaba özel saklar (`mobile/src/features/listingDraftStore.ts`, AsyncStorage `tms.listingDraft.<userId|demo>`); yeniden açılınca geri yükler ("Sil ve baştan başla" ile atılır). Yayınlanınca ve çıkışta/hesap silmede silinir. Tarayıcıdaki geçici fotoğraf adresleri (blob/data) saklanmaz; o durumda kullanıcı fotoğraf adımına döner.
+- Fotoğraflar: 20'ye kadar (sunucu sınırı), galeriden çoklu seçim (`pickImages`), fotoğrafa dokununca Kapak yap / Sola al / Sağa al / Sil; silmeden önce onay. İlk fotoğraf kapak.
+- Yeni alanlar (veritabanı `0008_listing_details`): `engineHours` (isteğe bağlı, 0–100000), `flag` (`tr` | `foreign`), `tradeIn`, `negotiable`. Uygulama ve sitede ilan sayfasında görünür.
+- Form: zorunlu alanlar yıldızlı, "İleri" eksik alanları kırmızıyla gösterir; örnek metinler "Örn." ile başlar; fiyat binlik ayraçlı. Saf mantık `mobile/src/features/listingForm.ts` (test: `__tests__/listingForm.test.ts`).
+- Belge adımında gizlilik notu: belgeler ilanda yayınlanmaz, yalnızca sahibi ve moderatör görür.
+- Not: `mobile/scripts/demo-flows.mjs` içindeki 1, 2, 4, 9. akışlar bu değişiklikten önce de geçmiyordu (yeni asistan kutusunda "Ara" düğmesi yok); script güncellenmeli.
+
 ## Kaldığımız yer (2026-10-02 akşamı)
 - Son commit: ac150d2. Bugün: Liman tasarımı her yerde, MINOA fotoğrafları, mağaza simgesi/açılış, rakip araştırması ve ondan 6 özellik (fiyat düştü, satıcı istatistikleri, paylaşım, anlık bildirim, karşılaştırma, belge rozeti + Devir asistanı).
 - Sıradaki aday: kısa ilan videosu (≤60 sn, sunucuda süre/boyut sınırı, ilan sayfasında oynatma). Sonra siteden mesajlaşma/favoriler. Finansman/sigorta yönlendirmesi ortak bulununca.

@@ -185,6 +185,13 @@ model Listing {
   cabins        Int            @default(0)
   engine        String         @default("")
   description   String         @default("")
+  /// Motor saati; null = satıcı belirtmedi.
+  engineHours   Int?
+  /// Bayrak: 'tr' | 'foreign'; null = belirtilmedi.
+  flag          String?
+  /// Takasa açık / pazarlık payı var.
+  tradeIn       Boolean        @default(false)
+  negotiable    Boolean        @default(false)
   status        ListingStatus  @default(draft)
   badges        String[]
   rejectReason  String?

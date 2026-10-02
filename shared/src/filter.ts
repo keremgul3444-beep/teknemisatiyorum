@@ -3,11 +3,16 @@ import { z } from 'zod';
 export const CURRENCIES = ['TRY', 'EUR', 'USD'] as const;
 export const BOAT_TYPES = ['motoryat', 'yelkenli', 'gulet', 'surat', 'balikci', 'katamaran'] as const;
 export const EQUIPMENT = ['jenerator', 'branda', 'klima', 'radar', 'otopilot', 'bowThruster', 'teak', 'tender'] as const;
+/** Bayrak: Türk bayraklı ya da yabancı bayraklı (alıcı için vergi/kayıt durumunu belirler). */
+export const FLAGS = ['tr', 'foreign'] as const;
+/** İlan formunda motor saati üst sınırı (daha büyüğü yazım hatasıdır). */
+export const MAX_ENGINE_HOURS = 100000;
 export const USTA_CATEGORIES = ['motor', 'elektrik', 'boya', 'jelkot', 'branda', 'doseme', 'elektronik', 'yelken'] as const;
 
 export type Currency = (typeof CURRENCIES)[number];
 export type BoatType = (typeof BOAT_TYPES)[number];
 export type Equipment = (typeof EQUIPMENT)[number];
+export type Flag = (typeof FLAGS)[number];
 export type UstaCategory = (typeof USTA_CATEGORIES)[number];
 export type BadgeKind = 'ekspertizli' | 'sahiplik' | 'broker' | 'belge';
 export type ListingStatus = 'yayinda' | 'onay-bekliyor' | 'satildi';

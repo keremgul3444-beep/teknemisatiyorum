@@ -73,6 +73,11 @@ export default async function IlanDetay({ params }: P) {
           <h1 style={{ marginTop: 8, marginBottom: 4 }}>{l.brand} {l.model}</h1>
           <p className="muted">{l.year} · {l.location} · {typeName}</p>
           <PriceBlock locale={locale} price={l.price} currency={l.currency} rates={rates} previous={l.priceDrop?.previousPrice} />
+          {l.negotiable || l.tradeIn ? (
+            <p className="muted small" style={{ margin: '4px 0 0' }}>
+              {[l.negotiable ? t(locale, 'listing.negotiable') : null, l.tradeIn ? t(locale, 'listing.tradeIn') : null].filter(Boolean).join(' · ')}
+            </p>
+          ) : null}
           {l.badges.length || l.status === 'sold' ? (
             <div className="row" style={{ margin: '12px 0 0' }}>
               {l.badges.map((b) => <span key={b} className="pill featured">{t(locale, `badge.${b}`, {})}</span>)}
@@ -93,6 +98,8 @@ export default async function IlanDetay({ params }: P) {
               <Spec k={t(locale, 'listing.type')} v={typeName} />
               <Spec k={t(locale, 'listing.location')} v={l.location} />
               {l.engine ? <Spec k={t(locale, 'listing.engine')} v={l.engine} /> : null}
+              {l.engineHours != null ? <Spec k={t(locale, 'listing.engineHours')} v={t(locale, 'listing.engineHoursValue', { hours: l.engineHours.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') })} /> : null}
+              {l.flag ? <Spec k={t(locale, 'listing.flag')} v={t(locale, l.flag === 'tr' ? 'listing.flagTr' : 'listing.flagForeign')} /> : null}
               {l.equipment.length ? <Spec k={t(locale, 'listing.equipment')} v={l.equipment.map((e) => t(locale, `equipment.${e}`)).join(', ')} /> : null}
               {l.seller.companyName ? <Spec k={t(locale, 'listing.company')} v={l.seller.companyName} /> : null}
             </tbody>

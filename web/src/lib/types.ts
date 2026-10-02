@@ -4,6 +4,7 @@ import type { Currency } from '@tms/shared';
 export type ListingView = {
   id: string; brand: string; model: string; year: number; lengthM: number; type: string; price: number; currency: Currency;
   location: string; equipment: string[]; cabins?: number; engine?: string; description: string; status: string; badges: string[];
+  engineHours?: number | null; flag?: 'tr' | 'foreign' | null; tradeIn?: boolean; negotiable?: boolean;
   photos: { id: string; url: string }[];
   seller: { id: string; name: string | null; since: number; companyName: string | null };
   logbook?: { count: number; latest: { id: string; title: string; date: string; kind: string; verified: boolean }[] } | null;

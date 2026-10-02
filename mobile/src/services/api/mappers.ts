@@ -1,5 +1,5 @@
 import type { Prefs } from '@/session/role';
-import type { BadgeKind, BoatType, Currency, Equipment } from '@tms/shared';
+import type { BadgeKind, BoatType, Currency, Equipment, Flag } from '@tms/shared';
 import { absolute } from '../mode';
 import type { AdminItem, AuditEntry, Boat, BrokerCase, Conversation, ExpertiseBooking, ExpertisePackage, Listing, LogEntry, Promo, SavedSearch, Seller } from '../types';
 
@@ -7,6 +7,7 @@ import type { AdminItem, AuditEntry, Boat, BrokerCase, Conversation, ExpertiseBo
 export interface ApiListing {
   id: string; brand: string; model: string; year: number; lengthM: number; type: string; price: number; currency: Currency;
   location: string; equipment: string[]; cabins: number; engine: string; description: string; status: string; badges: string[];
+  engineHours?: number | null; flag?: string | null; tradeIn?: boolean; negotiable?: boolean;
   rejectReason?: string | null; photos: { id: string; url: string }[];
   seller: { id: string; name: string | null; since: number; companyName: string | null };
   logbook: { count: number; latest: ApiEntry[]; boatId?: string } | null; isMine: boolean;
@@ -52,6 +53,7 @@ export function toListing(l: ApiListing): Listing {
     logbookLatest: l.logbook?.latest.map(toEntry) ?? [], rejectReason: l.rejectReason ?? null,
     promo: l.promo ?? { featured: false, urgent: false },
     priceDrop: l.priceDrop ?? null, webUrl: l.webUrl, stats: l.stats,
+    engineHours: l.engineHours ?? null, flag: (l.flag as Flag | null | undefined) ?? null, tradeIn: !!l.tradeIn, negotiable: !!l.negotiable,
   };
 }
 

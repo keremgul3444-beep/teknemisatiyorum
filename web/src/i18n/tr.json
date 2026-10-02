@@ -192,7 +192,14 @@
     "similar": "Benzer ilanlar",
     "type": "Tip",
     "location": "Konum",
-    "previousPrice": "Önceki fiyat {{price}}"
+    "previousPrice": "Önceki fiyat {{price}}",
+    "engineHours": "Motor saati",
+    "engineHoursValue": "{{hours}} saat",
+    "flag": "Bayrak",
+    "flagTr": "Türk bayraklı",
+    "flagForeign": "Yabancı bayraklı",
+    "tradeIn": "Takasa açık",
+    "negotiable": "Pazarlık payı var"
   },
   "gone": {
     "title": "Bu ilan artık yayında değil",

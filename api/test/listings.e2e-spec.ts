@@ -33,6 +33,22 @@ describe('taslak ve sahiplik', () => {
     expect((await t.http().patch(`/listings/${c.body.id}`).set(b.auth).send({ price: 1 })).status).toBe(404);
   });
 
+  test('motor saati, bayrak, takas ve pazarlık saklanır; gönderilmeyen alan korunur', async () => {
+    const a = await loginAs(t);
+    const bare = await t.http().post('/listings').set(a.auth).send(draft);
+    expect(bare.body).toMatchObject({ engineHours: null, flag: null, tradeIn: false, negotiable: false });
+    const c = await t.http().post('/listings').set(a.auth).send({ ...draft, engineHours: 850, flag: 'tr', tradeIn: true });
+    expect(c.status).toBe(201);
+    expect(c.body).toMatchObject({ engineHours: 850, flag: 'tr', tradeIn: true, negotiable: false });
+    const p = await t.http().patch(`/listings/${c.body.id}`).set(a.auth).send({ negotiable: true });
+    expect(p.body).toMatchObject({ engineHours: 850, flag: 'tr', tradeIn: true, negotiable: true });
+    // Satıcı motor saatini sonradan kaldırabilir.
+    expect((await t.http().patch(`/listings/${c.body.id}`).set(a.auth).send({ engineHours: null })).body.engineHours).toBeNull();
+    expect((await t.http().post('/listings').set(a.auth).send({ ...draft, flag: 'mars' })).status).toBe(400);
+    expect((await t.http().post('/listings').set(a.auth).send({ ...draft, engineHours: 1e6 })).status).toBe(400);
+    expect((await t.http().post('/listings').set(a.auth).send({ ...draft, engineHours: 12.5 })).status).toBe(400);
+  });
+
   test('geçersiz alanlar reddedilir', async () => {
     const a = await loginAs(t);
     const r = await t.http().post('/listings').set(a.auth).send({ ...draft, lengthM: -3, type: 'uzay-gemisi' });
