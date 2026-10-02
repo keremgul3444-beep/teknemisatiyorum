@@ -37,7 +37,6 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 
 ## Web/öne çıkarma — incelemeden ertelenen küçük maddeler
 - [ ] Fiyatlar kuruşlu girilebilirse gösterim de kuruşlu olsun (şu an tam liraya yuvarlanıyor; yönetim ekranı tam lira giriyor)
-- [ ] Herkese açık fotoğraflar şu an diskten hiç silinmiyor (hesap silinince yalnızca erişime kapanıyor). Silme eklenirken küçük kopyalar (`.w400/.w800/.w1600.webp`) da silinmeli — KVKK açısından hesap silmede fotoğraflar da temizlenmeli
 - [ ] Canlıda ters vekil (reverse proxy) Host başlığını korumalı ve TRUSTED_PROXY_HOPS doğru ayarlanmalı
 
 ## Canlıya çıkış altyapısı

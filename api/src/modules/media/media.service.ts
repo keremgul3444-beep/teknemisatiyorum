@@ -95,11 +95,17 @@ export class MediaService {
     if (n !== new Set(ids).size) throw Errors.notFound();
   }
 
-  /** Hesap silmede: kullanıcının korumalı belgeleri (kimlik, ruhsat vb.) diskten ve veritabanından kaldırılır. */
-  async purgePrivate(userId: string) {
-    const files = await this.prisma.file.findMany({ where: { ownerId: userId, visibility: 'private' } });
-    await Promise.all(files.map((f) => this.storage.remove(f.key)));
-    await this.prisma.file.deleteMany({ where: { id: { in: files.map((f) => f.id) } } });
+  /**
+   * Hesap silmede (KVKK): kullanıcının bütün dosyaları — korumalı belgeler (kimlik, ruhsat vb.) ve
+   * herkese açık fotoğraflar küçük kopyalarıyla — diskten ve veritabanından kaldırılır.
+   */
+  async purgeUser(userId: string) {
+    const files = await this.prisma.file.findMany({ where: { ownerId: userId } });
+    const keys = files.flatMap((f) => [f.key, ...MEDIA_WIDTHS.map((w) => `${f.key}.w${w}.webp`)]);
+    await Promise.all(keys.map((k) => this.storage.remove(k)));
+    const ids = files.map((f) => f.id);
+    await this.prisma.listingPhoto.deleteMany({ where: { fileId: { in: ids } } });
+    await this.prisma.file.deleteMany({ where: { id: { in: ids } } });
     await this.prisma.verificationRequest.updateMany({ where: { userId }, data: { fileIds: [], details: Prisma.DbNull } });
     // Bekleyen başvurular geri çekilir: silinmiş hesap moderatör kuyruğunda görünmez, onaylanamaz.
     await this.prisma.verificationRequest.updateMany({ where: { userId, status: 'pending' }, data: { status: 'rejected', rejectReason: 'withdrawn', decidedAt: new Date() } });

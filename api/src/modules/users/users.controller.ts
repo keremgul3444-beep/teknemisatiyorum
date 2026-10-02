@@ -108,7 +108,7 @@ export class UsersController {
       this.prisma.listing.updateMany({ where: { ownerId: u.id, status: { not: 'removed' } }, data: { status: 'removed' } }),
       this.prisma.session.updateMany({ where: { userId: u.id, revokedAt: null }, data: { revokedAt: now } }),
     ]);
-    await this.media.purgePrivate(u.id);
+    await this.media.purgeUser(u.id);
     await this.audit.log(u.id, 'audit.accountDeleted', {}, 'user', u.id);
   }
 }

@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import sharp from 'sharp';
 import { createTestApp, type TestApp } from './setup';
 import { deepContains, jpegWithExif, loginAs, randomTckn } from './helpers';
@@ -140,5 +142,23 @@ describe('hesap silme', () => {
     expect(row).toMatchObject({ phone: null, name: null, email: null, nationalIdEnc: null, nationalIdLast2: null });
     expect(row!.deletedAt).toBeTruthy();
     expect((await t.http().get('/me').set(a.auth)).status).toBe(401);
+  });
+
+  test('KVKK: herkese açık fotoğraflar ve küçük kopyaları diskten de silinir', async () => {
+    const a = await loginAs(t, { level: 2 });
+    const up = await t.http().post('/media').set(a.auth).field('visibility', 'public').attach('file', await jpegWithExif(900, 600), 'p.jpg');
+    expect((await t.http().get(`/media/${up.body.id}?w=400`)).status).toBe(200); // küçük kopya üretilir
+    const c = await t.http().post('/listings').set(a.auth).send({ brand: 'Sil', model: 'X', year: 2015, lengthM: 9, type: 'yelkenli', price: 1, currency: 'EUR', location: 'Bodrum' });
+    await t.http().post(`/listings/${c.body.id}/photos`).set(a.auth).send({ fileIds: [up.body.id] });
+    const { key } = await t.prisma.file.findUniqueOrThrow({ where: { id: up.body.id } });
+    const dir = process.env.STORAGE_DIR!;
+    expect(fs.existsSync(path.join(dir, key))).toBe(true);
+    expect(fs.existsSync(path.join(dir, `${key}.w400.webp`))).toBe(true);
+
+    expect((await t.http().delete('/me').set(a.auth)).status).toBe(204);
+    expect(fs.existsSync(path.join(dir, key))).toBe(false);
+    expect(fs.existsSync(path.join(dir, `${key}.w400.webp`))).toBe(false);
+    expect(await t.prisma.file.count({ where: { ownerId: a.user.id } })).toBe(0);
+    expect(await t.prisma.listingPhoto.count({ where: { listingId: c.body.id } })).toBe(0);
   });
 });
