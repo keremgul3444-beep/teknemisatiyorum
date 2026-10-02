@@ -18,9 +18,13 @@ export const gradients: [string, string][] = [
 ];
 
 const kebab = (s: string) => s.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
-/** Web için `:root{...}` CSS değişkenleri. */
+/** Web için CSS değişkenleri, `<html style>` üzerine konacak harita (ayrı <style> etiketi tarayıcı eklentileriyle çakışıyordu). */
+export function cssVariableMap(): Record<string, string> {
+  const c = Object.entries(colors).map(([k, v]) => [`--c-${kebab(k)}`, v] as const);
+  const r = Object.entries(radius).map(([k, v]) => [`--r-${kebab(k)}`, `${v}px`] as const);
+  return Object.fromEntries([...c, ...r]);
+}
+/** Aynı değişkenler `:root{...}` metni olarak (statik CSS üretimi için). */
 export function cssVariables(): string {
-  const c = Object.entries(colors).map(([k, v]) => `--c-${kebab(k)}:${v}`);
-  const r = Object.entries(radius).map(([k, v]) => `--r-${kebab(k)}:${v}px`);
-  return `:root{${[...c, ...r].join(';')}}`;
+  return `:root{${Object.entries(cssVariableMap()).map(([k, v]) => `${k}:${v}`).join(';')}}`;
 }

@@ -1,7 +1,7 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { notFound } from 'next/navigation';
 import { Bricolage_Grotesque, Figtree } from 'next/font/google';
-import { cssVariables } from '@tms/shared';
+import { cssVariableMap } from '@tms/shared';
 import { isLocale, localePath, LOCALES, t, type Locale } from '@/i18n';
 import { CookieConsent } from '@/components/CookieConsent';
 import { Header } from '@/components/Header';
@@ -17,12 +17,10 @@ export const generateStaticParams = () => LOCALES.map((locale) => ({ locale }));
 export default async function RootLayout({ children, params }: { children: ReactNode; params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
+  // Tasarım değişkenleri (renk/yarıçap) uygulamayla aynı kaynaktan, html etiketinin style niteliğinde. Karanlık mod gibi
+  // tarayıcı eklentileri html etiketine kendi niteliklerini ekler; bu farklar hata sayılmaz (suppressHydrationWarning yalnızca bu etiket için).
   return (
-    <html lang={locale} className={`${body.variable} ${heading.variable}`}>
-      <head>
-        {/* Tasarım dili (renk/yarıçap) uygulamayla aynı kaynaktan. */}
-        <style>{cssVariables()}</style>
-      </head>
+    <html lang={locale} className={`${body.variable} ${heading.variable}`} style={cssVariableMap() as CSSProperties} suppressHydrationWarning>
       <body>
         <Header locale={locale as Locale} />
         <main className="container">{children}</main>

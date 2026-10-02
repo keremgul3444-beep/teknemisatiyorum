@@ -1,4 +1,4 @@
-import { colors, cssVariables, fontFamilies, radius } from '../src/design';
+import { colors, cssVariableMap, cssVariables, fontFamilies, radius } from '../src/design';
 
 test('"Liman" tasarım dili: açık zemin, lacivert ana renk, turuncu vurgu', () => {
   expect(colors).toMatchObject({ bg: '#F6F8FA', card: '#FFFFFF', primary: '#0B3B5C', accent: '#F2652B', text: '#0E1B26', muted: '#556270' });
@@ -13,6 +13,7 @@ test('web için CSS değişkenleri üretilir', () => {
   expect(css).toContain('--c-accent-soft:#FFF1EA');
   expect(css).toContain('--r-card:20px');
   expect(css.startsWith(':root{')).toBe(true);
+  expect(cssVariableMap()).toMatchObject({ '--c-bg': '#F6F8FA', '--c-accent-text': '#B23F0E', '--r-card': '20px' });
 });
 
 /** WCAG göreli parlaklık ve karşıtlık oranı. */

@@ -4,7 +4,13 @@
     "declaration": true,
     "outDir": "dist",
     "rootDir": "src",
-    "types": ["node"]
+    "types": [
+      "node"
+    ],
+    // expo/tsconfig.base noEmit:true getiriyor; derleme çıktısı için burada açıkça kapatılır.
+    "noEmit": false
   },
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }
