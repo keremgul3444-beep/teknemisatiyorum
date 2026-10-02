@@ -61,6 +61,7 @@ export class AuthService {
     if (consumed.count !== 1) throw otpError('OTP_INVALID');
 
     const existing = await this.prisma.user.findUnique({ where: { phone } });
+    if (existing?.suspendedAt) throw new AppError('ACCOUNT_SUSPENDED', 'errors.account_suspended', 403);
     const user = existing
       ? await this.prisma.user.update({ where: { id: existing.id }, data: { verifyLevel: Math.max(1, existing.verifyLevel) } })
       : await this.prisma.user.create({ data: { phone, verifyLevel: 1 } });
@@ -87,7 +88,7 @@ export class AuthService {
     }
     if (now.getTime() - s.lastSeenAt.getTime() > REFRESH_TTL_MS) throw otpError('REFRESH_EXPIRED');
     const user = await this.prisma.user.findUnique({ where: { id: s.userId } });
-    if (!user || user.deletedAt) throw otpError('REFRESH_INVALID');
+    if (!user || user.deletedAt || user.suspendedAt) throw otpError('REFRESH_INVALID');
     const next = await this.issue(user.id, s.familyId, s.deviceName, now);
     // Yarış güvenliği: yalnızca hâlâ açık olan satır döndürülür.
     const rotated = await this.prisma.session.updateMany({
@@ -115,7 +116,7 @@ export class AuthService {
     const successor = await this.prisma.session.findUnique({ where: { id: s.replacedById } });
     if (!successor || successor.revokedAt) return null;
     const user = await this.prisma.user.findUnique({ where: { id: s.userId } });
-    if (!user || user.deletedAt) return null;
+    if (!user || user.deletedAt || user.suspendedAt) return null;
     const accessToken = await this.jwt.signAsync({ sub: user.id, sid: successor.id });
     return { accessToken, refreshToken: decrypt(s.graceRefreshEnc), user: userView(user) };
   }

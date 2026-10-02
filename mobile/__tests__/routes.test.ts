@@ -13,7 +13,7 @@ export const ROUTES = [
   'profil/ayarlar', 'profil/cihazlar', 'profil/hesap-sil',
   'panel/hizmet', 'panel/kurumsal',
   'admin/_layout', 'admin/index', 'admin/ilanlar', 'admin/belgeler', 'admin/broker', 'admin/ekspertiz',
-  'admin/kullanicilar', 'admin/odemeler', 'admin/kayitlar',
+  'admin/kullanicilar', 'admin/odemeler', 'admin/kayitlar', 'admin/sikayetler', 'bildir/[id]',
 ];
 
 test.each(ROUTES)('%s sayfası mevcut', (r) => {

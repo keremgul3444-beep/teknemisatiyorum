@@ -86,6 +86,13 @@ export default function IlanDetay() {
               <T variant="caption" color={colors.accentText} style={{ fontFamily: fonts.bodySemi }}>{t('listing.pending')}</T>
             </View>
           ) : null}
+          {l.status === 'kaldirildi' && (l.isMine || l.sellerId === 'me') ? (
+            <View style={{ backgroundColor: colors.surface, borderRadius: radius.button, padding: space(3), gap: space(1), borderLeftWidth: 3, borderLeftColor: colors.danger }}>
+              <T variant="caption" color={colors.danger} style={{ fontFamily: fonts.bodyBold }}>{t('listing.removedTitle')}</T>
+              {l.removedReason ? <T variant="caption">{t(`mine.removedReasons.${l.removedReason}`)}</T> : null}
+              <T variant="caption" color={colors.muted}>{t('listing.removedBody')}</T>
+            </View>
+          ) : null}
           {l.status === 'reddedildi' && (l.isMine || l.sellerId === 'me') ? (
             <View style={{ backgroundColor: colors.surface, borderRadius: radius.button, padding: space(3), gap: space(1), borderLeftWidth: 3, borderLeftColor: colors.danger }}>
               <T variant="caption" color={colors.danger} style={{ fontFamily: fonts.bodyBold }}>{t('listing.rejectedTitle')}</T>
@@ -181,6 +188,14 @@ export default function IlanDetay() {
             <Icon name="shield" size={16} color={colors.muted} />
             <T variant="caption" color={colors.muted} style={{ flex: 1 }}>{t('listing.safety')}</T>
           </View>
+          {/* Alıcı şüpheli ilanı bildirir; kendi ilanında ve yayında olmayan ilanda görünmez. */}
+          {l.status === 'yayinda' && !(l.isMine || l.sellerId === 'me') ? (
+            <Pressable onPress={() => { if (requireLevel(1)) router.push(`/bildir/${l.id}`); }} accessibilityRole="button" hitSlop={8}
+              style={{ flexDirection: 'row', gap: space(2), alignItems: 'center', alignSelf: 'flex-start', minHeight: 44 }}>
+              <Icon name="info" size={16} color={colors.danger} />
+              <T variant="caption" color={colors.danger} style={{ fontFamily: fonts.bodySemi }}>{t('report.action')}</T>
+            </Pressable>
+          ) : null}
         </View>
       </ScrollView>
       <View style={{ flexDirection: 'row', gap: space(3), padding: space(4), borderTopWidth: 1, borderColor: colors.line, backgroundColor: colors.card }}>

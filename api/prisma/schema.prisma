@@ -78,6 +78,9 @@ model User {
   prefs           Json?
   createdAt       DateTime  @default(now())
   deletedAt       DateTime?
+  /// Moderatör tarafından askıya alındı: oturumlar kapanır, giriş engellenir.
+  suspendedAt     DateTime?
+  suspendReason   String?
 
   sessions Session[]
 
@@ -204,6 +207,9 @@ model Listing {
   bumpedAt      DateTime?
   /// Herkese açık sayfanın ilan sahibi dışındakilerce açılma sayısı (satıcı istatistiği).
   viewCount     Int            @default(0)
+  /// Moderatör yayından kaldırdıysa gerekçe (scam | wrong_info | offensive | rules | account_suspended); sahibi kaldırdıysa null.
+  removedReason String?
+  reports       ListingReport[]
   photos        ListingPhoto[]
   favorites     Favorite[]
   orders        Order[]
@@ -451,4 +457,24 @@ model Order {
 
   @@index([userId, createdAt])
   @@index([status, createdAt])
+}
+
+/// Kullanıcının bir ilanı bildirmesi. Kişi başına ilan başına bir kayıt; moderatör kaldırır ya da yoksayar.
+model ListingReport {
+  id         String    @id @default(cuid())
+  listingId  String
+  listing    Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  reporterId String
+  /// scam | wrong_info | sold | offensive | other
+  reason     String
+  note       String    @default("")
+  /// open | dismissed | actioned
+  status     String    @default("open")
+  createdAt  DateTime  @default(now())
+  resolvedAt DateTime?
+  resolvedBy String?
+
+  @@unique([listingId, reporterId])
+  @@index([status])
+  @@index([reporterId, createdAt])
 }

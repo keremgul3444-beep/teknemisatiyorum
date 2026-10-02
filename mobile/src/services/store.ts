@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { t } from 'i18next';
 import type {
   AdminItem, AdminStatus, AuditEntry, Boat, BoatInput, BrokerCase, CaptainBooking, Company, Conversation, ExpertiseBooking,
-  ExpertisePackage, Job, JobInput, Listing, ListingDraft, Provider, RejectReason, SavedSearch, Seller, SubjectKind,
+  ExpertisePackage, Job, JobInput, Listing, ListingDraft, Provider, RejectReason, ReportGroup, ReportReason, SavedSearch, Seller, SubjectKind,
+  TakedownReason,
 } from './types';
 import { makeListings } from '@tms/shared';
 import { makeProviders } from '@/mocks/providers';
@@ -14,7 +15,10 @@ export interface Data {
   savedSearches: SavedSearch[]; favorites: string[]; expertisePackages: ExpertisePackage[]; expertiseBookings: ExpertiseBooking[];
   captainBookings: CaptainBooking[]; brokerCases: BrokerCase[]; companies: Company[]; sellers: Seller[];
   adminItems: AdminItem[]; audit: AuditEntry[];
+  /** Demo modunda bu oturumda gönderilen ilan bildirimleri. */
+  reports: DemoReport[];
 }
+export interface DemoReport { id: string; listingId: string; reason: ReportReason; note: string; createdAt: string; status: 'open' | 'dismissed' | 'actioned' }
 
 export interface Actions {
   createListing(d: ListingDraft): string;
@@ -37,6 +41,11 @@ export interface Actions {
   markRead(convId: string): void;
   startConversation(subject: { kind: SubjectKind; id: string; title: string }, withName: string): string;
   setAdminStatus(id: string, status: AdminStatus, reason?: RejectReason): void;
+  reportListing(listingId: string, reason: ReportReason, note: string): string;
+  reportGroups(): ReportGroup[];
+  takedownListing(listingId: string, reason: TakedownReason): void;
+  dismissReports(listingId: string): void;
+  suspendSeller(sellerId: string): void;
   resetDemo(): void;
 }
 
@@ -51,7 +60,7 @@ export function seed(): Data {
     listings: makeListings(), providers, jobs: makeJobs(providers), boats: makeBoats(), conversations: makeConversations(),
     savedSearches: makeSavedSearches(), favorites: [], expertisePackages: makeExpertisePackages(), expertiseBookings: [],
     captainBookings: [], brokerCases: makeBrokerCases(), companies: makeCompanies(), sellers: makeSellers(),
-    adminItems: makeAdminItems(), audit: makeAudit(),
+    adminItems: makeAdminItems(), audit: makeAudit(), reports: [],
   };
 }
 
@@ -195,6 +204,52 @@ export const useStore = create<Data & Actions>((set, get) => {
       return id;
     },
 
+    reportListing(listingId, reason, note) {
+      const id = nextId('r');
+      set({ reports: [...get().reports, { id, listingId, reason, note, createdAt: `${today()} ${nowHM()}`, status: 'open' }] });
+      const l = get().listings.find((x) => x.id === listingId);
+      log('audit.listingReported', { title: l ? `${l.brand} ${l.model}` : listingId });
+      return id;
+    },
+    reportGroups() {
+      const open = get().reports.filter((r) => r.status === 'open');
+      const ids = [...new Set(open.map((r) => r.listingId))];
+      return ids.flatMap((lid) => {
+        const l = get().listings.find((x) => x.id === lid);
+        if (!l) return [];
+        const seller = get().sellers.find((s) => s.id === l.sellerId);
+        const rs = open.filter((r) => r.listingId === lid);
+        return [{
+          listing: {
+            id: l.id, title: `${l.brand} ${l.model}`, year: l.year, price: l.price, currency: l.currency, status: l.status, description: l.description,
+            owner: { id: l.sellerId, name: seller?.name ?? null, verifyLevel: seller?.verified ? 2 : 1, suspended: false },
+          },
+          count: rs.length,
+          reports: rs.map((r) => ({ id: r.id, reason: r.reason, note: r.note, createdAt: r.createdAt, reporterName: DEMO_USER.name })),
+        }];
+      }).sort((a, b) => b.count - a.count);
+    },
+    takedownListing(listingId, reason) {
+      const l = get().listings.find((x) => x.id === listingId);
+      set({
+        listings: get().listings.map((x) => (x.id === listingId ? { ...x, status: 'kaldirildi', removedReason: reason } : x)),
+        reports: get().reports.map((r) => (r.listingId === listingId && r.status === 'open' ? { ...r, status: 'actioned' } : r)),
+      });
+      log('audit.listingRemoved', { title: l ? `${l.brand} ${l.model}` : listingId });
+    },
+    dismissReports(listingId) {
+      const l = get().listings.find((x) => x.id === listingId);
+      set({ reports: get().reports.map((r) => (r.listingId === listingId && r.status === 'open' ? { ...r, status: 'dismissed' } : r)) });
+      log('audit.reportsDismissed', { title: l ? `${l.brand} ${l.model}` : listingId });
+    },
+    suspendSeller(sellerId) {
+      const live = get().listings.filter((x) => x.sellerId === sellerId && (x.status === 'yayinda' || x.status === 'onay-bekliyor')).map((x) => x.id);
+      set({
+        listings: get().listings.map((x) => (live.includes(x.id) ? { ...x, status: 'kaldirildi', removedReason: 'account_suspended' } : x)),
+        reports: get().reports.map((r) => (live.includes(r.listingId) && r.status === 'open' ? { ...r, status: 'actioned' } : r)),
+      });
+      log('audit.userSuspended', { name: get().sellers.find((s) => s.id === sellerId)?.name ?? sellerId });
+    },
     setAdminStatus(id, status, reason = 'rules') {
       const item = get().adminItems.find((a) => a.id === id);
       if (!item) return;

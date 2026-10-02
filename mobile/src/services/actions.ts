@@ -7,7 +7,7 @@ import { applyUser, syncAdmin, syncAll, syncListings, syncMine } from './api/syn
 import { toBoat, toListing, toThread, type AdminOrder, type ApiBoat, type ApiListing, type ApiProduct, type ApiThread, type ApiUser } from './api/mappers';
 import { ApiError } from './api/client';
 import { devReceipt } from '@/features/promo';
-import type { AdminStatus, BoatInput, Listing, ListingDraft, RejectReason, SubjectKind } from './types';
+import type { AdminStatus, BoatInput, Listing, ListingDraft, RejectReason, ReportGroup, ReportReason, SubjectKind, TakedownReason } from './types';
 import { useSession, type Prefs } from '@/session/role';
 import { resetRates } from './rates';
 import { createPublisher, type PublishExtra } from '@/features/publishListing';
@@ -215,6 +215,34 @@ export const actions = {
       // İlan değiştiyse (LISTING_CHANGED) moderatör güncel hâlini görsün diye kuyruk her durumda yenilenir.
       await Promise.all([syncAdmin(), syncListings()]);
     }
+  },
+  // ——— Bildirim ve yaptırım ———
+  /** Alıcı ilanı bildirir; satıcıya gösterilmez, moderatör inceler. */
+  async reportListing(listingId: string, reason: ReportReason, note: string) {
+    if (!isApiMode()) return g().reportListing(listingId, reason, note);
+    const r = await api.post<{ id: string }>(`/listings/${listingId}/report`, { reason, note });
+    return r.id;
+  },
+  async adminReports(): Promise<ReportGroup[]> {
+    if (!isApiMode()) return g().reportGroups();
+    return api.get<ReportGroup[]>('/admin/reports');
+  },
+  async takedownListing(listingId: string, reason: Exclude<TakedownReason, 'account_suspended'>) {
+    if (!isApiMode()) return g().takedownListing(listingId, reason);
+    await api.post(`/admin/listings/${listingId}/takedown`, { reason });
+    await syncListings();
+  },
+  async dismissReports(listingId: string) {
+    if (!isApiMode()) return g().dismissReports(listingId);
+    await api.post(`/admin/listings/${listingId}/reports/dismiss`);
+  },
+  async suspendUser(userId: string, reason: string) {
+    if (!isApiMode()) return g().suspendSeller(userId);
+    await api.post(`/admin/users/${userId}/suspend`, { reason });
+    await syncListings();
+  },
+  async unsuspendUser(userId: string) {
+    if (isApiMode()) await api.post(`/admin/users/${userId}/unsuspend`);
   },
   async advanceBroker(id: string) {
     if (!isApiMode()) return g().advanceBroker(id);

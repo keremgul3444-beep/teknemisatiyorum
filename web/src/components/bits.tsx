@@ -47,11 +47,13 @@ export function SearchBox({ locale, defaultValue }: { locale: Locale; defaultVal
 }
 
 /** Uygulamaya derin bağlantı; uygulama yoksa sayfa altındaki "uygulamayı indir" bölümüne iner. */
+/** Uygulamada açılacak adres (ör. "ilan/abc"). */
+export const appHref = (path: string) => `${process.env.NEXT_PUBLIC_APP_SCHEME ?? 'teknemisatiyorum'}://${path.replace(/^\//, '')}`;
+
 export function AppLink({ locale, path, children, secondary }: { locale: Locale; path: string; children: ReactNode; secondary?: boolean }) {
-  const scheme = process.env.NEXT_PUBLIC_APP_SCHEME ?? 'teknemisatiyorum';
   return (
     <span className="row">
-      <a className={secondary ? 'btn secondary' : 'btn'} href={`${scheme}://${path.replace(/^\//, '')}`}>{children}</a>
+      <a className={secondary ? 'btn secondary' : 'btn'} href={appHref(path)}>{children}</a>
       <Link className="small" href={`${localePath(locale, '/')}#uygulama`}>{t(locale, 'common.noApp')}</Link>
     </span>
   );

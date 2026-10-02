@@ -200,7 +200,8 @@
     "flagForeign": "Foreign flag",
     "tradeIn": "Open to trade-in",
     "negotiable": "Price negotiable",
-    "soldNote": "This boat has been sold"
+    "soldNote": "This boat has been sold",
+    "report": "Something wrong? Report this listing (in the app)"
   },
   "gone": {
     "title": "This listing is no longer live",
@@ -453,7 +454,7 @@
     "invalid_tckn": "Invalid Turkish ID number.",
     "photo_required": "Add at least one photo.",
     "too_many_photos": "You can add up to {{max}} photos.",
-    "own_listing": "You can't message your own listing.",
+    "own_listing": "You cannot report your own listing.",
     "already_decided": "A decision was already made for this item.",
     "broker_done": "The file is at its final step.",
     "internal": "A server error occurred.",
@@ -478,7 +479,13 @@
     "not_refundable": "This order can't be refunded",
     "receipt_used": "This purchase was already used",
     "listing_changed": "The seller changed this listing while you were reviewing it. Check the current version and decide again.",
-    "version_required": "Update the app: decisions cannot be sent without the listing version."
+    "version_required": "Update the app: decisions cannot be sent without the listing version.",
+    "already_reported": "You already reported this listing; our team is reviewing it.",
+    "report_limit": "You reached today’s report limit. Try again tomorrow.",
+    "account_suspended": "Your account has been suspended. Write to iletisim@teknemisatiyorum.com for details.",
+    "staff_protected": "Team accounts cannot be suspended here.",
+    "already_suspended": "This account is already suspended.",
+    "not_suspended": "This account is not suspended."
   },
   "login": {
     "title": "Log in",

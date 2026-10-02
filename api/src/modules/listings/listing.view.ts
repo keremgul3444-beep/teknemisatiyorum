@@ -39,6 +39,7 @@ export function listingView(l: ListingRow, viewerId?: string, companyName?: stri
     cabins: l.cabins, engine: l.engine, description: l.description,
     engineHours: l.engineHours, flag: l.flag, tradeIn: l.tradeIn, negotiable: l.negotiable,
     status: l.status, badges: l.badges, rejectReason: viewerId === l.ownerId ? l.rejectReason : undefined,
+    removedReason: viewerId === l.ownerId ? l.removedReason : undefined,
     photos: l.photos.map((p) => ({ id: p.fileId, url: `${env().PUBLIC_URL}/media/${p.fileId}` })),
     seller: {
       id: l.owner.id,

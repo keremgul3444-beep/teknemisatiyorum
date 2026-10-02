@@ -47,7 +47,8 @@
     "dogrulanmis": "Verified",
     "beklemede": "Pending approval",
     "belge": "Documents match",
-    "reddedildi": "Rejected"
+    "reddedildi": "Rejected",
+    "kaldirildi": "Removed"
   },
   "boatType": {
     "motoryat": "Motor yacht",
@@ -110,7 +111,9 @@
     "negotiable": "Price negotiable",
     "rejectedTitle": "Your listing was not published",
     "rejectedBody": "Fix the issue and post the listing again.",
-    "soldNote": "This boat has been sold"
+    "soldNote": "This boat has been sold",
+    "removedTitle": "Your listing was taken down",
+    "removedBody": "To appeal, write to iletisim@teknemisatiyorum.com."
   },
   "usta": {
     "freeSurvey": "Free inspection",
@@ -754,6 +757,14 @@
       "blurry": "Reason: photos or document are not legible.",
       "mismatch": "Reason: details do not match the photos or document.",
       "rules": "Reason: content breaks listing rules (e.g. phone number, IBAN or another boat’s photos)."
+    },
+    "removed": "Removed",
+    "removedReasons": {
+      "scam": "Reason: suspected scam.",
+      "wrong_info": "Reason: wrong details or photos.",
+      "offensive": "Reason: inappropriate content.",
+      "rules": "Reason: breaks listing rules.",
+      "account_suspended": "Reason: account suspended."
     }
   },
   "settings": {
@@ -852,7 +863,8 @@
       "odemeler": "Payments",
       "kayitlar": "Audit log",
       "siparisler": "Orders",
-      "fiyatlar": "Prices"
+      "fiyatlar": "Prices",
+      "sikayetler": "Reports"
     },
     "kpi": {
       "active": "Active listings",
@@ -933,7 +945,23 @@
     "refundYes": "Yes, refund",
     "sellerLevel": "Seller",
     "sellerVerified": "ID verified",
-    "sellerUnverified": "ID not verified"
+    "sellerUnverified": "ID not verified",
+    "reportsEmpty": "No open reports",
+    "reportCount": "{{count}} report(s)",
+    "takedown": "Take down",
+    "takedownReason": "Choose a reason",
+    "dismiss": "Dismiss",
+    "suspend": "Suspend seller",
+    "suspendConfirm": "The seller’s sessions end and live listings are taken down. Are you sure?",
+    "suspendReasonDefault": "Suspected scam after reports",
+    "unsuspend": "Reinstate",
+    "suspended": "Suspended",
+    "takedownReasons": {
+      "scam": "Scam",
+      "wrong_info": "Wrong details",
+      "offensive": "Inappropriate",
+      "rules": "Rule violation"
+    }
   },
   "audit": {
     "listingApproved": "Listing approved: {{title}}",
@@ -956,7 +984,12 @@
     "orderPaid": "Order paid: {{product}} ({{channel}})",
     "orderRefunded": "Order refunded: {{product}}",
     "orderManual": "Bank transfer order: {{product}} ({{note}})",
-    "productPriceChanged": "Product price: {{code}} — web {{web}}, app {{app}} kuruş"
+    "productPriceChanged": "Product price: {{code}} — web {{web}}, app {{app}} kuruş",
+    "listingReported": "Listing reported: {{title}}",
+    "listingRemoved": "Listing taken down: {{title}}",
+    "reportsDismissed": "Reports dismissed: {{title}}",
+    "userSuspended": "Account suspended: {{name}}",
+    "userUnsuspended": "Account reinstated: {{name}}"
   },
   "errors": {
     "generic": "Something went wrong, please try again.",
@@ -975,7 +1008,7 @@
     "invalid_tckn": "Invalid Turkish ID number.",
     "photo_required": "Add at least one photo.",
     "too_many_photos": "You can add up to {{max}} photos.",
-    "own_listing": "You can't message your own listing.",
+    "own_listing": "You cannot report your own listing.",
     "already_decided": "A decision was already made for this item.",
     "broker_done": "The file is at its final step.",
     "internal": "A server error occurred.",
@@ -1000,7 +1033,13 @@
     "not_refundable": "This order can't be refunded",
     "receipt_used": "This purchase was already used",
     "listing_changed": "The seller changed this listing while you were reviewing it. Check the current version and decide again.",
-    "version_required": "Update the app: decisions cannot be sent without the listing version."
+    "version_required": "Update the app: decisions cannot be sent without the listing version.",
+    "already_reported": "You already reported this listing; our team is reviewing it.",
+    "report_limit": "You reached today’s report limit. Try again tomorrow.",
+    "account_suspended": "Your account has been suspended. Write to iletisim@teknemisatiyorum.com for details.",
+    "staff_protected": "Team accounts cannot be suspended here.",
+    "already_suspended": "This account is already suspended.",
+    "not_suspended": "This account is not suspended."
   },
   "soon": {
     "title": "Coming soon",
@@ -1015,7 +1054,8 @@
     "newMessage": "New message: {{title}}",
     "reportReady": "Your survey report is ready · {{score}}/100",
     "searchMatch": "New listing for your saved search: {{title}}",
-    "priceDrop": "A favourite dropped its price: {{title}}"
+    "priceDrop": "A favourite dropped its price: {{title}}",
+    "listingRemoved": "Your listing was taken down: {{title}}"
   },
   "notifs": {
     "title": "Notifications",
@@ -1069,6 +1109,23 @@
       "equipment": "Equipment",
       "badges": "Trust",
       "logbook": "Logbook entries"
+    }
+  },
+  "report": {
+    "action": "Report listing",
+    "title": "Report listing",
+    "body": "Why are you reporting it? The seller does not see your report; our team reviews it.",
+    "note": "Note (optional)",
+    "notePh": "e.g. the seller sent an IBAN for a deposit",
+    "send": "Report",
+    "doneTitle": "Report received",
+    "doneBody": "Our team will review the listing. Thank you.",
+    "reasons": {
+      "scam": "Suspected scam",
+      "wrong_info": "Wrong details or photos",
+      "sold": "Boat already sold",
+      "offensive": "Inappropriate content",
+      "other": "Other"
     }
   }
 }

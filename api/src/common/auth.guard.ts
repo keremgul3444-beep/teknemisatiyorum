@@ -42,7 +42,8 @@ export class AuthGuard implements CanActivate {
       return null;
     }
     const u = await this.prisma.user.findUnique({ where: { id: payload.sub } });
-    if (!u || u.deletedAt) return null;
+    // Silinmiş ya da askıya alınmış hesabın anahtarı geçmez (askıya almada oturumlar da kapatılır).
+    if (!u || u.deletedAt || u.suspendedAt) return null;
     if (payload.sid && payload.sid !== 'none') {
       const s = await this.prisma.session.findUnique({ where: { id: payload.sid } });
       if (!s || s.revokedAt) return null;

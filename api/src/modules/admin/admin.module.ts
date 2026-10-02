@@ -11,6 +11,7 @@ import { env } from '../../config/env';
 import { BoatsModule } from '../boats/boats.module';
 import { I18N_PREFIX, LogbookService, dateOnly } from '../boats/logbook.service';
 import { NotificationsService } from '../notifications/notifications.module';
+import { ModerationController } from './moderation.controller';
 
 const STAFF = { roles: ['moderator', 'admin'] as ('moderator' | 'admin')[] };
 const decisionBody = z.discriminatedUnion('decision', [
@@ -45,15 +46,16 @@ class AdminController {
   @Auth(STAFF)
   @Get('overview')
   async overview() {
-    const [activeListings, pendingListings, pendingVerifications, openBroker, pendingReports, users7d] = await Promise.all([
+    const [activeListings, pendingListings, pendingVerifications, openBroker, pendingReports, users7d, openListingReports] = await Promise.all([
       this.prisma.listing.count({ where: { status: 'published' } }),
       this.prisma.listing.count({ where: { status: 'pending' } }),
       this.prisma.verificationRequest.count({ where: { status: 'pending' } }),
       this.prisma.brokerCase.count({ where: { step: { lt: 4 } } }),
       this.prisma.expertiseBooking.count({ where: { reportStatus: 'pending' } }),
       this.prisma.user.count({ where: { createdAt: { gt: new Date(Date.now() - 7 * 864e5) }, deletedAt: null } }),
+      this.prisma.listingReport.count({ where: { status: 'open' } }),
     ]);
-    return { activeListings, pendingListings, pendingVerifications, openBroker, pendingReports, users7d };
+    return { activeListings, pendingListings, pendingVerifications, openBroker, pendingReports, users7d, openListingReports };
   }
 
   @Auth(STAFF)
@@ -166,6 +168,7 @@ class AdminController {
     // Kişisel veriler maskeli; tam görüntüleme bu turda yok.
     return rows.map((x) => ({
       id: x.id, name: x.name, roles: x.roles, verifyLevel: x.verifyLevel, createdAt: x.createdAt,
+      suspendedAt: x.suspendedAt, suspendReason: x.suspendReason,
       phone: x.phone ? maskPhone(x.phone) : null,
       nationalId: x.nationalIdLast2 ? `•••••••••${x.nationalIdLast2}` : null,
     }));
@@ -219,5 +222,5 @@ class AdminController {
   }
 }
 
-@Module({ imports: [BoatsModule], controllers: [AdminController] })
+@Module({ imports: [BoatsModule], controllers: [AdminController, ModerationController] })
 export class AdminModule {}

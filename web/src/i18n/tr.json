@@ -200,7 +200,8 @@
     "flagForeign": "Yabancı bayraklı",
     "tradeIn": "Takasa açık",
     "negotiable": "Pazarlık payı var",
-    "soldNote": "Bu tekne satıldı"
+    "soldNote": "Bu tekne satıldı",
+    "report": "Şüpheli bir durum mu var? İlanı bildir (uygulamada)"
   },
   "gone": {
     "title": "Bu ilan artık yayında değil",
@@ -453,7 +454,7 @@
     "invalid_tckn": "T.C. kimlik numarası geçersiz.",
     "photo_required": "En az bir fotoğraf ekle.",
     "too_many_photos": "En fazla {{max}} fotoğraf eklenebilir.",
-    "own_listing": "Kendi ilanına mesaj gönderemezsin.",
+    "own_listing": "Kendi ilanını bildiremezsin.",
     "already_decided": "Bu kayıt için zaten karar verilmiş.",
     "broker_done": "Dosya son adımda.",
     "internal": "Sunucuda bir hata oluştu.",
@@ -478,7 +479,13 @@
     "not_refundable": "Bu sipariş iade edilemez",
     "receipt_used": "Bu satın alma zaten kullanıldı",
     "listing_changed": "Satıcı ilanı sen incelerken değiştirdi. Güncel hâlini görüp yeniden karar ver.",
-    "version_required": "Uygulamanı güncelle: karar ilan sürümü olmadan gönderilemez."
+    "version_required": "Uygulamanı güncelle: karar ilan sürümü olmadan gönderilemez.",
+    "already_reported": "Bu ilanı zaten bildirdin; ekibimiz inceliyor.",
+    "report_limit": "Bugün için bildirim sınırına ulaştın. Yarın yeniden deneyebilirsin.",
+    "account_suspended": "Hesabın askıya alındı. Bilgi için iletisim@teknemisatiyorum.com adresine yaz.",
+    "staff_protected": "Ekip üyelerinin hesabı buradan askıya alınamaz.",
+    "already_suspended": "Bu hesap zaten askıda.",
+    "not_suspended": "Bu hesap askıda değil."
   },
   "login": {
     "title": "Giriş yap",

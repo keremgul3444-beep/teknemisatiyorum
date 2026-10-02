@@ -87,7 +87,17 @@ Motor saati, bayrak, takas ve pazarlık şu an yalnızca ilan sayfasında görü
 - C16: Satılmış ilanda uygulamada ve sitede mesaj/ekspertiz düğmeleri yerine "Bu tekne satıldı"; sitedeki ekspertiz bağlantısı ilan kimliğini taşıyor.
 - C20: Karne başlığı ve yazar adı `i18n:` ile başlayamıyor; uygulama ve site yalnızca `i18n:logbook.` anahtarlarını çeviriyor.
 
-Kalan: A5 (şikayet, yaptırım), B9–B14, C17–C19, C21, D ve E maddeleri.
+## Şikayet ve yaptırım paketi ile kapatılanlar (2026-10-02)
+
+- A5: İlan bildirme (`POST /listings/:id/report`, giriş yapmış alıcı, kişi başına ilan başına bir kez, günde en fazla 10). Gerekçeler: dolandırıcılık şüphesi, yanlış bilgi/fotoğraf, satılmış, uygunsuz içerik, diğer. Bildirim ilanı kendiliğinden kaldırmaz (rakiplerin birkaç hesapla ilan düşürmesi engellenir).
+- Moderatör: `GET /admin/reports` (ilana göre gruplu, en çok bildirilen önce), `POST /admin/listings/:id/takedown` (yayındaki, bekleyen ya da satılmış ilanı gerekçeyle kaldırır, sahibine bildirim), `POST /admin/listings/:id/reports/dismiss`. Uygulamada Yönetim > Bildirimler sayfası; kaldırma ve askıya alma ikinci adımla onaylanır.
+- Hesap askıya alma: `POST /admin/users/:id/suspend|unsuspend`. Askıda oturumlar kapanır, giriş ve anahtar yenileme engellenir (`ACCOUNT_SUSPENDED`), yayındaki ve bekleyen ilanlar `account_suspended` gerekçesiyle kalkar. Ekip üyesi ve kişinin kendisi askıya alınamaz. Askı kaldırılınca ilanlar kendiliğinden geri gelmez. Yönetim > Kullanıcılar'da askıdaki hesap işaretli, "Askıyı kaldır" var.
+- Satıcı: moderatörün kaldırdığı ilan İlanlarım > Kaldırıldı'da gerekçesiyle görünür (kendi kaldırdıkları gizli kalır).
+- Site: yayındaki ilanda "İlanı bildir (uygulamada)" bağlantısı.
+- KVKK dışa aktarımına kişinin gönderdiği bildirimler ve askı kaydı eklendi.
+- Veritabanı: `0009_reports_suspension` (ListingReport tablosu, User.suspendedAt/suspendReason, Listing.removedReason).
+
+Kalan: B9–B14, C17–C19, C21, D ve E maddeleri. Sitede bildirme şimdilik uygulamaya yönlendiriyor; siteden doğrudan bildirme için site girişi gerekir.
 
 ## Önerilen sıra
 

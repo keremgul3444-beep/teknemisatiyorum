@@ -20,6 +20,7 @@ export default function Ilanlarim() {
       <Segmented value={tab} onChange={setTab} options={[
         { key: 'yayinda', label: t('mine.live') }, { key: 'onay-bekliyor', label: t('mine.pending') },
         ...(mine.some((l) => l.status === 'reddedildi') ? [{ key: 'reddedildi' as const, label: t('mine.rejected') }] : []),
+        ...(mine.some((l) => l.status === 'kaldirildi') ? [{ key: 'kaldirildi' as const, label: t('mine.removed') }] : []),
         { key: 'satildi', label: t('mine.sold') },
       ]} />
       {list.length === 0 ? <EmptyState icon="anchor" title={t('mine.empty')} actionLabel={t('mine.post')} onAction={() => router.push('/ilan-ver')} />
@@ -27,6 +28,7 @@ export default function Ilanlarim() {
           <View key={l.id} style={{ gap: space(2) }}>
             <ListingCard listing={l} />
             {l.status === 'reddedildi' ? <T variant="caption" color={colors.danger}>{t(`mine.rejectReasons.${l.rejectReason ?? 'rules'}`)}</T> : null}
+            {l.status === 'kaldirildi' && l.removedReason ? <T variant="caption" color={colors.danger}>{t(`mine.removedReasons.${l.removedReason}`)}</T> : null}
             {l.stats ? <StatsRow stats={l.stats} /> : null}
             {l.status === 'yayinda' && isApiMode() ? <PromoRow listing={l} /> : null}
           </View>

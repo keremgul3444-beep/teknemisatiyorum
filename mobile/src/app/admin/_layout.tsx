@@ -7,7 +7,7 @@ import { colors, fonts, radius, space } from '@/theme';
 import { Header, T, showDemoToast } from '@/components';
 import { useSession } from '@/session/role';
 
-export const ADMIN_PAGES = ['index', 'ilanlar', 'belgeler', 'broker', 'ekspertiz', 'siparisler', 'fiyatlar', 'kullanicilar', 'odemeler', 'kayitlar'] as const;
+export const ADMIN_PAGES = ['index', 'ilanlar', 'sikayetler', 'belgeler', 'broker', 'ekspertiz', 'siparisler', 'fiyatlar', 'kullanicilar', 'odemeler', 'kayitlar'] as const;
 
 export default function AdminLayout() {
   const { t } = useTranslation();

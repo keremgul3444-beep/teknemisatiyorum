@@ -6,6 +6,7 @@ export function notifTarget(key: string, params: Record<string, string> | null):
     case 'notif.priceDrop': return p.listingId ? `/ilan/${p.listingId}` : null;
     case 'notif.listingApproved': return p.listingId ? `/ilan/${p.listingId}` : null;
     case 'notif.listingRejected': return '/profil/ilanlarim';
+    case 'notif.listingRemoved': return '/profil/ilanlarim';
     case 'notif.reportReady': return '/ekspertiz';
     case 'notif.brokerAdvanced': return '/broker';
     default: return null;

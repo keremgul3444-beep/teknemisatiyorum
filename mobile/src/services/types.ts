@@ -1,4 +1,4 @@
-import type { BadgeKind, BoatType, Currency, Equipment, Flag, ListingStatus, UstaCategory } from '@tms/shared';
+import type { BadgeKind, BoatType, Currency, Equipment, Flag, ListingStatus, ReportReason, TakedownReason, UstaCategory } from '@tms/shared';
 export type { BadgeKind, BoatType, Currency, Equipment, ListingStatus, UstaCategory } from '@tms/shared';
 export { USTA_CATEGORIES } from '@tms/shared';
 
@@ -11,6 +11,8 @@ export interface Listing {
   engineHours?: number | null; flag?: Flag | null; tradeIn?: boolean; negotiable?: boolean;
   /** Gerçek modda: sunucudaki fotoğraflar, ham durum (draft/pending/rejected…), ilan sahibi mi, bağlı tekne ve karne özeti. */
   photoUrls?: string[]; rawStatus?: string; isMine?: boolean; boatId?: string | null; logbookLatest?: LogEntry[]; rejectReason?: string | null;
+  /** Moderatör kaldırdıysa gerekçe (yalnızca ilan sahibine gelir). */
+  removedReason?: TakedownReason | null;
   /** Öne çıkarma: vitrin/acil etkin mi; bitiş tarihleri yalnızca ilan sahibine gelir. */
   promo?: Promo;
   /** Son 30 günde indirim yapıldıysa önceki fiyat ve indirim anı. */
@@ -71,6 +73,16 @@ export interface AdminItem {
   listing?: AdminListingInfo;
 }
 export type RejectReason = 'blurry' | 'mismatch' | 'rules';
+export type { ReportReason, TakedownReason };
+/** Moderatörün bildirim kuyruğu: ilana göre gruplanmış açık bildirimler. */
+export interface ReportGroup {
+  listing: {
+    id: string; title: string; year: number; price: number; currency: Currency; status: string; description: string;
+    owner: { id: string; name: string | null; verifyLevel: number; suspended: boolean };
+  };
+  count: number;
+  reports: { id: string; reason: ReportReason; note: string; createdAt: string; reporterName: string | null }[];
+}
 export interface AdminListingInfo {
   year: number; price: number; currency: Currency; lengthM: number; type: BoatType; location: string; cabins: number;
   engine: string; engineHours: number | null; flag: Flag | null; tradeIn: boolean; negotiable: boolean; equipment: Equipment[];

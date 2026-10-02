@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Headers, HttpCode, Ip, Param, Patch, Post, Put, Query } from '@nestjs/common';
 import { z } from 'zod';
-import { BOAT_TYPES, CURRENCIES, EQUIPMENT, FLAGS, MAX_ENGINE_HOURS, normalizeLocation, parsedQuerySchema } from '@tms/shared';
+import { BOAT_TYPES, CURRENCIES, EQUIPMENT, FLAGS, MAX_ENGINE_HOURS, MAX_REPORTS_PER_DAY, REPORT_REASONS, normalizeLocation, parsedQuerySchema } from '@tms/shared';
 import { Auth, CurrentUser, OptionalUser, Public, type AuthUser } from '../../common/decorators';
 import { ZodPipe } from '../../common/zod.pipe';
 import { PrismaService } from '../../common/prisma.service';
@@ -47,6 +47,7 @@ const IDENTITY_FIELDS = ['brand', 'model', 'year', 'lengthM', 'boatId'] as const
 const BOAT_BOUND_BADGES = ['sahiplik', 'belge', 'ekspertizli'];
 /** Bu başlıkla gelen okuma görüntülenme sayılmaz (sitenin ara katmanı ve sayfa önbelleği). */
 export const NO_COUNT_HEADER = 'x-tms-no-count';
+const reportSchema = z.object({ reason: z.enum(REPORT_REASONS), note: z.string().trim().max(500).default('') });
 const photosSchema = z.object({ fileIds: z.array(z.string().min(1)).min(1).transform((a) => [...new Set(a)]) });
 const mineQuery = z.object({ status: z.enum(['draft', 'pending', 'published', 'rejected', 'sold', 'removed']).optional() });
 const searchQuery = z.object({
@@ -107,6 +108,28 @@ export class ListingsController {
     return this.listings.view(l, u?.id);
   }
 
+  /**
+   * Alıcı yayındaki bir ilanı bildirir (dolandırıcılık şüphesi, yanlış bilgi, satılmış, uygunsuz içerik).
+   * Kişi başına ilan başına bir bildirim; günde en fazla MAX_REPORTS_PER_DAY. İlan kendiliğinden kalkmaz:
+   * rakiplerin birkaç hesapla ilan düşürmesini önlemek için kararı moderatör verir.
+   */
+  @Auth({ level: 1 })
+  @Post('listings/:id/report')
+  async report(@CurrentUser() u: AuthUser, @Param('id') id: string, @Body(new ZodPipe(reportSchema)) b: z.infer<typeof reportSchema>) {
+    const l = await this.listings.getVisible(id, u.id);
+    if (l.ownerId === u.id) throw Errors.conflict('OWN_LISTING');
+    if (l.status !== 'published') throw Errors.conflict('LISTING_CLOSED');
+    const since = new Date(Date.now() - 864e5);
+    if (await this.prisma.listingReport.count({ where: { reporterId: u.id, createdAt: { gt: since } } }) >= MAX_REPORTS_PER_DAY) {
+      throw Errors.tooMany('REPORT_LIMIT');
+    }
+    const existing = await this.prisma.listingReport.findUnique({ where: { listingId_reporterId: { listingId: id, reporterId: u.id } } });
+    if (existing) throw Errors.conflict('ALREADY_REPORTED');
+    const r = await this.prisma.listingReport.create({ data: { listingId: id, reporterId: u.id, reason: b.reason, note: b.note } });
+    await this.audit.log(u.id, 'audit.listingReported', { title: `${l.brand} ${l.model}`, reason: b.reason }, 'listing', id);
+    return { id: r.id, status: r.status };
+  }
+
   /** Sitedeki ilan sayfası tarayıcıda açılınca bir kez çağrılır (botlar ve ön yüklemeler sayılmaz). Yanıt her zaman 204. */
   @Public()
   @Post('listings/:id/view')
@@ -119,8 +142,9 @@ export class ListingsController {
   @Auth()
   @Get('me/listings')
   async mine(@CurrentUser() u: AuthUser, @Query(new ZodPipe(mineQuery)) q: z.infer<typeof mineQuery>) {
+    // Sahibinin kendi kaldırdığı ilanlar gizlenir; moderatörün kaldırdıkları gerekçesiyle görünür.
     const rows = await this.prisma.listing.findMany({
-      where: { ownerId: u.id, status: q.status ?? { not: 'removed' } },
+      where: { ownerId: u.id, ...(q.status ? { status: q.status } : { OR: [{ status: { not: 'removed' } }, { removedReason: { not: null } }] }) },
       include: listingInclude, orderBy: { updatedAt: 'desc' }, take: 200,
     });
     const stats = await this.listings.statsFor(rows);

@@ -7,7 +7,7 @@ import { formatPrice, idFromSlug, listingSlug, mediaUrl } from '@/lib/format';
 import { apiListingsPath, citySlug, landingQuery } from '@/lib/queries';
 import { breadcrumbJsonLd, listingJsonLd, listingMetadata, siteUrl } from '@/lib/seo';
 import type { ListingView, SearchResult } from '@/lib/types';
-import { AppLink, Breadcrumbs, JsonLd, ListingGrid, Section } from '@/components/bits';
+import { AppLink, Breadcrumbs, JsonLd, ListingGrid, Section, appHref } from '@/components/bits';
 import { ViewBeacon } from '@/components/ViewBeacon';
 import { PromoBadges } from '@/components/PromoBadges';
 
@@ -100,6 +100,7 @@ export default async function IlanDetay({ params }: P) {
               <AppLink locale={locale} path={`ekspertiz?ilan=${encodeURIComponent(l.id)}`} secondary>{t(locale, 'listing.requestSurvey')}</AppLink>
             </div>
           )}
+          {l.status === 'published' ? <p className="small"><a href={appHref(`bildir/${encodeURIComponent(l.id)}`)}>{t(locale, 'listing.report')}</a></p> : null}
           <table className="card specs" style={{ padding: 0 }}>
             <tbody>
               <Spec k={t(locale, 'listing.type')} v={typeName} />

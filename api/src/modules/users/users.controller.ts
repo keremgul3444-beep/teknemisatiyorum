@@ -61,7 +61,7 @@ export class UsersController {
   async export(@CurrentUser() u: AuthUser) {
     const id = u.id;
     const p = this.prisma;
-    const [user, sessions, listings, boats, favorites, savedSearches, convs, expertiseBookings, brokerCases, notifications, verificationRequests, consentHistory] = await Promise.all([
+    const [user, sessions, listings, boats, favorites, savedSearches, convs, expertiseBookings, brokerCases, notifications, verificationRequests, consentHistory, reports] = await Promise.all([
       p.user.findUniqueOrThrow({ where: { id } }),
       p.session.findMany({ where: { userId: id }, select: { deviceName: true, createdAt: true, lastSeenAt: true, revokedAt: true } }),
       p.listing.findMany({ where: { ownerId: id } }),
@@ -77,11 +77,14 @@ export class UsersController {
       p.notification.findMany({ where: { userId: id } }),
       p.verificationRequest.findMany({ where: { userId: id }, select: { kind: true, status: true, rejectReason: true, createdAt: true, decidedAt: true, details: true } }),
       p.auditLog.findMany({ where: { actorId: id, action: 'audit.marketingConsent' }, select: { params: true, at: true }, orderBy: { at: 'asc' } }),
+      p.listingReport.findMany({ where: { reporterId: id }, select: { listingId: true, reason: true, note: true, status: true, createdAt: true } }),
     ]);
     await this.audit.log(id, 'audit.dataExported', {}, 'user', id);
     return {
       exportedAt: new Date(), profile: userView(user),
       sessions, listings, boats, favorites, savedSearches, expertiseBookings, brokerCases, notifications, verificationRequests, consentHistory,
+      // Kişinin gönderdiği ilan bildirimleri ve varsa hesabının askıya alınma kaydı.
+      reports, suspension: user.suspendedAt ? { at: user.suspendedAt, reason: user.suspendReason } : null,
       // Sohbetler: kişinin gönderdiği ve aldığı mesajlar (karşı tarafın numarası yok).
       conversations: convs.map(({ messages, ...c }) => ({ ...c, messages: messages.map(({ senderId, ...m }) => ({ ...m, mine: senderId === id })) })),
     };

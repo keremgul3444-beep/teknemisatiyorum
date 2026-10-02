@@ -70,3 +70,38 @@ test('demo: red, ilanı "reddedildi" yapar ve gerekçeyi yazar', () => {
   useStore.getState().setAdminStatus(item.id, 'reddedildi', 'mismatch');
   expect(useStore.getState().listings.find((l) => l.id === id)).toMatchObject({ status: 'reddedildi', rejectReason: 'mismatch' });
 });
+
+describe('bildirim ve yaptırım', () => {
+  // Önceki testlerdeki sunucu modu yenilemesi ilan listesini boşaltır; demo verisi baştan kurulur.
+  beforeEach(() => useStore.getState().resetDemo());
+  test('kaldırılan ilan "kaldırıldı" olur ve gerekçesi sahibine taşınır', () => {
+    expect(toListing(apiListing({ status: 'removed', removedReason: 'scam', isMine: true }))).toMatchObject({ status: 'kaldirildi', removedReason: 'scam' });
+  });
+
+  test('alıcının bildirimi gerekçe ve notla sunucuya gider', async () => {
+    useMode.setState({ mode: 'api' });
+    const post = jest.spyOn(api, 'post').mockResolvedValue({ id: 'r1' } as never);
+    await expect(actions.reportListing('l9', 'scam', 'IBAN istedi')).resolves.toBe('r1');
+    expect(post).toHaveBeenCalledWith('/listings/l9/report', { reason: 'scam', note: 'IBAN istedi' });
+    jest.restoreAllMocks();
+    useMode.setState({ mode: 'demo' });
+  });
+
+  test('demo: bildirim kuyruğa düşer, kaldırma ilanı kapatır ve bildirimi kapatır', async () => {
+    const id = useStore.getState().listings.find((l) => l.status === 'yayinda')!.id;
+    actions.reportListing(id, 'scam', '');
+    const groups = await actions.adminReports();
+    expect(groups.find((g) => g.listing.id === id)?.count).toBe(1);
+    await actions.takedownListing(id, 'scam');
+    expect(useStore.getState().listings.find((l) => l.id === id)).toMatchObject({ status: 'kaldirildi', removedReason: 'scam' });
+    expect((await actions.adminReports()).some((g) => g.listing.id === id)).toBe(false);
+  });
+
+  test('demo: satıcıyı askıya almak yayındaki ilanlarını kaldırır', async () => {
+    const l = useStore.getState().listings.find((x) => x.status === 'yayinda' && x.sellerId !== 'me')!;
+    await actions.suspendUser(l.sellerId, 'test');
+    const after = useStore.getState().listings.filter((x) => x.sellerId === l.sellerId);
+    expect(after.every((x) => x.status !== 'yayinda')).toBe(true);
+    expect(after.find((x) => x.id === l.id)?.removedReason).toBe('account_suspended');
+  });
+});
