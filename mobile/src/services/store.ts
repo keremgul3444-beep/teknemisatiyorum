@@ -41,6 +41,8 @@ export interface Actions {
   markRead(convId: string): void;
   startConversation(subject: { kind: SubjectKind; id: string; title: string }, withName: string): string;
   setAdminStatus(id: string, status: AdminStatus, reason?: RejectReason): void;
+  updateListing(id: string, changes: Partial<ListingDraft>): void;
+  withdrawListing(id: string): void;
   reportListing(listingId: string, reason: ReportReason, note: string): string;
   reportGroups(): ReportGroup[];
   takedownListing(listingId: string, reason: TakedownReason): void;
@@ -204,6 +206,20 @@ export const useStore = create<Data & Actions>((set, get) => {
       return id;
     },
 
+    updateListing(id, changes) {
+      const l = get().listings.find((x) => x.id === id);
+      if (!l) return;
+      // Sunucudaki kural: yalnızca fiyat değişirse durum aynı kalır; diğer değişiklikler onaya düşer.
+      const priceOnly = Object.keys(changes).every((k) => k === 'price');
+      const status = priceOnly && l.status !== 'reddedildi' ? l.status : 'onay-bekliyor';
+      set({ listings: get().listings.map((x) => (x.id === id ? { ...x, ...changes, status, rejectReason: status === 'onay-bekliyor' ? null : x.rejectReason } : x)) });
+      if (status === 'onay-bekliyor' && l.status !== 'onay-bekliyor') {
+        set({ adminItems: [{ id: nextId('a'), kind: 'ilan', title: `${l.brand} ${l.model}`, who: DEMO_USER.name, status: 'bekliyor', refId: id }, ...get().adminItems] });
+      }
+    },
+    withdrawListing(id) {
+      set({ listings: get().listings.filter((x) => x.id !== id) });
+    },
     reportListing(listingId, reason, note) {
       const id = nextId('r');
       set({ reports: [...get().reports, { id, listingId, reason, note, createdAt: `${today()} ${nowHM()}`, status: 'open' }] });

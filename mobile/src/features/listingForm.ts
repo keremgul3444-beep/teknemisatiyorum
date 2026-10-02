@@ -1,11 +1,14 @@
 import { MAX_ENGINE_HOURS, MAX_LISTING_PHOTOS, type BoatType, type Currency, type Equipment, type Flag } from '@tms/shared';
-import type { ListingDraft } from '@/services/types';
+import type { Listing, ListingDraft } from '@/services/types';
 
 export { MAX_LISTING_PHOTOS };
 export const WIZARD_STEPS = ['photos', 'basics', 'equipment', 'price', 'docs'] as const;
 
-/** Sihirbazdaki fotoğraf: gerçek modda cihazdaki dosya adresi, demo modunda yalnızca örnek görsel tohumu. */
-export interface PhotoItem { id: string; uri?: string; seed: number }
+/**
+ * Sihirbazdaki fotoğraf: gerçek modda cihazdaki dosya adresi, demo modunda yalnızca örnek görsel tohumu.
+ * Düzenlemede ilandaki fotoğraflar sunucudaki dosya kimliğiyle (fileId) gelir; yeniden yüklenmez.
+ */
+export interface PhotoItem { id: string; uri?: string; seed: number; fileId?: string }
 
 export interface WizardFields {
   brand: string; model: string; year: string; length: string; cabins: string; engine: string; engineHours: string;
@@ -18,6 +21,8 @@ export interface WizardState {
   type?: BoatType; equipment: Equipment[]; currency: Currency; location?: string; flag?: Flag;
   tradeIn: boolean; negotiable: boolean; broker: boolean;
   doc: boolean; docUri: string | null; engineDoc: boolean; engineDocUri: string | null; engineSerial: string;
+  /** Sunucuda açılmış yarım taslağın kimliği: uygulama kapanıp açılırsa ikinci ilan açılmaz. */
+  serverId?: string;
 }
 
 export const emptyWizard = (): WizardState => ({
@@ -90,6 +95,39 @@ export function validateStep(step: number, s: WizardState, now = new Date()): St
 export function firstInvalidStep(s: WizardState, now = new Date()): number {
   return WIZARD_STEPS.findIndex((_, i) => Object.keys(validateStep(i, s, now)).length > 0);
 }
+
+/** Düzenleme: yayındaki/bekleyen/reddedilen ilan sihirbaz durumuna çevrilir (fotoğraflar sunucudaki sırasıyla). */
+export function fromListing(l: Listing, lang = 'tr'): WizardState {
+  const dec = (n: number) => (lang === 'tr' ? String(n).replace('.', ',') : String(n));
+  return {
+    ...emptyWizard(),
+    // Demo ilanlarının gerçek fotoğrafı yoktur (örnek görsel tohumu): kapak tek fotoğraf olarak gelir ve değişmemiş sayılır.
+    photos: l.photoUrls?.length
+      ? l.photoUrls.map((uri, i) => ({ id: `e${i}`, uri, seed: l.photoSeed + i, fileId: l.photoIds?.[i] }))
+      : [{ id: 'e0', seed: l.photoSeed, fileId: `demo:${l.photoSeed}` }],
+    f: {
+      brand: l.brand, model: l.model, year: String(l.year), length: dec(l.lengthM), cabins: l.cabins ? String(l.cabins) : '',
+      engine: l.engine === '—' ? '' : l.engine, engineHours: l.engineHours != null ? String(l.engineHours) : '',
+      description: l.description === '—' ? '' : l.description, price: String(Math.round(l.price)),
+    },
+    type: l.type, equipment: [...l.equipment], currency: l.currency, location: l.location, flag: l.flag ?? undefined,
+    tradeIn: !!l.tradeIn, negotiable: !!l.negotiable,
+  };
+}
+
+/** Yalnızca değişen alanlar: sunucu yalnızca fiyat değişikliğini yeniden onaya göndermez, bu yüzden fark gönderilir. */
+export function draftChanges(before: ListingDraft, after: ListingDraft): Partial<ListingDraft> {
+  const out: Partial<ListingDraft> = {};
+  for (const k of Object.keys(after) as (keyof ListingDraft)[]) {
+    const a = before[k];
+    const b = after[k];
+    const same = Array.isArray(a) && Array.isArray(b) ? a.length === b.length && a.every((x, i) => x === b[i]) : (a ?? null) === (b ?? null);
+    if (!same) (out as Record<string, unknown>)[k] = b;
+  }
+  return out;
+}
+export const photosChanged = (before: PhotoItem[], after: PhotoItem[]) =>
+  before.length !== after.length || after.some((p, i) => !p.fileId || p.fileId !== before[i].fileId);
 
 export function toDraft(s: WizardState): ListingDraft {
   return {

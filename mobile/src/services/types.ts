@@ -10,7 +10,7 @@ export interface Listing {
   /** Motor saati ve bayrak (null = belirtilmedi); takasa açık, pazarlık payı var. Eski kayıtlarda alan olmayabilir. */
   engineHours?: number | null; flag?: Flag | null; tradeIn?: boolean; negotiable?: boolean;
   /** Gerçek modda: sunucudaki fotoğraflar, ham durum (draft/pending/rejected…), ilan sahibi mi, bağlı tekne ve karne özeti. */
-  photoUrls?: string[]; rawStatus?: string; isMine?: boolean; boatId?: string | null; logbookLatest?: LogEntry[]; rejectReason?: string | null;
+  photoUrls?: string[]; photoIds?: string[]; rawStatus?: string; isMine?: boolean; boatId?: string | null; logbookLatest?: LogEntry[]; rejectReason?: string | null;
   /** Moderatör kaldırdıysa gerekçe (yalnızca ilan sahibine gelir). */
   removedReason?: TakedownReason | null;
   /** Öne çıkarma: vitrin/acil etkin mi; bitiş tarihleri yalnızca ilan sahibine gelir. */

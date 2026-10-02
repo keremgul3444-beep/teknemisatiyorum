@@ -6,10 +6,13 @@ export interface PublishExtra {
   ownershipUri?: string; engineDocUri?: string; engineSerialLast4?: string;
   /** Fotoğraf yükleme ilerlemesi (20 fotoğrafa kadar sürebilir): yüklenen / toplam. */
   onProgress?: (done: number, total: number) => void;
+  /** Sunucuda taslak açılınca kimliği bildirilir; uygulama kapanıp açılırsa aynı taslaktan sürdürülür (ikinci ilan açılmaz). */
+  onDraftCreated?: (listingId: string) => void;
 }
 interface Deps {
   post: (path: string, body?: unknown) => Promise<unknown>;
   patch: (path: string, body?: unknown) => Promise<unknown>;
+  put: (path: string, body?: unknown) => Promise<unknown>;
   upload: (uri: string, visibility: 'public' | 'private') => Promise<string>;
 }
 
@@ -36,7 +39,10 @@ export function createPublisher(deps: Deps) {
         id = undefined;
       }
     }
-    if (!id) id = st.listingId = await create(d);
+    if (!id) {
+      id = st.listingId = await create(d);
+      extra.onDraftCreated?.(id);
+    }
 
     const uris = extra.photoUris ?? [];
     let done = uris.filter((u) => st.files.has(u)).length;
@@ -46,10 +52,19 @@ export function createPublisher(deps: Deps) {
       st.files.set(uri, await deps.upload(uri, 'public'));
       extra.onProgress?.(++done, uris.length);
     }
-    const fileIds = (extra.photoUris ?? []).map((u) => st.files.get(u)!);
-    if (fileIds.length) await deps.post(`/listings/${id}/photos`, { fileIds });
+    // Tam liste ve sıra gönderilir: yeniden denemede sonradan silinen fotoğraf ilanda kalmaz, kapak değişikliği işler.
+    const fileIds = uris.map((u) => st.files.get(u)!);
+    if (fileIds.length) await deps.put(`/listings/${id}/photos`, { fileIds });
 
-    if (!st.submitted) { await deps.post(`/listings/${id}/submit`); st.submitted = true; }
+    if (!st.submitted) {
+      try {
+        await deps.post(`/listings/${id}/submit`);
+      } catch (e) {
+        // Sürdürülen taslak daha önce onaya gönderilmişse (409) yeniden göndermeye gerek yok.
+        if ((e as { status?: number }).status !== 409) throw e;
+      }
+      st.submitted = true;
+    }
     if (extra.ownershipUri && !st.ownership) {
       const fileIds = [await deps.upload(extra.ownershipUri, 'private')];
       if (extra.engineDocUri) fileIds.push(await deps.upload(extra.engineDocUri, 'private'));
@@ -66,5 +81,7 @@ export function createPublisher(deps: Deps) {
   }
   /** Çıkış/giriş yapılınca yarım kalan gönderim unutulur (başka hesap aynı taslağa dokunmasın). */
   publish.reset = () => { st = { files: new Map() }; };
+  /** Uygulama yeniden açıldıysa sunucudaki yarım taslaktan devam edilir (taslak kimliği yerel kayıttan gelir). */
+  publish.resume = (listingId: string) => { if (!st.listingId) st = { files: new Map(), listingId }; };
   return publish;
 }

@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { ScrollView, View, StyleProp, ViewStyle } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, View, StyleProp, ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, space } from '@/theme';
 
@@ -9,6 +9,8 @@ export function Screen({ children, scroll = true, padded = true, footer, style }
   const inner = { padding: padded ? space(5) : 0, paddingBottom: space(10), gap: space(4) };
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
+      {/* iOS'ta klavye alttaki alanları ve alt düğmeleri örtmesin (Android pencereyi kendisi küçültür). */}
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       {scroll ? (
         <ScrollView contentContainerStyle={[inner, style]} keyboardShouldPersistTaps="handled">{children}</ScrollView>
       ) : (
@@ -17,6 +19,7 @@ export function Screen({ children, scroll = true, padded = true, footer, style }
       {footer ? (
         <View style={{ padding: space(4), gap: space(2), borderTopWidth: 1, borderColor: colors.line, backgroundColor: colors.card }}>{footer}</View>
       ) : null}
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

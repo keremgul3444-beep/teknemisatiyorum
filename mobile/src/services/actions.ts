@@ -32,7 +32,7 @@ async function upload(uri: string, visibility: 'public' | 'private'): Promise<st
 }
 
 /** İlan gönderimi yarıda kalırsa yeniden denemede kaldığı yerden sürer (yeni taslak açılmaz). */
-const publishListing = createPublisher({ post: (p, b) => api.post(p, b), patch: (p, b) => api.patch(p, b), upload });
+const publishListing = createPublisher({ post: (p, b) => api.post(p, b), patch: (p, b) => api.patch(p, b), put: (p, b) => api.put(p, b), upload });
 // Hesap değişince (çıkış, başka kullanıcıyla giriş) yarım kalan ilan gönderimi unutulur.
 useSession.subscribe((s, prev) => { if (s.userId !== prev.userId || s.loggedIn !== prev.loggedIn) publishListing.reset(); });
 
@@ -119,6 +119,42 @@ export const actions = {
     const id = await publishListing(d, extra);
     await syncMine();
     return id;
+  },
+  /** Uygulama yeniden açıldıysa yarım kalan yayın sunucudaki taslaktan sürdürülür. */
+  resumePublish(listingId: string) {
+    if (isApiMode()) publishListing.resume(listingId);
+  },
+  /**
+   * İlanı düzenler. Yalnızca değişen alanlar gönderilir (yalnızca fiyat değişirse ilan onaya düşmez);
+   * fotoğraflar değiştiyse yeniler yüklenir ve tam liste sırasıyla gönderilir. Reddedilmiş ilan yeniden onaya gönderilir.
+   */
+  async updateListing(id: string, changes: Partial<ListingDraft>, photos?: { uri?: string; fileId?: string }[], opts: { onProgress?: (done: number, total: number) => void } = {}) {
+    if (!isApiMode()) return g().updateListing(id, changes);
+    const before = g().listings.find((l) => l.id === id);
+    if (Object.keys(changes).length) await api.patch(`/listings/${id}`, changes);
+    if (photos) {
+      const local = photos.filter((p) => !p.fileId && p.uri).length;
+      let done = 0;
+      if (local) opts.onProgress?.(0, local);
+      const fileIds: string[] = [];
+      for (const p of photos) {
+        if (p.fileId) { fileIds.push(p.fileId); continue; }
+        if (!p.uri) continue;
+        fileIds.push(await upload(p.uri, 'public'));
+        opts.onProgress?.(++done, local);
+      }
+      await api.put(`/listings/${id}/photos`, { fileIds });
+    }
+    // Yalnızca fiyatı değişen reddedilmiş ilan reddedilmiş kalır; satıcı düzelttiği için yeniden onaya gönderilir.
+    if (before?.rawStatus === 'rejected') await api.post(`/listings/${id}/submit`).catch((e: { status?: number }) => { if (e.status !== 409) throw e; });
+    await syncMine();
+  },
+  /** Satıcı ilanını yayından kaldırır (geri alınamaz; İlanlarım'da görünmez). */
+  async withdrawListing(id: string) {
+    if (!isApiMode()) return g().withdrawListing(id);
+    await api.del(`/listings/${id}`);
+    useStore.setState({ listings: g().listings.filter((l) => l.id !== id) });
+    await syncMine();
   },
   /** Devir asistanının sonunda: ilan satıldı (yayından kalkar, İlanlarım > Satıldı'da durur). */
   async markSold(id: string) {

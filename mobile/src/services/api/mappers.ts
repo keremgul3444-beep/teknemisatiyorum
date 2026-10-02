@@ -49,7 +49,7 @@ export function toListing(l: ApiListing): Listing {
     type: l.type as BoatType, location: l.location, equipment: l.equipment as Equipment[], badges: l.badges as BadgeKind[],
     sellerId: l.seller.id, logbookCount: l.logbook?.count ?? 0, description: l.description,
     status: STATUS[l.status] ?? 'onay-bekliyor', rawStatus: l.status, photoSeed: seedOf(l.id), cabins: l.cabins, engine: l.engine,
-    photoUrls: l.photos.map((p) => absolute(p.url)), isMine: l.isMine, boatId: l.logbook?.boatId ?? null,
+    photoUrls: l.photos.map((p) => absolute(p.url)), photoIds: l.photos.map((p) => p.id), isMine: l.isMine, boatId: l.logbook?.boatId ?? null,
     logbookLatest: l.logbook?.latest.map(toEntry) ?? [], rejectReason: l.rejectReason ?? null,
     removedReason: (l.removedReason as Listing['removedReason']) ?? null,
     promo: l.promo ?? { featured: false, urgent: false },

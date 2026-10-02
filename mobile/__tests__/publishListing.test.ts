@@ -16,6 +16,7 @@ function fakeApi(failSubmitTimes = 0) {
         return {};
       }),
       patch: jest.fn(async (path: string) => { calls.push(`PATCH ${path}`); return {}; }),
+      put: jest.fn(async (path: string, body?: unknown) => { calls.push(`PUT ${path} ${JSON.stringify(body)}`); return {}; }),
       upload: jest.fn(async (uri: string) => `F-${uri}`),
     },
   };
@@ -74,4 +75,28 @@ test('fotoğraf yükleme ilerlemesi bildirilir; yeniden denemede yüklenenler sa
   seen.length = 0;
   await publish(draft, { photoUris: ['a', 'b', 'c'], onProgress });
   expect(seen).toEqual(['3/3']);
+});
+
+test('fotoğraflar tam liste ve sırayla gider; yeniden denemede çıkarılan fotoğraf gönderilmez', async () => {
+  const f = fakeApi(1);
+  const publish = createPublisher(f.deps);
+  await expect(publish(draft, { photoUris: ['a', 'b', 'c'] })).rejects.toThrow('LEVEL_REQUIRED');
+  await publish(draft, { photoUris: ['c', 'a'] });
+  expect(f.calls.filter((c) => c.startsWith('PUT'))).toEqual([
+    'PUT /listings/L1/photos {"fileIds":["F-a","F-b","F-c"]}',
+    'PUT /listings/L1/photos {"fileIds":["F-c","F-a"]}',
+  ]);
+  expect(f.deps.upload).toHaveBeenCalledTimes(3);
+});
+
+test('uygulama yeniden açılınca sunucudaki yarım taslaktan sürdürülür; yeni taslak bildirilir', async () => {
+  const f = fakeApi();
+  const publish = createPublisher(f.deps);
+  publish.resume('L77');
+  await expect(publish(draft, { photoUris: ['a'] })).resolves.toBe('L77');
+  expect(f.calls).toContain('PATCH /listings/L77');
+  expect(f.calls).not.toContain('POST /listings');
+  const created: string[] = [];
+  await publish(draft, { onDraftCreated: (id) => created.push(id) });
+  expect(created).toEqual(['L1']);
 });

@@ -110,7 +110,7 @@
     "tradeIn": "Open to trade-in",
     "negotiable": "Price negotiable",
     "rejectedTitle": "Your listing was not published",
-    "rejectedBody": "Fix the issue and post the listing again.",
+    "rejectedBody": "Fix the issue and send the listing for review again.",
     "soldNote": "This boat has been sold",
     "removedTitle": "Your listing was taken down",
     "removedBody": "To appeal, write to iletisim@teknemisatiyorum.com."
@@ -467,7 +467,15 @@
     },
     "uploading": "Uploading photos: {{done}}/{{total}}",
     "draftPhotosMissing": "{{count}} photo(s) are no longer on this phone; please add them again.",
-    "discardConfirm": "Your photos and entries will be deleted. Are you sure?"
+    "discardConfirm": "Your photos and entries will be deleted. Are you sure?",
+    "editTitle": "Edit listing",
+    "save": "Save",
+    "editDonePrice": "Price updated",
+    "editDoneReview": "Changes sent for review",
+    "editNothing": "No changes",
+    "editReviewNote": "Changes other than the price go to review. Until approved (usually within 2 hours) the listing is not visible.",
+    "verifyBanner": "You need to verify your ID to publish. Do it now so you are not held up at the end.",
+    "verifyBannerCta": "Verify ID"
   },
   "boatAdd": {
     "title": "Add a boat",
@@ -765,7 +773,14 @@
       "offensive": "Reason: inappropriate content.",
       "rules": "Reason: breaks listing rules.",
       "account_suspended": "Reason: account suspended."
-    }
+    },
+    "edit": "Edit",
+    "fix": "Fix and resubmit",
+    "price": "Price",
+    "priceSave": "Save price",
+    "priceHint": "If only the price changes the listing stays live; people who saved it hear about a drop.",
+    "withdraw": "Withdraw",
+    "withdrawConfirm": "{{title}} will be withdrawn and removed from My listings. This cannot be undone. Are you sure?"
   },
   "settings": {
     "title": "Settings",

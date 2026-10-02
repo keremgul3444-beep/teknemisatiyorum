@@ -201,6 +201,32 @@ export class ListingsController {
     return this.listings.view(await this.listings.getOwn(id, u.id), u.id);
   }
 
+  /**
+   * Fotoğrafların tam listesi ve sırası (ilk fotoğraf kapak). Listede olmayanlar ilandan çıkar, yeniler eklenir.
+   * Yarım kalan gönderimin tekrarı ve düzenleme için: aynı liste ikinci kez gönderilirse hiçbir şey değişmez.
+   * Yayındaki ya da reddedilmiş ilanın fotoğrafları değişirse ilan yeniden onaya düşer.
+   */
+  @Auth({ level: 1 })
+  @Put('listings/:id/photos')
+  async setPhotos(@CurrentUser() u: AuthUser, @Param('id') id: string, @Body(new ZodPipe(photosSchema)) b: z.infer<typeof photosSchema>) {
+    const l = await this.listings.getOwn(id, u.id);
+    if (['sold', 'removed'].includes(l.status)) throw Errors.conflict('LISTING_CLOSED');
+    if (b.fileIds.length > MAX_PHOTOS) throw Errors.bad('TOO_MANY_PHOTOS', { max: MAX_PHOTOS });
+    const current = [...l.photos].sort((a, c) => a.order - c.order).map((p) => p.fileId);
+    const fresh = b.fileIds.filter((f) => !current.includes(f));
+    // Yalnızca yeni eklenenlerin sahipliği denetlenir; ilandakiler zaten bu ilana aittir.
+    if (fresh.length) await this.media.assertOwnPublic(u.id, fresh);
+    const changed = current.length !== b.fileIds.length || current.some((f, i) => f !== b.fileIds[i]);
+    if (changed) {
+      await this.prisma.$transaction([
+        this.prisma.listingPhoto.deleteMany({ where: { listingId: id } }),
+        this.prisma.listingPhoto.createMany({ data: b.fileIds.map((fileId, order) => ({ listingId: id, fileId, order })) }),
+        ...(l.status === 'published' || l.status === 'rejected' ? [this.prisma.listing.update({ where: { id }, data: { status: 'pending' } })] : []),
+      ]);
+    }
+    return this.listings.view(await this.listings.getOwn(id, u.id), u.id);
+  }
+
   @Auth({ level: 2 })
   @Post('listings/:id/submit')
   @HttpCode(200)

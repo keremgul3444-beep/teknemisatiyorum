@@ -110,7 +110,7 @@
     "tradeIn": "Takasa açık",
     "negotiable": "Pazarlık payı var",
     "rejectedTitle": "İlanın yayına alınmadı",
-    "rejectedBody": "Sorunu düzeltip ilanı yeniden verebilirsin.",
+    "rejectedBody": "Sorunu düzeltip ilanı yeniden onaya gönderebilirsin.",
     "soldNote": "Bu tekne satıldı",
     "removedTitle": "İlanın yayından kaldırıldı",
     "removedBody": "İtiraz için iletisim@teknemisatiyorum.com adresine yaz."
@@ -467,7 +467,15 @@
     },
     "uploading": "Fotoğraflar yükleniyor: {{done}}/{{total}}",
     "draftPhotosMissing": "{{count}} fotoğraf bu telefonda artık bulunamadı, yeniden eklemen gerekiyor.",
-    "discardConfirm": "Fotoğraflar ve yazdıkların silinecek. Emin misin?"
+    "discardConfirm": "Fotoğraflar ve yazdıkların silinecek. Emin misin?",
+    "editTitle": "İlanı düzenle",
+    "save": "Kaydet",
+    "editDonePrice": "Fiyat güncellendi",
+    "editDoneReview": "Değişiklikler onaya gönderildi",
+    "editNothing": "Değişiklik yok",
+    "editReviewNote": "Fiyat dışındaki değişiklikler onaya gider. Onaylanana kadar (genelde 2 saat) ilan yayında görünmez.",
+    "verifyBanner": "İlanı yayınlamak için kimliğini doğrulaman gerekiyor. Şimdi doğrularsan sonda beklemezsin.",
+    "verifyBannerCta": "Kimliğini doğrula"
   },
   "boatAdd": {
     "title": "Tekne ekle",
@@ -765,7 +773,14 @@
       "offensive": "Kaldırma nedeni: uygunsuz içerik.",
       "rules": "Kaldırma nedeni: ilan kurallarına aykırı.",
       "account_suspended": "Kaldırma nedeni: hesap askıya alındı."
-    }
+    },
+    "edit": "Düzenle",
+    "fix": "Düzelt ve yeniden gönder",
+    "price": "Fiyat",
+    "priceSave": "Fiyatı kaydet",
+    "priceHint": "Yalnızca fiyat değişirse ilan yayında kalır; indirimde favorileyenlere haber verilir.",
+    "withdraw": "Yayından kaldır",
+    "withdrawConfirm": "{{title}} yayından kaldırılacak ve İlanlarım'dan silinecek. Geri alınamaz. Emin misin?"
   },
   "settings": {
     "title": "Ayarlar",

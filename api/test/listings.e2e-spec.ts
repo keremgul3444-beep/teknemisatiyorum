@@ -49,6 +49,30 @@ describe('taslak ve sahiplik', () => {
     expect((await t.http().post('/listings').set(a.auth).send({ ...draft, engineHours: 12.5 })).status).toBe(400);
   });
 
+  test('fotoğraf listesi tam liste ve sırayla ayarlanır; aynı liste değişiklik sayılmaz, değişirse yayındaki ilan onaya düşer', async () => {
+    const a = await loginAs(t, { level: 2 });
+    const l = await published(a.user.id);
+    const [p1, p2, p3] = [await photo(a.auth), await photo(a.auth), await photo(a.auth)];
+    const order = async () => (await t.prisma.listingPhoto.findMany({ where: { listingId: l.id }, orderBy: { order: 'asc' } })).map((p) => p.fileId);
+    await t.prisma.listingPhoto.createMany({ data: [p1, p2].map((fileId, order) => ({ listingId: l.id, fileId, order })) });
+    // Aynı liste: hiçbir şey değişmez, ilan yayında kalır.
+    await t.http().put(`/listings/${l.id}/photos`).set(a.auth).send({ fileIds: [p1, p2] }).expect(200);
+    expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } })).status).toBe('published');
+    // Sıra değişir, biri çıkar, yenisi eklenir.
+    const r = await t.http().put(`/listings/${l.id}/photos`).set(a.auth).send({ fileIds: [p3, p1] });
+    expect(r.status).toBe(200);
+    expect(await order()).toEqual([p3, p1]);
+    expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } })).status).toBe('pending');
+    // Başkasının dosyası eklenemez.
+    const b = await loginAs(t, { level: 2 });
+    expect((await t.http().put(`/listings/${l.id}/photos`).set(a.auth).send({ fileIds: [p3, await photo(b.auth)] })).status).toBe(404);
+    expect(await order()).toEqual([p3, p1]);
+    // Başkasının ilanına dokunulamaz; satılmış ilan kapalı.
+    expect((await t.http().put(`/listings/${l.id}/photos`).set(b.auth).send({ fileIds: [p3] })).status).toBe(404);
+    await t.prisma.listing.update({ where: { id: l.id }, data: { status: 'sold' } });
+    expect((await t.http().put(`/listings/${l.id}/photos`).set(a.auth).send({ fileIds: [p1] })).body.code).toBe('LISTING_CLOSED');
+  });
+
   test('satılmış ilana fotoğraf eklenemez (denetimsiz görsel yayına çıkmasın)', async () => {
     const a = await loginAs(t, { level: 2 });
     const l = await published(a.user.id);

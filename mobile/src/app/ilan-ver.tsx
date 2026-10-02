@@ -1,20 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { colors, fonts, radius, space } from '@/theme';
 import {
-  BoatImage, Button, CheckRow, Chip, Field, Header, Icon, ListingCard, Screen, Section, Stepper, SuccessView, T, UploadBox,
+  BoatImage, Button, CheckRow, Chip, Field, Header, Icon, ListingCard, NotFound, Screen, Section, Stepper, SuccessView, T, UploadBox,
 } from '@/components';
-import { actions, type BoatType, type Currency, type Equipment, type Listing } from '@/services';
+import { actions, useListing, type BoatType, type Currency, type Equipment, type Listing } from '@/services';
 import { FLAGS, LOCATIONS, MAX_ENGINE_HOURS } from '@tms/shared';
 import { requireLevel, useSession } from '@/session/role';
 import { isApiMode } from '@/services';
 import { attempt } from '@/services/errors';
 import { pickImage, pickImages } from '@/services/pickImage';
 import {
-  MAX_LISTING_PHOTOS, WIZARD_STEPS, addPhotos, digitsOnly, dropMissingFiles, emptyWizard, firstInvalidStep, groupThousands,
-  makeCover, movePhoto, removePhoto, toDraft, validateStep, type StepErrors, type WizardFields, type WizardState,
+  MAX_LISTING_PHOTOS, WIZARD_STEPS, addPhotos, digitsOnly, draftChanges, dropMissingFiles, emptyWizard, firstInvalidStep, fromListing,
+  groupThousands, makeCover, movePhoto, photosChanged, removePhoto, toDraft, validateStep, type StepErrors, type WizardFields, type WizardState,
 } from '@/features/listingForm';
 import { clearListingDraft, loadListingDraft, saveListingDraft } from '@/features/listingDraftStore';
 import { clearDraftFiles, draftFileExists, keepDraftFile } from '@/features/draftFiles';
@@ -30,11 +30,20 @@ export default function IlanVer() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const userId = useSession((x) => x.userId);
-  const [s, setS] = useState<WizardState>(emptyWizard);
+  const verifyLevel = useSession((x) => x.verifyLevel);
+  // Düzenleme modu: /ilan-ver?id=… mevcut ilanı açar; yerel taslak kullanılmaz, belge adımı yoktur.
+  const { id: editId } = useLocalSearchParams<{ id?: string }>();
+  const editing = useListing(editId);
+  const isEdit = !!editId;
+  const [s, setS] = useState<WizardState>(() => (editing ? fromListing(editing, i18n.language) : emptyWizard()));
+  // Düzenlemenin başladığı hâl: değişen alanlar buna göre bulunur.
+  const [origin] = useState(() => (editing ? fromListing(editing, i18n.language) : null));
+  const steps = isEdit ? WIZARD_STEPS.slice(0, 4) : WIZARD_STEPS;
+  const [doneKind, setDoneKind] = useState<'created' | 'price' | 'review' | 'none'>('created');
   // Taslağı yüklenmiş hesap; hesap değişince yükleme bitene kadar kayıt yapılmaz (boş form başka hesabın taslağını silmesin).
   const [loadedFor, setLoadedFor] = useState<string | null>(null);
   const draftKey = userId ?? 'demo';
-  const loaded = loadedFor === draftKey;
+  const loaded = isEdit || loadedFor === draftKey;
   const [restored, setRestored] = useState<null | { lostPhotos: number; noPhotos: boolean }>(null);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
@@ -52,6 +61,7 @@ export default function IlanVer() {
 
   // Yarım kalan ilan bu cihazdan geri yüklenir; sonra her değişiklik kısa bir gecikmeyle kaydedilir.
   useEffect(() => {
+    if (isEdit) return;
     let alive = true;
     loadListingDraft(userId).then((d) => {
       if (!alive) return;
@@ -70,12 +80,12 @@ export default function IlanVer() {
       setLoadedFor(userId ?? 'demo');
     });
     return () => { alive = false; };
-  }, [userId]);
+  }, [userId, isEdit]);
   useEffect(() => {
-    if (!loaded || done) return;
+    if (isEdit || !loaded || done) return;
     const h = setTimeout(() => { void saveListingDraft(userId, s); }, 400);
     return () => clearTimeout(h);
-  }, [s, loaded, done, userId]);
+  }, [s, loaded, done, userId, isEdit]);
 
   const update = (patch: Partial<WizardState>) => setS((cur) => ({ ...cur, ...patch }));
   const set = (k: keyof WizardFields) => (v: string) => setS((cur) => ({ ...cur, f: { ...cur.f, [k]: v } }));
@@ -86,6 +96,8 @@ export default function IlanVer() {
   const discardDraft = async () => {
     await clearListingDraft(userId);
     clearDraftFiles();
+    // Sunucuda yarım kalmış taslak varsa o da silinir (İlanlarım'da sahipsiz kalmasın).
+    if (s.serverId) await actions.withdrawListing(s.serverId).catch(() => undefined);
     setS(emptyWizard());
     setRestored(null);
     setConfirmDiscard(false);
@@ -107,6 +119,9 @@ export default function IlanVer() {
     setRestored(null);
   };
 
+  // Düzenlenecek ilan bu cihazda yoksa (ör. eski bağlantı) form açılmaz.
+  if (isEdit && !editing && !done) return <NotFound />;
+
   const draft = toDraft(s);
   const previewListing: Listing = {
     ...draft, id: 'preview', badges: s.doc ? ['sahiplik'] : [], sellerId: 'me', logbookCount: 0, status: 'onay-bekliyor',
@@ -114,16 +129,41 @@ export default function IlanVer() {
   };
 
   if (done) {
+    const title = { created: t('wizard.doneTitle'), price: t('wizard.editDonePrice'), review: t('wizard.editDoneReview'), none: t('wizard.editNothing') }[doneKind];
+    const body = doneKind === 'created' || doneKind === 'review' ? t('wizard.doneBody') : undefined;
     return (
       <Screen>
         <Header title="" />
-        <SuccessView title={t('wizard.doneTitle')} body={t('wizard.doneBody')} actions={[
+        <SuccessView title={title} body={body} actions={[
           { title: t('wizard.goMine'), onPress: () => router.replace('/profil/ilanlarim') },
           { title: t('wizard.goHome'), onPress: () => router.dismissTo('/kesfet'), variant: 'ghost' },
         ]} />
       </Screen>
     );
   }
+
+  // Düzenleme: yalnızca değişen alanlar; fiyat dışında değişiklik ya da fotoğraf değişikliği yayındaki ilanı onaya düşürür.
+  const changes = origin ? draftChanges(toDraft(origin), draft) : {};
+  const photosDirty = origin ? photosChanged(origin.photos, s.photos) : false;
+  const priceOnly = Object.keys(changes).length > 0 && Object.keys(changes).every((k) => k === 'price') && !photosDirty;
+  const editNeedsReview = isEdit && editing?.status === 'yayinda' && (photosDirty || (Object.keys(changes).length > 0 && !priceOnly));
+  const save = async () => {
+    if (!editId) return;
+    if (!Object.keys(changes).length && !photosDirty && editing?.status !== 'reddedildi') { setDoneKind('none'); setDone(true); return; }
+    setBusy(true);
+    const ok = await attempt(async () => {
+      await actions.updateListing(editId, changes, photosDirty ? s.photos.map((p) => ({ uri: p.uri, fileId: p.fileId })) : undefined,
+        { onProgress: (d, total) => setProgress({ done: d, total }) });
+      return true;
+    });
+    setBusy(false);
+    setProgress(null);
+    if (ok) {
+      clearDraftFiles();
+      setDoneKind(priceOnly && editing?.status === 'yayinda' ? 'price' : 'review');
+      setDone(true);
+    }
+  };
 
   if (preview) {
     return (
@@ -132,10 +172,14 @@ export default function IlanVer() {
         {progress ? <T variant="caption" color={colors.muted} style={{ textAlign: 'center' }} accessibilityLiveRegion="polite">{t('wizard.uploading', { done: progress.done, total: progress.total })}</T> : null}
         <View style={{ flexDirection: 'row', gap: space(3) }}>
           <View style={{ flex: 1 }}><Button variant="ghost" title={t('common.back')} disabled={busy} onPress={() => setPreview(false)} /></View>
-          <View style={{ flex: 2 }}><Button title={t('wizard.publish')} loading={busy} onPress={async () => {
+          <View style={{ flex: 2 }}><Button title={isEdit ? t('wizard.save') : t('wizard.publish')} loading={busy} onPress={async () => {
+            if (isEdit) return save();
             if (!requireLevel(2)) return;
             setBusy(true);
+            // Uygulama kapanıp açıldıysa sunucudaki yarım taslaktan devam edilir.
+            if (s.serverId) actions.resumePublish(s.serverId);
             const id = await attempt(() => actions.createListing(draft, {
+              onDraftCreated: (serverId) => update({ serverId }),
               photoUris: s.photos.map((p) => p.uri).filter((u): u is string => !!u), broker: s.broker,
               ownershipUri: s.docUri ?? undefined, engineDocUri: s.engineDocUri ?? undefined, engineSerialLast4: s.engineSerial.trim() || undefined,
               onProgress: (done, total) => setProgress({ done, total }),
@@ -152,6 +196,11 @@ export default function IlanVer() {
         </View>
       }>
         <Header title={t('wizard.preview')} back={false} />
+        {editNeedsReview ? (
+          <View style={{ backgroundColor: colors.accentSoft, borderRadius: radius.button, padding: space(3) }}>
+            <T variant="caption" color={colors.accentText}>{t('wizard.editReviewNote')}</T>
+          </View>
+        ) : null}
         <ListingCard listing={previewListing} disabled />
       </Screen>
     );
@@ -163,7 +212,7 @@ export default function IlanVer() {
     setShowErrors(false);
     setSelected(null);
     setRestored(null);
-    if (step < WIZARD_STEPS.length - 1) { update({ step: step + 1 }); return; }
+    if (step < steps.length - 1) { update({ step: step + 1 }); return; }
     // Son adımda tüm adımlar yeniden denetlenir; hatalı adım varsa oraya dönülür ve hata gösterilir.
     const bad = firstInvalidStep(s);
     if (bad >= 0) { update({ step: bad }); setShowErrors(true); return; }
@@ -178,12 +227,19 @@ export default function IlanVer() {
         {showErrors && hasErrors ? <T variant="caption" color={colors.danger} style={{ textAlign: 'center' }}>{t('wizard.err.fix')}</T> : null}
         <View style={{ flexDirection: 'row', gap: space(3) }}>
           {step > 0 ? <View style={{ flex: 1 }}><Button variant="ghost" title={t('common.back')} onPress={() => { setShowErrors(false); update({ step: step - 1 }); }} /></View> : null}
-          <View style={{ flex: 2 }}><Button title={step === WIZARD_STEPS.length - 1 ? t('wizard.preview') : t('common.next')} disabled={!loaded} onPress={next} /></View>
+          <View style={{ flex: 2 }}><Button title={step === steps.length - 1 ? t('wizard.preview') : t('common.next')} disabled={!loaded} onPress={next} /></View>
         </View>
       </View>
     }>
-      <Header title={t('wizard.title')} />
-      <Stepper steps={WIZARD_STEPS.map((x) => t(`wizard.steps.${x}`))} current={step} />
+      <Header title={isEdit ? t('wizard.editTitle') : t('wizard.title')} />
+      <Stepper steps={steps.map((x) => t(`wizard.steps.${x}`))} current={step} />
+      {/* Girişten dönen kullanıcı formu doldurmadan önce kimlik adımını görsün (yayınlarken sürpriz olmasın). */}
+      {!isEdit && verifyLevel < 2 ? (
+        <View style={{ backgroundColor: colors.accentSoft, borderRadius: radius.button, padding: space(3), gap: space(2) }}>
+          <T variant="caption" color={colors.accentText}>{t('wizard.verifyBanner')}</T>
+          <Button small variant="secondary" title={t('wizard.verifyBannerCta')} onPress={() => router.push('/verify/identity')} />
+        </View>
+      ) : null}
 
       {restored ? (
         <View style={{ backgroundColor: colors.surface, borderRadius: radius.button, padding: space(3), gap: space(1.5) }}>

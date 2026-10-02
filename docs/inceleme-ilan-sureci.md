@@ -99,6 +99,16 @@ Motor saati, bayrak, takas ve pazarlık şu an yalnızca ilan sayfasında görü
 
 Kalan: B9–B14, C17–C19, C21, D ve E maddeleri. Sitede bildirme şimdilik uygulamaya yönlendiriyor; siteden doğrudan bildirme için site girişi gerekir.
 
+## Satıcı ilan yönetimi paketi ile kapatılanlar (2026-10-02)
+
+- B10: İlan düzenleme. Sihirbazın düzenleme modu (`/ilan-ver?id=…`): bilgiler, donanım, fiyat, yeni alanlar ve fotoğraflar (ekle, sırala, kapak, sil). Yalnızca değişen alanlar gönderilir; yalnızca fiyat değişirse ilan yayında kalır, diğer değişikliklerde önizlemede "onaya gider, onaylanana kadar görünmez" uyarısı var.
+- İlanlarım'da her ilan için Düzenle, hızlı Fiyat (onaya düşmez) ve Yayından kaldır (ikinci adımla onay). Reddedilen ilanda "Düzelt ve yeniden gönder"; kaydedince yeniden onaya gider.
+- B11: `PUT /listings/:id/photos` fotoğrafların tam listesini ve sırasını ayarlar. Yarıda kalan yayının yeniden denemesinde sonradan silinen fotoğraf ilanda kalmıyor, kapak değişikliği işleniyor. Sunucuda açılan taslağın kimliği yerel taslağa yazılıyor; uygulama kapanıp açılırsa aynı taslaktan sürdürülüyor (ikinci ilan açılmıyor). Sunucudaki yarım taslaklar İlanlarım'da gösterilmiyor; "Sil ve baştan başla" onları da siliyor.
+- B12: `Screen` klavyeden kaçınıyor (iOS).
+- B13: Kimliği doğrulanmamış kullanıcı ilan formunun başında "Kimliğini doğrula" uyarısı görüyor (yayınlarken sürpriz yok).
+
+Kalan: B9 tamamlandı; B14 (erişilebilirlik ayrıntıları), C17–C19, C21, D ve E maddeleri.
+
 ## Önerilen sıra
 
 1. **Güvenlik paketi:**

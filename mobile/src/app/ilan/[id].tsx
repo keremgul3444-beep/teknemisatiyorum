@@ -98,6 +98,7 @@ export default function IlanDetay() {
               <T variant="caption" color={colors.danger} style={{ fontFamily: fonts.bodyBold }}>{t('listing.rejectedTitle')}</T>
               <T variant="caption">{t(`mine.rejectReasons.${l.rejectReason ?? 'rules'}`)}</T>
               <T variant="caption" color={colors.muted}>{t('listing.rejectedBody')}</T>
+              <Button small title={t('mine.fix')} onPress={() => router.push({ pathname: '/ilan-ver', params: { id: l.id } })} />
             </View>
           ) : null}
           <View style={{ gap: space(2.5) }}>
