@@ -1,10 +1,43 @@
+# Gizli değerler: hiçbir .env dosyası depoya girmez (yalnızca örnek şablon kalır).
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+*.pem
+*.key
+*.p12
+*.keystore
+*.jks
+google-services.json
+GoogleService-Info.plist
+secrets/
+*.secret
+
+# Bağımlılıklar ve derleme çıktıları
 node_modules/
-.superpowers/
 dist/
+build/
+.next/
 .expo/
-*.log
-.playwright-mcp/
-api/.env
+.expo-shared/
+*.tsbuildinfo
+coverage/
+
+# Yerel veri: veritabanı, yüklenen dosyalar, yedekler, kayıtlar
 api/.data/
 api/storage/
 api/backups/
+*.log
+*.sqlite
+
+# Araç ve işletim sistemi dosyaları
+.superpowers/
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Tarayıcı otomasyonu eklentisinin yerel dosyaları
+.playwright-mcp/
