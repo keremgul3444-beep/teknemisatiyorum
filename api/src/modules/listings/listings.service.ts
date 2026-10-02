@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
-import { failures, normalizeLocation, type BoatType, type Equipment, type ParsedQuery, type Criterion } from '@tms/shared';
+import { failures, MAX_LISTING_PHOTOS, normalizeLocation, type BoatType, type Equipment, type ParsedQuery, type Criterion } from '@tms/shared';
 import { PrismaService } from '../../common/prisma.service';
 import { Errors } from '../../common/errors';
 import { FxService } from './fx.service';
@@ -8,7 +8,7 @@ import { listingInclude, listingView, priceDropOf, PRICE_DROP_DAYS, type Listing
 import { NotificationsService } from '../notifications/notifications.module';
 import { freshness, isActive } from '../promotions/promotion.rules';
 
-export const MAX_PHOTOS = 20;
+export const MAX_PHOTOS = MAX_LISTING_PHOTOS;
 export type Sort = 'new' | 'asc' | 'desc';
 
 const shuffle = <T,>(a: T[]) => {

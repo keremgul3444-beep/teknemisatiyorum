@@ -418,7 +418,7 @@
     "goMine": "İlanlarıma git",
     "goHome": "Keşfet'e dön",
     "engineDocLabel": "Motor seri numarası fotoğrafı",
-    "engineSerial": "Motor seri no (son 4 hane)",
+    "engineSerial": "Motor seri no (son 4–6 hane)",
     "engineSerialHint": "Moderatör fotoğrafla karşılaştırır; numaranın tamamı istenmez.",
     "brandPh": "Örn. Beneteau",
     "modelPh": "Örn. Oceanis 40",
@@ -457,7 +457,10 @@
       "price": "Fiyatı yaz.",
       "location": "Teknenin nerede olduğunu seç.",
       "fix": "Devam etmek için işaretli alanları tamamla."
-    }
+    },
+    "uploading": "Fotoğraflar yükleniyor: {{done}}/{{total}}",
+    "draftPhotosMissing": "{{count}} fotoğraf bu telefonda artık bulunamadı, yeniden eklemen gerekiyor.",
+    "discardConfirm": "Fotoğraflar ve yazdıkların silinecek. Emin misin?"
   },
   "boatAdd": {
     "title": "Tekne ekle",

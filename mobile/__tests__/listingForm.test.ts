@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
-  MAX_LISTING_PHOTOS, addPhotos, emptyWizard, groupThousands, makeCover, movePhoto, parseNum, removePhoto, restoreDraft,
+  MAX_LISTING_PHOTOS, addPhotos, dropMissingFiles, emptyWizard, firstInvalidStep, groupThousands, makeCover, movePhoto, parseNum, removePhoto, restoreDraft,
   serializeDraft, toDraft, validateStep, type PhotoItem, type WizardState,
 } from '@/features/listingForm';
 import { clearAllListingDrafts, loadListingDraft, saveListingDraft } from '@/features/listingDraftStore';
@@ -102,5 +102,24 @@ describe('taslak kaydı', () => {
     await saveListingDraft('u3', filled());
     await saveListingDraft('u3', emptyWizard());
     expect(await AsyncStorage.getItem('tms.listingDraft.u3')).toBeNull();
+  });
+});
+
+describe('tüm adım denetimi ve kaybolan dosyalar', () => {
+  test('önizlemeden önce ilk hatalı adım bulunur', () => {
+    expect(firstInvalidStep(filled())).toBe(-1);
+    expect(firstInvalidStep({ ...filled(), f: { ...filled().f, brand: '' } })).toBe(1);
+    expect(firstInvalidStep({ ...filled(), location: undefined })).toBe(3);
+    expect(firstInvalidStep({ ...filled(), photos: [] })).toBe(0);
+  });
+
+  test('cihazdan silinmiş fotoğraf ve belgeler düşer, sayısı bildirilir', () => {
+    const s = { ...filled(), step: 3, doc: true, docUri: 'file:///ruhsat.jpg', engineDoc: true, engineDocUri: 'file:///motor.jpg' };
+    const gone = new Set(['file:///p0.jpg', 'file:///ruhsat.jpg']);
+    const { state, lostPhotos } = dropMissingFiles(s, (u) => !gone.has(u));
+    expect(lostPhotos).toBe(1);
+    expect(state.photos.map((p) => p.uri)).toEqual(['file:///p1.jpg']);
+    expect(state).toMatchObject({ doc: false, docUri: null, engineDoc: true, step: 3 });
+    expect(dropMissingFiles(s, () => false).state.step).toBe(0);
   });
 });

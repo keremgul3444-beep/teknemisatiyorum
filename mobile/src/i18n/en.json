@@ -418,7 +418,7 @@
     "goMine": "Go to my listings",
     "goHome": "Back to Explore",
     "engineDocLabel": "Engine serial number photo",
-    "engineSerial": "Engine serial no (last 4)",
+    "engineSerial": "Engine serial no (last 4–6)",
     "engineSerialHint": "A moderator compares it with the photo; the full number is not required.",
     "brandPh": "e.g. Beneteau",
     "modelPh": "e.g. Oceanis 40",
@@ -457,7 +457,10 @@
       "price": "Enter the price.",
       "location": "Choose where the boat is.",
       "fix": "Complete the highlighted fields to continue."
-    }
+    },
+    "uploading": "Uploading photos: {{done}}/{{total}}",
+    "draftPhotosMissing": "{{count}} photo(s) are no longer on this phone; please add them again.",
+    "discardConfirm": "Your photos and entries will be deleted. Are you sure?"
   },
   "boatAdd": {
     "title": "Add a boat",

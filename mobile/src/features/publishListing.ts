@@ -4,6 +4,8 @@ export interface PublishExtra {
   photoUris?: string[]; broker?: boolean;
   /** Ruhsat/bağlama kütüğü fotoğrafı; yanında motor seri numarası fotoğrafı ve son haneleri verilirse "belgeleri eşleşti" için birlikte gönderilir. */
   ownershipUri?: string; engineDocUri?: string; engineSerialLast4?: string;
+  /** Fotoğraf yükleme ilerlemesi (20 fotoğrafa kadar sürebilir): yüklenen / toplam. */
+  onProgress?: (done: number, total: number) => void;
 }
 interface Deps {
   post: (path: string, body?: unknown) => Promise<unknown>;
@@ -36,7 +38,14 @@ export function createPublisher(deps: Deps) {
     }
     if (!id) id = st.listingId = await create(d);
 
-    for (const uri of extra.photoUris ?? []) if (!st.files.has(uri)) st.files.set(uri, await deps.upload(uri, 'public'));
+    const uris = extra.photoUris ?? [];
+    let done = uris.filter((u) => st.files.has(u)).length;
+    if (uris.length) extra.onProgress?.(done, uris.length);
+    for (const uri of uris) {
+      if (st.files.has(uri)) continue;
+      st.files.set(uri, await deps.upload(uri, 'public'));
+      extra.onProgress?.(++done, uris.length);
+    }
     const fileIds = (extra.photoUris ?? []).map((u) => st.files.get(u)!);
     if (fileIds.length) await deps.post(`/listings/${id}/photos`, { fileIds });
 

@@ -63,3 +63,15 @@ test('yarım taslak silinmişse (404/409) yeni taslakla baştan başlanır', asy
   f.deps.patch.mockImplementationOnce(async () => { throw Object.assign(new Error('gone'), { status: 409 }); });
   expect(await publisher(draft, {})).toBe('L2');
 });
+
+test('fotoğraf yükleme ilerlemesi bildirilir; yeniden denemede yüklenenler sayılmış başlar', async () => {
+  const f = fakeApi(1);
+  const publish = createPublisher(f.deps);
+  const seen: string[] = [];
+  const onProgress = (d: number, t: number) => seen.push(`${d}/${t}`);
+  await expect(publish(draft, { photoUris: ['a', 'b', 'c'], onProgress })).rejects.toThrow('LEVEL_REQUIRED');
+  expect(seen).toEqual(['0/3', '1/3', '2/3', '3/3']);
+  seen.length = 0;
+  await publish(draft, { photoUris: ['a', 'b', 'c'], onProgress });
+  expect(seen).toEqual(['3/3']);
+});

@@ -41,6 +41,7 @@ Tekne alım-satım + broker + ekspertiz + (2. dalga: usta/kaptan/güvenli ödeme
 - Yeni alanlar (veritabanı `0008_listing_details`): `engineHours` (isteğe bağlı, 0–100000), `flag` (`tr` | `foreign`), `tradeIn`, `negotiable`. Uygulama ve sitede ilan sayfasında görünür.
 - Form: zorunlu alanlar yıldızlı, "İleri" eksik alanları kırmızıyla gösterir; örnek metinler "Örn." ile başlar; fiyat binlik ayraçlı. Saf mantık `mobile/src/features/listingForm.ts` (test: `__tests__/listingForm.test.ts`).
 - Belge adımında gizlilik notu: belgeler ilanda yayınlanmaz, yalnızca sahibi ve moderatör görür.
+- Ayrıntılı ilan süreci incelemesi ve önerilen sıra: `docs/inceleme-ilan-sureci.md` (güvenlik açıkları önce).
 - Not: `mobile/scripts/demo-flows.mjs` içindeki 1, 2, 4, 9. akışlar bu değişiklikten önce de geçmiyordu (yeni asistan kutusunda "Ara" düğmesi yok); script güncellenmeli.
 
 ## Kaldığımız yer (2026-10-02 akşamı)

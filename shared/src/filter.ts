@@ -5,6 +5,8 @@ export const BOAT_TYPES = ['motoryat', 'yelkenli', 'gulet', 'surat', 'balikci', 
 export const EQUIPMENT = ['jenerator', 'branda', 'klima', 'radar', 'otopilot', 'bowThruster', 'teak', 'tender'] as const;
 /** Bayrak: Türk bayraklı ya da yabancı bayraklı (alıcı için vergi/kayıt durumunu belirler). */
 export const FLAGS = ['tr', 'foreign'] as const;
+/** İlan başına en fazla fotoğraf (sunucu ve uygulama aynı sınırı kullanır). */
+export const MAX_LISTING_PHOTOS = 20;
 /** İlan formunda motor saati üst sınırı (daha büyüğü yazım hatasıdır). */
 export const MAX_ENGINE_HOURS = 100000;
 export const USTA_CATEGORIES = ['motor', 'elektrik', 'boya', 'jelkot', 'branda', 'doseme', 'elektronik', 'yelken'] as const;

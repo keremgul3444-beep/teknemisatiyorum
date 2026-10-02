@@ -1,8 +1,7 @@
-import { MAX_ENGINE_HOURS, type BoatType, type Currency, type Equipment, type Flag } from '@tms/shared';
+import { MAX_ENGINE_HOURS, MAX_LISTING_PHOTOS, type BoatType, type Currency, type Equipment, type Flag } from '@tms/shared';
 import type { ListingDraft } from '@/services/types';
 
-/** Sunucudaki ilan başına fotoğraf sınırıyla aynı (api/src/modules/listings/listings.service.ts). */
-export const MAX_LISTING_PHOTOS = 20;
+export { MAX_LISTING_PHOTOS };
 export const WIZARD_STEPS = ['photos', 'basics', 'equipment', 'price', 'docs'] as const;
 
 /** Sihirbazdaki fotoğraf: gerçek modda cihazdaki dosya adresi, demo modunda yalnızca örnek görsel tohumu. */
@@ -87,6 +86,11 @@ export function validateStep(step: number, s: WizardState, now = new Date()): St
   return e;
 }
 
+/** Önizlemeye geçmeden tüm adımlar denetlenir (geri yüklenen ya da geri dönülüp değiştirilen taslak için); ilk hatalı adım ya da -1. */
+export function firstInvalidStep(s: WizardState, now = new Date()): number {
+  return WIZARD_STEPS.findIndex((_, i) => Object.keys(validateStep(i, s, now)).length > 0);
+}
+
 export function toDraft(s: WizardState): ListingDraft {
   return {
     brand: s.f.brand.trim(), model: s.f.model.trim(), year: Number(s.f.year), lengthM: parseDecimal(s.f.length),
@@ -116,6 +120,23 @@ export function serializeDraft(s: WizardState): string {
     docUri: keep(s.docUri), doc: s.doc && (!s.docUri || persistableUri(s.docUri)),
     engineDocUri: keep(s.engineDocUri), engineDoc: s.engineDoc && (!s.engineDocUri || persistableUri(s.engineDocUri)),
   });
+}
+
+/**
+ * Geri yüklenen taslakta cihazdan silinmiş dosyalar düşer (fotoğraf, ruhsat, motor belgesi).
+ * Kaç fotoğrafın kaybolduğu da döner; kullanıcıya söylenir.
+ */
+export function dropMissingFiles(s: WizardState, exists: (uri: string) => boolean): { state: WizardState; lostPhotos: number } {
+  const photos = s.photos.filter((p) => !p.uri || exists(p.uri));
+  const docOk = !s.docUri || exists(s.docUri);
+  const engineOk = !s.engineDocUri || exists(s.engineDocUri);
+  const state: WizardState = {
+    ...s, photos,
+    ...(docOk ? {} : { doc: false, docUri: null }),
+    ...(engineOk ? {} : { engineDoc: false, engineDocUri: null }),
+  };
+  if (photos.length === 0) state.step = 0;
+  return { state, lostPhotos: s.photos.length - photos.length };
 }
 
 /** Saklanan taslağı okur; bozuk ya da eski biçimdeyse null. */

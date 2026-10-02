@@ -13,10 +13,11 @@ import { isApiMode } from '@/services';
 import { attempt } from '@/services/errors';
 import { pickImage, pickImages } from '@/services/pickImage';
 import {
-  MAX_LISTING_PHOTOS, WIZARD_STEPS, addPhotos, digitsOnly, emptyWizard, groupThousands, makeCover, movePhoto, removePhoto,
-  toDraft, validateStep, type StepErrors, type WizardFields, type WizardState,
+  MAX_LISTING_PHOTOS, WIZARD_STEPS, addPhotos, digitsOnly, dropMissingFiles, emptyWizard, firstInvalidStep, groupThousands,
+  makeCover, movePhoto, removePhoto, toDraft, validateStep, type StepErrors, type WizardFields, type WizardState,
 } from '@/features/listingForm';
 import { clearListingDraft, loadListingDraft, saveListingDraft } from '@/features/listingDraftStore';
+import { clearDraftFiles, draftFileExists, keepDraftFile } from '@/features/draftFiles';
 
 const TYPES: BoatType[] = ['motoryat', 'yelkenli', 'katamaran', 'gulet', 'surat', 'balikci'];
 const EQUIP: Equipment[] = ['jenerator', 'branda', 'klima', 'radar', 'otopilot', 'bowThruster', 'teak', 'tender'];
@@ -30,8 +31,13 @@ export default function IlanVer() {
   const lang = i18n.language;
   const userId = useSession((x) => x.userId);
   const [s, setS] = useState<WizardState>(emptyWizard);
-  const [loaded, setLoaded] = useState(false);
-  const [restored, setRestored] = useState<null | { photosLost: boolean }>(null);
+  // Taslağı yüklenmiş hesap; hesap değişince yükleme bitene kadar kayıt yapılmaz (boş form başka hesabın taslağını silmesin).
+  const [loadedFor, setLoadedFor] = useState<string | null>(null);
+  const draftKey = userId ?? 'demo';
+  const loaded = loadedFor === draftKey;
+  const [restored, setRestored] = useState<null | { lostPhotos: number; noPhotos: boolean }>(null);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [showErrors, setShowErrors] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [confirmRemove, setConfirmRemove] = useState(false);
@@ -39,6 +45,7 @@ export default function IlanVer() {
   const [done, setDone] = useState(false);
   const [busy, setBusy] = useState(false);
   const seedRef = useRef(1);
+  const loadedOnce = useRef(false);
 
   // Değerleme, karne ya da ilanlarım gibi her giriş noktasında aynı kimlik kapısı geçerli.
   useEffect(() => { requireLevel(2); }, []);
@@ -49,11 +56,18 @@ export default function IlanVer() {
     loadListingDraft(userId).then((d) => {
       if (!alive) return;
       if (d) {
-        setS(d);
-        setRestored({ photosLost: d.photos.length === 0 });
-        seedRef.current = d.photos.reduce((m, p) => Math.max(m, p.seed + 1), 1);
+        // Telefonda silinmiş fotoğraf/belge dosyaları düşer; kullanıcıya kaç tanesinin yeniden ekleneceği söylenir.
+        const { state, lostPhotos } = dropMissingFiles(d, draftFileExists);
+        setS(state);
+        setRestored({ lostPhotos, noPhotos: state.photos.length === 0 });
+        seedRef.current = state.photos.reduce((m, p) => Math.max(m, p.seed + 1), 1);
+      } else if (loadedOnce.current) {
+        // Başka hesaba geçildi ve onun taslağı yok: önceki hesabın formu bu hesaba taşınmaz.
+        setS(emptyWizard());
+        setRestored(null);
       }
-      setLoaded(true);
+      loadedOnce.current = true;
+      setLoadedFor(userId ?? 'demo');
     });
     return () => { alive = false; };
   }, [userId]);
@@ -71,8 +85,10 @@ export default function IlanVer() {
 
   const discardDraft = async () => {
     await clearListingDraft(userId);
+    clearDraftFiles();
     setS(emptyWizard());
     setRestored(null);
+    setConfirmDiscard(false);
     setShowErrors(false);
     setSelected(null);
   };
@@ -81,13 +97,14 @@ export default function IlanVer() {
     const room = MAX_LISTING_PHOTOS - s.photos.length;
     if (room <= 0) return;
     if (isApiMode()) {
-      const uris = await pickImages(room);
-      if (!uris.length) return;
+      const picked = await pickImages(room);
+      if (!picked.length) return;
+      const uris = await Promise.all(picked.map(keepDraftFile));
       setS((cur) => ({ ...cur, photos: addPhotos(cur.photos, uris.map((uri) => ({ uri, seed: seedRef.current++ })), newPhotoId) }));
     } else {
       setS((cur) => ({ ...cur, photos: addPhotos(cur.photos, [{ seed: seedRef.current++ }], newPhotoId) }));
     }
-    setRestored((r) => (r ? { photosLost: false } : r));
+    setRestored(null);
   };
 
   const draft = toDraft(s);
@@ -111,21 +128,27 @@ export default function IlanVer() {
   if (preview) {
     return (
       <Screen footer={
+        <View style={{ gap: space(2) }}>
+        {progress ? <T variant="caption" color={colors.muted} style={{ textAlign: 'center' }} accessibilityLiveRegion="polite">{t('wizard.uploading', { done: progress.done, total: progress.total })}</T> : null}
         <View style={{ flexDirection: 'row', gap: space(3) }}>
-          <View style={{ flex: 1 }}><Button variant="ghost" title={t('common.back')} onPress={() => setPreview(false)} /></View>
+          <View style={{ flex: 1 }}><Button variant="ghost" title={t('common.back')} disabled={busy} onPress={() => setPreview(false)} /></View>
           <View style={{ flex: 2 }}><Button title={t('wizard.publish')} loading={busy} onPress={async () => {
             if (!requireLevel(2)) return;
             setBusy(true);
             const id = await attempt(() => actions.createListing(draft, {
               photoUris: s.photos.map((p) => p.uri).filter((u): u is string => !!u), broker: s.broker,
               ownershipUri: s.docUri ?? undefined, engineDocUri: s.engineDocUri ?? undefined, engineSerialLast4: s.engineSerial.trim() || undefined,
+              onProgress: (done, total) => setProgress({ done, total }),
             }));
             setBusy(false);
+            setProgress(null);
             if (id) {
               await clearListingDraft(userId);
+              clearDraftFiles();
               setDone(true);
             }
           }} /></View>
+        </View>
         </View>
       }>
         <Header title={t('wizard.preview')} back={false} />
@@ -140,8 +163,11 @@ export default function IlanVer() {
     setShowErrors(false);
     setSelected(null);
     setRestored(null);
-    if (step < WIZARD_STEPS.length - 1) update({ step: step + 1 });
-    else setPreview(true);
+    if (step < WIZARD_STEPS.length - 1) { update({ step: step + 1 }); return; }
+    // Son adımda tüm adımlar yeniden denetlenir; hatalı adım varsa oraya dönülür ve hata gösterilir.
+    const bad = firstInvalidStep(s);
+    if (bad >= 0) { update({ step: bad }); setShowErrors(true); return; }
+    setPreview(true);
   };
   const sel = s.photos.findIndex((p) => p.id === selected);
   const row = { flexDirection: 'row', flexWrap: 'wrap', gap: space(2) } as const;
@@ -161,10 +187,23 @@ export default function IlanVer() {
 
       {restored ? (
         <View style={{ backgroundColor: colors.surface, borderRadius: radius.button, padding: space(3), gap: space(1.5) }}>
-          <T variant="caption">{t('wizard.draftRestored')}{restored.photosLost ? ` ${t('wizard.draftPhotosLost')}` : ''}</T>
-          <Pressable onPress={discardDraft} accessibilityRole="button" hitSlop={8}>
-            <T variant="caption" color={colors.primary} style={{ fontFamily: fonts.bodyBold }}>{t('wizard.draftDiscard')}</T>
-          </Pressable>
+          <T variant="caption">
+            {t('wizard.draftRestored')}
+            {restored.lostPhotos > 0 ? ` ${t('wizard.draftPhotosMissing', { count: restored.lostPhotos })}` : restored.noPhotos ? ` ${t('wizard.draftPhotosLost')}` : ''}
+          </T>
+          {confirmDiscard ? (
+            <View style={{ gap: space(2) }}>
+              <T variant="caption">{t('wizard.discardConfirm')}</T>
+              <View style={{ flexDirection: 'row', gap: space(2) }}>
+                <View style={{ flex: 1 }}><Button small variant="secondary" title={t('common.cancel')} onPress={() => setConfirmDiscard(false)} /></View>
+                <View style={{ flex: 1 }}><Button small variant="danger" title={t('wizard.draftDiscard')} onPress={discardDraft} /></View>
+              </View>
+            </View>
+          ) : (
+            <Pressable onPress={() => setConfirmDiscard(true)} accessibilityRole="button" hitSlop={8}>
+              <T variant="caption" color={colors.primary} style={{ fontFamily: fonts.bodyBold }}>{t('wizard.draftDiscard')}</T>
+            </Pressable>
+          )}
         </View>
       ) : null}
 
@@ -293,19 +332,20 @@ export default function IlanVer() {
             if (isApiMode()) {
               const uri = await pickImage();
               if (!uri) return;
-              update({ docUri: uri });
+              update({ docUri: await keepDraftFile(uri) });
             }
             update({ doc: true });
           }} />
-          <UploadBox label={t('wizard.engineDocLabel')} state={s.engineDoc ? 'incelemede' : 'bos'} onPress={async () => {
+          {/* Motor seri numarası ruhsatla birlikte incelenir; ruhsat yokken tek başına gönderilmez. */}
+          {s.doc ? <UploadBox label={t('wizard.engineDocLabel')} state={s.engineDoc ? 'incelemede' : 'bos'} onPress={async () => {
             if (isApiMode()) {
               const uri = await pickImage();
               if (!uri) return;
-              update({ engineDocUri: uri });
+              update({ engineDocUri: await keepDraftFile(uri) });
             }
             update({ engineDoc: true });
-          }} />
-          {s.engineDoc ? (
+          }} /> : null}
+          {s.doc && s.engineDoc ? (
             <>
               <Field label={t('wizard.engineSerial')} value={s.engineSerial} onChangeText={(v) => update({ engineSerial: v.replace(/[^A-Za-z0-9]/g, '').slice(0, 6).toUpperCase() })} maxLength={6} />
               <T variant="caption" color={colors.muted}>{t('wizard.engineSerialHint')}</T>
