@@ -76,7 +76,6 @@ export const websiteJsonLd = (site = siteUrl()) => ({
   '@type': 'WebSite',
   name: SITE_NAME,
   url: site,
-  potentialAction: { '@type': 'SearchAction', target: `${site}/asistan?q={search_term_string}`, 'query-input': 'required name=search_term_string' },
 });
 
 /** JSON-LD'yi güvenle gömmek için: `</script>` kaçışı. */

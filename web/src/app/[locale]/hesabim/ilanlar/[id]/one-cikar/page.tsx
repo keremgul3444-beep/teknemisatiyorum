@@ -36,7 +36,7 @@ export default async function OneCikar({ params }: P) {
             <p className="muted small">{t(locale, `promo.kindHint.${p.kind}`)}</p>
             <strong style={{ fontSize: 24 }}>{tl(p.priceWebKurus, locale)}</strong>
             {p.isTrialPrice ? <span className="small" style={{ color: 'var(--c-warning)' }}>{t(locale, 'promo.trialPrice')}</span> : null}
-            <BuyButton listingId={l.id} productCode={p.code} label={t(locale, 'promo.buy')} errors={errors} />
+            <BuyButton listingId={l.id} productCode={p.code} label={t(locale, 'promo.buy')} errors={errors} locale={locale} />
           </div>
         ))}
       </div>

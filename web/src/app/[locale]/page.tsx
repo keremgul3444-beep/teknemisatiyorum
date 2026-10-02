@@ -7,7 +7,8 @@ import { organizationJsonLd, pageMetadata, websiteJsonLd } from '@/lib/seo';
 import type { SearchResult, Showcase, SitemapData } from '@/lib/types';
 import { JsonLd, ListingGrid, SearchBox, Section, Unavailable } from '@/components/bits';
 
-export const revalidate = 300;
+// Vitrin 1 dk'da tazelenir: satılan ilan ana sayfada en çok 1-2 dakika kalır.
+export const revalidate = 60;
 type P = { params: Promise<{ locale: string }> };
 
 export async function generateMetadata({ params }: P): Promise<Metadata> {
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: P): Promise<Metadata> {
 export default async function Home({ params }: P) {
   const { locale } = (await params) as { locale: Locale };
   const [show, latest, map] = await Promise.all([
-    apiGet<Showcase>('/listings/showcase', { revalidate: 300 }).catch(() => null),
+    apiGet<Showcase>('/listings/showcase', { revalidate: 60 }).catch(() => null),
     apiGet<SearchResult>('/listings?sort=new', { revalidate: 300 }).catch(() => null),
     apiGet<SitemapData>('/listings/sitemap', { revalidate: 300 }).catch(() => null),
   ]);

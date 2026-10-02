@@ -1,5 +1,7 @@
 'use client';
 import { useState } from 'react';
+import type { Locale } from '@/i18n';
+import { checkoutTarget } from '@/lib/checkout';
 
 /** Çıkış: sunucu oturumu kapatır ve HttpOnly çerezleri siler. */
 export function LogoutButton({ label, to }: { label: string; to: string }) {
@@ -17,7 +19,7 @@ export function LogoutButton({ label, to }: { label: string; to: string }) {
  * Öne çıkarma satın al: sipariş oluşturulur, ödeme sayfasına gidilir. Ödeme adresi yalnızca sitenin kendisi
  * ya da tanımlı ödeme sağlayıcısı olabilir (başka yere yönlendirme yok).
  */
-export function BuyButton({ listingId, productCode, label, errors }: { listingId: string; productCode: string; label: string; errors: Record<string, string> }) {
+export function BuyButton({ listingId, productCode, label, errors, locale }: { listingId: string; productCode: string; label: string; errors: Record<string, string>; locale: Locale }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const buy = async () => {
@@ -26,10 +28,9 @@ export function BuyButton({ listingId, productCode, label, errors }: { listingId
       const r = await fetch('/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ listingId, productCode }) });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) { setError(errors[String(j.messageKey ?? '').replace(/^errors\./, '')] ?? errors.generic); return; }
-      const url = new URL(j.checkoutUrl, window.location.href);
-      const allowed = [window.location.origin, process.env.NEXT_PUBLIC_PAYMENT_ORIGIN].filter(Boolean);
-      if (!allowed.includes(url.origin)) { setError(errors.generic); return; }
-      window.location.assign(url.toString());
+      const url = checkoutTarget(String(j.checkoutUrl ?? ''), window.location.origin, locale, process.env.NEXT_PUBLIC_PAYMENT_ORIGIN);
+      if (!url) { setError(errors.generic); return; }
+      window.location.assign(url);
     } catch {
       setError(errors.network ?? errors.generic);
     } finally {

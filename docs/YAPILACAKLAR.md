@@ -38,11 +38,8 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 ## Web/öne çıkarma — incelemeden ertelenen küçük maddeler
 - [ ] Fiyatlar kuruşlu girilebilirse gösterim de kuruşlu olsun (şu an tam liraya yuvarlanıyor; yönetim ekranı tam lira giriyor)
 - [ ] Yönetimde iade için onay sorusu
-- [ ] Deneme ödeme sayfası dil önekini korusun (EN kullanıcı TR sayfaya düşüyor)
-- [ ] Ana sayfa vitrini satılan ilanı 5-10 dk gösterebilir (önbellek süresi kısaltılabilir)
 - [ ] Konum adları normalize edilsin (Bodrum / bodrum ayrı sayılmasın)
 - [ ] Silinen görselin küçük kopyaları diskten de silinsin
-- [ ] Google arama kutusu işaretlemesi kaldırılsın (Google artık kullanmıyor)
 - [ ] Test boşlukları: satılan ilan vitrin ucunda yok mu; eşzamanlı bildirimde tüm yanıtlar 200 mü
 - [ ] Canlıda ters vekil (reverse proxy) Host başlığını korumalı ve TRUSTED_PROXY_HOPS doğru ayarlanmalı
 

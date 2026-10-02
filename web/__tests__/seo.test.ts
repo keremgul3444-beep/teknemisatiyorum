@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { listingJsonLd, listingMetadata, pageMetadata } from '../src/lib/seo';
+import { listingJsonLd, listingMetadata, pageMetadata, websiteJsonLd } from '../src/lib/seo';
 import type { ListingView } from '../src/lib/types';
 
 const l: ListingView = {
@@ -36,4 +36,9 @@ test('KVKK: bireysel satıcının adı Google verisine konmaz; firma adı konabi
   expect(j).not.toContain('Deniz');
   const firm = listingJsonLd({ ...l, seller: { ...l.seller, companyName: 'Mavi Koy Yatçılık' } }, 'tr', SITE) as any;
   expect(firm.offers.seller).toEqual({ '@type': 'Organization', name: 'Mavi Koy Yatçılık' });
+});
+
+test('site işaretlemesinde Google\'ın artık kullanmadığı arama kutusu yok', () => {
+  expect(websiteJsonLd(SITE)).not.toHaveProperty('potentialAction');
+  expect(websiteJsonLd(SITE)).toMatchObject({ '@type': 'WebSite', url: SITE });
 });
