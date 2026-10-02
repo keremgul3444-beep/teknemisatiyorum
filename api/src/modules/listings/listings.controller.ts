@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Query } from '@nestjs/common';
 import { z } from 'zod';
-import { BOAT_TYPES, CURRENCIES, EQUIPMENT, parsedQuerySchema } from '@tms/shared';
+import { BOAT_TYPES, CURRENCIES, EQUIPMENT, normalizeLocation, parsedQuerySchema } from '@tms/shared';
 import { Auth, CurrentUser, OptionalUser, Public, type AuthUser } from '../../common/decorators';
 import { ZodPipe } from '../../common/zod.pipe';
 import { PrismaService } from '../../common/prisma.service';
@@ -18,7 +18,7 @@ const draftSchema = z.object({
   type: z.enum(BOAT_TYPES),
   price: z.number().positive().max(1e10),
   currency: z.enum(CURRENCIES),
-  location: z.string().trim().min(1).max(40),
+  location: z.string().trim().min(1).max(40).transform(normalizeLocation),
   equipment: z.array(z.enum(EQUIPMENT)).max(8).default([]),
   cabins: z.number().int().min(0).max(50).default(0),
   engine: z.string().trim().max(80).default(''),

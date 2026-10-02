@@ -47,7 +47,9 @@ test('aynı bildirim eşzamanlı iki kez gelirse süre bir kez eklenir', async (
   const o = await t.http().post('/orders').set(u.auth).send({ listingId: id, productCode: 'acil_7' });
   const row = await t.prisma.order.findUniqueOrThrow({ where: { id: o.body.orderId } });
   const s = sim(row.providerRef!, row.id, 'success', 4900);
-  await Promise.all([callback(s), callback(s), callback(s)]);
+  const rs = await Promise.all([callback(s), callback(s), callback(s)]);
+  // Sağlayıcı 200 dışı yanıtı tekrar gönderir: tekrar gelen bildirim de başarıyla karşılanmalı.
+  expect(rs.map((r) => r.status)).toEqual([200, 200, 200]);
   const l = await t.prisma.listing.findUniqueOrThrow({ where: { id } });
   expect(l.urgentUntil!.getTime()).toBeLessThan(Date.now() + 7.1 * DAY);
 });

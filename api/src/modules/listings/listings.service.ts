@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
-import { failures, type BoatType, type Equipment, type ParsedQuery, type Criterion } from '@tms/shared';
+import { failures, normalizeLocation, type BoatType, type Equipment, type ParsedQuery, type Criterion } from '@tms/shared';
 import { PrismaService } from '../../common/prisma.service';
 import { Errors } from '../../common/errors';
 import { FxService } from './fx.service';
@@ -46,6 +46,8 @@ export class ListingsService {
 
   /** Veritabanında kaba süzme + fiyat/donanım için ortak `failures` kuralı (kur tablosuyla). */
   async match(q: ParsedQuery, extraWhere: Prisma.ListingWhereInput = {}) {
+    // Kayıtlardaki konum tek biçimde; aranan da aynı biçime getirilir ("bodrum" → "Bodrum").
+    if (q.location) q = { ...q, location: normalizeLocation(q.location) };
     const where: Prisma.ListingWhereInput = {
       ...extraWhere,
       status: 'published',

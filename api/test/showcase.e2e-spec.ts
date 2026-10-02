@@ -57,3 +57,19 @@ test('site haritası: yalnızca yayındaki ilanlar ve tip/şehir sayıları', as
   expect(ids).not.toContain(removed);
   expect(r.body.facets).toEqual(expect.arrayContaining([{ type: 'motoryat', location: 'Fethiye', count: 1 }, { type: 'motoryat', location: null, count: expect.any(Number) }]));
 });
+
+test('vitrin uç noktası: satılan ya da kaldırılan ilan süresi dolmasa da görünmez', async () => {
+  const u = await loginAs(t, { level: 2 });
+  // Önceki testlerin vitrinleri kapatılır: uç nokta en fazla 8'i rastgele seçtiği için sonuç şansa kalmasın.
+  await t.prisma.listing.updateMany({ data: { featuredUntil: null, urgentUntil: null } });
+  const promo = { featuredUntil: new Date(Date.now() + DAY), urgentUntil: new Date(Date.now() + DAY) };
+  const live = await listing(u.auth, promo);
+  const sold = await listing(u.auth, { ...promo, status: 'sold' });
+  const removed = await listing(u.auth, { ...promo, status: 'removed' });
+  const r = await t.http().get('/listings/showcase');
+  const ids = [...r.body.featured, ...r.body.urgent].map((x: { id: string }) => x.id);
+  expect(ids).not.toContain(sold);
+  expect(ids).not.toContain(removed);
+  expect(r.body.featured.map((x: { id: string }) => x.id)).toEqual([live]);
+  expect(r.body.urgent.map((x: { id: string }) => x.id)).toEqual([live]);
+});
