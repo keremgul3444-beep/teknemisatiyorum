@@ -4,6 +4,7 @@ Sonraya bırakılan her iş burada durur. Bir iş bitince satırını silip comm
 Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geçirilir.
 
 ## Senin (Kerem/işletme) yapman gerekenler — ben yapamam
+- [ ] Bulut depolama hesabı (Cloudflare R2 önerilir: çıkış trafiği ücretsiz) ve kova; anahtarları yalnızca sunucudaki `api/.env`'e yaz (`STORAGE_DRIVER=s3`, `S3_*`, `BACKUP_OFFSITE=1`). Kod hazır.
 - [ ] Avukat onayı: KVKK aydınlatma metni, açık rıza metinleri, kullanım koşulları, çerez politikası (sitede "taslak" ibaresiyle duruyor)
 - [ ] VERBİS kaydı; ticari ileti için İYS kaydı
 - [ ] Sanal POS anlaşması (iyzico, PayTR vb.) — şirket evrakı, vergi levhası
@@ -42,8 +43,6 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 ## Canlıya çıkış altyapısı
 - [ ] Sunucu ve alan adı, HTTPS
 - [ ] Gerçek SMS sağlayıcısı
-- [ ] Bulut dosya depolama
-- [ ] Bilgisayar dışında tutulan yedek
 - [ ] Yük / yoğunluk testi
 
 ## Gelir fikirleri (sonra)

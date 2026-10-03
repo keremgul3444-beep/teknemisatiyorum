@@ -1,12 +1,41 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { Injectable, Logger, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
+import crypto from 'crypto';
+import zlib from 'zlib';
+import { Inject, Injectable, Logger, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
 import { Prisma, type PrismaClient } from '@prisma/client';
 import { PrismaService } from '../common/prisma.service';
 import { env } from '../config/env';
+import { STORAGE, type Storage } from '../adapters/storage';
 
 const KEEP = 7;
 const DAY_MS = 24 * 60 * 60_000;
+/** Buluttaki şifreli yedekler daha uzun tutulur (sunucu diski kaybolsa da bir ay geriye dönülebilsin). */
+const KEEP_OFFSITE = 30;
+
+/** Yedek şifreleme anahtarı ID_ENC_KEY'den türetilir: geri yüklemek için aynı .env gerekir (scripts/backup-decrypt.ts). */
+const backupKey = () => crypto.createHmac('sha256', Buffer.from(env().ID_ENC_KEY, 'base64')).update('offsite-backup').digest();
+
+/** Sıkıştır + AES-256-GCM. Biçim: 12 bayt iv | 16 bayt etiket | şifreli veri. */
+export function sealBackup(plain: Buffer): Buffer {
+  const iv = crypto.randomBytes(12);
+  const c = crypto.createCipheriv('aes-256-gcm', backupKey(), iv);
+  const data = Buffer.concat([c.update(zlib.gzipSync(plain)), c.final()]);
+  return Buffer.concat([iv, c.getAuthTag(), data]);
+}
+
+export function openBackup(sealed: Buffer): Buffer {
+  const d = crypto.createDecipheriv('aes-256-gcm', backupKey(), sealed.subarray(0, 12));
+  d.setAuthTag(sealed.subarray(12, 28));
+  return zlib.gunzipSync(Buffer.concat([d.update(sealed.subarray(28)), d.final()]));
+}
+
+/** Günün yedeğini şifreleyip buluta yazar, 30 günden eskisini siler. */
+export async function pushOffsite(storage: Storage, file: string, now = new Date()) {
+  const day = (d: Date) => d.toISOString().slice(0, 10);
+  await storage.put(`backups/${day(now)}.json.enc`, sealBackup(await fs.readFile(file)));
+  await storage.remove(`backups/${day(new Date(now.getTime() - KEEP_OFFSITE * DAY_MS))}.json.enc`);
+}
 
 /**
  * Mantıksal yedek: her tablonun satırları tek bir günlük JSON dosyasına yazılır, son 7 gün tutulur.
@@ -32,12 +61,17 @@ export class BackupScheduler implements OnApplicationBootstrap, OnApplicationShu
   private readonly log = new Logger('Backup');
   private timer?: NodeJS.Timeout;
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService, @Inject(STORAGE) private readonly storage: Storage) {}
 
   onApplicationBootstrap() {
     if (env().NODE_ENV === 'test') return;
     const dir = path.resolve(process.cwd(), 'backups');
-    const run = () => runBackup(this.prisma, dir).then((f) => this.log.log(`Yedek alındı: ${f}`)).catch((e) => this.log.error(`Yedek alınamadı: ${e}`));
+    const run = () => runBackup(this.prisma, dir)
+      .then(async (f) => {
+        this.log.log(`Yedek alındı: ${f}`);
+        if (env().BACKUP_OFFSITE === '1') { await pushOffsite(this.storage, f); this.log.log('Şifreli yedek buluta yazıldı'); }
+      })
+      .catch((e) => this.log.error(`Yedek alınamadı: ${e}`));
     run();
     this.timer = setInterval(run, DAY_MS);
   }

@@ -12,6 +12,16 @@ const schema = z.object({
   LLM_MODEL: z.string().default('claude-haiku-4-5'),
   CORS_ORIGINS: z.string().default('http://localhost:8081'),
   STORAGE_DIR: z.string().default('storage'),
+  /** Dosyalar nerede: local = sunucu diski (STORAGE_DIR), s3 = S3 uyumlu bulut (AWS S3, Cloudflare R2, Backblaze B2, MinIO). */
+  STORAGE_DRIVER: z.enum(['local', 's3']).default('local'),
+  /** Örn. https://<hesap>.r2.cloudflarestorage.com ya da https://s3.eu-central-1.amazonaws.com */
+  S3_ENDPOINT: z.string().default(''),
+  S3_REGION: z.string().default('auto'),
+  S3_BUCKET: z.string().default(''),
+  S3_ACCESS_KEY_ID: z.string().default(''),
+  S3_SECRET_ACCESS_KEY: z.string().default(''),
+  /** 1: günlük veritabanı yedeği şifrelenip ayrıca buluta da yazılır (STORAGE_DRIVER=s3 gerekir). */
+  BACKUP_OFFSITE: z.enum(['0', '1']).default('0'),
   /** Boşsa medya bağlantıları göreli döner (önerilen); yalnızca farklı bir alan adından sunulacaksa doldurulur. */
   PUBLIC_URL: z.string().default(''),
   /** IP başına saatlik giriş kodu isteği sınırı. */
@@ -32,6 +42,15 @@ const schema = z.object({
 
 export type Env = z.infer<typeof schema>;
 
+/** Bulut seçildiyse eksik ayar sunucuyu açılışta durdurur (yarım ayarla dosyalar sessizce kaybolmasın). */
+function checkStorage(e: Env): string[] {
+  const missing = e.STORAGE_DRIVER === 's3'
+    ? (['S3_ENDPOINT', 'S3_BUCKET', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY'] as const).filter((k) => !e[k]).map((k) => `  - ${k}: STORAGE_DRIVER=s3 için gerekli`)
+    : [];
+  if (e.BACKUP_OFFSITE === '1' && e.STORAGE_DRIVER !== 's3') missing.push('  - BACKUP_OFFSITE: STORAGE_DRIVER=s3 olmadan bulut yedeği alınamaz');
+  return missing;
+}
+
 let cached: Env | undefined;
 /** Ortam değişkenlerini doğrular; eksik gizli değerde süreç anlaşılır bir hatayla durur. */
 export function env(): Env {
@@ -41,6 +60,8 @@ export function env(): Env {
     const msg = r.error.issues.map((i) => `  - ${i.path.join('.')}: ${i.message}`).join('\n');
     throw new Error(`Ortam ayarları geçersiz (api/.env):\n${msg}`);
   }
+  const storage = checkStorage(r.data);
+  if (storage.length) throw new Error(`Ortam ayarları geçersiz (api/.env):\n${storage.join('\n')}`);
   cached = r.data;
   return cached;
 }
