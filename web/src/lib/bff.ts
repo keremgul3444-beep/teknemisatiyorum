@@ -41,6 +41,30 @@ export async function relay(
   return { ok: data as Record<string, unknown>, fresh };
 }
 
+/**
+ * Dosya yükleme aktarımı (multipart): Origin denetimi ve oturum anahtarı `relay` ile aynı; gövde FormData olarak geçer.
+ * Boyut sınırı API'dedir (10 MB); burada yalnızca tek dosya ve görünürlük alanı aktarılır.
+ */
+export async function relayUpload(req: Request, path: string, form: FormData): Promise<Relayed> {
+  if (!sameOrigin(req)) return { res: forbidden() };
+  let token = cookieValue(req, ACCESS_COOKIE);
+  let fresh: Tokens | undefined;
+  if (!token || jwtExpired(token)) {
+    const rt = cookieValue(req, REFRESH_COOKIE);
+    fresh = (rt && (await refreshTokens(API_URL, rt))) || undefined;
+    token = fresh?.accessToken;
+  }
+  if (!token) return { res: json('UNAUTHENTICATED', 'errors.unauthenticated', 401) };
+  const r = await fetch(`${API_URL}${path}`, {
+    method: 'POST', body: form, signal: AbortSignal.timeout(60_000),
+    headers: { 'X-Forwarded-For': clientIp(req), Authorization: `Bearer ${token}` },
+  }).catch(() => null);
+  if (!r) return { res: withFresh(json('NETWORK', 'errors.network', 502), fresh), fresh };
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) return { res: withFresh(json(data.code ?? `HTTP_${r.status}`, data.messageKey ?? 'errors.generic', r.status), fresh), fresh };
+  return { ok: data as Record<string, unknown>, fresh };
+}
+
 /** Gövdeyi güvenle oku (bozuk JSON boş nesne). */
 export const readJson = async (req: Request): Promise<Record<string, unknown>> => (await req.clone().json().catch(() => ({}))) ?? {};
 

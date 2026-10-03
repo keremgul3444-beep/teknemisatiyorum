@@ -15,6 +15,7 @@ export function Header({ locale }: { locale: Locale }) {
         <Link className="hide-mobile" href={p('/usta')}>{t(locale, 'nav.usta')}</Link>
         <Link className="hide-mobile" href={p('/kaptan')}>{t(locale, 'nav.kaptan')}</Link>
         <LangSwitch locale={locale} label={t(locale, 'nav.lang')} />
+        <Link className="btn hide-mobile" href={p('/hesabim/ilan-ver')}>{t(locale, 'nav.sell')}</Link>
         <Link className="btn ghost" href={p('/hesabim')}>{t(locale, 'nav.account')}</Link>
       </nav>
     </header>
