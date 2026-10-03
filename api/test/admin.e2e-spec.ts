@@ -179,9 +179,16 @@ describe('yönetim', () => {
 });
 
 describe('başlangıç verisi', () => {
-  test('25 yayında ilan (fotoğraflı), paketler, kurlar ve yönetici', async () => {
+  test('canlı başlangıç verisi demo ilan içermez', async () => {
     await t.prisma.listing.deleteMany({});
     await runSeed(t.prisma);
+    expect(await t.prisma.listing.count()).toBe(0);
+    expect(await t.prisma.user.count({ where: { roles: { has: 'admin' } } })).toBeGreaterThanOrEqual(1);
+  });
+
+  test('demo: 25 yayında ilan (fotoğraflı), paketler, kurlar ve yönetici', async () => {
+    await t.prisma.listing.deleteMany({});
+    await runSeed(t.prisma, { demo: true });
     expect(await t.prisma.listing.count({ where: { status: 'published' } })).toBe(25);
     expect(await t.prisma.listingPhoto.count()).toBeGreaterThanOrEqual(25);
     expect(await t.prisma.expertisePackage.count()).toBeGreaterThanOrEqual(3);

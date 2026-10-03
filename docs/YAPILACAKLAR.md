@@ -37,7 +37,7 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 
 ## Web/öne çıkarma — incelemeden ertelenen küçük maddeler
 - [ ] Fiyatlar kuruşlu girilebilirse gösterim de kuruşlu olsun (şu an tam liraya yuvarlanıyor; yönetim ekranı tam lira giriyor)
-- [ ] Demo fotoğrafları MINOA'nın tek teknesinden; ilanlar farklı markalar olduğu için canlıya çıkmadan önce demo ilanlar ya kaldırılmalı ya da kendi fotoğraflarıyla değiştirilmeli
+- [ ] Canlı veritabanı yerelden kopyalanırsa demo içerik `scripts/remove-demo.ts` ile temizlenmeli (yeni kurulumda demo ilan zaten yüklenmez; yalnızca `SEED_DEMO=1` ile)
 - [ ] Canlıda ters vekil (reverse proxy) Host başlığını korumalı ve TRUSTED_PROXY_HOPS doğru ayarlanmalı
 
 ## Canlıya çıkış altyapısı

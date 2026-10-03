@@ -50,8 +50,8 @@ function start(name, cmd, args, opts = {}) {
   children.push({ name, p });
   return p;
 }
-function run(cmd, args, cwd) {
-  const r = spawnSync(cmd, args, { cwd, stdio: 'inherit', shell: isWin });
+function run(cmd, args, cwd, env) {
+  const r = spawnSync(cmd, args, { cwd, stdio: 'inherit', shell: isWin, env: env ? { ...process.env, ...env } : process.env });
   if (r.status !== 0) throw new Error(`${cmd} ${args.join(' ')} başarısız`);
 }
 const waitPort = (port) => new Promise((resolve) => {
@@ -79,7 +79,8 @@ for (let i = 1; ; i++) {
   try { run('npx', ['prisma', 'migrate', 'deploy'], API); break; } catch (e) { if (i >= 10) throw e; await new Promise((r) => setTimeout(r, 2000)); }
 }
 run('npm', ['run', 'build'], API);
-run('node', [...nodeEnv, 'prisma/seed.ts'], API);
+// Yerel geliştirmede demo ilanlar da yüklenir (canlıda SEED_DEMO yok: yalnızca yönetici, kurlar, paketler, ürünler).
+run('node', [...nodeEnv, 'prisma/seed.ts'], API, { SEED_DEMO: '1' });
 start('API', 'node', ['--env-file=.env', 'dist/src/main.js'], { cwd: API });
 await waitPort(3000);
 if (withWeb) {

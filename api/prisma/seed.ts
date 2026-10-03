@@ -1,12 +1,13 @@
-// Başlangıç verisi: prototipteki 25 ilan (MINOA'nın gerçek tekne fotoğraflarıyla), ekspertiz paketleri, kurlar ve yönetici hesabı.
-// Kullanım: node --env-file=.env --import tsx prisma/seed.ts   (scripts/dev.mjs veritabanı boşsa kendisi çalıştırır)
+// Başlangıç verisi: yönetici hesabı, kurlar, ekspertiz paketleri, öne çıkarma ürünleri.
+// Demo (yalnızca SEED_DEMO=1): prototipteki 25 ilan ve satıcıları (MINOA'nın tekne fotoğraflarıyla). Canlıda yüklenmez.
+// Kullanım: node --env-file=.env --import tsx prisma/seed.ts   (scripts/dev.mjs veritabanı boşsa kendisi çalıştırır, demo açık)
 import 'reflect-metadata';
 import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import { PrismaClient } from '@prisma/client';
 import { makeListings } from '@tms/shared';
-import { LocalDiskStorage } from '../src/adapters/storage';
+import { storageProvider } from '../src/adapters/storage';
 
 /** Demo fotoğrafları: `shared/assets/boats` (uygulamanın demo modu da aynı dosyaları gösterir). İlk 8'i dış çekim. */
 const PHOTO_DIR = path.resolve(__dirname, '../../shared/assets/boats');
@@ -20,7 +21,8 @@ function boatPhotos(seed: number) {
   return [cover, ...frames].map((f) => fs.readFileSync(path.join(PHOTO_DIR, f)));
 }
 
-const SELLERS: Record<string, { phone: string; name: string }> = {
+/** Demo satıcılar: `scripts/remove-demo.ts` bu numaralarla demo içeriği bulup siler. */
+export const SELLERS: Record<string, { phone: string; name: string }> = {
   u1: { phone: '+905550000101', name: 'Ahmet K.' }, u2: { phone: '+905550000102', name: 'Elif S.' },
   u3: { phone: '+905550000103', name: 'Mert A.' }, u4: { phone: '+905550000104', name: 'Canan T.' },
   u5: { phone: '+905550000105', name: 'Oğuz B.' }, u6: { phone: '+905550000106', name: 'Derya M.' },
@@ -47,7 +49,7 @@ export async function seedProducts(prisma: PrismaClient) {
   }
 }
 
-export async function runSeed(prisma: PrismaClient) {
+export async function runSeed(prisma: PrismaClient, opts: { demo?: boolean } = {}) {
   await prisma.user.upsert({
     where: { phone: '+905000000000' },
     create: { phone: '+905000000000', name: 'Yönetici', verifyLevel: 3, roles: ['admin', 'moderator'] },
@@ -67,7 +69,11 @@ export async function runSeed(prisma: PrismaClient) {
   }
 
   await seedProducts(prisma);
+  if (opts.demo) await seedDemo(prisma);
+}
 
+/** Demo satıcılar, firmalar ve 25 ilan. Fotoğraflar seçili depolamaya (disk ya da bulut) yazılır. */
+async function seedDemo(prisma: PrismaClient) {
   const userIds: Record<string, string> = {};
   const companyIds: Record<string, string> = {};
   for (const [key, s] of Object.entries(SELLERS)) {
@@ -80,7 +86,7 @@ export async function runSeed(prisma: PrismaClient) {
     }
   }
 
-  const storage = new LocalDiskStorage();
+  const storage = storageProvider.useFactory();
   const listings = makeListings();
   for (const [i, l] of listings.entries()) {
     const fileIds: string[] = [];
@@ -96,7 +102,7 @@ export async function runSeed(prisma: PrismaClient) {
         ownerId: userIds[l.sellerId], companyId: companyIds[l.sellerId] ?? null,
         brand: l.brand, model: l.model, year: l.year, lengthM: l.lengthM, type: l.type, price: l.price, currency: l.currency,
         location: l.location, equipment: l.equipment, badges: l.badges, cabins: l.cabins, engine: l.engine, description: l.description,
-        status: 'published', publishedAt: new Date(Date.now() - (listings.length - i) * 3600_000),
+        status: 'published', publishedAt: new Date(Date.now() - (listings.length - i) * 3600_000), expiresAt: new Date(Date.now() + 90 * 864e5),
         photos: { create: fileIds.map((fileId, order) => ({ fileId, order })) },
       },
     });
@@ -108,6 +114,7 @@ if (require.main === module) {
   // Ürün tablosu her seferinde tamamlanır (sonradan eklenen tablolar mevcut veritabanında da dolsun).
   seedProducts(prisma)
     .then(() => prisma.listing.count())
-    .then((n) => (n ? console.log('Veritabanında ilan var; başlangıç verisi atlandı.') : runSeed(prisma).then(() => console.log('Başlangıç verisi yüklendi.'))))
+    .then((n) => (n ? console.log('Veritabanında ilan var; başlangıç verisi atlandı.')
+      : runSeed(prisma, { demo: process.env.SEED_DEMO === '1' }).then(() => console.log(`Başlangıç verisi yüklendi${process.env.SEED_DEMO === '1' ? ' (demo ilanlarla)' : ''}.`))))
     .finally(() => prisma.$disconnect());
 }
