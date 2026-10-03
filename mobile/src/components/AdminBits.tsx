@@ -9,6 +9,7 @@ import { Button } from './Button';
 import { Card } from './Card';
 import { Chip } from './Chip';
 import { T } from './T';
+import { Icon } from './Icon';
 
 export function AdminPage({ children }: { children: ReactNode }) {
   return <ScrollView contentContainerStyle={{ padding: space(4), gap: space(3), paddingBottom: space(12) }}>{children}</ScrollView>;
@@ -68,6 +69,15 @@ export function ApprovalRow({ item, onDecide, onOpenFile }: { item: AdminItem; o
         </ScrollView>
       ) : null}
       {item.listing ? <ListingFacts info={item.listing} /> : null}
+      {(item.listing?.photoDuplicates ?? []).map((d) => (
+        <Pressable key={d.listingId} onPress={() => router.push(`/ilan/${d.listingId}`)} accessibilityRole="link"
+          style={{ flexDirection: 'row', gap: space(1.5), alignItems: 'center' }}>
+          <Icon name="info" size={14} color={d.sameOwner ? colors.warning : colors.danger} />
+          <T variant="caption" color={d.sameOwner ? colors.warning : colors.danger} style={{ flex: 1 }}>
+            {t(d.sameOwner ? 'admin.duplicateSame' : 'admin.duplicateOther', { title: d.title })}
+          </T>
+        </Pressable>
+      ))}
       {item.listing?.previousRejectReason ? (
         <T variant="caption" color={colors.danger}>{t('admin.previousReject')}: {t(`admin.reasons.${item.listing.previousRejectReason}`, { defaultValue: item.listing.previousRejectReason })}</T>
       ) : null}

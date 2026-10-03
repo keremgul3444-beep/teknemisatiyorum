@@ -90,6 +90,7 @@ export interface ApiAdminListing {
   year?: number; price?: number; currency?: Currency; lengthM?: number; type?: string; location?: string; cabins?: number; engine?: string;
   engineHours?: number | null; flag?: string | null; tradeIn?: boolean; negotiable?: boolean; equipment?: string[]; description?: string;
   previousRejectReason?: string | null;
+  photoDuplicates?: { listingId: string; title: string; status: string; sameOwner: boolean }[];
 }
 export const toAdminListing = (x: ApiAdminListing): AdminItem => ({
   id: `l:${x.id}`, kind: 'ilan', title: x.title, who: x.ownerName ?? '—', status: 'bekliyor', refId: x.id, photos: (x.photos ?? []).map(absolute),
@@ -99,7 +100,7 @@ export const toAdminListing = (x: ApiAdminListing): AdminItem => ({
     location: x.location ?? '', cabins: x.cabins ?? 0, engine: x.engine ?? '', engineHours: x.engineHours ?? null,
     flag: (x.flag as Flag | null | undefined) ?? null, tradeIn: !!x.tradeIn, negotiable: !!x.negotiable,
     equipment: (x.equipment ?? []) as Equipment[], description: x.description ?? '', ownerVerifyLevel: x.ownerVerifyLevel ?? 0,
-    previousRejectReason: x.previousRejectReason ?? null,
+    previousRejectReason: x.previousRejectReason ?? null, photoDuplicates: x.photoDuplicates ?? [],
   },
 });
 export const toAdminVerification = (x: { id: string; kind: string; userName: string | null; fileIds?: string[]; details?: Record<string, unknown> | null }): AdminItem =>

@@ -1002,7 +1002,9 @@
       "offensive": "Uygunsuz içerik",
       "rules": "Kural ihlali"
     },
-    "previousReject": "Önceki red gerekçesi"
+    "previousReject": "Önceki red gerekçesi",
+    "duplicateOther": "Bu fotoğraf başka bir satıcının ilanında da var: {{title}}",
+    "duplicateSame": "Bu fotoğraf aynı satıcının başka bir ilanında da var: {{title}}"
   },
   "audit": {
     "listingApproved": "İlan onaylandı: {{title}}",

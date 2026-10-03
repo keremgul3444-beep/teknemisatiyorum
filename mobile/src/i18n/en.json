@@ -1002,7 +1002,9 @@
       "offensive": "Inappropriate",
       "rules": "Rule violation"
     },
-    "previousReject": "Previous rejection reason"
+    "previousReject": "Previous rejection reason",
+    "duplicateOther": "This photo also appears in another seller’s listing: {{title}}",
+    "duplicateSame": "This photo also appears in another listing by the same seller: {{title}}"
   },
   "audit": {
     "listingApproved": "Listing approved: {{title}}",

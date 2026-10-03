@@ -8,6 +8,7 @@ import { AppError, Errors } from '../../common/errors';
 import { safeEqual, sign } from '../../common/crypto';
 import { STORAGE, type Storage } from '../../adapters/storage';
 import { env } from '../../config/env';
+import { dhash } from './phash';
 
 const IMAGE_FORMATS = new Set(['jpeg', 'png', 'webp']);
 /** Site ve uygulamanın isteyebileceği görsel genişlikleri (başkası reddedilir: disk dolmasın). */
@@ -55,7 +56,8 @@ export class MediaService {
     const id = crypto.randomUUID();
     const key = `${visibility}/${id.slice(0, 2)}/${id}`;
     await this.storage.put(key, out);
-    await this.prisma.file.create({ data: { id, ownerId, visibility, key, mime, size: out.length } });
+    const phash = visibility === 'public' && mime === 'image/jpeg' ? await dhash(out).catch(() => null) : null;
+    await this.prisma.file.create({ data: { id, ownerId, visibility, key, mime, size: out.length, phash } });
     return { id, url: visibility === 'public' ? `${env().PUBLIC_URL}/media/${id}` : undefined };
   }
 
@@ -171,6 +173,18 @@ export class MediaService {
     return orphans.length;
   }
 
+  /** İzi olmayan eski herkese açık görsellere iz çıkarır (her çalışmada en fazla `limit`). */
+  async backfillHashes(limit = 500) {
+    const rows = await this.prisma.file.findMany({ where: { visibility: 'public', phash: null, mime: 'image/jpeg' }, take: limit, select: { id: true, key: true } });
+    for (const f of rows) {
+      const data = await this.storage.get(f.key);
+      // Okunamayan dosya boş izle işaretlenir: her çalışmada yeniden denenmesin.
+      const phash = data ? await dhash(data).catch(() => '') : '';
+      await this.prisma.file.update({ where: { id: f.id }, data: { phash } });
+    }
+    return rows.length;
+  }
+
   private async read(key: string, mime: string) {
     const data = await this.storage.get(key);
     if (!data) throw Errors.notFound();
@@ -188,7 +202,10 @@ export class MediaJanitor implements OnApplicationBootstrap, OnApplicationShutdo
 
   onApplicationBootstrap() {
     if (env().NODE_ENV === 'test') return;
-    const run = () => this.media.sweepOrphans().then((n) => n && this.log.log(`${n} yetim dosya silindi`)).catch((e) => this.log.error(`Temizlik yapılamadı: ${e}`));
+    const run = () => this.media.sweepOrphans().then((n) => n && this.log.log(`${n} yetim dosya silindi`))
+      .then(() => this.media.backfillHashes())
+      .catch((e) => this.log.error(`Temizlik yapılamadı: ${e}`));
+    run();
     this.timer = setInterval(run, DAY_MS);
   }
 

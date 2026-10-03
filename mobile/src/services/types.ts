@@ -93,6 +93,8 @@ export interface AdminListingInfo {
   description: string; ownerVerifyLevel: number;
   /** Yeniden gönderilen ilanda önceki red gerekçesi (ör. 'blurry'). */
   previousRejectReason?: string | null;
+  /** Aynı fotoğrafın geçtiği diğer ilanlar (başka satıcı: çalıntı şüphesi; aynı satıcı: mükerrer). */
+  photoDuplicates?: { listingId: string; title: string; status: string; sameOwner: boolean }[];
 }
 /** İşlem kaydı dile bağlı metin değil, çeviri anahtarı + parametre taşır. */
 export interface AuditEntry { id: string; at: string; who: string; key: string; params?: Record<string, string> }

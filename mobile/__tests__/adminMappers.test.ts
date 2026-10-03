@@ -11,3 +11,8 @@ test('I-5: belge başvurusu dosyaları ve pasaport bilgileri moderatöre taşın
   expect(item.fileIds).toEqual(['f9']);
   expect(item.details).toEqual({ passport: 'U1', nationality: 'DE' });
 });
+
+test('aynı fotoğrafın geçtiği diğer ilanlar moderatöre taşınır', () => {
+  const item = toAdminListing({ id: 'l2', title: 'X', ownerName: 'A', year: 2018, photoDuplicates: [{ listingId: 'o1', title: 'Hanse 418', status: 'published', sameOwner: false }] });
+  expect(item.listing?.photoDuplicates).toEqual([{ listingId: 'o1', title: 'Hanse 418', status: 'published', sameOwner: false }]);
+});

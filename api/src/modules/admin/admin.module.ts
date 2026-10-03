@@ -12,6 +12,7 @@ import { BoatsModule } from '../boats/boats.module';
 import { I18N_PREFIX, LogbookService, dateOnly } from '../boats/logbook.service';
 import { NotificationsService } from '../notifications/notifications.module';
 import { nextExpiry } from '../listings/expiry';
+import { photoDuplicates } from '../listings/duplicates';
 import { ModerationController } from './moderation.controller';
 
 const STAFF = { roles: ['moderator', 'admin'] as ('moderator' | 'admin')[] };
@@ -77,10 +78,13 @@ class AdminController {
     const rejections = await this.prisma.auditLog.findMany({
       where: { action: 'audit.listingRejected', targetType: 'listing', targetId: { in: rows.map((l) => l.id) } }, orderBy: { at: 'desc' },
     });
+    const dups = await photoDuplicates(this.prisma, rows.map((l) => l.id));
     const previousReason = (id: string) => (rejections.find((x) => x.targetId === id)?.params as { reason?: string } | null)?.reason ?? null;
     // Moderatör ilanın yayına çıkacak her şeyini görür: açıklama, konum, özellikler ve yeni alanlar dahil.
     return rows.map((l) => ({
       previousRejectReason: previousReason(l.id),
+      /** Aynı fotoğrafın kullanıldığı diğer ilanlar (başka satıcıda: çalıntı şüphesi; aynı satıcıda: mükerrer ilan). */
+      photoDuplicates: dups.get(l.id) ?? [],
       id: l.id, title: `${l.brand} ${l.model}`, year: l.year, price: l.price, currency: l.currency, ownerName: l.owner.name,
       ownerVerifyLevel: l.owner.verifyLevel,
       photoCount: l.photos.length, photos: [...l.photos].sort((a, b) => a.order - b.order).map((p) => `/media/${p.fileId}`), updatedAt: l.updatedAt,

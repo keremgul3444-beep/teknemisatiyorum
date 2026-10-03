@@ -150,6 +150,8 @@ model File {
   key        String     @unique
   mime       String
   size       Int
+  /// Herkese açık görselin algısal izi (dHash, 16 hex); aynı fotoğrafın başka ilanda kullanıldığını yakalamak için.
+  phash      String?
   createdAt  DateTime   @default(now())
 }
 
