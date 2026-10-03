@@ -5,7 +5,7 @@ import { authedGet } from '@/lib/auth-server';
 import { LogoutButton } from '@/components/AccountBits';
 
 type P = { params: Promise<{ locale: string }> };
-type Me = { name: string | null; phone: string | null; verifyLevel: number };
+type Me = { name: string | null; phone: string | null; verifyLevel: number; roles?: string[] };
 
 export async function generateMetadata({ params }: P): Promise<Metadata> {
   const { locale } = (await params) as { locale: Locale };
@@ -24,6 +24,8 @@ export default async function Hesabim({ params }: P) {
         <Link className="card" href={p('/hesabim/ilan-ver')}><h3>{t(locale, 'account.sell')}</h3><p className="muted small">{t(locale, 'account.sellBody')}</p></Link>
         <Link className="card" href={p('/hesabim/ilanlar')}><h3>{t(locale, 'account.listings')}</h3><p className="muted small">{t(locale, 'account.listingsBody')}</p></Link>
         <Link className="card" href={p('/hesabim/mesajlar')}><h3>{t(locale, 'account.messages')}</h3><p className="muted small">{t(locale, 'account.messagesBody')}</p></Link>
+        <Link className="card" href={p('/firma')}><h3>{t(locale, 'account.firm')}</h3><p className="muted small">{t(locale, 'account.firmBody')}</p></Link>
+        {me.roles?.some((r) => r === 'admin' || r === 'moderator') ? <Link className="card" href={p('/yonetim')}><h3>{t(locale, 'account.admin')}</h3><p className="muted small">{t(locale, 'account.adminBody')}</p></Link> : null}
         <Link className="card" href={p('/hesabim/siparisler')}><h3>{t(locale, 'account.orders')}</h3><p className="muted small">{t(locale, 'account.ordersBody')}</p></Link>
       </div>
       <div style={{ marginTop: 24 }}><LogoutButton label={t(locale, 'account.logout')} to={p('/')} /></div>

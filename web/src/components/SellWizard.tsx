@@ -14,8 +14,10 @@ const DRAFT_KEY = 'tms.sell.draft';
  * gönderimden önce T.C. kimliğini doğrular. Alanlar sekmede saklanır (fotoğraflar hariç). Gönderim sırası:
  * taslak aç → fotoğrafları yükle → fotoğraf listesini ayarla → onaya gönder; yarıda kalırsa aynı taslaktan sürer.
  */
-export function SellWizard({ L, err, errors, types, equipment, verified, doneHref }: {
+export function SellWizard({ L, err, errors, types, equipment, verified, doneHref, companies = [] }: {
   L: Dict; err: Dict; errors: Dict; types: Dict; equipment: Dict; verified: boolean; doneHref: string;
+  /** Kullanıcının üyesi olduğu firmalar: ilan firma adına verilebilir. */
+  companies?: { id: string; name: string }[];
 }) {
   const [step, setStep] = useState(0);
   const [f, setF] = useState<SellFields>(emptySell);
@@ -247,6 +249,15 @@ export function SellWizard({ L, err, errors, types, equipment, verified, doneHre
             </select>
             {shown.location ? <span className="small" style={{ color: 'var(--c-danger)' }}>{err.location}</span> : null}
           </div>
+          {companies.length ? (
+            <div style={{ display: 'grid', gap: 6 }}>
+              <label htmlFor="sell-company">{L.seller}</label>
+              <select id="sell-company" className="input" value={companies.some((c) => c.id === f.companyId) ? f.companyId : ''} onChange={(e) => set('companyId', e.target.value)}>
+                <option value="">{L.sellerSelf}</option>
+                {companies.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+          ) : null}
           <label className="row"><input type="checkbox" checked={f.tradeIn} onChange={(e) => set('tradeIn', e.target.checked)} /> {L.tradeIn}</label>
           <label className="row"><input type="checkbox" checked={f.negotiable} onChange={(e) => set('negotiable', e.target.checked)} /> {L.negotiable}</label>
         </section>

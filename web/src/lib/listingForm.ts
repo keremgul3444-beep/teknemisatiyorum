@@ -7,11 +7,13 @@ export { MAX_LISTING_PHOTOS };
 export interface SellFields {
   brand: string; model: string; year: string; length: string; cabins: string; engine: string; engineHours: string; description: string; price: string;
   type: BoatType | ''; currency: Currency; location: string; flag: Flag | ''; equipment: Equipment[]; tradeIn: boolean; negotiable: boolean;
+  /** Firma adına verilen ilan (boş: bireysel). */
+  companyId: string;
 }
 
 export const emptySell = (): SellFields => ({
   brand: '', model: '', year: '', length: '', cabins: '', engine: '', engineHours: '', description: '', price: '',
-  type: '', currency: 'EUR', location: '', flag: '', equipment: [], tradeIn: false, negotiable: false,
+  type: '', currency: 'EUR', location: '', flag: '', equipment: [], tradeIn: false, negotiable: false, companyId: '',
 });
 
 /** "12,4" → 12.4; fiyattaki binlik noktalar atlanır. Boş → NaN. */
@@ -54,6 +56,7 @@ export function toDraft(f: SellFields) {
     currency: f.currency, type: f.type || 'motoryat', location: f.location, equipment: f.equipment,
     cabins: Number(f.cabins) || 0, engine: f.engine.trim(), description: f.description.trim(),
     engineHours: f.engineHours ? Number(f.engineHours) : null, flag: f.flag || null, tradeIn: f.tradeIn, negotiable: f.negotiable,
+    ...(f.companyId ? { companyId: f.companyId } : {}),
   };
 }
 

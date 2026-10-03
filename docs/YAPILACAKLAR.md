@@ -18,8 +18,6 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 ## Web sitesi
 - [ ] Aşama 2 ödeme: gerçek sanal POS ve gerçek Apple/Google ödemesi (hesaplar açılınca, deneme modunun yerine takılır)
 - [ ] Siteden ilan düzenleme ve belge (ruhsat) yükleme; ilan verme ve kimlik doğrulama sitede var (`/hesabim/ilan-ver`)
-- [ ] Web yönetim paneli (/yonetim)
-- [ ] Firma paneli (/firma)
 - [ ] Blog / içerik yazıları (SEO için değerli, ayrı içerik işi)
 - [ ] İstatistik aracı seçimi (Google Analytics ya da gizlilik dostu alternatif)
 - [ ] Canlı sunucuda hız ölçümünü (Lighthouse) tekrarla; yerel ölçüm: ana sayfa 96, ilan 92

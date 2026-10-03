@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { siteUrl } from '@/lib/seo';
 
 /** Google'a kapalı yollar (her iki dilde): girişli alan, ödeme, asistan sonuçları, kalkan ilan sayfası. */
-const CLOSED = ['/hesabim', '/odeme', '/giris', '/asistan', '/ilan-kalkti'];
+const CLOSED = ['/hesabim', '/odeme', '/giris', '/asistan', '/ilan-kalkti', '/yonetim', '/firma'];
 
 export default function robots(): MetadataRoute.Robots {
   return {

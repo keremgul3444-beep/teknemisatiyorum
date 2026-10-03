@@ -1,4 +1,5 @@
 import { Linking, Platform, Share } from 'react-native';
+import type { CompanyDetail } from '@/features/company';
 import { matchListings, parseQuery, parsedQuerySchema, type Criterion, type ParsedQuery } from '@tms/shared';
 import { useStore } from './store';
 import { absolute, isApiMode } from './mode';
@@ -157,6 +158,16 @@ export const actions = {
     await syncMine();
   },
   /** Devir asistanının sonunda: ilan satıldı (yayından kalkar, İlanlarım > Satıldı'da durur). */
+  /** Üyesi olunan firmalar (ilan formunda "Satıcı" seçimi ve firma paneli için). Demoda yerel firmalar. */
+  async myCompanies(): Promise<{ id: string; name: string }[]> {
+    if (!isApiMode()) return g().companies.map((c) => ({ id: c.id, name: c.name }));
+    return api.get<{ id: string; name: string }[]>('/companies/mine');
+  },
+  // ——— Firma paneli (gerçek mod) ———
+  companyDetail: (id: string) => api.get<CompanyDetail>(`/companies/${id}`),
+  createCompany: (b: { name: string; kind: string; city: string }) => api.post<{ id: string }>('/companies', b),
+  addCompanyMember: (id: string, phone: string, role: 'admin' | 'staff') => api.post(`/companies/${id}/members`, { phone, role }),
+  removeCompanyMember: (id: string, userId: string) => api.del(`/companies/${id}/members/${userId}`),
   /** Süresi dolan ya da dolmak üzere olan ilanı 90 gün uzatır (onaya düşmez). */
   async renewListing(id: string) {
     if (!isApiMode()) return g().renewListing(id);

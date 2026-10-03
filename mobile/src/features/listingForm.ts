@@ -23,6 +23,8 @@ export interface WizardState {
   doc: boolean; docUri: string | null; engineDoc: boolean; engineDocUri: string | null; engineSerial: string;
   /** Sunucuda açılmış yarım taslağın kimliği: uygulama kapanıp açılırsa ikinci ilan açılmaz. */
   serverId?: string;
+  /** Firma adına ilan (yalnızca yeni ilanda seçilir; boş: bireysel). */
+  companyId?: string;
 }
 
 export const emptyWizard = (): WizardState => ({
@@ -135,6 +137,7 @@ export function toDraft(s: WizardState): ListingDraft {
     price: parseNum(s.f.price), currency: s.currency, type: s.type ?? 'motoryat', location: s.location ?? '', equipment: s.equipment,
     cabins: Number(s.f.cabins) || 0, engine: s.f.engine.trim(), description: s.f.description.trim(),
     engineHours: s.f.engineHours ? Number(s.f.engineHours) : null, flag: s.flag ?? null, tradeIn: s.tradeIn, negotiable: s.negotiable,
+    ...(s.companyId ? { companyId: s.companyId } : {}),
   };
 }
 

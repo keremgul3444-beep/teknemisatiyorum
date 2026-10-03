@@ -14,13 +14,17 @@ export async function generateMetadata({ params }: P): Promise<Metadata> {
 /** Siteden ilan verme (girişli). Kimliği doğrulanmamış satıcı son adımda doğrular. */
 export default async function IlanVer({ params }: P) {
   const { locale } = (await params) as { locale: Locale };
-  const me = await authedGet<Me>(locale, '/me', '/hesabim/ilan-ver');
+  const [me, companies] = await Promise.all([
+    authedGet<Me>(locale, '/me', '/hesabim/ilan-ver'),
+    authedGet<{ id: string; name: string }[]>(locale, '/companies/mine', '/hesabim/ilan-ver'),
+  ]);
   return (
     <section className="section" style={{ maxWidth: 820 }}>
       <h1>{t(locale, 'sell.title')}</h1>
       <p className="muted">{t(locale, 'sell.intro')}</p>
       <SellWizard L={tDict(locale, 'sell')} err={tDict(locale, 'sell.err')} errors={tDict(locale, 'errors')} types={tDict(locale, 'boatType')}
-        equipment={tDict(locale, 'equipment')} verified={me.verifyLevel >= 2} doneHref={localePath(locale, '/hesabim/ilanlar')} />
+        equipment={tDict(locale, 'equipment')} verified={me.verifyLevel >= 2} doneHref={localePath(locale, '/hesabim/ilanlar')}
+        companies={companies.map((c) => ({ id: c.id, name: c.name }))} />
     </section>
   );
 }

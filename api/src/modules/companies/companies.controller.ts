@@ -1,11 +1,14 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post } from '@nestjs/common';
 import { z } from 'zod';
 import { Auth, CurrentUser, type AuthUser } from '../../common/decorators';
 import { ZodPipe } from '../../common/zod.pipe';
 import { PrismaService } from '../../common/prisma.service';
 import { AppError, Errors } from '../../common/errors';
 import { AuditService } from '../../common/audit.service';
+import { maskPhone } from '@tms/shared';
 import { phoneSchema } from '../auth/phone';
+import { ListingsService } from '../listings/listings.service';
+import { listingInclude } from '../listings/listing.view';
 
 const companyBody = z.object({
   name: z.string().trim().min(2).max(80),
@@ -16,7 +19,7 @@ const memberBody = z.object({ phone: phoneSchema, role: z.enum(['admin', 'staff'
 
 @Controller('companies')
 export class CompaniesController {
-  constructor(private readonly prisma: PrismaService, private readonly audit: AuditService) {}
+  constructor(private readonly prisma: PrismaService, private readonly audit: AuditService, private readonly listings: ListingsService) {}
 
   @Auth({ level: 2 })
   @Post()
@@ -47,6 +50,60 @@ export class CompaniesController {
       update: { role: b.role },
     });
     await this.audit.log(u.id, 'audit.memberChanged', { role: b.role, before: cur?.role ?? '-' }, 'company', id);
+    return m;
+  }
+
+  /**
+   * Firma paneli: firma, personel (telefon maskeli) ve firmanın ilanları istatistikleriyle. Yalnızca üyeler görür;
+   * ilan istatistikleri ve yönetim yalnızca sahip ve yöneticiye (personel kendi ilanlarını İlanlarım'da görür).
+   */
+  @Auth()
+  @Get(':id')
+  async detail(@CurrentUser() u: AuthUser, @Param('id') id: string) {
+    const me = await this.member(id, u.id);
+    const c = await this.prisma.company.findUniqueOrThrow({ where: { id }, include: { members: true } });
+    const users = await this.prisma.user.findMany({ where: { id: { in: c.members.map((m) => m.userId) } }, select: { id: true, name: true, phone: true, deletedAt: true } });
+    const manager = ['owner', 'admin'].includes(me.role);
+    const rows = await this.prisma.listing.findMany({
+      where: { companyId: id, status: { in: ['pending', 'published', 'rejected', 'sold', 'expired'] } },
+      include: listingInclude, orderBy: { updatedAt: 'desc' }, take: 200,
+    });
+    const stats = manager ? await this.listings.statsFor(rows) : new Map();
+    const nameOf = (uid: string) => users.find((x) => x.id === uid)?.name ?? null;
+    return {
+      id: c.id, name: c.name, kind: c.kind, city: c.city, myRole: me.role,
+      members: c.members.map((m) => {
+        const usr = users.find((x) => x.id === m.userId);
+        return { userId: m.userId, role: m.role, name: usr?.deletedAt ? null : usr?.name ?? null, phone: usr?.phone ? maskPhone(usr.phone) : null, me: m.userId === u.id };
+      }),
+      listings: rows.map((l) => ({
+        id: l.id, title: `${l.brand} ${l.model}`, year: l.year, price: l.price, currency: l.currency, status: l.status,
+        ownerName: nameOf(l.ownerId), cover: l.photos[0] ? `/media/${l.photos[0].fileId}` : null,
+        expiresAt: l.expiresAt?.toISOString() ?? null, ...(manager ? { stats: stats.get(l.id) } : {}),
+      })),
+    };
+  }
+
+  /** Personeli firmadan çıkar (sahip ya da yönetici; sahip çıkarılamaz). Kişinin firmadaki ilanları bireysel ilana döner. */
+  @Auth({ level: 2 })
+  @Delete(':id/members/:userId')
+  @HttpCode(204)
+  async removeMember(@CurrentUser() u: AuthUser, @Param('id') id: string, @Param('userId') userId: string) {
+    const me = await this.member(id, u.id);
+    if (!['owner', 'admin'].includes(me.role)) throw Errors.notFound();
+    const target = await this.prisma.companyMember.findUnique({ where: { companyId_userId: { companyId: id, userId } } });
+    if (!target) throw Errors.notFound();
+    if (target.role === 'owner') throw new AppError('OWNER_LOCKED', 'errors.owner_locked', 409);
+    await this.prisma.$transaction([
+      this.prisma.companyMember.delete({ where: { companyId_userId: { companyId: id, userId } } }),
+      this.prisma.listing.updateMany({ where: { companyId: id, ownerId: userId }, data: { companyId: null } }),
+    ]);
+    await this.audit.log(u.id, 'audit.memberRemoved', { role: target.role }, 'company', id);
+  }
+
+  private async member(companyId: string, userId: string) {
+    const m = await this.prisma.companyMember.findUnique({ where: { companyId_userId: { companyId, userId } } });
+    if (!m) throw Errors.notFound();
     return m;
   }
 }

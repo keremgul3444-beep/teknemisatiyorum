@@ -490,7 +490,9 @@
     "editReviewNote": "Fiyat dışındaki değişiklikler onaya gider. Onaylanana kadar (genelde 2 saat) ilan yayında görünmez.",
     "verifyBanner": "İlanı yayınlamak için kimliğini doğrulaman gerekiyor. Şimdi doğrularsan sonda beklemezsin.",
     "verifyBannerCta": "Kimliğini doğrula",
-    "photoLabelCover": "Fotoğraf {{n}} / {{total}}, kapak"
+    "photoLabelCover": "Fotoğraf {{n}} / {{total}}, kapak",
+    "seller": "Satıcı",
+    "sellerSelf": "Bireysel"
   },
   "boatAdd": {
     "title": "Tekne ekle",
@@ -888,6 +890,30 @@
       "broker": "Broker firması",
       "tersane": "Tersane",
       "servis": "Servis firması"
+    },
+    "createTitle": "Firma hesabı aç",
+    "createBody": "Galeri, broker, tersane ya da servis olarak firma hesabı aç; personelini ekle, ilanlarını tek yerden izle.",
+    "name": "Firma adı",
+    "city": "Şehir",
+    "create": "Firma aç",
+    "phone": "Personelin telefonu",
+    "add": "Ekle",
+    "addHint": "Kişinin önce uygulamada hesap açmış olması gerekir.",
+    "remove": "Çıkar",
+    "removeConfirm": "{{name}} firmadan çıkarılsın mı? İlanları bireysel ilana döner.",
+    "noListings": "Firmaya bağlı ilan yok. İlan verirken \"Satıcı\" alanında firmayı seç.",
+    "stats": "{{v}} görüntülenme · {{f}} favori · {{m}} mesaj",
+    "role": {
+      "owner": "Sahip",
+      "admin": "Yönetici",
+      "staff": "Personel"
+    },
+    "status": {
+      "pending": "Onay bekliyor",
+      "published": "Yayında",
+      "rejected": "Reddedildi",
+      "sold": "Satıldı",
+      "expired": "Süresi doldu"
     }
   },
   "admin": {
@@ -1039,7 +1065,8 @@
     "listingWithdrawn": "İlan sahibi tarafından kaldırıldı: {{title}}",
     "privateFileViewed": "Korumalı belge açıldı",
     "listingRenewed": "İlan yenilendi: {{title}}",
-    "identityFailed": "Kimlik doğrulama başarısız"
+    "identityFailed": "Kimlik doğrulama başarısız",
+    "memberRemoved": "Firma personeli çıkarıldı ({{role}})"
   },
   "errors": {
     "generic": "Bir şeyler ters gitti, tekrar dene.",

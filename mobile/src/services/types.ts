@@ -90,6 +90,8 @@ export interface ReportGroup {
 export interface AdminListingInfo {
   year: number; price: number; currency: Currency; lengthM: number; type: BoatType; location: string; cabins: number;
   engine: string; engineHours: number | null; flag: Flag | null; tradeIn: boolean; negotiable: boolean; equipment: Equipment[];
+  /** Firma adına ilan (yalnızca yeni ilanda). */
+  companyId?: string;
   description: string; ownerVerifyLevel: number;
   /** Yeniden gönderilen ilanda önceki red gerekçesi (ör. 'blurry'). */
   previousRejectReason?: string | null;

@@ -5,9 +5,9 @@ import { ACCESS_COOKIE, clearSession, FRESH_TOKEN_HEADER, jwtExpired, REFRESH_CO
 const API = () => process.env.API_URL ?? 'http://127.0.0.1:3000';
 
 /** Her istekte yeniden üretilen (girişli) sayfalar: nonce'lu sıkı güvenlik politikası burada. */
-const PRIVATE = /^\/(en\/)?(giris|hesabim|odeme)(\/|$)/;
+const PRIVATE = /^\/(en\/)?(giris|hesabim|odeme|yonetim|firma)(\/|$)/;
 /** Oturum gerektiren sayfalar (giriş sayfası hariç). */
-const NEEDS_SESSION = /^\/(en\/)?(hesabim|odeme)(\/|$)/;
+const NEEDS_SESSION = /^\/(en\/)?(hesabim|odeme|yonetim|firma)(\/|$)/;
 // Uzun adres (marka-model-yıl-…-kimlik) ve paylaşımdaki kısa adres (/ilan/kimlik): kalkan ilan ikisinde de 410.
 const LISTING = /^\/(?:en\/)?ilan\/(?:[^/]*-)?([a-z0-9]{8,40})$/;
 

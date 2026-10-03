@@ -88,6 +88,9 @@ export default function IlanVer() {
   }, [s, loaded, done, userId, isEdit]);
 
   const update = (patch: Partial<WizardState>) => setS((cur) => ({ ...cur, ...patch }));
+  // Firma adına ilan: kullanıcının üyesi olduğu firmalar (yoksa seçim gösterilmez).
+  const [companies, setCompanies] = useState<{ id: string; name: string }[]>([]);
+  useEffect(() => { if (isApiMode()) attempt(() => actions.myCompanies()).then((c) => { if (c) setCompanies(c); }); }, []);
   const set = (k: keyof WizardFields) => (v: string) => setS((cur) => ({ ...cur, f: { ...cur.f, [k]: v } }));
   const step = s.step;
   const errors: StepErrors = validateStep(step, s);
@@ -373,6 +376,14 @@ export default function IlanVer() {
             </View>
             {err('location') ? <T variant="caption" color={colors.danger}>{err('location')}</T> : null}
           </Section>
+          {!editing && companies.length ? (
+            <Section title={t('wizard.seller')}>
+              <View style={row}>
+                <Chip label={t('wizard.sellerSelf')} selected={!s.companyId} onPress={() => update({ companyId: undefined })} />
+                {companies.map((c) => <Chip key={c.id} label={c.name} selected={s.companyId === c.id} onPress={() => update({ companyId: c.id })} />)}
+              </View>
+            </Section>
+          ) : null}
           <CheckRow label={t('wizard.broker')} hint={t('wizard.brokerHint')} checked={s.broker} onToggle={() => update({ broker: !s.broker })} />
         </>
       ) : null}
