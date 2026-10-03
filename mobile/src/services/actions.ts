@@ -40,6 +40,7 @@ function apiSubject(subject: { kind: SubjectKind; id: string }) {
 export interface AdminServicePayment {
   id: string; payerId: string; providerId: string; providerName: string | null; subjectKind: string; subjectId: string;
   amountKurus: number; feeKurus: number; status: string; createdAt: string; paidAt: string | null;
+  autoReleaseAt: string | null; disputedAt: string | null; disputeNote: string | null;
 }
 
 export interface AssistantResult { query: ParsedQuery; exact: Listing[]; near: { listing: Listing; missing: Criterion[] }[]; source: 'llm' | 'rules' | 'local' }
@@ -443,6 +444,17 @@ export const actions = {
   async rateJob(jobId: string, stars: number) {
     if (!isApiMode()) return g().rateJob(jobId, stars);
     await api.post(`/jobs/${jobId}/review`, { stars });
+    await syncServices();
+  },
+  /** Usta: "işi bitirdim" (sahibine bildirim; süre sonunda ödeme kendiliğinden aktarılır). */
+  markDelivered: (jobId: string) => api.post(`/jobs/${jobId}/delivered`),
+  /** Ödeyen: sorun bildir; otomatik aktarım durur, karar ekipte. */
+  async disputeJob(jobId: string, note: string) {
+    await api.post(`/jobs/${jobId}/dispute`, { note });
+    await syncServices();
+  },
+  async disputeBooking(id: string, note: string) {
+    await api.post(`/captain-bookings/${id}/dispute`, { note });
     await syncServices();
   },
   async cancelJob(jobId: string) {

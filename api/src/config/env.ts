@@ -28,14 +28,22 @@ const schema = z.object({
   OTP_IP_LIMIT: z.coerce.number().default(10),
   /** Kapalı beta: SMS bağlanana kadar giriş kodu yanıtta döner. Üretimde (NODE_ENV=production) hiçbir koşulda çalışmaz. */
   DEV_OTP_ECHO: z.enum(['0', '1']).default('0'),
-  /** Ödeme sağlayıcıları: dev = deneme (gerçek para yok), live = gerçek (Aşama 2). */
-  PAYMENTS_MODE: z.enum(['dev', 'live']).default('dev'),
+  /** Ödeme sağlayıcıları: dev = deneme (gerçek para yok), live = gerçek (Aşama 2), off = ödeme kapalı (sanal POS anlaşmasına kadar canlıda). */
+  PAYMENTS_MODE: z.enum(['dev', 'live', 'off']).default('dev'),
   /** Ödeme bildirimi imza anahtarı (sanal POS paneli ile aynı değer). */
   PAYMENT_WEBHOOK_SECRET: z.string().min(32, 'PAYMENT_WEBHOOK_SECRET en az 32 karakter olmalı'),
   /** Usta ve kaptan ödemelerinde ödeyenden alınan platform payı (yüzde). */
   SERVICE_FEE_PERCENT: z.coerce.number().min(0).max(50).default(8),
   /** Sitenin adresi (ödeme dönüş ve deneme ödeme sayfası için). */
   WEB_URL: z.string().default('http://localhost:3001'),
+  /** SMS: dev = gönderilmez (yerel gelen kutusu; üretimde açılmaz), netgsm ya da twilio = gerçek gönderim. */
+  SMS_MODE: z.enum(['dev', 'netgsm', 'twilio']).default('dev'),
+  /** Netgsm: kullanıcı kodu / Twilio: Account SID. */
+  SMS_USER: z.string().default(''),
+  /** Netgsm: şifre / Twilio: Auth Token. */
+  SMS_PASSWORD: z.string().default(''),
+  /** Onaylı gönderici adı (Netgsm başlığı) ya da Twilio gönderici numarası/adı. */
+  SMS_SENDER_NAME: z.string().default(''),
   /** Kimlik doğrulama: algorithm = yalnızca numaranın algoritması (geliştirme), nvi = NVİ KPSPublic sorgusu (ad, soyad, doğum yılı eşleşmesi). */
   IDENTITY_MODE: z.enum(['algorithm', 'nvi']).default('algorithm'),
   /** Anlık bildirim: expo = Expo Push servisi (telefona), off = yalnızca uygulama içi (geliştirme ve test). */
@@ -52,6 +60,8 @@ function checkStorage(e: Env): string[] {
     ? (['S3_ENDPOINT', 'S3_BUCKET', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY'] as const).filter((k) => !e[k]).map((k) => `  - ${k}: STORAGE_DRIVER=s3 için gerekli`)
     : [];
   if (e.BACKUP_OFFSITE === '1' && e.STORAGE_DRIVER !== 's3') missing.push('  - BACKUP_OFFSITE: STORAGE_DRIVER=s3 olmadan bulut yedeği alınamaz');
+  if (e.NODE_ENV === 'production' && !/^https:\/\//.test(e.PUBLIC_URL)) missing.push('  - PUBLIC_URL: canlıda https ile başlayan API adresi gerekli (mobil uygulama fotoğrafları bu adresten açar)');
+  if (e.SMS_MODE !== 'dev') (['SMS_USER', 'SMS_PASSWORD', 'SMS_SENDER_NAME'] as const).filter((k) => !e[k]).forEach((k) => missing.push(`  - ${k}: SMS_MODE=${e.SMS_MODE} için gerekli`));
   return missing;
 }
 

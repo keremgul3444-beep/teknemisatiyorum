@@ -1,0 +1,68 @@
+# Canlı kurulum: PostgreSQL + API + site + Caddy (otomatik HTTPS).
+# Kullanım (sunucuda, depo kökünde): cp deploy/.env.example deploy/.env  → doldur → docker compose -f deploy/docker-compose.yml up -d --build
+name: teknemisatiyorum
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: tms
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD gerekli}
+      POSTGRES_DB: tms
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U tms']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build: { context: .., dockerfile: deploy/api.Dockerfile }
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://tms:${DB_PASSWORD}@db:5432/tms
+      STORAGE_DIR: /data/storage
+      # Fotoğraf ve dosya bağlantılarının kökü (mobil uygulama doğrudan buradan açar).
+      PUBLIC_URL: https://api.${DOMAIN}
+      WEB_URL: https://${DOMAIN}
+      CORS_ORIGINS: https://${DOMAIN},https://www.${DOMAIN}
+      # İstekler Caddy ve site üzerinden docker ağından gelir: yalnızca iç ağdaki vekillere güvenilir.
+      TRUST_PROXY: loopback, uniquelocal
+    volumes:
+      - storage:/data/storage
+      - backups:/app/api/backups
+    depends_on:
+      db: { condition: service_healthy }
+
+  web:
+    build:
+      context: ..
+      dockerfile: deploy/web.Dockerfile
+      args: { NEXT_PUBLIC_SITE_URL: 'https://${DOMAIN}' }
+    restart: unless-stopped
+    environment:
+      API_URL: http://api:3000
+      API_PUBLIC_URL: https://api.${DOMAIN}
+      NEXT_PUBLIC_SITE_URL: https://${DOMAIN}
+      # Ziyaretçi IP'si: Caddy'nin eklediği son halka.
+      TRUSTED_PROXY_HOPS: '1'
+    depends_on: [api]
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports: ['80:80', '443:443']
+    environment:
+      DOMAIN: ${DOMAIN:?DOMAIN gerekli}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    depends_on: [web, api]
+
+volumes:
+  pgdata:
+  storage:
+  backups:
+  caddy_data:

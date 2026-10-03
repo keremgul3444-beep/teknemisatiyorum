@@ -56,9 +56,27 @@ export class DevStoreVerifier implements StoreVerifier {
   }
 }
 
-/** Moda göre sağlayıcılar. Üretimde deneme modu ve bu turda live başlamayı reddeder. */
+export const paymentsDisabled = () => new AppError('PAYMENTS_DISABLED', 'errors.payments_disabled', 503);
+const disabled = paymentsDisabled;
+/** Ödeme kapalıysa kayıt açılmadan reddedilir (yarım sipariş/ödeme satırı kalmasın). */
+export const assertPaymentsOn = () => { if (env().PAYMENTS_MODE === 'off') throw paymentsDisabled(); };
+
+/**
+ * Ödeme kapalı (sanal POS anlaşması yokken canlı): site ve uygulama ilan sitesi olarak çalışır; ödeme başlatma,
+ * bildirim ve mağaza doğrulaması anlaşılır bir hatayla reddedilir.
+ */
+export class DisabledWebPayment implements WebPaymentProvider {
+  async createCheckout(): Promise<{ providerRef: string; checkoutUrl: string }> { throw disabled(); }
+  verifyCallback(): WebCallback { throw disabled(); }
+}
+export class DisabledStoreVerifier implements StoreVerifier {
+  async verify(): Promise<{ storeProductId: string; transactionId: string }> { throw disabled(); }
+}
+
+/** Moda göre sağlayıcılar. Üretimde deneme modu ve bu turda live başlamayı reddeder; `off` her ortamda açılır. */
 export function paymentProviders() {
   const e = env();
+  if (e.PAYMENTS_MODE === 'off') return { web: new DisabledWebPayment(), store: new DisabledStoreVerifier() };
   if (e.PAYMENTS_MODE === 'dev') {
     if (e.NODE_ENV === 'production') throw new Error('PAYMENTS_MODE=dev üretimde kullanılamaz (deneme ödemesi para çekmez)');
     return { web: new DevWebPayment(), store: new DevStoreVerifier() };

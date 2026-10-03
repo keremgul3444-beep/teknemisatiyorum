@@ -3,7 +3,7 @@ import type { Order, Prisma } from '@prisma/client';
 import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/audit.service';
 import { AppError, Errors } from '../../common/errors';
-import { STORE_VERIFIER, WEB_PAYMENT, type StoreVerifier, type WebPaymentProvider } from '../../adapters/payments';
+import { STORE_VERIFIER, WEB_PAYMENT, assertPaymentsOn, type StoreVerifier, type WebPaymentProvider } from '../../adapters/payments';
 import { applyProduct, revertProduct } from './promotion.rules';
 
 const PENDING_TTL_MS = 24 * 3600e3;
@@ -33,6 +33,7 @@ export class OrdersService {
   }
 
   async create(userId: string, listingId: string, productCode: string) {
+    assertPaymentsOn();
     await this.assertBuyable(userId, listingId);
     const p = await this.product(productCode);
     const o = await this.prisma.order.create({ data: { userId, listingId, productCode, channel: 'web', amountKurus: p.priceWebKurus } });

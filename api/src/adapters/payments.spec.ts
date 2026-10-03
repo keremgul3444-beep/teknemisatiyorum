@@ -36,7 +36,7 @@ test('deneme makbuzu biçimi', async () => {
 });
 
 test('üretimde deneme ödemesi başlamaz; live bu turda bağlanmadı', () => {
-  withEnv({ NODE_ENV: 'production', PAYMENTS_MODE: 'dev' });
+  withEnv({ NODE_ENV: 'production', PUBLIC_URL: 'https://api.test', PAYMENTS_MODE: 'dev' });
   expect(() => paymentProviders()).toThrow(/deneme/);
   withEnv({ NODE_ENV: 'development', PAYMENTS_MODE: 'live' });
   expect(() => paymentProviders()).toThrow(/bağlanmadı/);

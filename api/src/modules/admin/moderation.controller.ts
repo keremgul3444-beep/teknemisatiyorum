@@ -7,6 +7,7 @@ import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/audit.service';
 import { AppError, Errors } from '../../common/errors';
 import { NotificationsService } from '../notifications/notifications.module';
+import { restoreServices, retireServices } from '../marketplace/lifecycle';
 
 const STAFF = { roles: ['moderator', 'admin'] as ('moderator' | 'admin')[] };
 const takedownBody = z.object({ reason: z.enum(TAKEDOWN_REASONS) });
@@ -99,11 +100,13 @@ export class ModerationController {
     if (target.suspendedAt) throw Errors.conflict('ALREADY_SUSPENDED');
     const now = new Date();
     const live = await this.prisma.listing.findMany({ where: { ownerId: id, status: { in: ['published', 'pending'] } }, select: { id: true } });
-    await this.prisma.$transaction([
-      this.prisma.user.update({ where: { id }, data: { suspendedAt: now, suspendReason: b.reason } }),
-      this.prisma.session.updateMany({ where: { userId: id, revokedAt: null }, data: { revokedAt: now } }),
-      this.prisma.listing.updateMany({ where: { id: { in: live.map((x) => x.id) } }, data: { status: 'removed', removedReason: 'account_suspended' } }),
-    ]);
+    await this.prisma.$transaction(async (tx) => {
+      await tx.user.update({ where: { id }, data: { suspendedAt: now, suspendReason: b.reason } });
+      await tx.session.updateMany({ where: { userId: id, revokedAt: null }, data: { revokedAt: now } });
+      await tx.listing.updateMany({ where: { id: { in: live.map((x) => x.id) } }, data: { status: 'removed', removedReason: 'account_suspended' } });
+      // Usta/kaptan olarak da listeden kalkar, yeni ödeme alamaz; açık talepleri iptal olur.
+      await retireServices(tx, id, { anonymize: false });
+    });
     await this.resolveReports(live.map((x) => x.id), 'actioned', u.id);
     await this.audit.log(u.id, 'audit.userSuspended', { name: target.name ?? '—', listings: String(live.length) }, 'user', id);
     return { suspended: true, removedListings: live.length };
@@ -116,7 +119,10 @@ export class ModerationController {
     const target = await this.prisma.user.findUnique({ where: { id } });
     if (!target || target.deletedAt) throw Errors.notFound();
     if (!target.suspendedAt) throw Errors.conflict('NOT_SUSPENDED');
-    await this.prisma.user.update({ where: { id }, data: { suspendedAt: null, suspendReason: null } });
+    await this.prisma.$transaction(async (tx) => {
+      await tx.user.update({ where: { id }, data: { suspendedAt: null, suspendReason: null } });
+      await restoreServices(tx, id);
+    });
     await this.audit.log(u.id, 'audit.userUnsuspended', { name: target.name ?? '—' }, 'user', id);
     return { suspended: false };
   }

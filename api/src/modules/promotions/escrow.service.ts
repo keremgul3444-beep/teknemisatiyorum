@@ -4,13 +4,18 @@ import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/audit.service';
 import { AppError, Errors } from '../../common/errors';
 import { env } from '../../config/env';
-import { WEB_PAYMENT, type WebCallback, type WebPaymentProvider } from '../../adapters/payments';
+import { WEB_PAYMENT, assertPaymentsOn, type WebCallback, type WebPaymentProvider } from '../../adapters/payments';
 import { NotificationsService } from '../notifications/notifications.module';
 
 export type EscrowSubject = 'job' | 'captain';
 /** Ödeyenden alınan platform payı (hizmet bedelinin yüzdesi). */
 export const feeOf = (amountKurus: number) => Math.round((amountKurus * env().SERVICE_FEE_PERCENT) / 100);
 const alreadyPaid = () => new AppError('ALREADY_PAID', 'errors.already_paid', 409);
+const DAY_MS = 864e5;
+/** Usta "işi bitirdim" dedikten sonra sahibi bu kadar gün içinde onaylamaz ya da sorun bildirmezse para aktarılır. */
+export const JOB_AUTO_RELEASE_DAYS = 7;
+/** Kaptan kiralaması bitişinden bu kadar gün sonra (sorun bildirilmediyse) para aktarılır. */
+export const CAPTAIN_AUTO_RELEASE_DAYS = 3;
 
 /**
  * Emanet ödeme: ödeyen hizmet bedeli + platform payını sanal POS'ta öder, para platformda bekler (`held`).
@@ -28,6 +33,7 @@ export class EscrowService {
 
   /** Ödeme başlatır; bekleyen ödeme varsa yeni bağlantıyla sürer, ödenmişse 409. */
   async checkout(o: { payerId: string; providerId: string; subjectKind: EscrowSubject; subjectId: string; amountKurus: number }) {
+    assertPaymentsOn();
     const existing = await this.prisma.servicePayment.findMany({ where: { subjectKind: o.subjectKind, subjectId: o.subjectId, status: { in: ['held', 'released'] } } });
     if (existing.length) throw alreadyPaid();
     const p = await this.prisma.servicePayment.create({ data: { ...o, feeKurus: feeOf(o.amountKurus) } });
@@ -50,7 +56,12 @@ export class EscrowService {
       const r = await tx.servicePayment.updateMany({ where: { id: p.id, status: 'pending' }, data: { status: 'held', paidAt: new Date() } });
       if (!r.count) return false;
       if (p.subjectKind === 'job') await tx.job.updateMany({ where: { id: p.subjectId, status: 'accepted' }, data: { status: 'paid' } });
-      else await tx.captainBooking.updateMany({ where: { id: p.subjectId, status: 'requested' }, data: { status: 'paid' } });
+      else {
+        await tx.captainBooking.updateMany({ where: { id: p.subjectId, status: 'requested' }, data: { status: 'paid' } });
+        // Kiralama bitişinden sonra kendiliğinden aktarılır (müşteri sorun bildirmediyse).
+        const b = await tx.captainBooking.findUnique({ where: { id: p.subjectId } });
+        if (b) await tx.servicePayment.update({ where: { id: p.id }, data: { autoReleaseAt: new Date(b.start.getTime() + (b.days + CAPTAIN_AUTO_RELEASE_DAYS) * DAY_MS) } });
+      }
       return true;
     });
     if (done) {
@@ -66,8 +77,27 @@ export class EscrowService {
     return this.prisma.servicePayment.findFirst({ where: { subjectKind, subjectId, status: 'held' } });
   }
 
-  /** İş ya da rezervasyon tamamlandı: para hizmet verene aktarılır. */
-  async release(p: ServicePayment, actorId: string) {
+  /** Usta işi teslim etti: otomatik aktarım süresi başlar. */
+  async startAutoRelease(p: ServicePayment, days: number) {
+    await this.prisma.servicePayment.update({ where: { id: p.id }, data: { autoReleaseAt: new Date(Date.now() + days * DAY_MS) } });
+  }
+
+  /** Ödeyen sorun bildirir: otomatik aktarım durur, ekip iade ya da aktarma kararı verir. */
+  async dispute(p: ServicePayment, note: string) {
+    const r = await this.prisma.servicePayment.updateMany({ where: { id: p.id, status: 'held', disputedAt: null }, data: { disputedAt: new Date(), disputeNote: note } });
+    if (!r.count) throw Errors.conflict('ALREADY_DISPUTED');
+    const prov = await this.prisma.providerProfile.findUnique({ where: { id: p.providerId } });
+    if (prov) await this.notifications.push(prov.userId, 'notif.paymentDisputed', { kind: p.subjectKind, id: p.subjectId });
+    await this.audit.log(p.payerId, 'audit.paymentDisputed', { ref: p.id }, 'payment', p.id);
+  }
+
+  /** Süresi dolmuş, itirazsız emanetler (otomatik aktarım taraması için). */
+  dueForRelease(now = new Date()) {
+    return this.prisma.servicePayment.findMany({ where: { status: 'held', disputedAt: null, autoReleaseAt: { lte: now } }, take: 200 });
+  }
+
+  /** İş ya da rezervasyon tamamlandı: para hizmet verene aktarılır. `actorId` null: süre dolunca sistem aktardı. */
+  async release(p: ServicePayment, actorId: string | null) {
     const r = await this.prisma.servicePayment.updateMany({ where: { id: p.id, status: 'held' }, data: { status: 'released', releasedAt: new Date(), decidedById: actorId } });
     if (!r.count) throw Errors.conflict('PAYMENT_NOT_HELD');
     const prov = await this.prisma.providerProfile.findUnique({ where: { id: p.providerId } });

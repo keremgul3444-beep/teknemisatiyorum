@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Header, HttpCode, Patch } from '@nestjs/common';
+import { retireServices } from '../marketplace/lifecycle';
 import { z } from 'zod';
 import { Auth, CurrentUser, type AuthUser } from '../../common/decorators';
 import { ZodPipe } from '../../common/zod.pipe';
@@ -79,12 +80,23 @@ export class UsersController {
       p.auditLog.findMany({ where: { actorId: id, action: 'audit.marketingConsent' }, select: { params: true, at: true }, orderBy: { at: 'asc' } }),
       p.listingReport.findMany({ where: { reporterId: id }, select: { listingId: true, reason: true, note: true, status: true, createdAt: true } }),
     ]);
+    // Öne çıkarma siparişleri, firma üyelikleri ve 2. dalga (usta/kaptan profilleri, işler, teklifler, rezervasyonlar, ödemeler, değerlendirmeler).
+    const [orders, companies, providers, jobs, captainBookings, servicePayments, reviewsWritten] = await Promise.all([
+      p.order.findMany({ where: { userId: id }, select: { id: true, listingId: true, productCode: true, channel: true, amountKurus: true, status: true, createdAt: true, paidAt: true, refundedAt: true } }),
+      p.companyMember.findMany({ where: { userId: id }, select: { role: true, company: { select: { name: true, kind: true, city: true } } } }),
+      p.providerProfile.findMany({ where: { userId: id }, include: { quotes: { select: { jobId: true, priceTry: true, days: true, note: true, createdAt: true } } } }),
+      p.job.findMany({ where: { ownerId: id }, include: { quotes: { select: { priceTry: true, days: true, note: true, createdAt: true } } } }),
+      p.captainBooking.findMany({ where: { userId: id }, select: { id: true, start: true, days: true, totalEur: true, status: true, createdAt: true } }),
+      p.servicePayment.findMany({ where: { payerId: id }, select: { subjectKind: true, subjectId: true, amountKurus: true, feeKurus: true, status: true, createdAt: true, paidAt: true, releasedAt: true, refundedAt: true } }),
+      p.review.findMany({ where: { authorId: id }, select: { subjectKind: true, stars: true, text: true, createdAt: true } }),
+    ]);
     await this.audit.log(id, 'audit.dataExported', {}, 'user', id);
     return {
       exportedAt: new Date(), profile: userView(user),
       sessions, listings, boats, favorites, savedSearches, expertiseBookings, brokerCases, notifications, verificationRequests, consentHistory,
       // Kişinin gönderdiği ilan bildirimleri ve varsa hesabının askıya alınma kaydı.
       reports, suspension: user.suspendedAt ? { at: user.suspendedAt, reason: user.suspendReason } : null,
+      orders, companies, providers, jobs, captainBookings, servicePayments, reviewsWritten,
       // Sohbetler: kişinin gönderdiği ve aldığı mesajlar (karşı tarafın numarası yok).
       conversations: convs.map(({ messages, ...c }) => ({ ...c, messages: messages.map(({ senderId, ...m }) => ({ ...m, mine: senderId === id })) })),
     };
@@ -111,6 +123,10 @@ export class UsersController {
       this.prisma.listing.updateMany({ where: { ownerId: u.id, status: { not: 'removed' } }, data: { status: 'removed' } }),
       this.prisma.session.updateMany({ where: { userId: u.id, revokedAt: null }, data: { revokedAt: now } }),
     ]);
+    // Usta/kaptan profili listeden kalkar ve görünen bilgileri silinir; açık iş talepleri iptal olur.
+    await retireServices(this.prisma, u.id, { anonymize: true });
+    // Firma üyelikleri biter (sahibi olduğu firma diğer üyeler için kalır).
+    await this.prisma.companyMember.deleteMany({ where: { userId: u.id } });
     await this.media.purgeUser(u.id);
     await this.audit.log(u.id, 'audit.accountDeleted', {}, 'user', u.id);
   }

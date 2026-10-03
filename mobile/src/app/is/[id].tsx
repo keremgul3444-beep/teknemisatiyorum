@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { colors, space } from '@/theme';
-import { Avatar, Button, Card, Header, Icon, NotFound, Rating, Screen, Section, Stepper, SuccessView, T } from '@/components';
+import { Avatar, Button, Card, DisputeBox, Header, Icon, NotFound, Rating, Screen, Section, Stepper, SuccessView, T } from '@/components';
 import { actions, formatPrice, isApiMode, JOB_STEPS, useJob, useAllProviders } from '@/services';
 import { attempt } from '@/services/errors';
 import { currentLang } from '@/i18n';
@@ -86,7 +86,11 @@ export default function IsDetay() {
         <Card>
           <T variant="h3">{t('job.inProgress')}</T>
           <T color={colors.muted}>{t('job.inProgressBody')}</T>
+          {job.deliveredAt && job.autoReleaseAt && !job.disputed ? (
+            <T variant="caption" color={colors.warning}>{t('job.delivered', { date: job.autoReleaseAt.slice(0, 10) })}</T>
+          ) : null}
           <Button icon="check" title={t('job.complete')} onPress={() => attempt(() => actions.completeJob(job.id))} />
+          {isApiMode() ? <DisputeBox disputed={job.disputed} onSubmit={(note) => actions.disputeJob(job.id, note)} /> : null}
         </Card>
       ) : null}
 

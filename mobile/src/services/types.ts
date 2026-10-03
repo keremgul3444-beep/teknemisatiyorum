@@ -41,6 +41,8 @@ export interface Offer { id: string; providerId: string; priceTRY: number; days:
 export interface Job {
   id: string; category: UstaCategory; title: string; description: string; boatId: string; status: JobStatus;
   offers: Offer[]; acceptedOfferId?: string; paid: boolean; rating?: number; createdAt: string;
+  /** Gerçek mod: usta işi bitirdi dedi; `autoReleaseAt`'e kadar onaylanmaz ya da sorun bildirilmezse ödeme aktarılır. */
+  deliveredAt?: string | null; autoReleaseAt?: string | null; disputed?: boolean;
 }
 export type JobInput = Pick<Job, 'category' | 'title' | 'description' | 'boatId'>;
 
@@ -64,7 +66,7 @@ export interface SavedSearch { id: string; query: string; createdAt: string; new
 export interface CaptainBooking {
   id: string; captainId: string; start: string; days: number; totalEUR: number; paid: boolean;
   /** Gerçek modda sunucu durumu: requested | paid | done | cancelled; `reviewed` değerlendirildi mi. */
-  status?: 'requested' | 'paid' | 'done' | 'cancelled'; reviewed?: boolean;
+  status?: 'requested' | 'paid' | 'done' | 'cancelled'; reviewed?: boolean; autoReleaseAt?: string | null; disputed?: boolean;
 }
 export interface ExpertiseBooking { id: string; packageId: string; listingId?: string; date: string; slot: string; reportStatus?: string; score?: number | null }
 export interface ExpertisePackage { id: string; name: string; priceTRY: number; items: string[] }

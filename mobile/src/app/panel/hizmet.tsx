@@ -236,6 +236,9 @@ function UstaInbox() {
               <T variant="h3">{j.title}</T>
               <T variant="caption" color={colors.muted}>{t(`panel.jobStatus.${j.status}`)} · {j.quotes[0] ? formatPrice(j.quotes[0].priceTry, 'TRY', lang) : ''}</T>
               {j.acceptedQuoteId && j.quotes.some((x) => x.id === j.acceptedQuoteId) ? <StatusLine text={t('panel.won')} /> : null}
+              {j.status === 'paid' && j.quotes.some((x) => x.id === j.acceptedQuoteId) ? (j.deliveredAt
+                ? <T variant="caption" color={colors.muted}>{t('panel.delivered')}</T>
+                : <Button small icon="check" title={t('panel.markDelivered')} onPress={async () => { await attempt(() => actions.markDelivered(j.id)); reload(); }} />) : null}
             </Card>
           ))}
         </Section>

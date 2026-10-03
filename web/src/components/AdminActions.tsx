@@ -120,3 +120,21 @@ export function UserSuspend({ id, suspended, L, errors }: { id: string; suspende
     </div>
   );
 }
+
+/** Emanet ödeme: iade ya da hizmet verene aktarma (anlaşmazlık kararı). İade ikinci dokunuşla onaylanır. */
+export function PaymentDecision({ id, L, errors }: { id: string; L: Dict; errors: Dict }) {
+  const a = useAction(errors);
+  const [sure, setSure] = useState(false);
+  return (
+    <div style={{ display: 'grid', gap: 8 }}>
+      <div className="row">
+        {sure
+          ? <><button type="button" className="btn" disabled={a.busy} onClick={() => void a.run(`service-payments/${id}/refund`)}>{L.refund}</button>
+            <button type="button" className="linklike" onClick={() => setSure(false)}>{L.cancel}</button></>
+          : <><button type="button" className="btn ghost" onClick={() => setSure(true)}>{L.refund}</button>
+            <button type="button" className="btn ghost" disabled={a.busy} onClick={() => void a.run(`service-payments/${id}/release`)}>{L.release}</button></>}
+      </div>
+      <Err text={a.error} />
+    </div>
+  );
+}

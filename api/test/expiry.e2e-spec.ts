@@ -51,3 +51,14 @@ test('süresi dolan ilan düzenlenirse yeniden onaya düşer', async () => {
   const r = await t.http().patch(`/listings/${l.id}`).set(owner.auth).send({ description: 'Yeni açıklama' });
   expect(r.body.status).toBe('pending');
 });
+
+test('30 gün dokunulmamış taslak taramada kaldırılır', async () => {
+  const owner = await loginAs(t, { level: 2 });
+  const d = await t.prisma.listing.create({ data: {
+    brand: 'Eski', model: 'Taslak', year: 2018, lengthM: 9, type: 'yelkenli', price: 1, currency: 'EUR', location: 'Bodrum',
+    equipment: [], badges: [], cabins: 1, engine: '', description: '', ownerId: owner.user.id, status: 'draft',
+  } });
+  await t.prisma.$executeRaw`UPDATE "Listing" SET "updatedAt" = NOW() - INTERVAL '31 days' WHERE id = ${d.id}`;
+  await t.app.get(ListingExpiry).sweep();
+  expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: d.id } })).status).toBe('removed');
+});

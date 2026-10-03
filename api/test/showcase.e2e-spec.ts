@@ -6,7 +6,14 @@ beforeAll(async () => { t = await createTestApp(); });
 afterAll(async () => { await t.close(); });
 
 const DAY = 864e5;
-async function listing(ownerAuth: Record<string, string>, data: Record<string, unknown>) {
+// Taslaklar sırayla açılır: aynı anda 5'ten fazla açık taslak sınırına takılır (TOO_MANY_DRAFTS); her taslak hemen yayına alınır.
+let chain: Promise<unknown> = Promise.resolve();
+function listing(ownerAuth: Record<string, string>, data: Record<string, unknown>): Promise<string> {
+  const next = chain.then(() => create(ownerAuth, data));
+  chain = next.catch(() => undefined);
+  return next;
+}
+async function create(ownerAuth: Record<string, string>, data: Record<string, unknown>) {
   const r = await t.http().post('/listings').set(ownerAuth).send({ brand: 'S', model: `M${Math.random().toString(36).slice(2, 7)}`, year: 2015, lengthM: 10, type: 'yelkenli', price: 50000, currency: 'EUR', location: 'Bodrum' });
   await t.prisma.listing.update({ where: { id: r.body.id }, data: { status: 'published', publishedAt: new Date(Date.now() - 10 * DAY), ...data } });
   return r.body.id as string;

@@ -8,6 +8,7 @@ afterAll(async () => { await t.close(); delete process.env.DEV_OTP_ECHO; resetEn
 const setEnv = (echo: string | undefined, nodeEnv: string) => {
   if (echo === undefined) delete process.env.DEV_OTP_ECHO; else process.env.DEV_OTP_ECHO = echo;
   process.env.NODE_ENV = nodeEnv;
+  if (nodeEnv === 'production') process.env.PUBLIC_URL = 'https://api.test'; else delete process.env.PUBLIC_URL;
   resetEnvCache();
 };
 

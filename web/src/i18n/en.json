@@ -539,7 +539,10 @@
     "booking_not_paid": "The booking hasn’t been paid yet.",
     "booking_not_started": "The booking can be completed once it has started.",
     "booking_not_done": "You can review once the booking is done.",
-    "already_paid": "This has already been paid."
+    "already_paid": "This has already been paid.",
+    "already_disputed": "You already reported a problem for this payment; the team is reviewing it.",
+    "already_delivered": "You already marked this job as done.",
+    "payments_disabled": "Payments are currently unavailable. They will open soon."
   },
   "login": {
     "title": "Log in",
@@ -840,7 +843,22 @@
       "birthYear": "Birth year",
       "engineSerialLast4": "Engine serial (last digits)"
     },
-    "paymentRisk": "The description mentions a payment request (IBAN, deposit, transfer)."
+    "paymentRisk": "The description mentions a payment request (IBAN, deposit, transfer).",
+    "disputed": "Problem reported",
+    "autoReleaseAt": "Auto-release: {{date}}",
+    "navPayments": "Escrow payments",
+    "paymentsEmpty": "No escrow payments.",
+    "refund": "Refund",
+    "release": "Release to provider",
+    "service_job": "Technician job",
+    "service_captain": "Captain booking",
+    "fee": "platform fee",
+    "payStatus": {
+      "held": "Held",
+      "released": "Released",
+      "refunded": "Refunded",
+      "failed": "Failed"
+    }
   },
   "audit": {
     "listingApproved": "Listing approved: {{title}}",
@@ -879,7 +897,8 @@
     "memberRemoved": "Company staff removed ({{role}})",
     "providerCreated": "Provider profile opened ({{kind}})",
     "servicePaid": "Service payment held ({{kind}}): ₺{{amount}}",
-    "paymentRefunded": "Service payment refunded: {{ref}}"
+    "paymentRefunded": "Service payment refunded: {{ref}}",
+    "paymentDisputed": "Service payment disputed: {{ref}}"
   },
   "firm": {
     "title": "Company panel",

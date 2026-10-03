@@ -1,4 +1,6 @@
 const API_ORIGIN = new URL(process.env.API_URL ?? 'http://127.0.0.1:3000').origin;
+// Canlıda fotoğraflar API'nin genel adresinden (PUBLIC_URL, ör. https://api.alanadi.com) gelir.
+const MEDIA_ORIGIN = process.env.API_PUBLIC_URL ? new URL(process.env.API_PUBLIC_URL).origin : '';
 
 /**
  * Güvenlik başlıkları. `nonce` verilirse (girişli, her istekte üretilen sayfalar) betikler yalnızca nonce ile çalışır.
@@ -11,7 +13,7 @@ export function securityHeaders(o: { nonce?: string; isProd: boolean; isDev?: bo
     "default-src 'self'",
     `script-src ${script}${o.isDev ? " 'unsafe-eval'" : ''}`,
     "style-src 'self' 'unsafe-inline'",
-    `img-src 'self' data: blob: ${API_ORIGIN}`,
+    `img-src 'self' data: blob: ${API_ORIGIN}${MEDIA_ORIGIN ? ` ${MEDIA_ORIGIN}` : ''}`,
     "font-src 'self'",
     `connect-src 'self'${o.isDev ? ' ws:' : ''}`,
     "object-src 'none'",

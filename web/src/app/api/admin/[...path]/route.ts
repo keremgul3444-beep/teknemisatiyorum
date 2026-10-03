@@ -6,6 +6,7 @@ const ID = '[a-z0-9-]{8,40}';
 const ALLOWED = [
   new RegExp(`^listings/${ID}/decision$`), new RegExp(`^listings/${ID}/takedown$`), new RegExp(`^listings/${ID}/reports/dismiss$`),
   new RegExp(`^users/${ID}/suspend$`), new RegExp(`^users/${ID}/unsuspend$`), new RegExp(`^verifications/${ID}/decision$`),
+  new RegExp(`^service-payments/${ID}/refund$`), new RegExp(`^service-payments/${ID}/release$`),
 ];
 
 export async function POST(req: Request, ctx: { params: Promise<{ path: string[] }> }) {

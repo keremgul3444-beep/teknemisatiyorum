@@ -9,7 +9,7 @@ import { ErrorFilter } from './common/error.filter';
 import { Public } from './common/decorators';
 import { env } from './config/env';
 import { CLOCK, systemClock } from './common/clock';
-import { DevSmsSender, SMS_SENDER } from './adapters/sms';
+import { DevSmsSender, SMS_SENDER, smsSenderFor } from './adapters/sms';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { MediaModule } from './modules/media/media.module';
@@ -57,7 +57,7 @@ class HealthController {
     AuditService,
     BackupScheduler,
     DevSmsSender,
-    { provide: SMS_SENDER, useExisting: DevSmsSender },
+    { provide: SMS_SENDER, useFactory: smsSenderFor, inject: [DevSmsSender] },
     { provide: CLOCK, useValue: systemClock },
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: AuthGuard },

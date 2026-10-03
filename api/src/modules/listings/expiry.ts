@@ -10,6 +10,8 @@ export const LISTING_DAYS = 90;
 /** Bitişe bu kadar gün kala sahibine haber verilir ve yenileme açılır. */
 export const RENEW_WINDOW_DAYS = 14;
 export const WARN_DAYS = 7;
+/** Bu kadar gün dokunulmamış taslak kaldırılır. */
+export const STALE_DRAFT_DAYS = 30;
 
 export const nextExpiry = (now = new Date()) => new Date(now.getTime() + LISTING_DAYS * DAY_MS);
 
@@ -36,6 +38,8 @@ export class ListingExpiry implements OnApplicationBootstrap, OnApplicationShutd
       await this.prisma.listing.update({ where: { id: l.id }, data: { expiryWarnedAt: now } });
       await this.notifications.push(l.ownerId, 'notif.listingExpiring', { title: `${l.brand} ${l.model}`, listingId: l.id, days });
     }
+    // 30 gün dokunulmamış yarım taslaklar kaldırılır (fotoğrafları yetim dosya temizliğinde silinir).
+    await this.prisma.listing.updateMany({ where: { status: 'draft', updatedAt: { lt: new Date(now.getTime() - STALE_DRAFT_DAYS * DAY_MS) } }, data: { status: 'removed' } });
     const due = await this.prisma.listing.findMany({ where: { status: 'published', expiresAt: { lte: now } } });
     for (const l of due) {
       // Koşullu güncelleme: aynı anda yenilenen ilan düşürülmez.

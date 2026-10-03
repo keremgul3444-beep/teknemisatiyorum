@@ -103,3 +103,68 @@ describe('kaptan rezervasyonu ve ekip iadesi', () => {
     expect((await t.http().post('/conversations').set(cap.auth).send({ subjectKind: 'provider', subjectId: cap.profileId })).body.code).toBe('OWN_PROFILE');
   });
 });
+
+describe('emanet: otomatik aktarım, itiraz, askı ve hesap silme', () => {
+  async function paidJob(category = 'elektrik') {
+    const owner = await loginAs(t, { level: 2 });
+    const usta = await provider('usta', { categories: [category] });
+    const job = (await t.http().post('/jobs').set(owner.auth).send({ category, title: 'Akü şarj etmiyor', description: 'Akü şarj olmuyor, alternatör kontrol.' })).body;
+    const q = (await t.http().post(`/jobs/${job.id}/quotes`).set(usta.auth).send({ priceTry: 3000, days: 1 })).body;
+    await t.http().post(`/jobs/${job.id}/accept`).set(owner.auth).send({ quoteId: q.id }).expect(200);
+    const pay = (await t.http().post(`/jobs/${job.id}/pay`).set(owner.auth)).body;
+    await devPay(owner.auth, pay.paymentId);
+    return { owner, usta, job, pay };
+  }
+  const { EscrowSweeper } = require('../src/modules/marketplace/marketplace.module');
+  const sweep = (daysAhead: number) => t.app.get(EscrowSweeper).sweep(new Date(Date.now() + daysAhead * 864e5));
+
+  test('usta "işi bitirdim" der; sahibi onaylamazsa 7 gün sonra para kendiliğinden aktarılır', async () => {
+    const { owner, usta, job, pay } = await paidJob();
+    expect((await t.http().post(`/jobs/${job.id}/delivered`).set(owner.auth)).status).toBe(404);
+    await t.http().post(`/jobs/${job.id}/delivered`).set(usta.auth).expect(200);
+    const v = (await t.http().get(`/jobs/${job.id}`).set(owner.auth)).body;
+    expect(v.deliveredAt).toBeTruthy();
+    expect(new Date(v.autoReleaseAt).getTime()).toBeGreaterThan(Date.now() + 6 * 864e5);
+    await sweep(3);
+    expect((await t.prisma.servicePayment.findUniqueOrThrow({ where: { id: pay.paymentId } })).status).toBe('held');
+    await sweep(8);
+    expect((await t.prisma.servicePayment.findUniqueOrThrow({ where: { id: pay.paymentId } })).status).toBe('released');
+    expect((await t.prisma.job.findUniqueOrThrow({ where: { id: job.id } })).status).toBe('done');
+    expect(await t.prisma.notification.count({ where: { userId: owner.user.id, key: 'notif.autoReleased' } })).toBe(1);
+  });
+
+  test('sorun bildirilirse otomatik aktarım durur, ekip kuyruğunda en üstte görünür', async () => {
+    const { owner, usta, job, pay } = await paidJob('yelken');
+    await t.http().post(`/jobs/${job.id}/delivered`).set(usta.auth).expect(200);
+    await t.http().post(`/jobs/${job.id}/dispute`).set(owner.auth).send({ note: 'Yelken hâlâ yırtık' }).expect(200);
+    expect((await t.http().post(`/jobs/${job.id}/dispute`).set(owner.auth).send({ note: 'tekrar deneme' })).body.code).toBe('ALREADY_DISPUTED');
+    await sweep(30);
+    expect((await t.prisma.servicePayment.findUniqueOrThrow({ where: { id: pay.paymentId } })).status).toBe('held');
+    const list = (await t.http().get('/admin/service-payments').set((await moderator()).auth)).body;
+    expect(list[0]).toMatchObject({ id: pay.paymentId, disputeNote: 'Yelken hâlâ yırtık' });
+  });
+
+  test('askıya alınan usta listeden kalkar, ödenmemiş işteki teklifi düşer; askı kalkınca geri gelir', async () => {
+    const owner = await loginAs(t, { level: 2 });
+    const usta = await provider('usta', { categories: ['jelkot'] });
+    const job = (await t.http().post('/jobs').set(owner.auth).send({ category: 'jelkot', title: 'Jelkot çatlağı', description: 'Baş tarafta jelkot çatlağı var.' })).body;
+    const q = (await t.http().post(`/jobs/${job.id}/quotes`).set(usta.auth).send({ priceTry: 4000, days: 1 })).body;
+    await t.http().post(`/jobs/${job.id}/accept`).set(owner.auth).send({ quoteId: q.id }).expect(200);
+    const m = await moderator();
+    await t.http().post(`/admin/users/${usta.user.id}/suspend`).set(m.auth).send({ reason: 'Dolandırıcılık' }).expect(200);
+    expect((await t.http().get(`/providers/${usta.profileId}`)).status).toBe(404);
+    expect((await t.http().get(`/jobs/${job.id}`).set(owner.auth)).body).toMatchObject({ status: 'open', acceptedQuoteId: null, quotes: [] });
+    await t.http().post(`/admin/users/${usta.user.id}/unsuspend`).set(m.auth).expect(200);
+    expect((await t.http().get(`/providers/${usta.profileId}`)).status).toBe(200);
+  });
+
+  test('hesap silinince profil bilgileri temizlenir; veri dökümünde işler ve ödemeler var', async () => {
+    const { owner, usta } = await paidJob('doseme');
+    const dump = (await t.http().get('/me/export').set(owner.auth)).body;
+    expect(dump.jobs).toHaveLength(1);
+    expect(dump.servicePayments[0]).toMatchObject({ subjectKind: 'job', status: 'held' });
+    expect((await t.http().get('/me/export').set(usta.auth)).body.providers[0].quotes).toHaveLength(1);
+    await t.http().delete('/me').set(usta.auth).expect(204);
+    expect(await t.prisma.providerProfile.findUniqueOrThrow({ where: { id: usta.profileId } })).toMatchObject({ status: 'suspended', displayName: '—', bio: '' });
+  });
+});

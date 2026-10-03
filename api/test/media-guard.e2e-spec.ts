@@ -85,4 +85,9 @@ test('açık taslak sayısı sınırlı', async () => {
   const over = await t.http().post('/listings').set(u.auth).send(body);
   expect(over.status).toBe(409);
   expect(over.body.code).toBe('TOO_MANY_DRAFTS');
+  // Yarıda bırakılmış eski taslak varsa en eskisi kaldırılır, yeni taslak açılır.
+  const oldest = await t.prisma.listing.findFirstOrThrow({ where: { ownerId: u.user.id, status: 'draft' }, orderBy: { createdAt: 'asc' } });
+  await t.prisma.$executeRaw`UPDATE "Listing" SET "updatedAt" = NOW() - INTERVAL '2 hours' WHERE id = ${oldest.id}`;
+  await t.http().post('/listings').set(u.auth).send(body).expect(201);
+  expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: oldest.id } })).status).toBe('removed');
 });

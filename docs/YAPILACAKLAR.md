@@ -4,10 +4,15 @@ Sonraya bırakılan her iş burada durur. Bir iş bitince satırını silip comm
 Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geçirilir.
 
 ## Senin (Kerem/işletme) yapman gerekenler — ben yapamam
-- [ ] Bulut depolama hesabı (Cloudflare R2 önerilir: çıkış trafiği ücretsiz) ve kova; anahtarları yalnızca sunucudaki `api/.env`'e yaz (`STORAGE_DRIVER=s3`, `S3_*`, `BACKUP_OFFSITE=1`). Kod hazır.
+- [ ] Bulut depolama hesabı (Cloudflare R2 önerilir: çıkış trafiği ücretsiz) ve kova; anahtarları yalnızca sunucudaki `deploy/.env`'e yaz (`STORAGE_DRIVER=s3`, `S3_*`, `BACKUP_OFFSITE=1`). Kod hazır.
 - [ ] Avukat onayı: KVKK aydınlatma metni, açık rıza metinleri, kullanım koşulları, çerez politikası (sitede "taslak" ibaresiyle duruyor)
 - [ ] VERBİS kaydı; ticari ileti için İYS kaydı
-- [ ] Sanal POS anlaşması (iyzico, PayTR vb.) — şirket evrakı, vergi levhası
+- [ ] Lisanslı ödeme kuruluşuyla pazaryeri / alt üye işyeri anlaşması (iyzico, PayTR vb.) — şirket evrakı, vergi levhası. Emanet ödeme (usta/kaptan) 6493 kapsamında bu modeli gerektirir; o zamana kadar canlı `PAYMENTS_MODE=off`
+- [ ] Ödeme açılmadan önce: mesafeli satış sözleşmesi + ön bilgilendirme formu, komisyon için e-fatura/e-arşiv
+- [ ] SMS sağlayıcı hesabı (Netgsm: başlık onayı + API alt kullanıcısı); kod hazır, `docs/CANLIYA-CIKIS.md` 2. adım
+- [ ] Sunucu + alan adı + DNS (alan adı, www, api A kayıtları); kurulum `docs/CANLIYA-CIKIS.md`
+- [ ] KVKK metinlerine yurt dışına aktarım (R2, Expo push, Anthropic) ile ödeme, usta/kaptan ve NVİ işlemeleri eklenmeli
+- [ ] Kesinti takibi (UptimeRobot) ve hata takibi (Sentry) hesabı
 - [ ] Apple Developer hesabı (~99$/yıl) ve Google Play Console hesabı (~25$ tek sefer)
 - [ ] Claude API anahtarı (Akıllı Asistan şu an kural tabanlı yedekle çalışıyor)
 - [ ] Google Search Console kaydı (site canlıya çıkınca)
@@ -39,8 +44,9 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 - [ ] Canlıda ters vekil (reverse proxy) Host başlığını korumalı ve TRUSTED_PROXY_HOPS doğru ayarlanmalı
 
 ## Canlıya çıkış altyapısı
-- [ ] Sunucu ve alan adı, HTTPS
-- [ ] Gerçek SMS sağlayıcısı
+- [ ] Docker imajları bulut oturumunda derlenemedi (Debian deposuna ağ izni yok); adımlar yerelde ayrı ayrı doğrulandı (site derlemesi, API canlı ayarla açılış). İlk sunucu kurulumunda `up -d --build` çıktısı kontrol edilmeli
+- [ ] Netgsm API adresi ve yanıt kodları sağlayıcının güncel belgesiyle bir kez doğrulanmalı (ilk giriş SMS'i yeterli kanıt)
+- [ ] Hata takibi (Sentry) koda bağlanmalı
 - [ ] Yük / yoğunluk testi
 
 ## Gelir fikirleri (sonra)

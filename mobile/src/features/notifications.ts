@@ -9,6 +9,15 @@ export function notifTarget(key: string, params: Record<string, string> | null):
     case 'notif.listingRemoved': return '/profil/ilanlarim';
     case 'notif.reportReady': return '/ekspertiz';
     case 'notif.brokerAdvanced': return '/broker';
+    case 'notif.listingExpiring': case 'notif.listingExpired': return '/profil/ilanlarim';
+    case 'notif.docApproved': case 'notif.docRejected': return '/profil';
+    // 2. dalga: iş sahibi işi görür; usta ve kaptan hizmet paneline gider.
+    case 'notif.newQuote': case 'notif.jobDelivered': case 'notif.autoReleased':
+      return p.jobId ? `/is/${p.jobId}` : p.kind === 'job' && p.id ? `/is/${p.id}` : '/profil/islerim';
+    case 'notif.newJob': case 'notif.quoteAccepted': case 'notif.servicePaid': case 'notif.paymentReleased':
+    case 'notif.paymentDisputed': case 'notif.bookingRequested': return '/panel/hizmet';
+    case 'notif.bookingDeclined': return '/profil/islerim';
+    case 'notif.paymentRefunded': return '/profil/odemeler';
     default: return null;
   }
 }

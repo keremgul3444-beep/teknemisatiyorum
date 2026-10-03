@@ -170,10 +170,11 @@ describe('yönetim', () => {
     const r = await t.http().get('/admin/dev/otp-inbox').set(admin.auth);
     expect(r.body.at(-1)).toMatchObject({ phone: '+905551112233', code: '123456' });
     expect((await t.http().get('/admin/dev/otp-inbox').set((await moderator()).auth)).status).toBe(403);
-    process.env.NODE_ENV = 'production';
+    Object.assign(process.env, { NODE_ENV: 'production', PUBLIC_URL: 'https://api.test' });
     resetEnvCache();
     expect((await t.http().get('/admin/dev/otp-inbox').set(admin.auth)).status).toBe(404);
     process.env.NODE_ENV = 'test';
+    delete process.env.PUBLIC_URL;
     resetEnvCache();
   });
 });

@@ -24,6 +24,8 @@ function ApiPayments() {
             <View style={{ flex: 1 }}>
               <T variant="bodySemi">{t(p.subjectKind === 'job' ? 'services.usta' : 'services.captain')} · {p.providerName ?? '—'}</T>
               <T variant="caption" color={color[p.status] ?? colors.muted}>{t(`admin.payStatus.${p.status}`, { defaultValue: p.status })}</T>
+              {p.disputedAt && p.status === 'held' ? <T variant="caption" color={colors.danger}>{t('admin.disputed')}: {p.disputeNote}</T>
+                : p.autoReleaseAt && p.status === 'held' ? <T variant="caption" color={colors.muted}>{t('admin.autoReleaseAt', { date: p.autoReleaseAt.slice(0, 10) })}</T> : null}
             </View>
             <T variant="h3">{formatPrice((p.amountKurus + p.feeKurus) / 100, 'TRY', lang)}</T>
           </View>

@@ -561,7 +561,8 @@
     "waitingQuotes": "Talebin alanındaki ustalara iletildi. Teklifler geldikçe burada görünür.",
     "cancelled": "Bu iş talebi iptal edildi.",
     "cancel": "Talebi iptal et",
-    "descriptionMin": "En az 10 karakter: ustalar doğru teklif verebilsin."
+    "descriptionMin": "En az 10 karakter: ustalar doğru teklif verebilsin.",
+    "delivered": "Usta işi bitirdiğini bildirdi. {{date}} tarihine kadar onaylamaz ya da sorun bildirmezsen ödeme ustaya aktarılır."
   },
   "payment": {
     "title": "Güvenli ödeme",
@@ -821,7 +822,8 @@
     "bookingCancelled": "İptal edildi",
     "payBooking": "Öde",
     "completeBooking": "Kiralama tamamlandı",
-    "refunded": "İade edildi"
+    "refunded": "İade edildi",
+    "autoRelease": "Sorun bildirmezsen ödeme {{date}} tarihinde kaptana aktarılır."
   },
   "settings": {
     "title": "Ayarlar",
@@ -934,7 +936,9 @@
       "paid": "Ödendi (emanette)",
       "done": "Tamamlandı",
       "cancelled": "İptal"
-    }
+    },
+    "markDelivered": "İşi bitirdim",
+    "delivered": "Bitti bildirildi; müşteri onayı ya da süre sonu bekleniyor"
   },
   "corporate": {
     "title": "Firma paneli",
@@ -1097,7 +1101,9 @@
       "released": "Aktarıldı",
       "refunded": "İade edildi",
       "failed": "Başarısız"
-    }
+    },
+    "disputed": "Sorun bildirildi",
+    "autoReleaseAt": "Otomatik aktarım: {{date}}"
   },
   "audit": {
     "listingApproved": "İlan onaylandı: {{title}}",
@@ -1136,7 +1142,8 @@
     "memberRemoved": "Firma personeli çıkarıldı ({{role}})",
     "providerCreated": "Hizmet veren profili açıldı ({{kind}})",
     "servicePaid": "Hizmet ödemesi emanete alındı ({{kind}}): ₺{{amount}}",
-    "paymentRefunded": "Hizmet ödemesi iade edildi: {{ref}}"
+    "paymentRefunded": "Hizmet ödemesi iade edildi: {{ref}}",
+    "paymentDisputed": "Hizmet ödemesine itiraz: {{ref}}"
   },
   "errors": {
     "generic": "Bir şeyler ters gitti, tekrar dene.",
@@ -1217,7 +1224,10 @@
     "booking_not_started": "Rezervasyon başlamadan tamamlanamaz.",
     "booking_not_done": "Rezervasyon tamamlanmadan değerlendirilemez.",
     "already_paid": "Bu ödeme zaten yapıldı.",
-    "no_quote": "Bu işe henüz teklif gelmedi; teklif gelince ustayla yazışabilirsin."
+    "no_quote": "Bu işe henüz teklif gelmedi; teklif gelince ustayla yazışabilirsin.",
+    "already_disputed": "Bu ödeme için zaten sorun bildirdin; ekip inceliyor.",
+    "already_delivered": "İşi bitirdiğini zaten bildirdin.",
+    "payments_disabled": "Ödemeler şu an kapalı. Kısa süre içinde açılacak."
   },
   "soon": {
     "title": "Yakında",
@@ -1243,7 +1253,10 @@
     "paymentReleased": "Ödemen hesabına aktarıldı: ₺{{amount}}",
     "paymentRefunded": "Ödemen iade edildi: ₺{{amount}}",
     "bookingRequested": "Yeni rezervasyon talebi: {{start}} · {{days}} gün",
-    "bookingDeclined": "Kaptan rezervasyon talebini geri çevirdi"
+    "bookingDeclined": "Kaptan rezervasyon talebini geri çevirdi",
+    "jobDelivered": "Usta işi bitirdiğini bildirdi: {{title}}. {{days}} gün içinde onaylamaz ya da sorun bildirmezsen ödeme ustaya aktarılır.",
+    "paymentDisputed": "Müşteri bir sorun bildirdi; ödeme ekip incelemesine alındı.",
+    "autoReleased": "Süre dolduğu için emanetteki ödeme hizmet verene aktarıldı."
   },
   "notifs": {
     "title": "Bildirimler",
@@ -1318,5 +1331,12 @@
       "offensive": "Uygunsuz içerik",
       "other": "Diğer"
     }
+  },
+  "dispute": {
+    "open": "Sorun bildir",
+    "note": "Ne oldu?",
+    "hint": "İş yapılmadıysa ya da eksikse yaz. Otomatik ödeme durur, ekip iki tarafla görüşüp karar verir.",
+    "send": "Bildir",
+    "sent": "Sorun bildirdin; ödeme beklemede, ekip inceliyor."
   }
 }

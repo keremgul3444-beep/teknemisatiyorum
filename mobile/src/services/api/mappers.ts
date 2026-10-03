@@ -125,7 +125,7 @@ export interface ApiJob {
   id: string; category: string; title: string; description: string; region: string; boatId?: string | null;
   status: 'open' | 'accepted' | 'paid' | 'done' | 'cancelled'; acceptedQuoteId: string | null; createdAt: string;
   quotes: { id: string; priceTry: number; days: number; note: string; provider: ApiProvider }[];
-  paymentStatus?: string | null; reviewed?: boolean;
+  paymentStatus?: string | null; reviewed?: boolean; deliveredAt?: string | null; autoReleaseAt?: string | null; disputed?: boolean;
 }
 /** Sunucu durumu → uygulamadaki adım: teklif gelmemiş açık iş "talep", teklif varsa "teklif". */
 export function jobStatusOf(j: Pick<ApiJob, 'status' | 'quotes' | 'reviewed'>): Job['status'] {
@@ -142,11 +142,14 @@ export const toJob = (j: ApiJob): Job => ({
   status: jobStatusOf(j), acceptedOfferId: j.acceptedQuoteId ?? undefined, createdAt: j.createdAt.slice(0, 10),
   paid: j.paymentStatus === 'held' || j.paymentStatus === 'released',
   offers: j.quotes.map((q) => ({ id: q.id, providerId: q.provider.id, priceTRY: q.priceTry, days: q.days, note: q.note })),
+  deliveredAt: j.deliveredAt ?? null, autoReleaseAt: j.autoReleaseAt ?? null, disputed: !!j.disputed,
 });
 
 export interface ApiCaptainBooking {
   id: string; start: string; days: number; totalEur: number; status: 'requested' | 'paid' | 'done' | 'cancelled'; captain: ApiProvider; reviewed?: boolean;
+  autoReleaseAt?: string | null; disputed?: boolean;
 }
 export const toCaptainBooking = (b: ApiCaptainBooking): CaptainBooking => ({
   id: b.id, captainId: b.captain.id, start: b.start, days: b.days, totalEUR: b.totalEur, paid: b.status === 'paid' || b.status === 'done', status: b.status, reviewed: b.reviewed,
+  autoReleaseAt: b.autoReleaseAt ?? null, disputed: !!b.disputed,
 });

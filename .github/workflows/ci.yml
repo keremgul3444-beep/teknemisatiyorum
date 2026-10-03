@@ -1,0 +1,66 @@
+# Her push ve PR'da: ortak paket, API (gerçek PostgreSQL ile uçtan uca), uygulama ve site testleri, tip denetimi ve lint.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_OPTIONS: --max-old-space-size=4096
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+
+jobs:
+  shared-web:
+    name: Ortak paket ve site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm test -w shared
+      - run: npm run build -w shared
+      - run: npx tsc --noEmit -p web
+      - run: npm test -w web
+
+  mobile:
+    name: Uygulama
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run build -w shared
+      - run: npx tsc --noEmit -p mobile
+      - run: npm run lint -w mobile
+      - run: npm test -w mobile
+
+  api:
+    name: API (PostgreSQL 16)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      # Gömülü veritabanı yerine servis kullanılır (test/global-setup.ts); her test dosyası kendi şemasında çalışır.
+      TEST_DB_BASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npx prisma generate
+        working-directory: api
+      - run: npx tsc --noEmit -p api
+      - run: npm test -w api

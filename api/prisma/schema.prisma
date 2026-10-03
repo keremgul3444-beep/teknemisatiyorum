@@ -561,6 +561,8 @@ model Job {
   acceptedQuoteId String?   @unique
   createdAt       DateTime  @default(now())
   completedAt     DateTime?
+  /// Usta "işi bitirdim" dedi: sahibi onaylamaz ya da sorun bildirmezse ödeme süre sonunda otomatik aktarılır.
+  deliveredAt     DateTime?
   quotes          Quote[]
 
   @@index([ownerId, createdAt])
@@ -631,6 +633,11 @@ model ServicePayment {
   releasedAt   DateTime?
   refundedAt   DateTime?
   decidedById  String?
+  /// Bu tarihten sonra (sorun bildirilmediyse) para hizmet verene kendiliğinden aktarılır.
+  autoReleaseAt DateTime?
+  /// Ödeyen sorun bildirdi: otomatik aktarım durur, karar ekipte.
+  disputedAt   DateTime?
+  disputeNote  String?
 
   @@index([subjectKind, subjectId])
   @@index([status, createdAt])

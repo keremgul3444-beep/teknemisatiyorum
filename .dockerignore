@@ -1,0 +1,16 @@
+# Docker derleme bağlamına girmeyenler: gizli ayarlar, bağımlılıklar, derleme çıktıları, yerel veri.
+**/node_modules
+**/.env
+**/.env.*
+!**/.env.example
+**/dist
+**/.next
+**/.expo
+api/.data
+api/storage
+api/backups
+deploy/.env
+.git
+docs
+mobile/*
+!mobile/package.json

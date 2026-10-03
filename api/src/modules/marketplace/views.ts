@@ -17,20 +17,25 @@ export function quoteView(q: Quote & { provider: ProviderProfile }) {
 }
 
 /** İş görünümü. `viewer`: sahibi tüm teklifleri, teklif veren usta yalnızca kendi teklifini görür. */
-export function jobView(j: Job & { quotes: (Quote & { provider: ProviderProfile })[] }, viewer: { userId: string; providerId?: string }, payment?: { status: string } | null, reviewed?: boolean) {
+type PaymentInfo = { status: string; autoReleaseAt?: Date | null; disputedAt?: Date | null } | null | undefined;
+
+export function jobView(j: Job & { quotes: (Quote & { provider: ProviderProfile })[] }, viewer: { userId: string; providerId?: string }, payment?: PaymentInfo, reviewed?: boolean) {
   const owner = viewer.userId === j.ownerId;
   const quotes = owner ? j.quotes : j.quotes.filter((q) => q.providerId === viewer.providerId);
   return {
     id: j.id, category: j.category, title: j.title, description: j.description, region: j.region, boatId: owner ? j.boatId : undefined,
     status: j.status, acceptedQuoteId: j.acceptedQuoteId, createdAt: j.createdAt, completedAt: j.completedAt, isMine: owner,
     quotes: quotes.map(quoteView), paymentStatus: owner ? payment?.status ?? null : undefined, reviewed: owner ? !!reviewed : undefined,
+    /** Usta işi bitirdi dedi; sahibi `autoReleaseAt`'e kadar onaylamaz ya da sorun bildirmezse ödeme aktarılır. */
+    deliveredAt: j.deliveredAt, autoReleaseAt: owner ? payment?.autoReleaseAt ?? null : undefined, disputed: owner ? !!payment?.disputedAt : undefined,
   };
 }
 
-export function bookingView(b: CaptainBooking & { provider: ProviderProfile }, viewerId: string, reviewed?: boolean) {
+export function bookingView(b: CaptainBooking & { provider: ProviderProfile }, viewerId: string, reviewed?: boolean, payment?: PaymentInfo) {
   return {
     id: b.id, start: dateOnly(b.start), days: b.days, totalEur: b.totalEur, status: b.status, createdAt: b.createdAt,
     captain: providerView(b.provider), isMine: b.userId === viewerId, reviewed: b.userId === viewerId ? !!reviewed : undefined,
+    autoReleaseAt: b.userId === viewerId ? payment?.autoReleaseAt ?? null : undefined, disputed: b.userId === viewerId ? !!payment?.disputedAt : undefined,
   };
 }
 

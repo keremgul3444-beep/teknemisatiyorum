@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Module, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Injectable, Logger, Module, Param, Post, Put, Query, type OnApplicationBootstrap, type OnApplicationShutdown } from '@nestjs/common';
 import { z } from 'zod';
 import { USTA_CATEGORIES } from '@tms/shared';
 import { Auth, CurrentUser, Public, type AuthUser } from '../../common/decorators';
@@ -12,7 +12,8 @@ import { LogbookService, dateOnly, parseDateOnly, I18N_PREFIX } from '../boats/l
 import { ListingsModule } from '../listings/listings.module';
 import { FxService } from '../listings/fx.service';
 import { PromotionsModule } from '../promotions/promotions.module';
-import { EscrowService } from '../promotions/escrow.service';
+import { EscrowService, JOB_AUTO_RELEASE_DAYS } from '../promotions/escrow.service';
+import { env } from '../../config/env';
 import { bookingView, captainTotal, jobView, providerView } from './views';
 
 const STAFF = { roles: ['moderator', 'admin'] as ('moderator' | 'admin')[] };
@@ -40,6 +41,7 @@ const quoteBody = z.object({ priceTry: z.number().int().min(100).max(10_000_000)
 const acceptBody = z.object({ quoteId: z.string().min(1) });
 const reviewBody = z.object({ stars: z.number().int().min(1).max(5), text: z.string().trim().max(500).default('') });
 const bookingBody = z.object({ providerId: z.string().min(1), start: z.iso.date(), days: z.number().int().min(1).max(60) });
+const disputeBody = z.object({ note: z.string().trim().min(5).max(500) });
 
 /** Aynı anda açık en fazla bu kadar iş talebi. */
 export const MAX_OPEN_JOBS = 10;
@@ -221,10 +223,39 @@ class JobsController {
     const p = await this.escrow.held('job', id);
     if (!p) throw notAllowed('PAYMENT_NOT_HELD');
     await this.escrow.release(p, u.id);
-    await this.prisma.job.update({ where: { id }, data: { status: 'done', completedAt: new Date() } });
-    const q = j.quotes.find((x) => x.id === j.acceptedQuoteId)!;
-    if (j.boatId) await this.logbook.addVerified(j.boatId, { kind: 'onarim', date: dateOnly(new Date()), title: j.title, byName: q.provider.displayName, sourceRef: `job:${id}` });
+    await finishJob(this.prisma, this.logbook, id);
     return { id, status: 'done' };
+  }
+
+  /** Usta: "işi bitirdim". Sahibi süre içinde onaylamaz ya da sorun bildirmezse ödeme kendiliğinden aktarılır. */
+  @Auth()
+  @Post('jobs/:id/delivered')
+  @HttpCode(200)
+  async delivered(@CurrentUser() u: AuthUser, @Param('id') id: string) {
+    const j = await this.prisma.job.findUnique({ where: { id }, include: quoteInclude });
+    const q = j?.quotes.find((x) => x.id === j.acceptedQuoteId);
+    if (!j || !q || q.provider.userId !== u.id) throw Errors.notFound();
+    if (j.status !== 'paid') throw notAllowed('JOB_NOT_PAID');
+    if (j.deliveredAt) throw notAllowed('ALREADY_DELIVERED');
+    const p = await this.escrow.held('job', id);
+    if (!p) throw notAllowed('PAYMENT_NOT_HELD');
+    await this.prisma.job.update({ where: { id }, data: { deliveredAt: new Date() } });
+    if (!p.disputedAt) await this.escrow.startAutoRelease(p, JOB_AUTO_RELEASE_DAYS);
+    await this.notifications.push(j.ownerId, 'notif.jobDelivered', { jobId: id, title: j.title, days: String(JOB_AUTO_RELEASE_DAYS) });
+    return { id, deliveredAt: new Date(), autoReleaseDays: JOB_AUTO_RELEASE_DAYS };
+  }
+
+  /** Sahibi: sorun bildir. Otomatik aktarım durur; ekip iade ya da aktarma kararı verir. */
+  @Auth({ level: 1 })
+  @Post('jobs/:id/dispute')
+  @HttpCode(200)
+  async dispute(@CurrentUser() u: AuthUser, @Param('id') id: string, @Body(new ZodPipe(disputeBody)) b: z.infer<typeof disputeBody>) {
+    const j = await this.own(id, u.id);
+    if (j.status !== 'paid') throw notAllowed('JOB_NOT_PAID');
+    const p = await this.escrow.held('job', id);
+    if (!p) throw notAllowed('PAYMENT_NOT_HELD');
+    await this.escrow.dispute(p, b.note);
+    return { id, disputed: true };
   }
 
   @Auth({ level: 1 })
@@ -250,6 +281,53 @@ class JobsController {
     const j = await this.prisma.job.findUnique({ where: { id }, include: quoteInclude });
     if (!j || j.ownerId !== userId) throw Errors.notFound();
     return j;
+  }
+}
+
+/** İş bitti: durum, tamamlanma anı ve teknenin karnesine doğrulanmış kayıt (bir kez). */
+async function finishJob(prisma: PrismaService, logbook: LogbookService, id: string) {
+  const j = await prisma.job.findUniqueOrThrow({ where: { id }, include: quoteInclude });
+  const r = await prisma.job.updateMany({ where: { id, status: 'paid' }, data: { status: 'done', completedAt: new Date() } });
+  const q = j.quotes.find((x) => x.id === j.acceptedQuoteId);
+  if (r.count && q && j.boatId) await logbook.addVerified(j.boatId, { kind: 'onarim', date: dateOnly(new Date()), title: j.title, byName: q.provider.displayName, sourceRef: `job:${id}` });
+}
+
+async function finishSubject(prisma: PrismaService, logbook: LogbookService, kind: string, id: string) {
+  if (kind === 'job') await finishJob(prisma, logbook, id);
+  else await prisma.captainBooking.updateMany({ where: { id, status: 'paid' }, data: { status: 'done', completedAt: new Date() } });
+}
+
+/** Saatlik: süresi dolmuş, itirazsız emanetleri hizmet verene aktarır; ödeyene haber verir (testte kapalı). */
+@Injectable()
+export class EscrowSweeper implements OnApplicationBootstrap, OnApplicationShutdown {
+  private readonly log = new Logger('Escrow');
+  private timer?: NodeJS.Timeout;
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly escrow: EscrowService,
+    private readonly logbook: LogbookService,
+    private readonly notifications: NotificationsService,
+  ) {}
+
+  async sweep(now = new Date()) {
+    const due = await this.escrow.dueForRelease(now);
+    for (const p of due) {
+      await this.escrow.release(p, null);
+      await finishSubject(this.prisma, this.logbook, p.subjectKind, p.subjectId);
+      await this.notifications.push(p.payerId, 'notif.autoReleased', { kind: p.subjectKind, id: p.subjectId });
+    }
+    return due.length;
+  }
+
+  onApplicationBootstrap() {
+    if (env().NODE_ENV === 'test') return;
+    const run = () => this.sweep().then((n) => n && this.log.log(`${n} emanet ödeme süre sonunda aktarıldı`)).catch((e) => this.log.error(`Emanet taraması yapılamadı: ${e}`));
+    this.timer = setInterval(run, 60 * 60 * 1000);
+  }
+
+  onApplicationShutdown() {
+    if (this.timer) clearInterval(this.timer);
   }
 }
 
@@ -299,8 +377,12 @@ class BookingsController {
   @Get('me/captain-bookings')
   async mine(@CurrentUser() u: AuthUser) {
     const rows = await this.prisma.captainBooking.findMany({ where: { userId: u.id }, include: { provider: true }, orderBy: { createdAt: 'desc' }, take: 100 });
-    const reviews = await this.prisma.review.findMany({ where: { subjectKind: 'captain', subjectId: { in: rows.map((b) => b.id) } }, select: { subjectId: true } });
-    return rows.map((b) => bookingView(b, u.id, reviews.some((r) => r.subjectId === b.id)));
+    const ids = rows.map((b) => b.id);
+    const [reviews, pays] = await Promise.all([
+      this.prisma.review.findMany({ where: { subjectKind: 'captain', subjectId: { in: ids } }, select: { subjectId: true } }),
+      this.prisma.servicePayment.findMany({ where: { subjectKind: 'captain', subjectId: { in: ids }, status: { in: ['held', 'released', 'refunded'] } } }),
+    ]);
+    return rows.map((b) => bookingView(b, u.id, reviews.some((r) => r.subjectId === b.id), pays.find((p) => p.subjectId === b.id)));
   }
 
   /** Kaptanın takvimi: kendisine gelen rezervasyonlar (müşterinin adı yok; iletişim mesajla). */
@@ -350,6 +432,19 @@ class BookingsController {
     return { id, status: 'cancelled' };
   }
 
+  /** Müşteri: sorun bildir (ödenmiş rezervasyon). Otomatik aktarım durur, karar ekipte. */
+  @Auth({ level: 1 })
+  @Post('captain-bookings/:id/dispute')
+  @HttpCode(200)
+  async dispute(@CurrentUser() u: AuthUser, @Param('id') id: string, @Body(new ZodPipe(disputeBody)) b: z.infer<typeof disputeBody>) {
+    const bk = await this.own(id, u.id);
+    if (bk.status !== 'paid') throw notAllowed('BOOKING_NOT_PAID');
+    const p = await this.escrow.held('captain', id);
+    if (!p) throw notAllowed('PAYMENT_NOT_HELD');
+    await this.escrow.dispute(p, b.note);
+    return { id, disputed: true };
+  }
+
   /** Kaptan ödenmemiş talebi geri çevirir. */
   @Auth()
   @Post('captain-bookings/:id/decline')
@@ -382,7 +477,7 @@ class BookingsController {
 
 @Controller()
 class ServicePaymentsController {
-  constructor(private readonly prisma: PrismaService, private readonly escrow: EscrowService) {}
+  constructor(private readonly prisma: PrismaService, private readonly escrow: EscrowService, private readonly logbook: LogbookService) {}
 
   /** Ödeyenin ödemeleri (Profil > Ödemelerim). */
   @Auth()
@@ -408,6 +503,8 @@ class ServicePaymentsController {
     const rows = await this.prisma.servicePayment.findMany({
       where: status && ok.includes(status) ? { status: status as 'held' } : { status: { not: 'pending' } }, orderBy: { createdAt: 'desc' }, take: 200,
     });
+    // Sorun bildirilmiş ve hâlâ emanette olanlar en üstte (ekibin kararını bekliyor).
+    rows.sort((a, b) => Number(!!b.disputedAt && b.status === 'held') - Number(!!a.disputedAt && a.status === 'held'));
     const provs = await this.prisma.providerProfile.findMany({ where: { id: { in: rows.map((r) => r.providerId) } }, select: { id: true, displayName: true } });
     return rows.map((p) => ({ ...p, providerName: provs.find((x) => x.id === p.providerId)?.displayName ?? null }));
   }
@@ -428,8 +525,7 @@ class ServicePaymentsController {
     if (!p) throw Errors.notFound();
     if (p.payerId === u.id) throw new AppError('SELF_DECISION', 'errors.self_decision', 403);
     await this.escrow.release(p, u.id);
-    if (p.subjectKind === 'job') await this.prisma.job.update({ where: { id: p.subjectId }, data: { status: 'done', completedAt: new Date() } });
-    else await this.prisma.captainBooking.update({ where: { id: p.subjectId }, data: { status: 'done', completedAt: new Date() } });
+    await finishSubject(this.prisma, this.logbook, p.subjectKind, p.subjectId);
     return { id, status: 'released' };
   }
 }
@@ -437,5 +533,6 @@ class ServicePaymentsController {
 @Module({
   imports: [BoatsModule, ListingsModule, PromotionsModule],
   controllers: [ProvidersController, JobsController, BookingsController, ServicePaymentsController],
+  providers: [EscrowSweeper],
 })
 export class MarketplaceModule {}

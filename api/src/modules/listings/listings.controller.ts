@@ -165,8 +165,13 @@ export class ListingsController {
   async create(@CurrentUser() u: AuthUser, @Body(new ZodPipe(draftSchema)) b: z.infer<typeof draftSchema>) {
     if (b.companyId) await this.assertMember(u.id, b.companyId);
     if (b.boatId) await this.assertOwnBoat(u.id, b.boatId);
-    // Yarım kalan taslaklar sınırsız birikmesin (her biri fotoğraf yükleme kapısı).
-    if ((await this.prisma.listing.count({ where: { ownerId: u.id, status: 'draft' } })) >= MAX_OPEN_DRAFTS) throw Errors.conflict('TOO_MANY_DRAFTS');
+    // Yarım kalan taslaklar sınırsız birikmesin (her biri fotoğraf yükleme kapısı). Sınırdaysa bir saatten eski en eski
+    // taslak kaldırılır (yarıda bırakılmış gönderim); hepsi yeniyse (seri açma) reddedilir.
+    if ((await this.prisma.listing.count({ where: { ownerId: u.id, status: 'draft' } })) >= MAX_OPEN_DRAFTS) {
+      const stale = await this.prisma.listing.findFirst({ where: { ownerId: u.id, status: 'draft', updatedAt: { lt: new Date(Date.now() - 3600e3) } }, orderBy: { updatedAt: 'asc' } });
+      if (!stale) throw Errors.conflict('TOO_MANY_DRAFTS');
+      await this.prisma.listing.update({ where: { id: stale.id }, data: { status: 'removed' } });
+    }
     const l = await this.prisma.listing.create({ data: { ...b, ownerId: u.id, status: 'draft', badges: [] }, include: listingInclude });
     return this.listings.view(l, u.id);
   }

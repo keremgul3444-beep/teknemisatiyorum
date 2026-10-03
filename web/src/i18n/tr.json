@@ -539,7 +539,10 @@
     "booking_not_paid": "Rezervasyon henüz ödenmedi.",
     "booking_not_started": "Rezervasyon başlamadan tamamlanamaz.",
     "booking_not_done": "Rezervasyon tamamlanmadan değerlendirilemez.",
-    "already_paid": "Bu ödeme zaten yapıldı."
+    "already_paid": "Bu ödeme zaten yapıldı.",
+    "already_disputed": "Bu ödeme için zaten sorun bildirdin; ekip inceliyor.",
+    "already_delivered": "İşi bitirdiğini zaten bildirdin.",
+    "payments_disabled": "Ödemeler şu an kapalı. Kısa süre içinde açılacak."
   },
   "login": {
     "title": "Giriş yap",
@@ -840,7 +843,22 @@
       "birthYear": "Doğum yılı",
       "engineSerialLast4": "Motor seri no (son hane)"
     },
-    "paymentRisk": "Açıklamada ödeme isteği (IBAN, kapora, havale) geçiyor."
+    "paymentRisk": "Açıklamada ödeme isteği (IBAN, kapora, havale) geçiyor.",
+    "disputed": "Sorun bildirildi",
+    "autoReleaseAt": "Otomatik aktarım: {{date}}",
+    "navPayments": "Emanet ödemeler",
+    "paymentsEmpty": "Emanet ödeme yok.",
+    "refund": "İade et",
+    "release": "Hizmet verene aktar",
+    "service_job": "Usta işi",
+    "service_captain": "Kaptan rezervasyonu",
+    "fee": "platform payı",
+    "payStatus": {
+      "held": "Emanette",
+      "released": "Aktarıldı",
+      "refunded": "İade edildi",
+      "failed": "Başarısız"
+    }
   },
   "audit": {
     "listingApproved": "İlan onaylandı: {{title}}",
@@ -879,7 +897,8 @@
     "memberRemoved": "Firma personeli çıkarıldı ({{role}})",
     "providerCreated": "Hizmet veren profili açıldı ({{kind}})",
     "servicePaid": "Hizmet ödemesi emanete alındı ({{kind}}): ₺{{amount}}",
-    "paymentRefunded": "Hizmet ödemesi iade edildi: {{ref}}"
+    "paymentRefunded": "Hizmet ödemesi iade edildi: {{ref}}",
+    "paymentDisputed": "Hizmet ödemesine itiraz: {{ref}}"
   },
   "firm": {
     "title": "Firma paneli",

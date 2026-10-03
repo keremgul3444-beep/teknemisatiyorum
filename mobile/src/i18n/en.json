@@ -561,7 +561,8 @@
     "waitingQuotes": "Your request was sent to technicians in this field. Quotes will appear here.",
     "cancelled": "This job request was cancelled.",
     "cancel": "Cancel request",
-    "descriptionMin": "At least 10 characters so technicians can quote accurately."
+    "descriptionMin": "At least 10 characters so technicians can quote accurately.",
+    "delivered": "The technician marked the job done. If you don’t confirm or report a problem by {{date}}, the payment is released."
   },
   "payment": {
     "title": "Secure payment",
@@ -821,7 +822,8 @@
     "bookingCancelled": "Cancelled",
     "payBooking": "Pay",
     "completeBooking": "Charter completed",
-    "refunded": "Refunded"
+    "refunded": "Refunded",
+    "autoRelease": "If you don’t report a problem, the payment is released to the captain on {{date}}."
   },
   "settings": {
     "title": "Settings",
@@ -934,7 +936,9 @@
       "paid": "Paid (in escrow)",
       "done": "Completed",
       "cancelled": "Cancelled"
-    }
+    },
+    "markDelivered": "Job done",
+    "delivered": "Marked done; waiting for customer confirmation or the deadline"
   },
   "corporate": {
     "title": "Company panel",
@@ -1097,7 +1101,9 @@
       "released": "Released",
       "refunded": "Refunded",
       "failed": "Failed"
-    }
+    },
+    "disputed": "Problem reported",
+    "autoReleaseAt": "Auto-release: {{date}}"
   },
   "audit": {
     "listingApproved": "Listing approved: {{title}}",
@@ -1136,7 +1142,8 @@
     "memberRemoved": "Company staff removed ({{role}})",
     "providerCreated": "Provider profile opened ({{kind}})",
     "servicePaid": "Service payment held ({{kind}}): ₺{{amount}}",
-    "paymentRefunded": "Service payment refunded: {{ref}}"
+    "paymentRefunded": "Service payment refunded: {{ref}}",
+    "paymentDisputed": "Service payment disputed: {{ref}}"
   },
   "errors": {
     "generic": "Something went wrong, please try again.",
@@ -1217,7 +1224,10 @@
     "booking_not_started": "The booking can be completed once it has started.",
     "booking_not_done": "You can review once the booking is done.",
     "already_paid": "This has already been paid.",
-    "no_quote": "No quotes yet; you can message a technician once a quote arrives."
+    "no_quote": "No quotes yet; you can message a technician once a quote arrives.",
+    "already_disputed": "You already reported a problem for this payment; the team is reviewing it.",
+    "already_delivered": "You already marked this job as done.",
+    "payments_disabled": "Payments are currently unavailable. They will open soon."
   },
   "soon": {
     "title": "Coming soon",
@@ -1243,7 +1253,10 @@
     "paymentReleased": "Your payment was released: ₺{{amount}}",
     "paymentRefunded": "Your payment was refunded: ₺{{amount}}",
     "bookingRequested": "New booking request: {{start}} · {{days}} days",
-    "bookingDeclined": "The captain declined your booking request"
+    "bookingDeclined": "The captain declined your booking request",
+    "jobDelivered": "The technician marked the job done: {{title}}. If you don’t confirm or report a problem within {{days}} days, the payment is released.",
+    "paymentDisputed": "The customer reported a problem; the payment is under team review.",
+    "autoReleased": "The held payment was released to the provider after the waiting period."
   },
   "notifs": {
     "title": "Notifications",
@@ -1318,5 +1331,12 @@
       "offensive": "Inappropriate content",
       "other": "Other"
     }
+  },
+  "dispute": {
+    "open": "Report a problem",
+    "note": "What happened?",
+    "hint": "Tell us if the work wasn’t done or is incomplete. Automatic payment stops and the team decides after talking to both sides.",
+    "send": "Report",
+    "sent": "You reported a problem; the payment is on hold while the team reviews it."
   }
 }

@@ -50,9 +50,12 @@ export async function seedProducts(prisma: PrismaClient) {
 }
 
 export async function runSeed(prisma: PrismaClient, opts: { demo?: boolean } = {}) {
+  // Canlıda yönetici telefonu SEED_ADMIN_PHONE ile verilir (giriş kodu bu numaraya gider); yerelde örnek numara.
+  const adminPhone = process.env.SEED_ADMIN_PHONE || '+905000000000';
+  if (!/^\+90[5]\d{9}$/.test(adminPhone)) throw new Error('SEED_ADMIN_PHONE +905xxxxxxxxx biçiminde olmalı');
   await prisma.user.upsert({
-    where: { phone: '+905000000000' },
-    create: { phone: '+905000000000', name: 'Yönetici', verifyLevel: 3, roles: ['admin', 'moderator'] },
+    where: { phone: adminPhone },
+    create: { phone: adminPhone, name: 'Yönetici', verifyLevel: 3, roles: ['admin', 'moderator'] },
     update: {},
   });
   for (const [currency, rateToTry] of [['TRY', 1], ['EUR', 48], ['USD', 41]] as const) {
