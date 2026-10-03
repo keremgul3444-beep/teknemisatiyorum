@@ -16,3 +16,7 @@ export const idFromSlug = (slug: string) => slug.slice(slug.lastIndexOf('-') + 1
 
 /** API'nin ürettiği WebP genişlikleri; site `/media`'yı API'ye yeniden yazar. */
 export const mediaUrl = (fileId: string, w: 400 | 800 | 1600) => `/media/${fileId}?w=${w}`;
+
+/** Kuruş → "₺1.499"; kuruşlu tutar iki haneyle "₺1.499,90". */
+export const formatKurus = (k: number, locale: Locale) =>
+  `₺${(k / 100).toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US', { minimumFractionDigits: k % 100 === 0 ? 0 : 2, maximumFractionDigits: 2 })}`;

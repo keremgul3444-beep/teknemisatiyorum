@@ -4,6 +4,7 @@ import { PrismaService } from '../../common/prisma.service';
 import { NotificationsService } from '../notifications/notifications.module';
 import { env } from '../../config/env';
 import { reportError } from '../../adapters/error-report';
+import { purgeDeletedIdentities } from '../users/reregistration';
 
 const DAY_MS = 864e5;
 /** Onaylanan ya da yenilenen ilan bu kadar gün yayında kalır; satılmış ama işaretlenmemiş ilanlar sonsuza kadar durmaz. */
@@ -41,6 +42,8 @@ export class ListingExpiry implements OnApplicationBootstrap, OnApplicationShutd
     }
     // 30 gün dokunulmamış yarım taslaklar kaldırılır (fotoğrafları yetim dosya temizliğinde silinir).
     await this.prisma.listing.updateMany({ where: { status: 'draft', updatedAt: { lt: new Date(now.getTime() - STALE_DRAFT_DAYS * DAY_MS) } }, data: { status: 'removed' } });
+    // Silinen sorunlu hesap izleri saklama süresi dolunca silinir.
+    await purgeDeletedIdentities(this.prisma, now);
     const due = await this.prisma.listing.findMany({ where: { status: 'published', expiresAt: { lte: now } } });
     for (const l of due) {
       // Koşullu güncelleme: aynı anda yenilenen ilan düşürülmez.

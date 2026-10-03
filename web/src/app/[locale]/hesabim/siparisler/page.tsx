@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { t, type Locale } from '@/i18n';
 import { authedGet } from '@/lib/auth-server';
+import { formatKurus } from '@/lib/format';
 
 type P = { params: Promise<{ locale: string }> };
 type Order = { id: string; listingTitle: string | null; productCode: string; channel: string; amountKurus: number; status: string; createdAt: string };
@@ -13,7 +14,7 @@ export async function generateMetadata({ params }: P): Promise<Metadata> {
 export default async function Siparisler({ params }: P) {
   const { locale } = (await params) as { locale: Locale };
   const rows = await authedGet<Order[]>(locale, '/me/orders', '/hesabim/siparisler');
-  const fmt = (k: number) => `₺${Math.round(k / 100).toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US')}`;
+  const fmt = (k: number) => formatKurus(k, locale);
   return (
     <section className="section">
       <h1>{t(locale, 'account.orders')}</h1>

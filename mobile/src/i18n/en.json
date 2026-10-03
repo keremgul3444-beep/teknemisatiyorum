@@ -267,7 +267,7 @@
     "h5": "Transfers abroad",
     "b5": "Some of our providers run servers abroad: cloud file storage and encrypted backups (Cloudflare), push notifications (Expo: notification text and device token), the smart assistant (Anthropic: the search text you type). These transfers rely on the standard contract published by the Board under KVKK art. 9. Please do not type personal details into the assistant.",
     "h6": "Retention",
-    "b6": "When you delete your account, your profile, listings and messages are deleted or anonymised. Records the law requires us to keep (payment, invoice and access logs) are kept for the required period and then deleted.",
+    "b6": "When you delete your account, your profile, listings and messages are deleted or anonymised. Records the law requires us to keep (payment, invoice and access logs) are kept for the required period and then deleted. If an account with listings reported or removed for rule violations is deleted, an irreversible fingerprint of its phone and ID number is kept for 1 year to prevent fraud; if the same person opens a new account, the team is notified.",
     "h7": "Your rights (KVKK art. 11)",
     "b7": "You may access, correct and delete your data, object to processing and claim compensation. You can download a copy of your data and delete your account in the app. For other requests write to our contact address; we reply within 30 days at the latest."
   },
@@ -1143,7 +1143,8 @@
       "failed": "Failed"
     },
     "disputed": "Problem reported",
-    "autoReleaseAt": "Auto-release: {{date}}"
+    "autoReleaseAt": "Auto-release: {{date}}",
+    "reregistered": "Opened with the phone or ID of a deleted problem account"
   },
   "audit": {
     "listingApproved": "Listing approved: {{title}}",
@@ -1184,7 +1185,8 @@
     "servicePaid": "Service payment held ({{kind}}): ₺{{amount}}",
     "paymentRefunded": "Service payment refunded: {{ref}}",
     "paymentDisputed": "Service payment disputed: {{ref}}",
-    "preinfoAccepted": "Pre-contract information and contract accepted (version {{version}})"
+    "preinfoAccepted": "Pre-contract information and contract accepted (version {{version}})",
+    "reregistered": "Matched a deleted problem account ({{via}})"
   },
   "errors": {
     "generic": "Something went wrong, please try again.",

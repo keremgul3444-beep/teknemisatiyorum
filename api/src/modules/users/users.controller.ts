@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, Header, HttpCode, Patch } from '@nestjs/common';
-import { retireServices } from '../marketplace/lifecycle';
 import { z } from 'zod';
 import { Auth, CurrentUser, type AuthUser } from '../../common/decorators';
 import { ZodPipe } from '../../common/zod.pipe';
@@ -8,6 +7,7 @@ import { AuditService } from '../../common/audit.service';
 import { prefsOf, userView } from './user.view';
 import { MediaService } from '../media/media.service';
 import { Errors } from '../../common/errors';
+import { deleteAccount } from './account-deletion';
 
 const patchBody = z.object({
   name: z.string().trim().min(1).max(80).optional(),
@@ -102,32 +102,12 @@ export class UsersController {
     };
   }
 
-  /**
-   * Hesap silme: kişisel alanlar temizlenir ve kullanıcı anonimleşir; ilanları yayından kalkar,
-   * karne geçmişi "silinmiş kullanıcı" olarak kalır. Tüm oturumlar kapanır.
-   */
+  /** Hesap silme (ayrıntı: account-deletion.ts). Kural ihlali geçmişi varsa yeniden açılan hesap tanınsın diye iz saklanır. */
   @Auth()
   @Delete()
   @HttpCode(204)
   async remove(@CurrentUser() u: AuthUser) {
-    const now = new Date();
-    const { phone } = await this.prisma.user.findUniqueOrThrow({ where: { id: u.id }, select: { phone: true } });
-    await this.prisma.$transaction([
-      // Giriş kodu kayıtları da telefon numarası taşır; hesapla birlikte gider.
-      ...(phone ? [this.prisma.otpCode.deleteMany({ where: { phone } })] : []),
-      this.prisma.user.update({
-        where: { id: u.id },
-        data: { phone: null, name: null, email: null, nationalIdEnc: null, nationalIdLast2: null, nationalIdHash: null, deletedAt: now },
-      }),
-      // KVKK: silinen kişinin ilanları yayından kalkar (kayıt geçmiş için saklanır, kimseye gösterilmez).
-      this.prisma.listing.updateMany({ where: { ownerId: u.id, status: { not: 'removed' } }, data: { status: 'removed' } }),
-      this.prisma.session.updateMany({ where: { userId: u.id, revokedAt: null }, data: { revokedAt: now } }),
-    ]);
-    // Usta/kaptan profili listeden kalkar ve görünen bilgileri silinir; açık iş talepleri iptal olur.
-    await retireServices(this.prisma, u.id, { anonymize: true });
-    // Firma üyelikleri biter (sahibi olduğu firma diğer üyeler için kalır).
-    await this.prisma.companyMember.deleteMany({ where: { userId: u.id } });
-    await this.media.purgeUser(u.id);
+    await deleteAccount(this.prisma, u.id, { remember: true, purgeFiles: (id) => this.media.purgeUser(id) });
     await this.audit.log(u.id, 'audit.accountDeleted', {}, 'user', u.id);
   }
 }

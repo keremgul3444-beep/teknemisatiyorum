@@ -415,7 +415,7 @@
         },
         {
           "h": "Saklama süresi",
-          "b": "Hesabını silince profilin, ilanların ve mesajların silinir ya da anonimleştirilir. Mevzuatın saklamayı zorunlu tuttuğu kayıtlar (ödeme, fatura ve erişim kayıtları) ilgili süre boyunca saklanır, süre dolunca silinir."
+          "b": "Hesabını silince profilin, ilanların ve mesajların silinir ya da anonimleştirilir. Mevzuatın saklamayı zorunlu tuttuğu kayıtlar (ödeme, fatura ve erişim kayıtları) ilgili süre boyunca saklanır, süre dolunca silinir. Kural ihlali nedeniyle bildirilmiş ya da kaldırılmış ilanı olan hesap silinirse, dolandırıcılığın önlenmesi için telefon ve kimlik numarasının geri çözülemeyen izi 1 yıl saklanır; aynı kişi yeni hesap açarsa ekip bilgilendirilir."
         },
         {
           "h": "Haklarınız (KVKK m.11)",
@@ -680,7 +680,7 @@
     "unread": "Yeni",
     "replyPh": "Yanıtını yaz",
     "closedNote": "Bu ilan artık yayında değil.",
-    "fixInApp": "Düzeltip yeniden göndermek için uygulamada İlanlarım'ı aç.",
+    "fixInApp": "Düzeltip yeniden göndermek için Düzenle.",
     "rejectReasons": {
       "blurry": "Red nedeni: fotoğraflar ya da belge okunaksız.",
       "mismatch": "Red nedeni: bilgiler fotoğraflarla ya da belgeyle uyuşmuyor.",
@@ -709,7 +709,9 @@
     "firm": "Firma paneli",
     "firmBody": "Personel ve firma ilanları",
     "admin": "Yönetim",
-    "adminBody": "Onaylar, bildirimler, kullanıcılar"
+    "adminBody": "Onaylar, bildirimler, kullanıcılar",
+    "edit": "Düzenle",
+    "document": "Ruhsat yükle"
   },
   "pay": {
     "devTitle": "Deneme ödemesi",
@@ -836,7 +838,12 @@
       "location": "Konum seç."
     },
     "seller": "Satıcı",
-    "sellerSelf": "Bireysel (kendi adıma)"
+    "sellerSelf": "Bireysel (kendi adıma)",
+    "editTitle": "İlanı düzenle",
+    "editNote": "Yalnızca fiyatı ölçülü değiştirirsen ilan yayında kalır. Diğer değişiklikler ve fotoğraflar kısa bir onaydan geçer.",
+    "editDoneTitle": "Değişiklikler kaydedildi",
+    "editDoneBody": "Onay gerekiyorsa ilan kısa süre sonra yeniden yayına girer; sonucu bildirimle haber veririz.",
+    "saveEdit": "Değişiklikleri kaydet"
   },
   "admin": {
     "title": "Yönetim",
@@ -936,7 +943,8 @@
       "released": "Aktarıldı",
       "refunded": "İade edildi",
       "failed": "Başarısız"
-    }
+    },
+    "reregistered": "Silinmiş sorunlu bir hesabın numarası ya da kimliğiyle açıldı"
   },
   "audit": {
     "listingApproved": "İlan onaylandı: {{title}}",
@@ -977,7 +985,8 @@
     "servicePaid": "Hizmet ödemesi emanete alındı ({{kind}}): ₺{{amount}}",
     "paymentRefunded": "Hizmet ödemesi iade edildi: {{ref}}",
     "paymentDisputed": "Hizmet ödemesine itiraz: {{ref}}",
-    "preinfoAccepted": "Ön bilgilendirme ve sözleşme onaylandı (sürüm {{version}})"
+    "preinfoAccepted": "Ön bilgilendirme ve sözleşme onaylandı (sürüm {{version}})",
+    "reregistered": "Silinmiş sorunlu hesabın izi eşleşti ({{via}})"
   },
   "firm": {
     "title": "Firma paneli",
@@ -1027,5 +1036,21 @@
     "sent": "Mesajın iletildi. Yanıtı burada ve uygulamada görürsün.",
     "reviews": "Değerlendirmeler",
     "noReviews": "Henüz değerlendirme yok."
+  },
+  "doc": {
+    "title": "Ruhsat yükle",
+    "intro": "Ruhsatını yükle; ekip ilan bilgileriyle karşılaştırıp onaylayınca ilanında sahiplik rozeti görünür. Motor seri numarası fotoğrafını da eklersen ikisi birlikte \"belgeleri eşleşti\" rozeti getirir.",
+    "privacy": "Belgeler ilanda yayınlanmaz; yalnızca sen ve inceleyen ekip görür.",
+    "license": "Ruhsat (fotoğraf ya da PDF)",
+    "licenseHint": "En çok 10 MB",
+    "serialPhoto": "Motor seri numarası fotoğrafı",
+    "serialPhotoHint": "İsteğe bağlı",
+    "serial": "Seri numarasının son 2–6 hanesi",
+    "serialInvalid": "Yalnızca harf ve rakam, 2–6 hane.",
+    "send": "Gönder",
+    "sending": "Gönderiliyor…",
+    "sentTitle": "Belge incelemeye gönderildi",
+    "sentBody": "Sonucu bildirimle haber veririz.",
+    "back": "İlanlarım'a dön"
   }
 }

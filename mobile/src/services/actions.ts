@@ -14,6 +14,7 @@ import { resetRates } from './rates';
 import { createPublisher, type PublishExtra } from '@/features/publishListing';
 import { clearAllListingDrafts } from '@/features/listingDraftStore';
 import { getPushToken } from '@/features/push';
+import { shareTextFile } from '@/features/shareFile';
 
 /** Bu cihazın sunucuya bıraktığı bildirim jetonu; çıkışta silinir. */
 let pushToken: string | null = null;
@@ -362,7 +363,7 @@ export const actions = {
     }
     applyUser(await api.patch<ApiUser>('/me', patch));
   },
-  /** KVKK: kişisel verinin kopyası. Web'de dosya olarak iner, telefonda paylaşım menüsü açılır. */
+  /** KVKK: kişisel verinin kopyası. Web'de dosya olarak iner, telefonda dosya olarak paylaşılır (yoksa metin olarak). */
   async exportData(): Promise<boolean> {
     if (!isApiMode()) return false;
     const data = await api.get<unknown>('/me/export');
@@ -373,7 +374,7 @@ export const actions = {
       a.download = 'verilerim.json';
       a.click();
       URL.revokeObjectURL(a.href);
-    } else await Share.share({ title: 'verilerim.json', message: json });
+    } else if (!(await shareTextFile('verilerim.json', json))) await Share.share({ title: 'verilerim.json', message: json });
     return true;
   },
   async notifications() {

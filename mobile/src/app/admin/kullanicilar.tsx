@@ -10,7 +10,7 @@ import { api } from '@/services/api/instance';
 import { attempt } from '@/services/errors';
 
 
-type Row = { id: string; name: string | null; role: string; level: number; phone: string; joined: string; suspended?: boolean };
+type Row = { id: string; name: string | null; role: string; level: number; phone: string; joined: string; suspended?: boolean; reregistered?: boolean };
 
 export default function AdminKullanicilar() {
   const { t } = useTranslation();
@@ -19,10 +19,10 @@ export default function AdminKullanicilar() {
   const [tick, setTick] = useState(0);
   useEffect(() => {
     if (mode !== 'api') return;
-    attempt(() => api.get<{ id: string; name: string | null; roles: string[]; verifyLevel: number; phone: string | null; createdAt: string; suspendedAt?: string | null }[]>('/admin/users'))
+    attempt(() => api.get<{ id: string; name: string | null; roles: string[]; verifyLevel: number; phone: string | null; createdAt: string; suspendedAt?: string | null; reregistered?: boolean }[]>('/admin/users'))
       .then((r) => r && setRemote(r.map((u) => ({
         id: u.id, name: u.name, level: u.verifyLevel, phone: u.phone ?? '—', joined: u.createdAt.slice(0, 10),
-        role: u.roles.includes('admin') || u.roles.includes('moderator') ? 'yonetici' : 'bireysel', suspended: !!u.suspendedAt,
+        role: u.roles.includes('admin') || u.roles.includes('moderator') ? 'yonetici' : 'bireysel', suspended: !!u.suspendedAt, reregistered: !!u.reregistered,
       }))));
   }, [mode, tick]);
   // Askıya alma bildirimler sayfasından yapılır; burada yalnızca askı kaldırılır (ilanlar kendiliğinden geri gelmez).
@@ -47,6 +47,7 @@ export default function AdminKullanicilar() {
             <T variant="caption" style={{ flex: 1 }}>{u.level}</T>
             <T variant="caption" style={{ flex: 1 }} numberOfLines={1}>{u.phone}</T>
             <T variant="caption" style={{ flex: 1 }}>{u.joined}</T>
+            {u.reregistered ? <T variant="caption" color={colors.warning} style={{ flexBasis: '100%', marginTop: space(1) }}>{t('admin.reregistered')}</T> : null}
             {u.suspended ? (
               <View style={{ flexBasis: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space(2), marginTop: space(1) }}>
                 <T variant="caption" color={colors.danger} style={{ fontFamily: fonts.bodyBold }}>{t('admin.suspended')}</T>

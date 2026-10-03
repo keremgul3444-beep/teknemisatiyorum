@@ -9,6 +9,7 @@ import { blindIndex, encrypt } from '../../common/crypto';
 import { IDENTITY_VERIFIER, IdentityServiceDown, type IdentityVerifier } from '../../adapters/identity';
 import { MediaService } from '../media/media.service';
 import { userView } from '../users/user.view';
+import { flagIfReregistered } from '../users/reregistration';
 
 const person = { firstName: z.string().trim().min(1).max(60), lastName: z.string().trim().min(1).max(60), birthYear: z.number().int().min(1900).max(2010) };
 const identityBody = z.union([
@@ -69,6 +70,7 @@ export class VerificationController {
         },
       }).catch((e) => { throw e?.code === 'P2002' ? tcknInUse() : e; });
       await this.audit.log(u.id, 'audit.identityVerified', {}, 'user', u.id);
+      if (await flagIfReregistered(this.prisma, u.id, hash)) await this.audit.log(u.id, 'audit.reregistered', { via: 'nationalId' }, 'user', u.id);
       return userView(user);
     }
     await this.media.assertOwnPrivate(u.id, [b.fileId]);

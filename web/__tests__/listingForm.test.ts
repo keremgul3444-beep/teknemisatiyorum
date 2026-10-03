@@ -34,3 +34,15 @@ test('saklanan taslak geri gelir; bozuk olan yok sayılır', () => {
   expect(restoreSell('{bozuk')).toBeNull();
   expect(restoreSell(JSON.stringify({ ...filled(), year: 2016 }))).toBeNull();
 });
+
+test('düzenleme: ilan forma dolar; yalnızca değişen alanlar gönderilir', async () => {
+  const { fromListing, changedDraft } = await import('../src/lib/listingForm');
+  const l = { brand: 'Bavaria', model: 'C41', year: 2016, lengthM: 12.4, cabins: 3, engine: 'Volvo', engineHours: 850, description: 'Temiz', price: 145000,
+    type: 'yelkenli', currency: 'EUR' as const, location: 'Bodrum', flag: 'tr' as const, equipment: ['gps'], tradeIn: false, negotiable: true };
+  const f = fromListing(l);
+  expect(f).toMatchObject({ length: '12,4', year: '2016', engineHours: '850', price: '145000', flag: 'tr', negotiable: true });
+  expect(changedDraft(f, f)).toEqual({});
+  expect(changedDraft(f, { ...f, price: '139000' })).toEqual({ price: 139000 });
+  expect(changedDraft(f, { ...f, description: 'Yeni boya', equipment: ['gps', 'radar'] as never })).toEqual({ description: 'Yeni boya', equipment: ['gps', 'radar'] });
+  expect(fromListing({ ...l, engineHours: null, flag: null, cabins: 0 }, 'en')).toMatchObject({ length: '12.4', engineHours: '', flag: '', cabins: '' });
+});

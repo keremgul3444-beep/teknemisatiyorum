@@ -4,6 +4,7 @@ import { localePath, t, tDict, type Locale } from '@/i18n';
 import { ApiError } from '@/lib/api';
 import { authedGet } from '@/lib/auth-server';
 import { DevPayButtons } from '@/components/AccountBits';
+import { formatKurus } from '@/lib/format';
 
 type P = { params: Promise<{ locale: string }>; searchParams: Promise<{ order?: string | string[]; pay?: string | string[] }> };
 type ServicePay = { id: string; subjectKind: 'job' | 'captain'; amountKurus: number; feeKurus: number; status: string };
@@ -35,7 +36,7 @@ export default async function DenemeOdeme({ params, searchParams }: P) {
       <div className="card" style={{ display: 'grid', gap: 6, margin: '16px 0' }}>
         <span>{o.listingTitle}</span>
         <span>{t(locale, `promo.product.${o.productCode}`, {})}</span>
-        <strong style={{ fontSize: 24 }}>₺{Math.round(o.amountKurus / 100).toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US')}</strong>
+        <strong style={{ fontSize: 24 }}>{formatKurus(o.amountKurus, locale)}</strong>
       </div>
       {o.status === 'pending'
         ? <DevPayButtons orderId={o.id} resultHref={result} errors={tDict(locale, 'errors')} labels={{ success: t(locale, 'pay.devSuccess'), failure: t(locale, 'pay.devFailure') }} />
@@ -50,7 +51,7 @@ async function ServicePayPage({ locale, id }: { locale: Locale; id: string }) {
     if (e instanceof ApiError && e.status === 404) notFound();
     throw e;
   });
-  const tl = (k: number) => `₺${(k / 100).toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US', { maximumFractionDigits: 2 })}`;
+  const tl = (k: number) => formatKurus(k, locale);
   const result = `${localePath(locale, '/odeme/sonuc')}?pay=${p.id}`;
   return (
     <section className="section" style={{ maxWidth: 560 }}>

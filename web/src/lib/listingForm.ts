@@ -83,3 +83,24 @@ export function restoreSell(raw: string | null): SellFields | null {
     return null;
   }
 }
+
+/** Düzenleme: sunucudaki ilan → form alanları (firma seçimi düzenlemede değişmez). */
+export function fromListing(l: {
+  brand: string; model: string; year: number; lengthM: number; cabins?: number; engine?: string; engineHours?: number | null; description: string;
+  price: number; type: string; currency: Currency; location: string; flag?: Flag | null; equipment: string[]; tradeIn?: boolean; negotiable?: boolean;
+}, locale: 'tr' | 'en' = 'tr'): SellFields {
+  return {
+    ...emptySell(),
+    brand: l.brand, model: l.model, year: String(l.year), length: locale === 'tr' ? String(l.lengthM).replace('.', ',') : String(l.lengthM),
+    cabins: l.cabins ? String(l.cabins) : '', engine: l.engine ?? '', engineHours: l.engineHours != null ? String(l.engineHours) : '',
+    description: l.description, price: String(l.price), type: l.type as BoatType, currency: l.currency, location: l.location,
+    flag: l.flag ?? '', equipment: l.equipment as Equipment[], tradeIn: !!l.tradeIn, negotiable: !!l.negotiable,
+  };
+}
+
+/** Düzenlemede yalnızca değişen alanlar gönderilir: yalnızca fiyat değişirse ilan yeniden onaya düşmez. */
+export function changedDraft(before: SellFields, after: SellFields): Record<string, unknown> {
+  const a = toDraft({ ...before, companyId: '' }) as Record<string, unknown>;
+  const b = toDraft({ ...after, companyId: '' }) as Record<string, unknown>;
+  return Object.fromEntries(Object.keys(b).filter((k) => JSON.stringify(a[k]) !== JSON.stringify(b[k])).map((k) => [k, b[k]]));
+}

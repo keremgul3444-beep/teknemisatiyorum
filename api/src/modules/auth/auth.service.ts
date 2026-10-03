@@ -8,6 +8,7 @@ import { CLOCK, type Clock } from '../../common/clock';
 import { SMS_SENDER, type SmsSender } from '../../adapters/sms';
 import { userView } from '../users/user.view';
 import { decrypt, encrypt } from '../../common/crypto';
+import { flagIfReregistered, phoneIndex } from '../users/reregistration';
 
 const OTP_TTL_MS = 5 * 60_000;
 const OTP_MAX_ATTEMPTS = 5;
@@ -65,6 +66,10 @@ export class AuthService {
     const user = existing
       ? await this.prisma.user.update({ where: { id: existing.id }, data: { verifyLevel: Math.max(1, existing.verifyLevel) } })
       : await this.prisma.user.create({ data: { phone, verifyLevel: 1 } });
+    // Yeni hesap, kural ihlali geçmişiyle silinmiş bir hesabın numarasıyla açıldıysa moderatöre işaretlenir.
+    if (!existing && (await flagIfReregistered(this.prisma, user.id, phoneIndex(phone)))) {
+      await this.prisma.auditLog.create({ data: { actorId: user.id, action: 'audit.reregistered', params: { via: 'phone' }, targetType: 'user', targetId: user.id } });
+    }
     const familyId = crypto.randomUUID();
     return { ...(await this.issue(user.id, familyId, deviceName.slice(0, 60) || 'Cihaz', now)), user: userView(user) };
   }

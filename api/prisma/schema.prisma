@@ -89,6 +89,8 @@ model User {
   /// Moderatör tarafından askıya alındı: oturumlar kapanır, giriş engellenir.
   suspendedAt     DateTime?
   suspendReason   String?
+  /// Kural ihlali geçmişiyle silinmiş bir hesabın telefonu ya da kimliğiyle açıldı (moderatöre işaret; engel değil).
+  reregisteredFrom String?
 
   sessions Session[]
 
@@ -477,6 +479,20 @@ model Order {
 
   @@index([userId, createdAt])
   @@index([status, createdAt])
+}
+
+/// Kural ihlali geçmişiyle silinen hesabın telefon ve kimlik izleri (HMAC; numara geri çıkarılamaz). Aynı kişi yeni
+/// hesap açarsa moderatöre işaretlenir. Süre sonunda silinir (users/reregistration.ts, RETENTION_DAYS).
+model DeletedIdentity {
+  id            String   @id @default(cuid())
+  hash          String
+  deletedUserId String
+  /// reports | takedown
+  reason        String
+  createdAt     DateTime @default(now())
+
+  @@index([hash])
+  @@index([createdAt])
 }
 
 /// Kullanıcının bir ilanı bildirmesi. Kişi başına ilan başına bir kayıt; moderatör kaldırır ya da yoksayar.

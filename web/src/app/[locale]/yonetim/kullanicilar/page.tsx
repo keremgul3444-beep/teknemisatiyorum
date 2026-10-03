@@ -5,7 +5,7 @@ import { AdminNav } from '@/components/AdminNav';
 import { UserSuspend } from '@/components/AdminActions';
 
 type P = { params: Promise<{ locale: string }> };
-type U = { id: string; name: string | null; roles: string[]; verifyLevel: number; createdAt: string; suspendedAt: string | null; suspendReason: string | null; phone: string | null };
+type U = { id: string; name: string | null; roles: string[]; verifyLevel: number; createdAt: string; suspendedAt: string | null; suspendReason: string | null; phone: string | null; reregistered?: boolean };
 
 export async function generateMetadata({ params }: P): Promise<Metadata> {
   const { locale } = (await params) as { locale: Locale };
@@ -27,7 +27,7 @@ export default async function Kullanicilar({ params }: P) {
           <tbody>
             {rows.map((u) => (
               <tr key={u.id} style={{ borderTop: '1px solid var(--c-line)' }}>
-                <td style={{ padding: '8px 4px' }}>{u.name ?? '—'}<div className="muted">{u.phone}</div>{u.suspendedAt ? <div style={{ color: 'var(--c-danger)' }}>{t(locale, 'admin.suspended')}: {u.suspendReason}</div> : null}</td>
+                <td style={{ padding: '8px 4px' }}>{u.name ?? '—'}<div className="muted">{u.phone}</div>{u.suspendedAt ? <div style={{ color: 'var(--c-danger)' }}>{t(locale, 'admin.suspended')}: {u.suspendReason}</div> : null}{u.reregistered ? <div style={{ color: 'var(--c-warning)' }}>{t(locale, 'admin.reregistered')}</div> : null}</td>
                 <td>{u.verifyLevel}</td>
                 <td>{u.roles.join(', ') || '—'}</td>
                 <td>{fmt.format(new Date(u.createdAt))}</td>

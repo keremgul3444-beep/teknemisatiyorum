@@ -3,6 +3,7 @@ import { t, tDict, type Locale } from '@/i18n';
 import { staffGet } from '@/lib/auth-server';
 import { AdminNav } from '@/components/AdminNav';
 import { PaymentDecision } from '@/components/AdminActions';
+import { formatKurus } from '@/lib/format';
 
 type P = { params: Promise<{ locale: string }> };
 type Pay = {
@@ -19,7 +20,7 @@ export async function generateMetadata({ params }: P): Promise<Metadata> {
 export default async function Odemeler({ params }: P) {
   const { locale } = (await params) as { locale: Locale };
   const rows = await staffGet<Pay[]>(locale, '/admin/service-payments', '/yonetim/odemeler');
-  const tl = (k: number) => `₺${(k / 100).toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US', { maximumFractionDigits: 2 })}`;
+  const tl = (k: number) => formatKurus(k, locale);
   return (
     <section className="section">
       <h1>{t(locale, 'admin.navPayments')}</h1>

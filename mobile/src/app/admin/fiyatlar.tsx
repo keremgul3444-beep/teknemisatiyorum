@@ -7,6 +7,7 @@ import { actions } from '@/services';
 import type { ApiProduct } from '@/services/api/mappers';
 import { useRemote } from '@/services/useRemote';
 import { attempt } from '@/services/errors';
+import { kurusToInput, parseLira } from '@/features/promo';
 
 /** Yönetim · Fiyatlar: her ürünün site ve uygulama fiyatı (TL, tam sayı). Deneme fiyatı uyarısı. */
 export default function AdminFiyatlar() {
@@ -20,11 +21,13 @@ export default function AdminFiyatlar() {
 
 function PriceRow({ product: p, onSaved }: { product: ApiProduct; onSaved: () => Promise<void> }) {
   const { t } = useTranslation();
-  const [web, setWeb] = useState(String(Math.round(p.priceWebKurus / 100)));
-  const [app, setApp] = useState(String(Math.round(p.priceAppKurus / 100)));
-  const ok = /^\d{1,7}$/.test(web) && /^\d{1,7}$/.test(app) && Number(web) >= 1 && Number(app) >= 1;
+  const [web, setWeb] = useState(kurusToInput(p.priceWebKurus));
+  const [app, setApp] = useState(kurusToInput(p.priceAppKurus));
+  const webK = parseLira(web);
+  const appK = parseLira(app);
+  const ok = webK !== null && appK !== null && webK >= 100 && appK >= 100;
   const save = () => attempt(async () => {
-    await actions.adminSetPrice(p.code, { priceWebKurus: Number(web) * 100, priceAppKurus: Number(app) * 100 });
+    await actions.adminSetPrice(p.code, { priceWebKurus: webK!, priceAppKurus: appK! });
     await onSaved();
   });
   return (
@@ -32,8 +35,8 @@ function PriceRow({ product: p, onSaved }: { product: ApiProduct; onSaved: () =>
       <T variant="h3">{t(`promo.product.${p.code}`, { defaultValue: p.code })}</T>
       {p.isTrialPrice ? <T variant="caption" color={colors.warning}>{t('promo.trialWarning')}</T> : null}
       <View style={{ flexDirection: 'row', gap: space(3) }}>
-        <View style={{ flex: 1 }}><Field label={t('admin.priceWeb')} value={web} onChangeText={setWeb} keyboardType="number-pad" maxLength={7} /></View>
-        <View style={{ flex: 1 }}><Field label={t('admin.priceApp')} value={app} onChangeText={setApp} keyboardType="number-pad" maxLength={7} /></View>
+        <View style={{ flex: 1 }}><Field label={t('admin.priceWeb')} value={web} onChangeText={setWeb} keyboardType="decimal-pad" maxLength={10} /></View>
+        <View style={{ flex: 1 }}><Field label={t('admin.priceApp')} value={app} onChangeText={setApp} keyboardType="decimal-pad" maxLength={10} /></View>
       </View>
       <Button small title={t('admin.save')} disabled={!ok} onPress={save} />
     </Card>

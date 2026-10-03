@@ -5,6 +5,7 @@ import { apiGet } from '@/lib/api';
 import { authedGet } from '@/lib/auth-server';
 import type { ListingView } from '@/lib/types';
 import { AcceptGate, BuyButton } from '@/components/AccountBits';
+import { formatKurus } from '@/lib/format';
 
 type P = { params: Promise<{ locale: string; id: string }> };
 type Product = { code: string; kind: 'vitrin' | 'acil' | 'bump'; days: number | null; priceWebKurus: number; isTrialPrice: boolean };
@@ -14,7 +15,7 @@ export async function generateMetadata({ params }: P): Promise<Metadata> {
   return { title: t(locale, 'seo.pageTitle', { title: t(locale, 'promo.title') }), robots: { index: false, follow: false } };
 }
 
-const tl = (k: number, locale: Locale) => `₺${Math.round(k / 100).toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US')}`;
+const tl = formatKurus;
 
 /** Öne çıkar: ürün seçimi (site fiyatı). Yalnızca kendi yayındaki ilanı için. */
 export default async function OneCikar({ params }: P) {

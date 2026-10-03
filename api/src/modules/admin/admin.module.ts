@@ -187,7 +187,7 @@ class AdminController {
     // Kişisel veriler maskeli; tam görüntüleme bu turda yok.
     return rows.map((x) => ({
       id: x.id, name: x.name, roles: x.roles, verifyLevel: x.verifyLevel, createdAt: x.createdAt,
-      suspendedAt: x.suspendedAt, suspendReason: x.suspendReason,
+      suspendedAt: x.suspendedAt, suspendReason: x.suspendReason, reregistered: !!x.reregisteredFrom,
       phone: x.phone ? maskPhone(x.phone) : null,
       nationalId: x.nationalIdLast2 ? `•••••••••${x.nationalIdLast2}` : null,
     }));

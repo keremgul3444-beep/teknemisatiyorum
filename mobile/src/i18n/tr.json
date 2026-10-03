@@ -267,7 +267,7 @@
     "h5": "Yurt dışına aktarım",
     "b5": "Bazı hizmet sağlayıcılarımızın sunucuları yurt dışındadır: bulut dosya depolama ve şifreli yedek (Cloudflare), anlık bildirim (Expo: bildirim metni ve cihaz jetonu), akıllı asistan (Anthropic: asistana yazdığın arama metni). Bu aktarımlar KVKK m.9 uyarınca Kurulca ilan edilen standart sözleşmeyle yapılır. Asistana kişisel bilgi yazmaman önerilir.",
     "h6": "Saklama süresi",
-    "b6": "Hesabını silince profilin, ilanların ve mesajların silinir ya da anonimleştirilir. Mevzuatın saklamayı zorunlu tuttuğu kayıtlar (ödeme, fatura ve erişim kayıtları) ilgili süre boyunca saklanır, süre dolunca silinir.",
+    "b6": "Hesabını silince profilin, ilanların ve mesajların silinir ya da anonimleştirilir. Mevzuatın saklamayı zorunlu tuttuğu kayıtlar (ödeme, fatura ve erişim kayıtları) ilgili süre boyunca saklanır, süre dolunca silinir. Kural ihlali nedeniyle bildirilmiş ya da kaldırılmış ilanı olan hesap silinirse, dolandırıcılığın önlenmesi için telefon ve kimlik numarasının geri çözülemeyen izi 1 yıl saklanır; aynı kişi yeni hesap açarsa ekip bilgilendirilir.",
     "h7": "Haklarınız (KVKK m.11)",
     "b7": "Verilerine erişme, düzeltme, silme, işlemeye itiraz etme ve zararın giderilmesini talep etme hakkın var. Verilerinin kopyasını uygulamadan indirebilir, hesabını uygulamadan silebilirsin. Diğer talepler için iletişim adresimize yazabilirsin; en geç 30 gün içinde yanıtlanır."
   },
@@ -1143,7 +1143,8 @@
       "failed": "Başarısız"
     },
     "disputed": "Sorun bildirildi",
-    "autoReleaseAt": "Otomatik aktarım: {{date}}"
+    "autoReleaseAt": "Otomatik aktarım: {{date}}",
+    "reregistered": "Silinmiş sorunlu bir hesabın numarası ya da kimliğiyle açıldı"
   },
   "audit": {
     "listingApproved": "İlan onaylandı: {{title}}",
@@ -1184,7 +1185,8 @@
     "servicePaid": "Hizmet ödemesi emanete alındı ({{kind}}): ₺{{amount}}",
     "paymentRefunded": "Hizmet ödemesi iade edildi: {{ref}}",
     "paymentDisputed": "Hizmet ödemesine itiraz: {{ref}}",
-    "preinfoAccepted": "Ön bilgilendirme ve sözleşme onaylandı (sürüm {{version}})"
+    "preinfoAccepted": "Ön bilgilendirme ve sözleşme onaylandı (sürüm {{version}})",
+    "reregistered": "Silinmiş sorunlu hesabın izi eşleşti ({{via}})"
   },
   "errors": {
     "generic": "Bir şeyler ters gitti, tekrar dene.",

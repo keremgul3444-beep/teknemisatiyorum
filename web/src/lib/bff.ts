@@ -15,7 +15,7 @@ type Relayed = { res: NextResponse; ok?: never; fresh?: Tokens } | { ok: Record<
  */
 export async function relay(
   req: Request, path: string, body: unknown,
-  o: { auth?: boolean; method?: 'GET' | 'POST' | 'PUT' | 'DELETE'; token?: string } = {},
+  o: { auth?: boolean; method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'; token?: string } = {},
 ): Promise<Relayed> {
   // GET yalnızca okur; diğer yöntemler başka siteden tetiklenemesin diye Origin denetlenir.
   if ((o.method ?? 'POST') !== 'GET' && !sameOrigin(req)) return { res: forbidden() };

@@ -1,4 +1,4 @@
-import { daysLeft, devReceipt, formatKurus } from '@/features/promo';
+import { daysLeft, devReceipt, formatKurus, kurusToInput, parseLira } from '@/features/promo';
 
 test('kalan gün yukarı yuvarlanır; geçmiş/eksik bitiş null', () => {
   const now = new Date('2026-10-01T12:00:00Z');
@@ -14,4 +14,16 @@ test('kuruş biçimi', () => {
 
 test('deneme makbuzu sunucunun beklediği biçimde', () => {
   expect(devReceipt('tms.vitrin_7')).toMatch(/^dev:tms\.vitrin_7:[\w-]{6,}$/);
+});
+
+test('kuruşlu fiyat: gösterim iki haneli, giriş virgül ya da noktayla', () => {
+  expect(formatKurus(149990, 'tr')).toBe('₺1.499,90');
+  expect(formatKurus(149905, 'en')).toBe('₺1,499.05');
+  expect(parseLira('1499')).toBe(149900);
+  expect(parseLira('1499,9')).toBe(149990);
+  expect(parseLira('1499.05')).toBe(149905);
+  expect(parseLira('1.499,90')).toBeNull();
+  expect(parseLira('abc')).toBeNull();
+  expect(kurusToInput(149900)).toBe('1499');
+  expect(kurusToInput(149905)).toBe('1499,05');
 });

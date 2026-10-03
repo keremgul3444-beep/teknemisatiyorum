@@ -415,7 +415,7 @@
         },
         {
           "h": "Retention",
-          "b": "When you delete your account, your profile, listings and messages are deleted or anonymised. Records the law requires us to keep (payment, invoice and access logs) are kept for the required period and then deleted."
+          "b": "When you delete your account, your profile, listings and messages are deleted or anonymised. Records the law requires us to keep (payment, invoice and access logs) are kept for the required period and then deleted. If an account with listings reported or removed for rule violations is deleted, an irreversible fingerprint of its phone and ID number is kept for 1 year to prevent fraud; if the same person opens a new account, the team is notified."
         },
         {
           "h": "Your rights (KVKK art. 11)",
@@ -680,7 +680,7 @@
     "unread": "New",
     "replyPh": "Write your reply",
     "closedNote": "This listing is no longer live.",
-    "fixInApp": "To fix and resubmit, open My listings in the app.",
+    "fixInApp": "Use Edit to fix and resubmit.",
     "rejectReasons": {
       "blurry": "Reason: photos or document not legible.",
       "mismatch": "Reason: details do not match the photos or document.",
@@ -709,7 +709,9 @@
     "firm": "Company panel",
     "firmBody": "Staff and company listings",
     "admin": "Admin",
-    "adminBody": "Approvals, reports, users"
+    "adminBody": "Approvals, reports, users",
+    "edit": "Edit",
+    "document": "Upload registration"
   },
   "pay": {
     "devTitle": "Trial payment",
@@ -836,7 +838,12 @@
       "location": "Choose a location."
     },
     "seller": "Seller",
-    "sellerSelf": "Individual (myself)"
+    "sellerSelf": "Individual (myself)",
+    "editTitle": "Edit listing",
+    "editNote": "A moderate price change keeps the listing live. Other changes and photos go through a short review.",
+    "editDoneTitle": "Changes saved",
+    "editDoneBody": "If review is needed, the listing goes live again shortly; we will notify you.",
+    "saveEdit": "Save changes"
   },
   "admin": {
     "title": "Admin",
@@ -936,7 +943,8 @@
       "released": "Released",
       "refunded": "Refunded",
       "failed": "Failed"
-    }
+    },
+    "reregistered": "Opened with the phone or ID of a deleted problem account"
   },
   "audit": {
     "listingApproved": "Listing approved: {{title}}",
@@ -977,7 +985,8 @@
     "servicePaid": "Service payment held ({{kind}}): ₺{{amount}}",
     "paymentRefunded": "Service payment refunded: {{ref}}",
     "paymentDisputed": "Service payment disputed: {{ref}}",
-    "preinfoAccepted": "Pre-contract information and contract accepted (version {{version}})"
+    "preinfoAccepted": "Pre-contract information and contract accepted (version {{version}})",
+    "reregistered": "Matched a deleted problem account ({{via}})"
   },
   "firm": {
     "title": "Company panel",
@@ -1027,5 +1036,21 @@
     "sent": "Your message was sent. You’ll see the reply here and in the app.",
     "reviews": "Reviews",
     "noReviews": "No reviews yet."
+  },
+  "doc": {
+    "title": "Upload registration",
+    "intro": "Upload your boat registration; once the team checks it against the listing, an ownership badge appears. Add a photo of the engine serial number too and both together earn the \"documents matched\" badge.",
+    "privacy": "Documents are never published; only you and the reviewing team can see them.",
+    "license": "Registration (photo or PDF)",
+    "licenseHint": "Up to 10 MB",
+    "serialPhoto": "Engine serial number photo",
+    "serialPhotoHint": "Optional",
+    "serial": "Last 2–6 characters of the serial number",
+    "serialInvalid": "Letters and digits only, 2–6 characters.",
+    "send": "Send",
+    "sending": "Sending…",
+    "sentTitle": "Document sent for review",
+    "sentBody": "We will notify you of the result.",
+    "back": "Back to my listings"
   }
 }

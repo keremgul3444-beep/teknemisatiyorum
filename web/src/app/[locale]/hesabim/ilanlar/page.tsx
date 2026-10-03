@@ -50,10 +50,18 @@ export default async function HesabimIlanlar({ params }: P) {
                     {u ? <span>{t(locale, 'account.urgentLeft', { n: u })}</span> : null}
                   </div>
                 </div>
-                {renewable ? <RenewButton listingId={l.id} label={t(locale, 'account.renew')} errors={tDict(locale, 'errors')} /> : null}
-                {live
-                  ? <Link className="btn" href={localePath(locale, `/hesabim/ilanlar/${l.id}/one-cikar`)}>{t(locale, 'account.promote')}</Link>
-                  : <span className="muted small">{t(locale, l.status === 'sold' || l.status === 'removed' ? 'account.closedNote' : l.status === 'rejected' ? 'account.fixInApp' : l.status === 'expired' ? 'account.expiredShort' : 'account.notPublished')}</span>}
+                <div style={{ display: 'grid', gap: 8, justifyItems: 'end' }}>
+                  {renewable ? <RenewButton listingId={l.id} label={t(locale, 'account.renew')} errors={tDict(locale, 'errors')} /> : null}
+                  {live
+                    ? <Link className="btn" href={localePath(locale, `/hesabim/ilanlar/${l.id}/one-cikar`)}>{t(locale, 'account.promote')}</Link>
+                    : <span className="muted small">{t(locale, l.status === 'sold' || l.status === 'removed' ? 'account.closedNote' : l.status === 'rejected' ? 'account.fixInApp' : l.status === 'expired' ? 'account.expiredShort' : 'account.notPublished')}</span>}
+                  {l.status === 'sold' || l.status === 'removed' ? null : (
+                    <div className="row small">
+                      <Link href={localePath(locale, `/hesabim/ilanlar/${l.id}/duzenle`)}>{t(locale, 'account.edit')}</Link>
+                      {l.badges.includes('sahiplik') ? null : <Link href={localePath(locale, `/hesabim/ilanlar/${l.id}/belge`)}>{t(locale, 'account.document')}</Link>}
+                    </div>
+                  )}
+                </div>
               </div>
             );
           })}

@@ -2,26 +2,32 @@
 import { useEffect, useRef, useState } from 'react';
 import { BOAT_TYPES, CURRENCIES, EQUIPMENT, LOCATIONS, type Equipment } from '@tms/shared';
 import {
-  MAX_LISTING_PHOTOS, SELL_STEPS, digits, emptySell, firstInvalid, move, restoreSell, toCover, toDraft, validateSell, type SellErrors, type SellFields,
+  MAX_LISTING_PHOTOS, SELL_STEPS, changedDraft, digits, emptySell, firstInvalid, move, restoreSell, toCover, toDraft, validateSell, type SellErrors, type SellFields,
 } from '@/lib/listingForm';
 
 type Dict = Record<string, string>;
-type Photo = { key: string; file: File; url: string };
+/** Yeni seçilen fotoğrafın dosyası var; düzenlemede sunucudaki fotoğrafın yalnızca kimliği. */
+type Photo = { key: string; url: string; file?: File; fileId?: string };
+/** Düzenleme modu: var olan ilan, alanları ve fotoğraflarıyla. */
+export type SellEdit = { id: string; status: string; fields: SellFields; photos: { id: string; url: string }[] };
 const DRAFT_KEY = 'tms.sell.draft';
 
 /**
  * Siteden ilan verme: fotoğraflar → bilgiler → donanım → fiyat ve konum → kontrol. Kimliği doğrulanmamış satıcı
  * gönderimden önce T.C. kimliğini doğrular. Alanlar sekmede saklanır (fotoğraflar hariç). Gönderim sırası:
  * taslak aç → fotoğrafları yükle → fotoğraf listesini ayarla → onaya gönder; yarıda kalırsa aynı taslaktan sürer.
+ * Düzenlemede yalnızca değişen alanlar gönderilir; yalnızca fiyat değişirse ilan yeniden onaya düşmez, reddedilmiş ilan
+ * düzeltilince yeniden onaya gönderilir.
  */
-export function SellWizard({ L, err, errors, types, equipment, verified, doneHref, companies = [] }: {
+export function SellWizard({ L, err, errors, types, equipment, verified, doneHref, companies = [], edit }: {
   L: Dict; err: Dict; errors: Dict; types: Dict; equipment: Dict; verified: boolean; doneHref: string;
+  edit?: SellEdit;
   /** Kullanıcının üyesi olduğu firmalar: ilan firma adına verilebilir. */
   companies?: { id: string; name: string }[];
 }) {
   const [step, setStep] = useState(0);
-  const [f, setF] = useState<SellFields>(emptySell);
-  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [f, setF] = useState<SellFields>(() => edit?.fields ?? emptySell());
+  const [photos, setPhotos] = useState<Photo[]>(() => edit?.photos.map((p) => ({ key: p.id, url: p.url, fileId: p.id })) ?? []);
   const [shown, setShown] = useState<SellErrors>({});
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState('');
@@ -34,7 +40,7 @@ export function SellWizard({ L, err, errors, types, equipment, verified, doneHre
   const restored = useRef(false);
 
   useEffect(() => {
-    if (restored.current) return;
+    if (restored.current || edit) return;
     restored.current = true;
     try {
       const back = restoreSell(sessionStorage.getItem(DRAFT_KEY));
@@ -43,9 +49,10 @@ export function SellWizard({ L, err, errors, types, equipment, verified, doneHre
     } catch { /* gizli sekme: taslak saklanmaz */ }
   }, []);
   useEffect(() => {
+    if (edit) return;
     try { sessionStorage.setItem(DRAFT_KEY, JSON.stringify(f)); } catch { /* yoksay */ }
-  }, [f]);
-  useEffect(() => () => photos.forEach((p) => URL.revokeObjectURL(p.url)), []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [f, edit]);
+  useEffect(() => () => photos.forEach((p) => p.file && URL.revokeObjectURL(p.url)), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const set = <K extends keyof SellFields>(k: K, v: SellFields[K]) => setF((s) => ({ ...s, [k]: v }));
   const msg = (key?: string) => errors[String(key ?? '').replace(/^errors\./, '')] ?? errors.generic;
@@ -58,7 +65,7 @@ export function SellWizard({ L, err, errors, types, equipment, verified, doneHre
     setPhotos((p) => [...p, ...add]);
     setShown((s) => ({ ...s, photos: undefined }));
   };
-  const removePhoto = (i: number) => setPhotos((p) => { URL.revokeObjectURL(p[i].url); return p.filter((_, k) => k !== i); });
+  const removePhoto = (i: number) => setPhotos((p) => { if (p[i].file) URL.revokeObjectURL(p[i].url); return p.filter((_, k) => k !== i); });
 
   const next = () => {
     const e = validateSell(step, f, photos.length);
@@ -85,25 +92,46 @@ export function SellWizard({ L, err, errors, types, equipment, verified, doneHre
     } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
   };
 
+  /** Yeni fotoğrafları yükler (yarıda kalan denemede yüklenenler tekrar gönderilmez); tam kimlik listesi sırasıyla. */
+  const uploadAll = async () => {
+    const s = server.current;
+    const fresh = photos.filter((p) => !p.fileId).length;
+    let n = 0;
+    const ids: string[] = [];
+    for (const p of photos) {
+      if (p.fileId) { ids.push(p.fileId); continue; }
+      setProgress(L.uploading.replace('{{n}}', String(++n)).replace('{{total}}', String(fresh)));
+      let id = s.uploaded.get(p.key);
+      if (!id) {
+        const form = new FormData();
+        form.set('file', p.file!);
+        id = (await post('/api/sell/media', { method: 'POST', body: form })).id as string;
+        s.uploaded.set(p.key, id);
+      }
+      ids.push(id);
+    }
+    return ids;
+  };
+
   const publish = async () => {
     const bad = firstInvalid(f, photos.length);
     if (bad >= 0) { setStep(bad); setShown(validateSell(bad, f, photos.length)); return; }
     setBusy(true); setError('');
     try {
+      if (edit) {
+        const changes = changedDraft(edit.fields, f);
+        if (Object.keys(changes).length) await post(`/api/sell/${edit.id}`, json(changes, 'PATCH'));
+        const ids = await uploadAll();
+        setProgress(L.sending);
+        if (JSON.stringify(ids) !== JSON.stringify(edit.photos.map((p) => p.id))) await post(`/api/sell/${edit.id}/photos`, json({ fileIds: ids }, 'PUT'));
+        // Reddedilmiş ilan düzeltildi: yeniden onaya gönderilir (zaten onaydaysa sunucu 409 döner, sorun değil).
+        if (edit.status === 'rejected') await post(`/api/sell/${edit.id}/submit`, { method: 'POST' }).catch(() => null);
+        setDone(true);
+        return;
+      }
       const s = server.current;
       if (!s.id) s.id = (await post('/api/sell', json(toDraft(f)))).id as string;
-      const ids: string[] = [];
-      for (const [i, p] of photos.entries()) {
-        setProgress(L.uploading.replace('{{n}}', String(i + 1)).replace('{{total}}', String(photos.length)));
-        let id = s.uploaded.get(p.key);
-        if (!id) {
-          const form = new FormData();
-          form.set('file', p.file);
-          id = (await post('/api/sell/media', { method: 'POST', body: form })).id as string;
-          s.uploaded.set(p.key, id);
-        }
-        ids.push(id);
-      }
+      const ids = await uploadAll();
       setProgress(L.sending);
       await post(`/api/sell/${s.id}/photos`, json({ fileIds: ids }, 'PUT'));
       await post(`/api/sell/${s.id}/submit`, { method: 'POST' });
@@ -119,8 +147,8 @@ export function SellWizard({ L, err, errors, types, equipment, verified, doneHre
   if (done) {
     return (
       <div className="card" style={{ display: 'grid', gap: 12 }} role="status">
-        <h2>{L.doneTitle}</h2>
-        <p className="muted">{L.doneBody}</p>
+        <h2>{edit ? L.editDoneTitle : L.doneTitle}</h2>
+        <p className="muted">{edit ? L.editDoneBody : L.doneBody}</p>
         <a className="btn" href={doneHref}>{L.toListings}</a>
       </div>
     );
@@ -249,7 +277,7 @@ export function SellWizard({ L, err, errors, types, equipment, verified, doneHre
             </select>
             {shown.location ? <span className="small" style={{ color: 'var(--c-danger)' }}>{err.location}</span> : null}
           </div>
-          {companies.length ? (
+          {companies.length && !edit ? (
             <div style={{ display: 'grid', gap: 6 }}>
               <label htmlFor="sell-company">{L.seller}</label>
               <select id="sell-company" className="input" value={companies.some((c) => c.id === f.companyId) ? f.companyId : ''} onChange={(e) => set('companyId', e.target.value)}>
@@ -295,7 +323,7 @@ export function SellWizard({ L, err, errors, types, equipment, verified, doneHre
         {step > 0 ? <button type="button" className="btn ghost" disabled={busy} onClick={back}>{L.back}</button> : <span />}
         {step < SELL_STEPS.length - 1
           ? <button type="button" className="btn" onClick={next}>{L.next}</button>
-          : <button type="button" className="btn" disabled={busy || !isVerified} onClick={() => void publish()}>{L.publish}</button>}
+          : <button type="button" className="btn" disabled={busy || !isVerified} onClick={() => void publish()}>{edit ? L.saveEdit : L.publish}</button>}
       </div>
     </div>
   );

@@ -146,15 +146,7 @@ export class MediaService {
    * herkese açık fotoğraflar küçük kopyalarıyla — diskten ve veritabanından kaldırılır.
    */
   async purgeUser(userId: string) {
-    const files = await this.prisma.file.findMany({ where: { ownerId: userId } });
-    const keys = files.flatMap((f) => [f.key, ...MEDIA_WIDTHS.map((w) => `${f.key}.w${w}.webp`)]);
-    await Promise.all(keys.map((k) => this.storage.remove(k)));
-    const ids = files.map((f) => f.id);
-    await this.prisma.listingPhoto.deleteMany({ where: { fileId: { in: ids } } });
-    await this.prisma.file.deleteMany({ where: { id: { in: ids } } });
-    await this.prisma.verificationRequest.updateMany({ where: { userId }, data: { fileIds: [], details: Prisma.DbNull } });
-    // Bekleyen başvurular geri çekilir: silinmiş hesap moderatör kuyruğunda görünmez, onaylanamaz.
-    await this.prisma.verificationRequest.updateMany({ where: { userId, status: 'pending' }, data: { status: 'rejected', rejectReason: 'withdrawn', decidedAt: new Date() } });
+    await purgeUserFiles(this.prisma, this.storage, userId);
   }
 
   /** Hiçbir ilana ya da başvuruya bağlanmamış, bir haftadan eski dosyaları küçük kopyalarıyla siler. */
@@ -213,4 +205,17 @@ export class MediaJanitor implements OnApplicationBootstrap, OnApplicationShutdo
   onApplicationShutdown() {
     if (this.timer) clearInterval(this.timer);
   }
+}
+
+/** Kullanıcının tüm dosyaları (küçük kopyalarıyla) depodan ve veritabanından silinir; başvurulardaki belge izleri temizlenir. */
+export async function purgeUserFiles(prisma: Prisma.TransactionClient | import('@prisma/client').PrismaClient, storage: Storage, userId: string) {
+  const files = await prisma.file.findMany({ where: { ownerId: userId } });
+  const keys = files.flatMap((f) => [f.key, ...MEDIA_WIDTHS.map((w) => `${f.key}.w${w}.webp`)]);
+  await Promise.all(keys.map((k) => storage.remove(k)));
+  const ids = files.map((f) => f.id);
+  await prisma.listingPhoto.deleteMany({ where: { fileId: { in: ids } } });
+  await prisma.file.deleteMany({ where: { id: { in: ids } } });
+  await prisma.verificationRequest.updateMany({ where: { userId }, data: { fileIds: [], details: Prisma.DbNull } });
+  // Bekleyen başvurular geri çekilir: silinmiş hesap moderatör kuyruğunda görünmez, onaylanamaz.
+  await prisma.verificationRequest.updateMany({ where: { userId, status: 'pending' }, data: { status: 'rejected', rejectReason: 'withdrawn', decidedAt: new Date() } });
 }

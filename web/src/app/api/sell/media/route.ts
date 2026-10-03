@@ -3,7 +3,7 @@ import { relayUpload, withFresh } from '@/lib/bff';
 
 const MAX_BYTES = 10 * 1024 * 1024;
 
-/** İlan fotoğrafı yükleme: yalnızca tek görsel ve herkese açık görünürlük (belgeler uygulamadan yüklenir). */
+/** İlan fotoğrafı yükleme: yalnızca tek görsel ve herkese açık görünürlük (belgeler /api/sell/document ile, korumalı). */
 export async function POST(req: Request) {
   const form = await req.formData().catch(() => null);
   const file = form?.get('file');

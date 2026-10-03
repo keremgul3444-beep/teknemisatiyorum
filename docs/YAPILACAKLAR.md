@@ -5,14 +5,14 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 
 ## Senin (Kerem/işletme) yapman gerekenler — ben yapamam
 - [ ] Bulut depolama hesabı (Cloudflare R2 önerilir: çıkış trafiği ücretsiz) ve kova; anahtarları yalnızca sunucudaki `deploy/.env`'e yaz (`STORAGE_DRIVER=s3`, `S3_*`, `BACKUP_OFFSITE=1`). Kod hazır.
-- [ ] Avukat onayı: KVKK aydınlatma metni, açık rıza metinleri, kullanım koşulları, çerez politikası (sitede "taslak" ibaresiyle duruyor)
+- [ ] Avukat onayı: KVKK aydınlatma metni, ön bilgilendirme formu, mesafeli satış sözleşmesi, kullanım koşulları, çerez politikası (taslakları sitede ve uygulamada "taslak" ibaresiyle duruyor; şirket unvanı/adres/MERSİS yer tutucuları doldurulmalı)
+- [ ] KVKK m.9 standart sözleşmesi: yurt dışı sağlayıcılarla (Cloudflare, Expo, Anthropic) imzalanıp 5 iş günü içinde Kurula bildirilmeli; aydınlatma metni bunu varsayıyor. Sağlayıcı imzalamazsa o hizmet AB/TR alternatifiyle değiştirilmeli
 - [ ] VERBİS kaydı; ticari ileti için İYS kaydı
 - [ ] Lisanslı ödeme kuruluşuyla pazaryeri / alt üye işyeri anlaşması (iyzico, PayTR vb.) — şirket evrakı, vergi levhası. Emanet ödeme (usta/kaptan) 6493 kapsamında bu modeli gerektirir; o zamana kadar canlı `PAYMENTS_MODE=off`
-- [ ] Ödeme açılmadan önce: mesafeli satış sözleşmesi + ön bilgilendirme formu, komisyon için e-fatura/e-arşiv
+- [ ] Ödeme açılmadan önce: komisyon ve öne çıkarma için e-fatura/e-arşiv entegratörü (sözleşme ve ön bilgilendirme metinleri ile ödeme öncesi onay kodda hazır)
 - [ ] SMS sağlayıcı hesabı (Netgsm: başlık onayı + API alt kullanıcısı); kod hazır, `docs/CANLIYA-CIKIS.md` 2. adım
 - [ ] Sunucu + alan adı + DNS (alan adı, www, api A kayıtları); kurulum `docs/CANLIYA-CIKIS.md`
-- [ ] KVKK metinlerine yurt dışına aktarım (R2, Expo push, Anthropic) ile ödeme, usta/kaptan ve NVİ işlemeleri eklenmeli
-- [ ] Kesinti takibi (UptimeRobot) ve hata takibi (Sentry) hesabı
+- [ ] Kesinti takibi (UptimeRobot → `/health/ready`) ve hata takibi hesabı (GlitchTip önerilir; DSN'i `ERROR_DSN`'e yaz)
 - [ ] Apple Developer hesabı (~99$/yıl) ve Google Play Console hesabı (~25$ tek sefer)
 - [ ] Claude API anahtarı (Akıllı Asistan şu an kural tabanlı yedekle çalışıyor)
 - [ ] Google Search Console kaydı (site canlıya çıkınca)
@@ -22,9 +22,8 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 
 ## Web sitesi
 - [ ] Aşama 2 ödeme: gerçek sanal POS ve gerçek Apple/Google ödemesi (hesaplar açılınca, deneme modunun yerine takılır)
-- [ ] Siteden ilan düzenleme ve belge (ruhsat) yükleme; ilan verme ve kimlik doğrulama sitede var (`/hesabim/ilan-ver`)
 - [ ] Blog / içerik yazıları (SEO için değerli, ayrı içerik işi)
-- [ ] İstatistik aracı seçimi (Google Analytics ya da gizlilik dostu alternatif)
+- [ ] İstatistik aracı seçimi (Google Analytics ya da gizlilik dostu alternatif) — karar senin; çerez onayı altyapısı hazır
 - [ ] Canlı sunucuda hız ölçümünü (Lighthouse) tekrarla; yerel ölçüm: ana sayfa 96, ilan 92
 - [ ] Uygulamanın "Öne çıkar" ekranını uçtan uca tarayıcı testiyle dene (bu turda bellek yetersizliğinden uygulama önizlemesi açılmadı; aynı sunucu ucu kabul testinde denendi)
 
@@ -34,20 +33,16 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 - [ ] NVİ bağlantısı kodda hazır (`IDENTITY_MODE=nvi`); canlı sunucudan bir kez gerçek bilgilerle denenmeli (bulut oturumundan NVİ'ye erişilmedi)
 - [ ] Anlık bildirimi gerçek telefonda dene: EAS projesi (`extra.eas.projectId`) + geliştirme derlemesi gerekir (Expo Go'da uzak bildirim çalışmıyor); sunucuda `PUSH_MODE=expo`
 - [ ] Mağaza derlemesi (EAS build) ve mağaza başvurusu; şu an yalnızca Expo Go
-- [ ] Veri kopyası telefonda dosya olarak paylaşılsın (çok büyük kopyada paylaşım menüsü sınırı)
-- [ ] Yasaklama: hesap askıya alma var; silinip yeniden açılan hesabı tanıma yok (T.C. silmede serbest kaldığı için T.C.'ye dayanamaz, cihaz/telefon izine dayanmalı)
-- [ ] Kapalı beta deneme hesaplarının temizliği (aynı T.C. ile açılmış kabul testi hesapları)
+- [ ] Kapalı beta deneme hesaplarının temizliği: canlıda bir kez `scripts/cleanup-accounts.ts <numaralar>` (önce önizleme, sonra `--apply`)
 
 ## Web/öne çıkarma — incelemeden ertelenen küçük maddeler
-- [ ] Fiyatlar kuruşlu girilebilirse gösterim de kuruşlu olsun (şu an tam liraya yuvarlanıyor; yönetim ekranı tam lira giriyor)
 - [ ] Canlı veritabanı yerelden kopyalanırsa demo içerik `scripts/remove-demo.ts` ile temizlenmeli (yeni kurulumda demo ilan zaten yüklenmez; yalnızca `SEED_DEMO=1` ile)
 - [ ] Canlıda ters vekil (reverse proxy) Host başlığını korumalı ve TRUSTED_PROXY_HOPS doğru ayarlanmalı
 
 ## Canlıya çıkış altyapısı
 - [ ] Docker imajları bulut oturumunda derlenemedi (Debian deposuna ağ izni yok); adımlar yerelde ayrı ayrı doğrulandı (site derlemesi, API canlı ayarla açılış). İlk sunucu kurulumunda `up -d --build` çıktısı kontrol edilmeli
-- [ ] Netgsm API adresi ve yanıt kodları sağlayıcının güncel belgesiyle bir kez doğrulanmalı (ilk giriş SMS'i yeterli kanıt)
-- [ ] Hata takibi (Sentry) koda bağlanmalı
-- [ ] Yük / yoğunluk testi
+- [ ] Netgsm: kod resmî kütüphanedeki REST v2 ucuna göre yazıldı; gerçek hesapla ilk giriş SMS'i son kanıt
+- [ ] Siteden ilan düzenleme ve ruhsat yükleme birim ve ara katman testleriyle doğrulandı; ilk canlı denemede tarayıcıda bir kez uçtan uca denenmeli
 
 ## Gelir fikirleri (sonra)
 - [ ] Sigorta ve kredi yönlendirme komisyonu
