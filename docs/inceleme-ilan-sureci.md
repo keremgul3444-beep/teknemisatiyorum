@@ -153,7 +153,8 @@ Kalan: B9 tamamlandı; B14 (erişilebilirlik ayrıntıları), C17–C19, C21, D 
 - L4: "Ekspertizli" rozeti ve karne kaydı yalnızca ilan sahibinin yaptırdığı ekspertizden geliyor; rozet için en az 60 puan gerekiyor.
 - L5: Düzenleme, fotoğraf değişikliği, satıldı ve yayından kaldırma denetim kaydına yazılıyor.
 - L8: İlanın firma bağı `companyId: null` ile kaldırılabiliyor.
-- Açık kalanlar: kopya veya çalıntı fotoğraf tespiti, ilan süresi ve yenileme.
+- İlan süresi (migration `0011_listing_expiry`): onay ve yenileme 90 gün yayın verir; 7 gün kala sahibine haber gider, süre dolunca ilan "Süresi doldu" olur ve aramadan çıkar. Son 14 günde ya da süresi dolunca tek dokunuşla yenilenir (onaya düşmez); süresi dolan ilan düzenlenirse onaya düşer. Uygulamada İlanlarım ve sitede Hesabım > İlanlarım'da "Yenile".
+- Açık kalan: kopya veya çalıntı fotoğraf tespiti.
 
 ## B14 erişilebilirlik ile kapatılanlar (2026-10-02)
 

@@ -517,7 +517,8 @@
     "storage_quota": "Your file space is full. Delete unused drafts and try again.",
     "image_too_large": "This photo’s resolution is too high. Choose a smaller photo.",
     "too_many_drafts": "You have too many unfinished listings. Finish or delete one first.",
-    "price_change_limit": "You’ve changed the price enough this week. Try again in a few days."
+    "price_change_limit": "You’ve changed the price enough this week. Try again in a few days.",
+    "not_renewable": "This listing can’t be renewed yet; you can renew it in its last 14 days."
   },
   "login": {
     "title": "Log in",
@@ -552,7 +553,8 @@
       "published": "Live",
       "rejected": "Rejected",
       "sold": "Sold",
-      "removed": "Removed"
+      "removed": "Removed",
+      "expired": "Expired"
     },
     "orderStatus": {
       "pending": "Awaiting payment",
@@ -595,7 +597,11 @@
     "cancel": "Cancel",
     "blockedByMe": "You blocked this person.",
     "blockedByThem": "Messages can no longer be sent in this chat.",
-    "paymentRisk": "This message asks for a payment. Don’t send a deposit or transfer before seeing the boat and signing a contract."
+    "paymentRisk": "This message asks for a payment. Don’t send a deposit or transfer before seeing the boat and signing a contract.",
+    "renew": "Renew",
+    "expiresIn": "Listing ends in {{n}} days",
+    "expiredNote": "Expired; no longer shown in search. Renew to keep it live for 90 more days.",
+    "expiredShort": "Expired"
   },
   "pay": {
     "devTitle": "Trial payment",

@@ -49,7 +49,8 @@
     "beklemede": "Pending approval",
     "belge": "Documents match",
     "reddedildi": "Rejected",
-    "kaldirildi": "Removed"
+    "kaldirildi": "Removed",
+    "suresidoldu": "Expired"
   },
   "boatType": {
     "motoryat": "Motor yacht",
@@ -800,7 +801,11 @@
     "priceSave": "Save price",
     "priceHint": "If only the price changes the listing stays live; people who saved it hear about a drop.",
     "withdraw": "Withdraw",
-    "withdrawConfirm": "{{title}} will be withdrawn and removed from My listings. This cannot be undone. Are you sure?"
+    "withdrawConfirm": "{{title}} will be withdrawn and removed from My listings. This cannot be undone. Are you sure?",
+    "expired": "Expired",
+    "renew": "Renew",
+    "expiresIn": "Listing ends in {{n}} days",
+    "expiredNote": "The listing no longer shows in search. Renew it to keep it live for 90 more days."
   },
   "settings": {
     "title": "Settings",
@@ -1030,7 +1035,8 @@
     "listingPhotosChanged": "Listing photos changed",
     "listingSold": "Listing marked as sold: {{title}}",
     "listingWithdrawn": "Listing withdrawn by owner: {{title}}",
-    "privateFileViewed": "Protected document opened"
+    "privateFileViewed": "Protected document opened",
+    "listingRenewed": "Listing renewed: {{title}}"
   },
   "errors": {
     "generic": "Something went wrong, please try again.",
@@ -1089,7 +1095,8 @@
     "storage_quota": "Your file space is full. Delete unused drafts and try again.",
     "image_too_large": "This photo’s resolution is too high. Choose a smaller photo.",
     "too_many_drafts": "You have too many unfinished listings. Finish or delete one first.",
-    "price_change_limit": "You’ve changed the price enough this week. Try again in a few days."
+    "price_change_limit": "You’ve changed the price enough this week. Try again in a few days.",
+    "not_renewable": "This listing can’t be renewed yet; you can renew it in its last 14 days."
   },
   "soon": {
     "title": "Coming soon",
@@ -1105,7 +1112,9 @@
     "reportReady": "Your survey report is ready · {{score}}/100",
     "searchMatch": "New listing for your saved search: {{title}}",
     "priceDrop": "A favourite dropped its price: {{title}}",
-    "listingRemoved": "Your listing was taken down: {{title}}"
+    "listingRemoved": "Your listing was taken down: {{title}}",
+    "listingExpiring": "Your listing expires in {{days}} days: {{title}}",
+    "listingExpired": "Your listing expired, renew it anytime: {{title}}"
   },
   "notifs": {
     "title": "Notifications",

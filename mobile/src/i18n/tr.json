@@ -49,7 +49,8 @@
     "beklemede": "Onay bekliyor",
     "belge": "Belgeleri eşleşti",
     "reddedildi": "Reddedildi",
-    "kaldirildi": "Kaldırıldı"
+    "kaldirildi": "Kaldırıldı",
+    "suresidoldu": "Süresi doldu"
   },
   "boatType": {
     "motoryat": "Motoryat",
@@ -800,7 +801,11 @@
     "priceSave": "Fiyatı kaydet",
     "priceHint": "Yalnızca fiyat değişirse ilan yayında kalır; indirimde favorileyenlere haber verilir.",
     "withdraw": "Yayından kaldır",
-    "withdrawConfirm": "{{title}} yayından kaldırılacak ve İlanlarım'dan silinecek. Geri alınamaz. Emin misin?"
+    "withdrawConfirm": "{{title}} yayından kaldırılacak ve İlanlarım'dan silinecek. Geri alınamaz. Emin misin?",
+    "expired": "Süresi doldu",
+    "renew": "Yenile",
+    "expiresIn": "Yayın {{n}} gün sonra bitiyor",
+    "expiredNote": "İlan artık aramada görünmüyor. Yenilersen 90 gün daha yayında kalır."
   },
   "settings": {
     "title": "Ayarlar",
@@ -1030,7 +1035,8 @@
     "listingPhotosChanged": "İlan fotoğrafları değişti",
     "listingSold": "İlan satıldı olarak işaretlendi: {{title}}",
     "listingWithdrawn": "İlan sahibi tarafından kaldırıldı: {{title}}",
-    "privateFileViewed": "Korumalı belge açıldı"
+    "privateFileViewed": "Korumalı belge açıldı",
+    "listingRenewed": "İlan yenilendi: {{title}}"
   },
   "errors": {
     "generic": "Bir şeyler ters gitti, tekrar dene.",
@@ -1089,7 +1095,8 @@
     "storage_quota": "Dosya alanın doldu. Kullanmadığın taslakları silip yeniden dene.",
     "image_too_large": "Fotoğrafın çözünürlüğü çok yüksek. Daha küçük bir fotoğraf seç.",
     "too_many_drafts": "Yarım kalmış ilanların çok. Önce birini tamamla ya da sil.",
-    "price_change_limit": "Fiyatı bu hafta yeterince değiştirdin. Birkaç gün sonra yeniden deneyebilirsin."
+    "price_change_limit": "Fiyatı bu hafta yeterince değiştirdin. Birkaç gün sonra yeniden deneyebilirsin.",
+    "not_renewable": "Bu ilan şimdi yenilenemez; bitişine 14 gün kala yenileyebilirsin."
   },
   "soon": {
     "title": "Yakında",
@@ -1105,7 +1112,9 @@
     "reportReady": "Ekspertiz raporun hazır · {{score}}/100",
     "searchMatch": "Kayıtlı aramana yeni ilan: {{title}}",
     "priceDrop": "Favorindeki ilanın fiyatı düştü: {{title}}",
-    "listingRemoved": "İlanın yayından kaldırıldı: {{title}}"
+    "listingRemoved": "İlanın yayından kaldırıldı: {{title}}",
+    "listingExpiring": "İlanının süresi {{days}} gün içinde doluyor: {{title}}",
+    "listingExpired": "İlanının süresi doldu, yenileyebilirsin: {{title}}"
   },
   "notifs": {
     "title": "Bildirimler",

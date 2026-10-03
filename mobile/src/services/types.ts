@@ -13,6 +13,8 @@ export interface Listing {
   photoUrls?: string[]; photoIds?: string[]; rawStatus?: string; isMine?: boolean; boatId?: string | null; logbookLatest?: LogEntry[]; rejectReason?: string | null;
   /** Moderatör kaldırdıysa gerekçe (yalnızca ilan sahibine gelir). */
   removedReason?: TakedownReason | null;
+  /** Yayın bitişi (yalnızca sahibine gelir). */
+  expiresAt?: string | null;
   /** Öne çıkarma: vitrin/acil etkin mi; bitiş tarihleri yalnızca ilan sahibine gelir. */
   promo?: Promo;
   /** Son 30 günde indirim yapıldıysa önceki fiyat ve indirim anı. */

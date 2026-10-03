@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { localePath, t, type Locale } from '@/i18n';
+import { localePath, t, tDict, type Locale } from '@/i18n';
 import { authedGet } from '@/lib/auth-server';
 import { formatPrice, listingSlug } from '@/lib/format';
 import type { ListingView } from '@/lib/types';
 import { PromoBadges } from '@/components/PromoBadges';
+import { RenewButton } from '@/components/AccountBits';
 
 type P = { params: Promise<{ locale: string }> };
 
@@ -31,6 +32,8 @@ export default async function HesabimIlanlar({ params }: P) {
             const f = daysLeft(l.promo.featuredUntil);
             const u = daysLeft(l.promo.urgentUntil);
             const live = l.status === 'published';
+            const ends = live ? daysLeft(l.expiresAt ?? undefined) : null;
+            const renewable = l.status === 'expired' || (ends !== null && ends <= 14);
             return (
               <div key={l.id} className="card spread">
                 <div>
@@ -38,6 +41,8 @@ export default async function HesabimIlanlar({ params }: P) {
                   <div className="muted small">{formatPrice(l.price, l.currency, locale)} · {t(locale, `account.status.${l.status}`, {})}</div>
                   {l.status === 'rejected' && l.rejectReason ? <div className="small" style={{ color: 'var(--c-danger)' }}>{t(locale, `account.rejectReasons.${l.rejectReason}`, {})}</div> : null}
                   {l.status === 'removed' && l.removedReason ? <div className="small" style={{ color: 'var(--c-danger)' }}>{t(locale, `account.removedReasons.${l.removedReason}`, {})}</div> : null}
+                  {l.status === 'expired' ? <div className="small" style={{ color: 'var(--c-warning)' }}>{t(locale, 'account.expiredNote')}</div>
+                    : renewable ? <div className="small" style={{ color: 'var(--c-warning)' }}>{t(locale, 'account.expiresIn', { n: ends ?? 0 })}</div> : null}
                   {l.stats ? <div className="muted small">{t(locale, 'account.stats', { v: l.stats.views, f: l.stats.favorites, m: l.stats.messages })}</div> : null}
                   <div className="row small" style={{ marginTop: 6 }}>
                     <PromoBadges promo={l.promo} priceDrop={l.priceDrop} locale={locale} />
@@ -45,9 +50,10 @@ export default async function HesabimIlanlar({ params }: P) {
                     {u ? <span>{t(locale, 'account.urgentLeft', { n: u })}</span> : null}
                   </div>
                 </div>
+                {renewable ? <RenewButton listingId={l.id} label={t(locale, 'account.renew')} errors={tDict(locale, 'errors')} /> : null}
                 {live
                   ? <Link className="btn" href={localePath(locale, `/hesabim/ilanlar/${l.id}/one-cikar`)}>{t(locale, 'account.promote')}</Link>
-                  : <span className="muted small">{t(locale, l.status === 'sold' || l.status === 'removed' ? 'account.closedNote' : l.status === 'rejected' ? 'account.fixInApp' : 'account.notPublished')}</span>}
+                  : <span className="muted small">{t(locale, l.status === 'sold' || l.status === 'removed' ? 'account.closedNote' : l.status === 'rejected' ? 'account.fixInApp' : l.status === 'expired' ? 'account.expiredShort' : 'account.notPublished')}</span>}
               </div>
             );
           })}

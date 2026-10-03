@@ -121,3 +121,24 @@ export function BlockButton({ conversationId, blocked, labels, errors }: {
     </div>
   );
 }
+
+/** İlanı yenile: başarıda sayfa yenilenir; hata yerinde gösterilir. */
+export function RenewButton({ listingId, label, errors }: { listingId: string; label: string; errors: Record<string, string> }) {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const go = async () => {
+    setBusy(true); setError('');
+    const r = await fetch(`/api/listings/${encodeURIComponent(listingId)}/renew`, { method: 'POST' }).catch(() => null);
+    const j = r ? await r.json().catch(() => ({})) : {};
+    setBusy(false);
+    if (!r?.ok) { setError(errors[String(j.messageKey ?? '').replace(/^errors\./, '')] ?? errors.generic); return; }
+    router.refresh();
+  };
+  return (
+    <div style={{ display: 'grid', gap: 6, justifyItems: 'end' }}>
+      <button className="btn" type="button" disabled={busy} onClick={() => void go()}>{label}</button>
+      {error ? <p className="small" role="alert" style={{ color: 'var(--c-danger)', margin: 0 }}>{error}</p> : null}
+    </div>
+  );
+}

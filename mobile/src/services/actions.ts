@@ -157,6 +157,12 @@ export const actions = {
     await syncMine();
   },
   /** Devir asistanının sonunda: ilan satıldı (yayından kalkar, İlanlarım > Satıldı'da durur). */
+  /** Süresi dolan ya da dolmak üzere olan ilanı 90 gün uzatır (onaya düşmez). */
+  async renewListing(id: string) {
+    if (!isApiMode()) return g().renewListing(id);
+    await api.post(`/listings/${id}/renew`);
+    await syncMine();
+  },
   async markSold(id: string) {
     if (!isApiMode()) return g().markSold(id);
     await api.post(`/listings/${id}/sold`);

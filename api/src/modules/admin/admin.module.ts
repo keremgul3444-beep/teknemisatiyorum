@@ -11,6 +11,7 @@ import { env } from '../../config/env';
 import { BoatsModule } from '../boats/boats.module';
 import { I18N_PREFIX, LogbookService, dateOnly } from '../boats/logbook.service';
 import { NotificationsService } from '../notifications/notifications.module';
+import { nextExpiry } from '../listings/expiry';
 import { ModerationController } from './moderation.controller';
 
 const STAFF = { roles: ['moderator', 'admin'] as ('moderator' | 'admin')[] };
@@ -104,7 +105,7 @@ class AdminController {
     const approve = b.decision === 'approve';
     const r = await this.prisma.listing.updateMany({
       where: { id, status: 'pending', updatedAt: l.updatedAt },
-      data: approve ? { status: 'published', publishedAt: new Date(), rejectReason: null } : { status: 'rejected', rejectReason: b.reason },
+      data: approve ? { status: 'published', publishedAt: new Date(), expiresAt: nextExpiry(), expiryWarnedAt: null, rejectReason: null } : { status: 'rejected', rejectReason: b.reason },
     });
     if (!r.count) {
       // Başka moderatör aynı anda karar verdiyse "zaten karar verildi", satıcı değiştirdiyse "ilan değişti".

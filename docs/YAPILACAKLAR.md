@@ -16,7 +16,6 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 
 ## Web sitesi
 - [ ] Aşama 2 ödeme: gerçek sanal POS ve gerçek Apple/Google ödemesi (hesaplar açılınca, deneme modunun yerine takılır)
-- [ ] Siteden mesajlaşma ve favoriler (B seçeneği)
 - [ ] Siteden ilan verme, kimlik doğrulama, fotoğraf yükleme (C seçeneği)
 - [ ] Web yönetim paneli (/yonetim)
 - [ ] Firma paneli (/firma)
@@ -26,13 +25,13 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 - [ ] Uygulamanın "Öne çıkar" ekranını uçtan uca tarayıcı testiyle dene (bu turda bellek yetersizliğinden uygulama önizlemesi açılmadı; aynı sunucu ucu kabul testinde denendi)
 
 ## Uygulama ve arka uç
+- [ ] API uçtan uca testleri yerelde çalıştırılmalı (`cd api; npx jest --runInBand`); bulut oturumunda çalışmıyor
 - [ ] Usta / kaptan / iş / güvenli ödeme arka ucu (2. dalga); sonra sitede usta-kaptan rehber sayfaları
 - [ ] Gerçek kimlik doğrulama (NVİ / e-Devlet); şu an T.C. yalnızca algoritmayla kontrol ediliyor
 - [ ] Anlık bildirimi gerçek telefonda dene: EAS projesi (`extra.eas.projectId`) + geliştirme derlemesi gerekir (Expo Go'da uzak bildirim çalışmıyor); sunucuda `PUSH_MODE=expo`
 - [ ] Mağaza derlemesi (EAS build) ve mağaza başvurusu; şu an yalnızca Expo Go
 - [ ] Veri kopyası telefonda dosya olarak paylaşılsın (çok büyük kopyada paylaşım menüsü sınırı)
-- [ ] Arama veritabanı sorgusuna taşınsın (binlerce ilanda gerekli)
-- [ ] Yasaklama mekanizması (T.C. silmede serbest kaldığı için T.C.'ye dayanamaz)
+- [ ] Yasaklama: hesap askıya alma var; silinip yeniden açılan hesabı tanıma yok (T.C. silmede serbest kaldığı için T.C.'ye dayanamaz, cihaz/telefon izine dayanmalı)
 - [ ] Kapalı beta deneme hesaplarının temizliği (aynı T.C. ile açılmış kabul testi hesapları)
 
 ## Web/öne çıkarma — incelemeden ertelenen küçük maddeler

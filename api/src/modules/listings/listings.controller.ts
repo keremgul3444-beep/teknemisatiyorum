@@ -9,6 +9,7 @@ import { Errors } from '../../common/errors';
 import { MediaService } from '../media/media.service';
 import { ListingsService, MAX_PHOTOS } from './listings.service';
 import { listingInclude, priceNeedsReview, PRICE_CHANGES_PER_WEEK, type ListingRow } from './listing.view';
+import { canRenew, nextExpiry } from './expiry';
 
 /** Kullanıcı başına açık (gönderilmemiş) taslak sınırı. */
 const MAX_OPEN_DRAFTS = 5;
@@ -46,6 +47,8 @@ const patchSchema = draftSchema.partial().extend({
   /** null: ilan firmadan çıkarılır, bireysel satıcı adıyla görünür. */
   companyId: z.string().nullable().optional(),
 });
+/** Onaydan geçmiş (ya da reddedilmiş) içerik: değişirse ilan yeniden onaya düşer. Süresi dolan da onaylıdır; düzenlenip yenilenirse denetimsiz yayına çıkmasın. */
+const REVIEWED: string[] = ['published', 'rejected', 'expired'];
 /** Bu alanlardan biri değişirse ilan başka bir tekneyi anlatıyor olabilir. */
 const IDENTITY_FIELDS = ['brand', 'model', 'year', 'lengthM', 'boatId'] as const;
 /** Tekneye bağlı (belge/ekspertizle kazanılan) rozetler; satıcının kendi beyanına dayananlar değil. */
@@ -54,7 +57,7 @@ const BOAT_BOUND_BADGES = ['sahiplik', 'belge', 'ekspertizli'];
 export const NO_COUNT_HEADER = 'x-tms-no-count';
 const reportSchema = z.object({ reason: z.enum(REPORT_REASONS), note: z.string().trim().max(500).default('') });
 const photosSchema = z.object({ fileIds: z.array(z.string().min(1)).min(1).transform((a) => [...new Set(a)]) });
-const mineQuery = z.object({ status: z.enum(['draft', 'pending', 'published', 'rejected', 'sold', 'removed']).optional() });
+const mineQuery = z.object({ status: z.enum(['draft', 'pending', 'published', 'rejected', 'sold', 'removed', 'expired']).optional() });
 const searchQuery = z.object({
   q: z.string().max(2000).optional().transform((s, ctx) => {
     if (!s) return { equipment: [] };
@@ -184,7 +187,7 @@ export class ListingsController {
       const recent = await this.prisma.priceHistory.count({ where: { listingId: id, at: { gt: new Date(Date.now() - 7 * 864e5) } } });
       if (recent >= PRICE_CHANGES_PER_WEEK) throw Errors.tooMany('PRICE_CHANGE_LIMIT');
     }
-    const status = priceOnly ? l.status : l.status === 'published' || l.status === 'rejected' ? 'pending' : l.status;
+    const status = priceOnly ? l.status : REVIEWED.includes(l.status) ? 'pending' : l.status;
     // Belge ve ekspertiz rozetleri belirli bir tekne içindir: tekne kimliği değişirse rozetler düşer.
     const identityChanged = IDENTITY_FIELDS.some((k) => b[k] !== undefined && b[k] !== l[k]);
     const badges = identityChanged ? l.badges.filter((x) => !BOAT_BOUND_BADGES.includes(x)) : l.badges;
@@ -214,7 +217,7 @@ export class ListingsController {
       if (current.length + fresh.length > MAX_PHOTOS) throw Errors.bad('TOO_MANY_PHOTOS', { max: MAX_PHOTOS });
       await tx.listingPhoto.createMany({ data: fresh.map((fileId, i) => ({ listingId: id, fileId, order: current.length + i })) });
       // Onaylanmış içerik denetimsiz değişmesin: yayındaki/reddedilmiş ilana fotoğraf eklenince yeniden onaya düşer.
-      if (fresh.length && (l.status === 'published' || l.status === 'rejected')) await tx.listing.update({ where: { id }, data: { status: 'pending' } });
+      if (fresh.length && REVIEWED.includes(l.status)) await tx.listing.update({ where: { id }, data: { status: 'pending' } });
       return fresh.length;
     });
     if (added) await this.audit.log(u.id, 'audit.listingPhotosChanged', { added: String(added) }, 'listing', id);
@@ -242,7 +245,7 @@ export class ListingsController {
         await tx.$queryRaw`SELECT id FROM "Listing" WHERE id = ${id} FOR UPDATE`;
         await tx.listingPhoto.deleteMany({ where: { listingId: id } });
         await tx.listingPhoto.createMany({ data: b.fileIds.map((fileId, order) => ({ listingId: id, fileId, order })) });
-        if (l.status === 'published' || l.status === 'rejected') await tx.listing.update({ where: { id }, data: { status: 'pending' } });
+        if (REVIEWED.includes(l.status)) await tx.listing.update({ where: { id }, data: { status: 'pending' } });
       });
       await this.audit.log(u.id, 'audit.listingPhotosChanged', { count: String(b.fileIds.length) }, 'listing', id);
     }
@@ -269,6 +272,20 @@ export class ListingsController {
     if (l.status !== 'published') throw Errors.conflict('LISTING_NOT_PUBLISHED');
     const updated = await this.prisma.listing.update({ where: { id }, data: { status: 'sold' }, include: listingInclude });
     await this.audit.log(u.id, 'audit.listingSold', { title: `${l.brand} ${l.model}` }, 'listing', id);
+    return this.listings.view(updated, u.id);
+  }
+
+  /** Süresi dolan ya da dolmak üzere olan ilanı 90 gün daha yayında tutar; içerik değişmediği için onaya düşmez. */
+  @Auth({ level: 1 })
+  @Post('listings/:id/renew')
+  @HttpCode(200)
+  async renew(@CurrentUser() u: AuthUser, @Param('id') id: string) {
+    const l = await this.listings.getOwn(id, u.id);
+    if (!canRenew(l)) throw Errors.conflict('NOT_RENEWABLE');
+    const updated = await this.prisma.listing.update({
+      where: { id }, data: { status: 'published', expiresAt: nextExpiry(), expiryWarnedAt: null }, include: listingInclude,
+    });
+    await this.audit.log(u.id, 'audit.listingRenewed', { title: `${l.brand} ${l.model}` }, 'listing', id);
     return this.listings.view(updated, u.id);
   }
 

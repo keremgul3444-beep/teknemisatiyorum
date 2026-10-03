@@ -25,7 +25,7 @@ export type ReportReason = (typeof REPORT_REASONS)[number];
 export type TakedownReason = (typeof TAKEDOWN_REASONS)[number] | 'account_suspended';
 export type UstaCategory = (typeof USTA_CATEGORIES)[number];
 export type BadgeKind = 'ekspertizli' | 'sahiplik' | 'broker' | 'belge';
-export type ListingStatus = 'yayinda' | 'onay-bekliyor' | 'reddedildi' | 'satildi' | 'kaldirildi';
+export type ListingStatus = 'yayinda' | 'onay-bekliyor' | 'reddedildi' | 'satildi' | 'kaldirildi' | 'suresi-doldu';
 
 const pos = z.number().finite().positive().max(1e9);
 const year = z.number().int().min(1900).max(2100);

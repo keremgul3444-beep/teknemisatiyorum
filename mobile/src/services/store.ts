@@ -44,6 +44,7 @@ export interface Actions {
   setAdminStatus(id: string, status: AdminStatus, reason?: RejectReason): void;
   updateListing(id: string, changes: Partial<ListingDraft>): void;
   withdrawListing(id: string): void;
+  renewListing(id: string): void;
   reportListing(listingId: string, reason: ReportReason, note: string): string;
   reportGroups(): ReportGroup[];
   takedownListing(listingId: string, reason: TakedownReason): void;
@@ -220,6 +221,10 @@ export const useStore = create<Data & Actions>((set, get) => {
       if (status === 'onay-bekliyor' && l.status !== 'onay-bekliyor') {
         set({ adminItems: [{ id: nextId('a'), kind: 'ilan', title: `${l.brand} ${l.model}`, who: DEMO_USER.name, status: 'bekliyor', refId: id }, ...get().adminItems] });
       }
+    },
+    renewListing(id) {
+      const expiresAt = new Date(Date.now() + 90 * 864e5).toISOString();
+      set({ listings: get().listings.map((x) => (x.id === id ? { ...x, status: 'yayinda', expiresAt } : x)) });
     },
     withdrawListing(id) {
       set({ listings: get().listings.filter((x) => x.id !== id) });

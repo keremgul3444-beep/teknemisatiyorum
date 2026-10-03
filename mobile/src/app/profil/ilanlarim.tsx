@@ -16,6 +16,7 @@ export default function Ilanlarim() {
   const mine = useListings().filter((l) => (l.sellerId === 'me' || l.isMine) && l.rawStatus !== 'draft');
   // Önce satıcının ilgilenmesi gereken durum açılır: reddedilen, sonra onay bekleyen.
   const [tab, setTab] = useState<ListingStatus>(mine.some((l) => l.status === 'reddedildi') ? 'reddedildi'
+    : mine.some((l) => l.status === 'suresi-doldu') ? 'suresi-doldu'
     : mine.some((l) => l.status === 'onay-bekliyor') ? 'onay-bekliyor' : 'yayinda');
   const list = mine.filter((l) => l.status === tab);
   return (
@@ -25,6 +26,7 @@ export default function Ilanlarim() {
         { key: 'yayinda', label: t('mine.live') }, { key: 'onay-bekliyor', label: t('mine.pending') },
         ...(mine.some((l) => l.status === 'reddedildi') ? [{ key: 'reddedildi' as const, label: t('mine.rejected') }] : []),
         ...(mine.some((l) => l.status === 'kaldirildi') ? [{ key: 'kaldirildi' as const, label: t('mine.removed') }] : []),
+        ...(mine.some((l) => l.status === 'suresi-doldu') ? [{ key: 'suresi-doldu' as const, label: t('mine.expired') }] : []),
         { key: 'satildi', label: t('mine.sold') },
       ]} />
       {list.length === 0 ? <EmptyState icon="anchor" title={t('mine.empty')} actionLabel={t('mine.post')} onAction={() => router.push('/ilan-ver')} />
@@ -33,6 +35,7 @@ export default function Ilanlarim() {
             <ListingCard listing={l} />
             {l.status === 'reddedildi' ? <T variant="caption" color={colors.danger}>{t(`mine.rejectReasons.${l.rejectReason ?? 'rules'}`)}</T> : null}
             {l.status === 'kaldirildi' && l.removedReason ? <T variant="caption" color={colors.danger}>{t(`mine.removedReasons.${l.removedReason}`)}</T> : null}
+            {l.status === 'suresi-doldu' || (l.status === 'yayinda' && expiringIn(l) !== null) ? <RenewRow listing={l} /> : null}
             {l.stats ? <StatsRow stats={l.stats} /> : null}
             {l.status === 'yayinda' && isApiMode() ? <PromoRow listing={l} /> : null}
             {l.status === 'yayinda' || l.status === 'onay-bekliyor' || l.status === 'reddedildi' ? <ManageRow listing={l} /> : null}
@@ -90,6 +93,29 @@ function ManageRow({ listing: l }: { listing: Listing }) {
         <Button small variant="ghost" title={`${t('mine.price')} · ${formatPrice(l.price, l.currency, currentLang())}`} onPress={() => setMode('price')} />
       ) : null}
       <Button small variant="ghost" icon="x" title={t('mine.withdraw')} onPress={() => setMode('withdraw')} />
+    </View>
+  );
+}
+
+/** Yayının bitmesine kalan gün; yalnızca yenileme penceresinde (14 gün) sayı, değilse null. */
+function expiringIn(l: Listing, now = Date.now()): number | null {
+  if (!l.expiresAt) return null;
+  const d = Math.ceil((new Date(l.expiresAt).getTime() - now) / 864e5);
+  return d <= 14 ? Math.max(d, 0) : null;
+}
+
+/** Süresi dolan ya da dolmak üzere olan ilan: tek dokunuşla 90 gün yenileme (onaya düşmez). */
+function RenewRow({ listing: l }: { listing: Listing }) {
+  const { t } = useTranslation();
+  const [busy, setBusy] = useState(false);
+  const left = expiringIn(l);
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(2) }}>
+      <T variant="caption" color={colors.warning} style={{ flex: 1 }}>
+        {l.status === 'suresi-doldu' ? t('mine.expiredNote') : t('mine.expiresIn', { n: left })}
+      </T>
+      <Button small icon="check" title={t('mine.renew')} loading={busy}
+        onPress={async () => { setBusy(true); await attempt(() => actions.renewListing(l.id)); setBusy(false); }} />
     </View>
   );
 }

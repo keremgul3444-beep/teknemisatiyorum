@@ -20,6 +20,8 @@ enum ListingStatus {
   rejected
   sold
   removed
+  /// Yayın süresi doldu; sahibi tek dokunuşla yeniler (içerik değişmediği için onaya düşmez).
+  expired
 }
 
 enum VerificationKind {
@@ -201,6 +203,10 @@ model Listing {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   publishedAt   DateTime?
+  /// Yayın bitişi (onayda ve yenilemede +90 gün); geçince ilan `expired` olur.
+  expiresAt     DateTime?
+  /// "Süresi yaklaşıyor" bildirimi bu yayın dönemi için gönderildi mi.
+  expiryWarnedAt DateTime?
   /// Öne çıkarma: vitrin ve acil bitişleri, son üste taşınma (sorgu zamanında denetlenir).
   featuredUntil DateTime?
   urgentUntil   DateTime?

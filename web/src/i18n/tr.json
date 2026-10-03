@@ -517,7 +517,8 @@
     "storage_quota": "Dosya alanın doldu. Kullanmadığın taslakları silip yeniden dene.",
     "image_too_large": "Fotoğrafın çözünürlüğü çok yüksek. Daha küçük bir fotoğraf seç.",
     "too_many_drafts": "Yarım kalmış ilanların çok. Önce birini tamamla ya da sil.",
-    "price_change_limit": "Fiyatı bu hafta yeterince değiştirdin. Birkaç gün sonra yeniden deneyebilirsin."
+    "price_change_limit": "Fiyatı bu hafta yeterince değiştirdin. Birkaç gün sonra yeniden deneyebilirsin.",
+    "not_renewable": "Bu ilan şimdi yenilenemez; bitişine 14 gün kala yenileyebilirsin."
   },
   "login": {
     "title": "Giriş yap",
@@ -552,7 +553,8 @@
       "published": "Yayında",
       "rejected": "Reddedildi",
       "sold": "Satıldı",
-      "removed": "Kaldırıldı"
+      "removed": "Kaldırıldı",
+      "expired": "Süresi doldu"
     },
     "orderStatus": {
       "pending": "Ödeme bekleniyor",
@@ -595,7 +597,11 @@
     "cancel": "Vazgeç",
     "blockedByMe": "Bu kişiyi engelledin.",
     "blockedByThem": "Bu sohbete artık mesaj gönderilemiyor.",
-    "paymentRisk": "Bu mesajda ödeme isteği var. Tekneyi görmeden ve sözleşme yapmadan kapora ya da havale gönderme."
+    "paymentRisk": "Bu mesajda ödeme isteği var. Tekneyi görmeden ve sözleşme yapmadan kapora ya da havale gönderme.",
+    "renew": "Yenile",
+    "expiresIn": "Yayın {{n}} gün sonra bitiyor",
+    "expiredNote": "Süresi doldu; aramada görünmüyor. Yenilersen 90 gün daha yayında kalır.",
+    "expiredShort": "Süresi doldu"
   },
   "pay": {
     "devTitle": "Deneme ödemesi",

@@ -8,7 +8,7 @@ export interface ApiListing {
   id: string; brand: string; model: string; year: number; lengthM: number; type: string; price: number; currency: Currency;
   location: string; equipment: string[]; cabins: number; engine: string; description: string; status: string; badges: string[];
   engineHours?: number | null; flag?: string | null; tradeIn?: boolean; negotiable?: boolean;
-  rejectReason?: string | null; removedReason?: string | null; photos: { id: string; url: string }[];
+  rejectReason?: string | null; removedReason?: string | null; expiresAt?: string | null; photos: { id: string; url: string }[];
   seller: { id: string; name: string | null; since: number; companyName: string | null; verified?: boolean };
   logbook: { count: number; latest: ApiEntry[]; boatId?: string } | null; isMine: boolean;
   promo?: Promo;
@@ -36,7 +36,7 @@ export interface ApiThread {
   messages: { id: string; text: string; at: string; mine: boolean }[];
 }
 
-const STATUS: Record<string, Listing['status']> = { published: 'yayinda', sold: 'satildi', rejected: 'reddedildi', removed: 'kaldirildi' };
+const STATUS: Record<string, Listing['status']> = { published: 'yayinda', sold: 'satildi', rejected: 'reddedildi', removed: 'kaldirildi', expired: 'suresi-doldu' };
 /** İlanın fotoğraf yoksa prototipteki degrade görsele düşmesi için id'den kararlı bir tohum üretilir. */
 const seedOf = (id: string) => [...id].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7) % 1000;
 const hm = (iso: string) => new Date(iso).toTimeString().slice(0, 5);
@@ -51,7 +51,7 @@ export function toListing(l: ApiListing): Listing {
     status: STATUS[l.status] ?? 'onay-bekliyor', rawStatus: l.status, photoSeed: seedOf(l.id), cabins: l.cabins, engine: l.engine,
     photoUrls: l.photos.map((p) => absolute(p.url)), photoIds: l.photos.map((p) => p.id), isMine: l.isMine, boatId: l.logbook?.boatId ?? null,
     logbookLatest: l.logbook?.latest.map(toEntry) ?? [], rejectReason: l.rejectReason ?? null,
-    removedReason: (l.removedReason as Listing['removedReason']) ?? null,
+    removedReason: (l.removedReason as Listing['removedReason']) ?? null, expiresAt: l.expiresAt ?? null,
     promo: l.promo ?? { featured: false, urgent: false },
     priceDrop: l.priceDrop ?? null, webUrl: l.webUrl, stats: l.stats,
     engineHours: l.engineHours ?? null, flag: (l.flag as Flag | null | undefined) ?? null, tradeIn: !!l.tradeIn, negotiable: !!l.negotiable,

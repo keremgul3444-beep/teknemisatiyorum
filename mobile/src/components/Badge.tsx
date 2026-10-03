@@ -4,13 +4,13 @@ import { colors, radius, space, fonts } from '@/theme';
 import { T } from './T';
 import { Icon } from './Icon';
 
-export type BadgeName = 'ekspertizli' | 'sahiplik' | 'broker' | 'belge' | 'dogrulanmis' | 'beklemede' | 'reddedildi' | 'kaldirildi';
+export type BadgeName = 'ekspertizli' | 'sahiplik' | 'broker' | 'belge' | 'dogrulanmis' | 'beklemede' | 'reddedildi' | 'kaldirildi' | 'suresidoldu';
 
 /** Güven rozeti ("Liman"): hap biçimli; fotoğraf üstünde beyaz, sayfada çerçeveli. Bekleyen: turuncu nokta. */
 export function Badge({ kind, onDark }: { kind: BadgeName; onDark?: boolean }) {
   const { t } = useTranslation();
   // Bekleyen turuncu, reddedilen kırmızı noktayla; diğerleri onay işaretiyle.
-  const dot = kind === 'beklemede' ? colors.warning : kind === 'reddedildi' || kind === 'kaldirildi' ? colors.danger : null;
+  const dot = kind === 'beklemede' || kind === 'suresidoldu' ? colors.warning : kind === 'reddedildi' || kind === 'kaldirildi' ? colors.danger : null;
   const pending = dot !== null;
   const fg = dot ?? (onDark ? colors.primary : colors.text);
   return (
