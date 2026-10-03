@@ -10,7 +10,8 @@ export type WebCallback = { providerRef: string; orderId: string; result: 'succe
 
 /** Sanal POS takma yuvası. Gerçek sağlayıcı (Aşama 2) kendi bildirimini bu biçime çevirir. */
 export interface WebPaymentProvider {
-  createCheckout(o: { orderId: string; amountKurus: number }): Promise<{ providerRef: string; checkoutUrl: string }>;
+  /** `kind`: öne çıkarma siparişi (varsayılan) ya da emanet hizmet ödemesi (deneme sayfası farklı kaydı açar). */
+  createCheckout(o: { orderId: string; amountKurus: number; kind?: 'order' | 'service' }): Promise<{ providerRef: string; checkoutUrl: string }>;
   /** İmza doğrulanmadan hiçbir şey döndürmez; bozuk/imzasız bildirimde hata atar. */
   verifyCallback(rawBody: string, signature: string | undefined): WebCallback;
 }
@@ -27,8 +28,9 @@ export const signPayload = (raw: string) => crypto.createHmac('sha256', env().PA
 
 /** Deneme sanal POS'u: para çekmez; site deneme sayfası sonucu seçer, sunucu imzalı bildirimi kendisi üretir. */
 export class DevWebPayment implements WebPaymentProvider {
-  async createCheckout(o: { orderId: string; amountKurus: number }) {
-    return { providerRef: `dev_${crypto.randomUUID()}`, checkoutUrl: `${env().WEB_URL}/odeme/deneme?order=${encodeURIComponent(o.orderId)}` };
+  async createCheckout(o: { orderId: string; amountKurus: number; kind?: 'order' | 'service' }) {
+    const q = o.kind === 'service' ? 'pay' : 'order';
+    return { providerRef: `dev_${crypto.randomUUID()}`, checkoutUrl: `${env().WEB_URL}/odeme/deneme?${q}=${encodeURIComponent(o.orderId)}` };
   }
 
   verifyCallback(rawBody: string, signature: string | undefined): WebCallback {

@@ -21,6 +21,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { ServicesModule } from './modules/services/services.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { PromotionsModule } from './modules/promotions/promotions.module';
+import { MarketplaceModule } from './modules/marketplace/marketplace.module';
 import { BackupScheduler } from './backup/backup';
 
 @Controller('health')
@@ -48,6 +49,7 @@ class HealthController {
     ServicesModule,
     AdminModule,
     PromotionsModule,
+    MarketplaceModule,
   ],
   controllers: [HealthController],
   providers: [

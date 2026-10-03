@@ -9,6 +9,7 @@ import { AppError, Errors } from '../../common/errors';
 import { env } from '../../config/env';
 import { DevWebPayment, WEB_PAYMENT, type WebCallback, type WebPaymentProvider } from '../../adapters/payments';
 import { OrdersService } from './orders.service';
+import { EscrowService } from './escrow.service';
 
 const devBody = z.object({ orderId: z.string().min(1), result: z.enum(['success', 'failure']) });
 
@@ -16,6 +17,7 @@ const devBody = z.object({ orderId: z.string().min(1), result: z.enum(['success'
 export class PaymentsController {
   constructor(
     private readonly orders: OrdersService,
+    private readonly escrow: EscrowService,
     private readonly prisma: PrismaService,
     @Inject(WEB_PAYMENT) private readonly web: WebPaymentProvider,
   ) {}
@@ -36,7 +38,9 @@ export class PaymentsController {
   @HttpCode(200)
   async devComplete(@CurrentUser() u: AuthUser, @Body(new ZodPipe(devBody)) b: z.infer<typeof devBody>) {
     if (env().PAYMENTS_MODE !== 'dev' || !(this.web instanceof DevWebPayment)) throw Errors.notFound();
+    const web = this.web;
     const o = await this.prisma.order.findFirst({ where: { id: b.orderId, userId: u.id } });
+    if (!o && (await this.escrow.devComplete(u.id, b.orderId, b.result, (c) => web.simulate(c)))) return { ok: true };
     if (!o || !o.providerRef) throw Errors.notFound();
     const s = this.web.simulate({ providerRef: o.providerRef, orderId: o.id, result: b.result, amountKurus: o.amountKurus });
     await this.apply(this.web.verifyCallback(s.rawBody, s.signature));
@@ -45,6 +49,8 @@ export class PaymentsController {
 
   private async apply(c: WebCallback) {
     const o = await this.prisma.order.findFirst({ where: { id: c.orderId, providerRef: c.providerRef } });
+    // Sipariş değilse emanet hizmet ödemesi olabilir (usta işi, kaptan rezervasyonu).
+    if (!o && (await this.escrow.applyCallback(c))) return;
     if (!o) throw Errors.notFound();
     if (o.amountKurus !== c.amountKurus) throw new AppError('AMOUNT_MISMATCH', 'errors.amount_mismatch', 409);
     if (c.result === 'failure') await this.orders.markFailed(c.providerRef);

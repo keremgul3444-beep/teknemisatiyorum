@@ -46,6 +46,7 @@ test('derlenmiş NestJS sunucusu decorator metadata ile açılır', async () => 
       DATABASE_URL: 'postgresql://postgres@127.0.0.1:54329/postgres',
       JWT_SECRET: 'test-secret-test-secret-test-secret-123',
       ID_ENC_KEY: Buffer.alloc(32, 7).toString('base64'),
+      PAYMENT_WEBHOOK_SECRET: 'test-webhook-secret-test-webhook-secret',
     },
     stdio: 'pipe',
   });

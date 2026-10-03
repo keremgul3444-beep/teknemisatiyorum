@@ -521,7 +521,25 @@
     "price_change_limit": "You’ve changed the price enough this week. Try again in a few days.",
     "not_renewable": "This listing can’t be renewed yet; you can renew it in its last 14 days.",
     "identity_attempts": "Too many failed attempts today. Check your details and try again tomorrow.",
-    "identity_service_down": "The identity service is unavailable right now. Please try again shortly."
+    "identity_service_down": "The identity service is unavailable right now. Please try again shortly.",
+    "category_required": "Choose at least one specialty.",
+    "rate_required": "Enter your day rate.",
+    "too_many_jobs": "You can have up to 10 open job requests at once.",
+    "own_job": "You can’t quote on your own job.",
+    "job_closed": "This job no longer accepts quotes.",
+    "job_not_accepted": "Accept a quote first.",
+    "job_not_paid": "The job hasn’t been paid yet.",
+    "payment_not_held": "No payment is held in escrow.",
+    "job_not_done": "You can review once the job is done.",
+    "already_reviewed": "You already reviewed this.",
+    "own_profile": "You can’t do this with your own profile.",
+    "past_date": "You can’t choose a past date.",
+    "captain_busy": "The captain is booked on these dates.",
+    "booking_closed": "This booking can no longer be changed.",
+    "booking_not_paid": "The booking hasn’t been paid yet.",
+    "booking_not_started": "The booking can be completed once it has started.",
+    "booking_not_done": "You can review once the booking is done.",
+    "already_paid": "This has already been paid."
   },
   "login": {
     "title": "Log in",
@@ -841,7 +859,10 @@
     "privateFileViewed": "Protected document opened",
     "listingRenewed": "Listing renewed: {{title}}",
     "identityFailed": "Identity verification failed",
-    "memberRemoved": "Company staff removed ({{role}})"
+    "memberRemoved": "Company staff removed ({{role}})",
+    "providerCreated": "Provider profile opened ({{kind}})",
+    "servicePaid": "Service payment held ({{kind}}): ₺{{amount}}",
+    "paymentRefunded": "Service payment refunded: {{ref}}"
   },
   "firm": {
     "title": "Company panel",

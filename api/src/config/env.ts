@@ -32,6 +32,8 @@ const schema = z.object({
   PAYMENTS_MODE: z.enum(['dev', 'live']).default('dev'),
   /** Ödeme bildirimi imza anahtarı (sanal POS paneli ile aynı değer). */
   PAYMENT_WEBHOOK_SECRET: z.string().min(32, 'PAYMENT_WEBHOOK_SECRET en az 32 karakter olmalı'),
+  /** Usta ve kaptan ödemelerinde ödeyenden alınan platform payı (yüzde). */
+  SERVICE_FEE_PERCENT: z.coerce.number().min(0).max(50).default(8),
   /** Sitenin adresi (ödeme dönüş ve deneme ödeme sayfası için). */
   WEB_URL: z.string().default('http://localhost:3001'),
   /** Kimlik doğrulama: algorithm = yalnızca numaranın algoritması (geliştirme), nvi = NVİ KPSPublic sorgusu (ad, soyad, doğum yılı eşleşmesi). */

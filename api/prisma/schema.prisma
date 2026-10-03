@@ -50,6 +50,12 @@ enum SubjectKind {
   listing
   broker
   expertise
+  /// Usta işi: konu kimliği teklif (iş sahibi ↔ teklif veren usta).
+  job
+  /// Kaptan rezervasyonu: konu kimliği rezervasyon.
+  captain
+  /// Hizmet veren profili: rezervasyon ya da iş öncesi soru.
+  provider
 }
 
 enum Visibility {
@@ -491,4 +497,155 @@ model ListingReport {
   @@unique([listingId, reporterId])
   @@index([status])
   @@index([reporterId, createdAt])
+}
+
+/// 2. dalga: hizmet verenler (usta, kaptan), iş talepleri, teklifler, kaptan rezervasyonları, emanet ödeme, değerlendirme.
+enum ProviderKind {
+  usta
+  kaptan
+}
+
+/// Hizmet veren profili: belge onayı (usta/kaptan başvurusu) gelince `active` olur ve listelerde görünür.
+enum ProviderStatus {
+  pending
+  active
+  suspended
+}
+
+model ProviderProfile {
+  id          String         @id @default(cuid())
+  userId      String
+  kind        ProviderKind
+  status      ProviderStatus @default(pending)
+  displayName String
+  /// Usta için uzmanlık alanları (shared USTA_CATEGORIES); kaptan için boş.
+  categories  String[]
+  region      String
+  bio         String         @default("")
+  priceNote   String         @default("")
+  yearsExp    Int            @default(0)
+  languages   String[]
+  areas       String[]
+  /// Kaptan ücretleri (avro): günlük ve haftalık.
+  dayRateEur  Int?
+  weekRateEur Int?
+  ratingSum   Int            @default(0)
+  ratingCount Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  quotes      Quote[]
+  bookings    CaptainBooking[]
+
+  @@unique([userId, kind])
+  @@index([kind, status])
+}
+
+/// İş talebi: sahibi açar, ustalar teklif verir, sahibi birini kabul eder, öder (emanet), iş bitince onaylar, değerlendirir.
+enum JobStatus {
+  open
+  accepted
+  paid
+  done
+  cancelled
+}
+
+model Job {
+  id              String    @id @default(cuid())
+  ownerId         String
+  boatId          String?
+  category        String
+  title           String
+  description     String
+  region          String    @default("")
+  status          JobStatus @default(open)
+  acceptedQuoteId String?   @unique
+  createdAt       DateTime  @default(now())
+  completedAt     DateTime?
+  quotes          Quote[]
+
+  @@index([ownerId, createdAt])
+  @@index([status, category])
+}
+
+model Quote {
+  id         String          @id @default(cuid())
+  jobId      String
+  job        Job             @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  providerId String
+  provider   ProviderProfile @relation(fields: [providerId], references: [id])
+  priceTry   Int
+  days       Int
+  note       String          @default("")
+  createdAt  DateTime        @default(now())
+
+  @@unique([jobId, providerId])
+}
+
+enum BookingStatus {
+  requested
+  paid
+  done
+  cancelled
+}
+
+model CaptainBooking {
+  id          String          @id @default(cuid())
+  userId      String
+  providerId  String
+  provider    ProviderProfile @relation(fields: [providerId], references: [id])
+  start       DateTime        @db.Date
+  days        Int
+  totalEur    Int
+  status      BookingStatus   @default(requested)
+  createdAt   DateTime        @default(now())
+  completedAt DateTime?
+
+  @@index([userId, createdAt])
+  @@index([providerId, start])
+}
+
+/// Emanet ödeme: ödeyen öder (tutar + platform payı), para işin/rezervasyonun sonunda hizmet verene aktarılır ya da iade edilir.
+enum ServicePaymentStatus {
+  pending
+  held
+  released
+  refunded
+  failed
+}
+
+model ServicePayment {
+  id           String               @id @default(cuid())
+  payerId      String
+  providerId   String
+  /// job | captain
+  subjectKind  String
+  subjectId    String
+  /// Hizmet bedeli (kuruş, TRY); kaptan rezervasyonunda ödeme anındaki kurla çevrilir.
+  amountKurus  Int
+  /// Platform payı (kuruş); ödeyen tutar = amountKurus + feeKurus.
+  feeKurus     Int
+  status       ServicePaymentStatus @default(pending)
+  providerRef  String?              @unique
+  createdAt    DateTime             @default(now())
+  paidAt       DateTime?
+  releasedAt   DateTime?
+  refundedAt   DateTime?
+  decidedById  String?
+
+  @@index([subjectKind, subjectId])
+  @@index([status, createdAt])
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  providerId  String
+  authorId    String
+  subjectKind String
+  subjectId   String
+  stars       Int
+  text        String   @default("")
+  createdAt   DateTime @default(now())
+
+  @@unique([subjectKind, subjectId])
+  @@index([providerId, createdAt])
 }

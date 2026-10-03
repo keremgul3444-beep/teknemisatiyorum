@@ -149,7 +149,11 @@ class AdminController {
         const granted = v.fileIds.length >= 2 ? ['sahiplik', 'belge'] : ['sahiplik'];
         const badges = l ? [...l.badges, ...granted.filter((b) => !l.badges.includes(b))] : [];
         if (l && badges.length !== l.badges.length) await tx.listing.update({ where: { id: l.id }, data: { badges } });
-      } else if (v.kind !== 'ruhsat') await tx.user.update({ where: { id: v.userId }, data: { verifyLevel: 3 } });
+      } else if (v.kind !== 'ruhsat') {
+        await tx.user.update({ where: { id: v.userId }, data: { verifyLevel: 3 } });
+        // Usta/kaptan belgesi onaylanınca açılmış hizmet profili listelerde görünür.
+        if (v.kind === 'usta' || v.kind === 'kaptan') await tx.providerProfile.updateMany({ where: { userId: v.userId, kind: v.kind, status: 'pending' }, data: { status: 'active' } });
+      }
     });
     await this.notifications.push(v.userId, approve ? 'notif.docApproved' : 'notif.docRejected', { kind: v.kind, ...(approve ? {} : { reason: b.reason }) });
     await this.audit.log(u.id, approve ? 'audit.docApproved' : 'audit.docRejected', { title: v.kind }, 'verification', id);

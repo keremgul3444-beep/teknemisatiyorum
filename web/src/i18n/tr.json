@@ -521,7 +521,25 @@
     "price_change_limit": "Fiyatı bu hafta yeterince değiştirdin. Birkaç gün sonra yeniden deneyebilirsin.",
     "not_renewable": "Bu ilan şimdi yenilenemez; bitişine 14 gün kala yenileyebilirsin.",
     "identity_attempts": "Bugün çok sayıda hatalı deneme yapıldı. Bilgilerini kontrol edip yarın yeniden dene.",
-    "identity_service_down": "Kimlik doğrulama servisine şu an ulaşılamıyor. Biraz sonra yeniden dene."
+    "identity_service_down": "Kimlik doğrulama servisine şu an ulaşılamıyor. Biraz sonra yeniden dene.",
+    "category_required": "En az bir uzmanlık alanı seç.",
+    "rate_required": "Günlük ücretini yaz.",
+    "too_many_jobs": "Aynı anda en fazla 10 açık iş talebin olabilir.",
+    "own_job": "Kendi işine teklif veremezsin.",
+    "job_closed": "Bu iş artık teklif almıyor.",
+    "job_not_accepted": "Önce bir teklifi kabul et.",
+    "job_not_paid": "İş henüz ödenmedi.",
+    "payment_not_held": "Emanette ödeme yok.",
+    "job_not_done": "İş tamamlanmadan değerlendirilemez.",
+    "already_reviewed": "Bunu zaten değerlendirdin.",
+    "own_profile": "Kendi profilinle işlem yapamazsın.",
+    "past_date": "Geçmiş bir tarih seçilemez.",
+    "captain_busy": "Kaptan bu tarihlerde dolu.",
+    "booking_closed": "Bu rezervasyon artık değiştirilemez.",
+    "booking_not_paid": "Rezervasyon henüz ödenmedi.",
+    "booking_not_started": "Rezervasyon başlamadan tamamlanamaz.",
+    "booking_not_done": "Rezervasyon tamamlanmadan değerlendirilemez.",
+    "already_paid": "Bu ödeme zaten yapıldı."
   },
   "login": {
     "title": "Giriş yap",
@@ -841,7 +859,10 @@
     "privateFileViewed": "Korumalı belge açıldı",
     "listingRenewed": "İlan yenilendi: {{title}}",
     "identityFailed": "Kimlik doğrulama başarısız",
-    "memberRemoved": "Firma personeli çıkarıldı ({{role}})"
+    "memberRemoved": "Firma personeli çıkarıldı ({{role}})",
+    "providerCreated": "Hizmet veren profili açıldı ({{kind}})",
+    "servicePaid": "Hizmet ödemesi emanete alındı ({{kind}}): ₺{{amount}}",
+    "paymentRefunded": "Hizmet ödemesi iade edildi: {{ref}}"
   },
   "firm": {
     "title": "Firma paneli",

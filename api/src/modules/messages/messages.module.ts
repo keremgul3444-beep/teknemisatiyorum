@@ -8,7 +8,7 @@ import { AppError, Errors } from '../../common/errors';
 import { NotificationsService } from '../notifications/notifications.module';
 import { prefsOf } from '../users/user.view';
 
-const startBody = z.object({ subjectKind: z.enum(['listing', 'broker', 'expertise']), subjectId: z.string().min(1) });
+const startBody = z.object({ subjectKind: z.enum(['listing', 'broker', 'expertise', 'job', 'captain', 'provider']), subjectId: z.string().min(1) });
 const messageBody = z.object({ text: z.string().trim().min(1).max(2000) });
 
 /** Spam ve numara toplamaya karşı sınırlar. */
@@ -173,6 +173,25 @@ class MessagesController {
       if (!l || !['published', 'sold'].includes(l.status)) throw Errors.notFound();
       if (l.ownerId === userId) throw Errors.bad('OWN_LISTING');
       return { otherId: l.ownerId, title: `${l.brand} ${l.model} · ${l.year}` };
+    }
+    // Usta işi: konu teklif; iş sahibi ↔ teklifi veren usta (ikisinden biri başlatır).
+    if (kind === 'job') {
+      const q = await this.prisma.quote.findUnique({ where: { id: subjectId }, include: { job: true, provider: true } });
+      if (!q || (q.job.ownerId !== userId && q.provider.userId !== userId)) throw Errors.notFound();
+      return { otherId: q.job.ownerId === userId ? q.provider.userId : q.job.ownerId, title: q.job.title };
+    }
+    // Kaptan rezervasyonu: müşteri ↔ kaptan.
+    if (kind === 'captain') {
+      const b = await this.prisma.captainBooking.findUnique({ where: { id: subjectId }, include: { provider: true } });
+      if (!b || (b.userId !== userId && b.provider.userId !== userId)) throw Errors.notFound();
+      return { otherId: b.userId === userId ? b.provider.userId : b.userId, title: `${b.provider.displayName} · ${b.start.toISOString().slice(0, 10)}` };
+    }
+    // Hizmet veren profili: rezervasyon ya da iş öncesi soru (yalnızca aktif profile).
+    if (kind === 'provider') {
+      const p = await this.prisma.providerProfile.findUnique({ where: { id: subjectId } });
+      if (!p || p.status !== 'active') throw Errors.notFound();
+      if (p.userId === userId) throw Errors.bad('OWN_PROFILE');
+      return { otherId: p.userId, title: p.displayName };
     }
     const own = kind === 'broker'
       ? await this.prisma.brokerCase.findFirst({ where: { id: subjectId, userId } })

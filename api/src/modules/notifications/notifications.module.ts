@@ -86,5 +86,5 @@ class NotificationsController {
 }
 
 @Global()
-@Module({ controllers: [NotificationsController, PushTokenController], providers: [NotificationsService, { provide: PUSH, useClass: pushTransportClass() }], exports: [NotificationsService, PUSH] })
+@Module({ controllers: [NotificationsController, PushTokenController], providers: [NotificationsService, { provide: PUSH, useFactory: () => new (pushTransportClass())() }], exports: [NotificationsService, PUSH] })
 export class NotificationsModule {}

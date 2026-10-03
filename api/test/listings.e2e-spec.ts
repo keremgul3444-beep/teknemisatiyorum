@@ -65,7 +65,9 @@ describe('taslak ve sahiplik', () => {
     expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } })).status).toBe('pending');
     // Başkasının dosyası eklenemez.
     const b = await loginAs(t, { level: 2 });
-    expect((await t.http().put(`/listings/${l.id}/photos`).set(a.auth).send({ fileIds: [p3, await photo(b.auth)] })).status).toBe(404);
+    // İç içe istek atılmaz (supertest sunucuyu yeniden bağlar): dosya önce yüklenir.
+    const foreign = await photo(b.auth);
+    expect((await t.http().put(`/listings/${l.id}/photos`).set(a.auth).send({ fileIds: [p3, foreign] })).status).toBe(404);
     expect(await order()).toEqual([p3, p1]);
     // Başkasının ilanına dokunulamaz; satılmış ilan kapalı.
     expect((await t.http().put(`/listings/${l.id}/photos`).set(b.auth).send({ fileIds: [p3] })).status).toBe(404);
@@ -77,7 +79,8 @@ describe('taslak ve sahiplik', () => {
     const a = await loginAs(t, { level: 2 });
     const l = await published(a.user.id);
     await t.prisma.listing.update({ where: { id: l.id }, data: { status: 'sold' } });
-    const r = await t.http().post(`/listings/${l.id}/photos`).set(a.auth).send({ fileIds: [await photo(a.auth)] });
+    const fileId = await photo(a.auth);
+    const r = await t.http().post(`/listings/${l.id}/photos`).set(a.auth).send({ fileIds: [fileId] });
     expect(r.status).toBe(409);
     expect(r.body.code).toBe('LISTING_CLOSED');
     expect(await t.prisma.listingPhoto.count({ where: { listingId: l.id } })).toBe(0);
@@ -183,14 +186,14 @@ describe('arama ve kurlar', () => {
   test('motor saati, bayrak, takas ve pazarlıkla süzülür; sayfa ve toplam doğru', async () => {
     const a = await loginAs(t);
     const mk = (over: object) => t.prisma.listing.create({
-      data: { ...draft, brand: 'SaatTest', location: 'Didim', ownerId: a.user.id, currency: 'EUR', status: 'published', publishedAt: new Date(), badges: [], ...over },
+      data: { ...draft, brand: 'SaatTest', location: 'Marmaris', ownerId: a.user.id, currency: 'EUR', status: 'published', publishedAt: new Date(), badges: [], ...over },
     });
     const ok = await mk({ engineHours: 800, flag: 'tr', tradeIn: true, negotiable: true });
     await mk({ engineHours: 1500, flag: 'tr', tradeIn: true, negotiable: true }); // saat fazla
     await mk({ engineHours: null, flag: 'tr', tradeIn: true, negotiable: true }); // saat belirtilmemiş
     await mk({ engineHours: 500, flag: 'foreign', tradeIn: true, negotiable: true }); // bayrak
     await mk({ engineHours: 500, flag: 'tr', tradeIn: false, negotiable: true }); // takas yok
-    const q = (o: object) => encodeURIComponent(JSON.stringify({ location: 'Didim', equipment: [], ...o }));
+    const q = (o: object) => encodeURIComponent(JSON.stringify({ location: 'Marmaris', equipment: [], ...o }));
     const r = await t.http().get(`/listings?q=${q({ maxEngineHours: 1000, flag: 'tr', tradeIn: true, negotiable: true })}`);
     expect(r.body.items.map((l: { id: string }) => l.id)).toEqual([ok.id]);
     expect(r.body.total).toBe(1);

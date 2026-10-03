@@ -1,0 +1,104 @@
+import { createTestApp, type TestApp } from './setup';
+import { loginAs } from './helpers';
+
+let t: TestApp;
+beforeAll(async () => { t = await createTestApp(); });
+afterAll(async () => { await t.close(); });
+
+type Auth = Record<string, string>;
+const moderator = () => loginAs(t, { level: 3, roles: ['moderator'] });
+/** Hizmet veren: profil aç, belge başvurusu onaylansın → aktif. */
+async function provider(kind: 'usta' | 'kaptan', body: Record<string, unknown>) {
+  const u = await loginAs(t, { level: 2 });
+  const r = await t.http().put(`/me/provider/${kind}`).set(u.auth).send({ displayName: kind === 'usta' ? 'Usta Ali' : 'Kaptan Ece', region: 'Bodrum', ...body });
+  expect(r.status).toBe(200);
+  expect(r.body.status).toBe('pending');
+  const v = await t.prisma.verificationRequest.create({ data: { userId: u.user.id, kind, fileIds: [] } });
+  await t.http().post(`/admin/verifications/${v.id}/decision`).set((await moderator()).auth).send({ decision: 'approve' }).expect(200);
+  return { ...u, profileId: r.body.id as string };
+}
+const devPay = (auth: Auth, paymentId: string) => t.http().post('/payments/web/dev-complete').set(auth).send({ orderId: paymentId, result: 'success' }).expect(200);
+
+describe('usta işi: talep → teklif → kabul → emanet ödeme → tamam → karne → değerlendirme', () => {
+  test('uçtan uca akış', async () => {
+    const owner = await loginAs(t, { level: 2 });
+    const boat = await t.prisma.boat.create({ data: { ownerId: owner.user.id, name: 'Mavi', brand: 'Bavaria', model: '41', year: 2016, lengthM: 12.4 } });
+    const usta = await provider('usta', { categories: ['motor'] });
+    expect((await t.http().get('/providers?kind=usta&category=motor')).body.some((p: { id: string }) => p.id === usta.profileId)).toBe(true);
+
+    const job = (await t.http().post('/jobs').set(owner.auth).send({ category: 'motor', title: 'Motor su alıyor', description: 'Sintineye su geliyor, motor bölmesi ıslak.', boatId: boat.id })).body;
+    expect(job.status).toBe('open');
+    const inbox = (await t.http().get('/provider/jobs').set(usta.auth)).body;
+    expect(inbox.open.map((j: { id: string }) => j.id)).toContain(job.id);
+    const q = await t.http().post(`/jobs/${job.id}/quotes`).set(usta.auth).send({ priceTry: 12000, days: 2, note: 'Yarın bakarım' });
+    expect(q.status).toBe(201);
+    expect((await t.http().post(`/jobs/${job.id}/quotes`).set(owner.auth).send({ priceTry: 5000, days: 1 })).status).toBe(404);
+
+    expect((await t.http().post(`/jobs/${job.id}/pay`).set(owner.auth)).body.code).toBe('JOB_NOT_ACCEPTED');
+    await t.http().post(`/jobs/${job.id}/accept`).set(owner.auth).send({ quoteId: q.body.id }).expect(200);
+    expect((await t.http().post(`/jobs/${job.id}/quotes`).set(usta.auth).send({ priceTry: 9000, days: 2 })).body.code).toBe('JOB_CLOSED');
+    const pay = (await t.http().post(`/jobs/${job.id}/pay`).set(owner.auth)).body;
+    expect(pay).toMatchObject({ amountKurus: 1200000, feeKurus: 96000 });
+    expect(pay.checkoutUrl).toContain(`pay=${pay.paymentId}`);
+    // Başkası ödemeyi tamamlayamaz.
+    expect((await t.http().post('/payments/web/dev-complete').set(usta.auth).send({ orderId: pay.paymentId, result: 'success' })).status).toBe(404);
+    await devPay(owner.auth, pay.paymentId);
+    expect((await t.http().get(`/jobs/${job.id}`).set(owner.auth)).body).toMatchObject({ status: 'paid', paymentStatus: 'held' });
+    expect((await t.http().post(`/jobs/${job.id}/pay`).set(owner.auth)).body.code).toBe('ALREADY_PAID');
+
+    await t.http().post(`/jobs/${job.id}/complete`).set(owner.auth).expect(200);
+    expect((await t.prisma.servicePayment.findUniqueOrThrow({ where: { id: pay.paymentId } })).status).toBe('released');
+    const entry = await t.prisma.logbookEntry.findFirst({ where: { boatId: boat.id, sourceRef: `job:${job.id}` } });
+    expect(entry).toMatchObject({ kind: 'onarim', verified: true, title: 'Motor su alıyor', byName: 'Usta Ali' });
+
+    await t.http().post(`/jobs/${job.id}/review`).set(owner.auth).send({ stars: 5, text: 'Hızlı ve temiz' }).expect(201);
+    expect((await t.http().post(`/jobs/${job.id}/review`).set(owner.auth).send({ stars: 1 })).body.code).toBe('ALREADY_REVIEWED');
+    expect((await t.http().get(`/providers/${usta.profileId}`)).body).toMatchObject({ rating: 5, reviewCount: 1 });
+    expect(await t.prisma.notification.count({ where: { userId: usta.user.id, key: 'notif.paymentReleased' } })).toBe(1);
+  });
+
+  test('onaysız usta listede görünmez ve teklif veremez; başkasının işini göremez', async () => {
+    const owner = await loginAs(t, { level: 2 });
+    const u = await loginAs(t, { level: 2 });
+    const r = await t.http().put('/me/provider/usta').set(u.auth).send({ displayName: 'Bekleyen', region: 'Fethiye', categories: ['boya'] });
+    expect((await t.http().get(`/providers/${r.body.id}`)).status).toBe(404);
+    const job = (await t.http().post('/jobs').set(owner.auth).send({ category: 'boya', title: 'Zehirli boya', description: 'Karinaya zehirli boya yapılacak.' })).body;
+    expect((await t.http().post(`/jobs/${job.id}/quotes`).set(u.auth).send({ priceTry: 5000, days: 1 })).status).toBe(404);
+    expect((await t.http().get(`/jobs/${job.id}`).set((await loginAs(t)).auth)).status).toBe(404);
+    expect((await t.http().post('/jobs').set(owner.auth).send({ category: 'boya', title: 'i18n:logbook.boatAdded', description: 'Taklit başlık denemesi uzun.' })).status).toBe(400);
+  });
+});
+
+describe('kaptan rezervasyonu ve ekip iadesi', () => {
+  test('rezervasyon → ödeme (kurla) → ekip iadesi; çakışan tarih alınamaz', async () => {
+    const cap = await provider('kaptan', { dayRateEur: 300, weekRateEur: 1600, languages: ['tr', 'en'] });
+    const guest = await loginAs(t, { level: 1 });
+    const start = new Date(Date.now() + 10 * 864e5).toISOString().slice(0, 10);
+    const b = (await t.http().post('/captain-bookings').set(guest.auth).send({ providerId: cap.profileId, start, days: 7 })).body;
+    expect(b).toMatchObject({ totalEur: 1600, status: 'requested' });
+    const pay = (await t.http().post(`/captain-bookings/${b.id}/pay`).set(guest.auth)).body;
+    const rate = (await t.http().get('/fx')).body.EUR;
+    expect(pay.amountKurus).toBe(Math.round(1600 * rate * 100));
+    await devPay(guest.auth, pay.paymentId);
+    expect((await t.http().get('/provider/bookings').set(cap.auth)).body[0]).toMatchObject({ id: b.id, status: 'paid' });
+
+    const other = await loginAs(t, { level: 1 });
+    expect((await t.http().post('/captain-bookings').set(other.auth).send({ providerId: cap.profileId, start, days: 2 })).body.code).toBe('CAPTAIN_BUSY');
+    expect((await t.http().post(`/captain-bookings/${b.id}/complete`).set(guest.auth)).body.code).toBe('BOOKING_NOT_STARTED');
+
+    const m = await moderator();
+    expect((await t.http().get('/admin/service-payments?status=held').set(m.auth)).body.some((p: { id: string }) => p.id === pay.paymentId)).toBe(true);
+    await t.http().post(`/admin/service-payments/${pay.paymentId}/refund`).set(m.auth).expect(200);
+    expect((await t.prisma.captainBooking.findUniqueOrThrow({ where: { id: b.id } })).status).toBe('cancelled');
+    expect((await t.http().get('/me/service-payments').set(guest.auth)).body[0]).toMatchObject({ id: pay.paymentId, status: 'refunded' });
+    expect((await t.http().get('/admin/service-payments').set(guest.auth)).status).toBe(403);
+  });
+
+  test('profil ve teklif üzerinden mesajlaşma açılır', async () => {
+    const cap = await provider('kaptan', { dayRateEur: 250 });
+    const guest = await loginAs(t, { level: 1 });
+    const c = await t.http().post('/conversations').set(guest.auth).send({ subjectKind: 'provider', subjectId: cap.profileId });
+    expect(c.status).toBe(201);
+    expect((await t.http().post('/conversations').set(cap.auth).send({ subjectKind: 'provider', subjectId: cap.profileId })).body.code).toBe('OWN_PROFILE');
+  });
+});
