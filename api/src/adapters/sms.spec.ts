@@ -6,17 +6,19 @@ const saved = { ...process.env };
 const withEnv = (e: Record<string, string> = {}) => { Object.assign(process.env, base, e); resetEnvCache(); };
 afterEach(() => { process.env = { ...saved }; resetEnvCache(); });
 
-test('Netgsm: numara 10 hane, Türkçe kodlama, başlık; "00 iş no" başarı, hata kodu hata', async () => {
+test('Netgsm REST v2: Basic yetki, numara 10 hane, Türkçe kodlama, başlık; code 00 başarı, hata kodu hata', async () => {
   withEnv({ SMS_MODE: 'netgsm', SMS_USER: '8501112233', SMS_PASSWORD: 'p', SMS_SENDER_NAME: 'TEKNEMSAT' });
   let url = '';
-  const ok = (async (u: string) => { url = u; return new Response('00 123456789'); }) as unknown as typeof fetch;
+  let init: RequestInit = {};
+  const ok = (async (u: string, i: RequestInit) => { url = u; init = i; return Response.json({ code: '00', jobid: '123456789', description: 'queued' }); }) as unknown as typeof fetch;
   await new NetgsmSmsSender(env(), ok).sendOtp('+905321234567', '482913');
-  const q = new URL(url).searchParams;
-  expect(q.get('gsmno')).toBe('5321234567');
-  expect(q.get('dil')).toBe('TR');
-  expect(q.get('msgheader')).toBe('TEKNEMSAT');
-  expect(q.get('message')).toContain('482913');
-  const bad = (async () => new Response('30')) as unknown as typeof fetch;
+  expect(url).toBe('https://api.netgsm.com.tr/sms/rest/v2/send');
+  expect(init.method).toBe('POST');
+  expect((init.headers as Record<string, string>).Authorization).toBe(`Basic ${Buffer.from('8501112233:p').toString('base64')}`);
+  const body = JSON.parse(String(init.body));
+  expect(body).toMatchObject({ msgheader: 'TEKNEMSAT', encoding: 'TR', messages: [{ no: '5321234567' }] });
+  expect(body.messages[0].msg).toContain('482913');
+  const bad = (async () => Response.json({ code: '30', description: 'yetki' })) as unknown as typeof fetch;
   await expect(new NetgsmSmsSender(env(), bad).sendOtp('+905321234567', '1')).rejects.toThrow(/Netgsm/);
 });
 

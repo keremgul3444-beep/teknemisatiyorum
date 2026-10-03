@@ -9,6 +9,7 @@ import { safeEqual, sign } from '../../common/crypto';
 import { STORAGE, type Storage } from '../../adapters/storage';
 import { env } from '../../config/env';
 import { dhash } from './phash';
+import { reportError } from '../../adapters/error-report';
 
 const IMAGE_FORMATS = new Set(['jpeg', 'png', 'webp']);
 /** Site ve uygulamanın isteyebileceği görsel genişlikleri (başkası reddedilir: disk dolmasın). */
@@ -204,7 +205,7 @@ export class MediaJanitor implements OnApplicationBootstrap, OnApplicationShutdo
     if (env().NODE_ENV === 'test') return;
     const run = () => this.media.sweepOrphans().then((n) => n && this.log.log(`${n} yetim dosya silindi`))
       .then(() => this.media.backfillHashes())
-      .catch((e) => this.log.error(`Temizlik yapılamadı: ${e}`));
+      .catch((e) => { this.log.error(`Temizlik yapılamadı: ${e}`); void reportError(e, { job: 'media-cleanup' }); });
     run();
     this.timer = setInterval(run, DAY_MS);
   }

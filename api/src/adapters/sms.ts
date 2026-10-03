@@ -39,13 +39,18 @@ const local10 = (phone: string) => phone.replace(/^\+90/, '');
  */
 export class NetgsmSmsSender implements SmsSender {
   constructor(private readonly c = env(), private readonly fetchImpl: typeof fetch = fetch) {}
+  /** REST v2 (Netgsm'in resmî kütüphanesiyle aynı): JSON gövde, Basic yetki; başarı `code: "00"` + `jobid`. */
   async sendOtp(phone: string, code: string) {
-    const q = new URLSearchParams({
-      usercode: this.c.SMS_USER, password: this.c.SMS_PASSWORD, gsmno: local10(phone), message: otpText(code), msgheader: this.c.SMS_SENDER_NAME, dil: 'TR',
+    const auth = Buffer.from(`${this.c.SMS_USER}:${this.c.SMS_PASSWORD}`).toString('base64');
+    const r = await this.fetchImpl('https://api.netgsm.com.tr/sms/rest/v2/send', {
+      method: 'POST',
+      headers: { Authorization: `Basic ${auth}`, 'Content-Type': 'application/json' },
+      // Türkçe karakter içerdiği için kodlama TR; giriş kodu ticari ileti olmadığından İYS süzgeci kullanılmaz.
+      body: JSON.stringify({ msgheader: this.c.SMS_SENDER_NAME, encoding: 'TR', messages: [{ msg: otpText(code), no: local10(phone) }] }),
+      signal: AbortSignal.timeout(10_000),
     });
-    const r = await this.fetchImpl(`https://api.netgsm.com.tr/sms/send/get?${q}`, { signal: AbortSignal.timeout(10_000) });
-    const body = (await r.text()).trim();
-    if (!r.ok || !/^0[0-2]\b/.test(body)) throw new Error(`Netgsm gönderemedi: ${body.slice(0, 40)}`);
+    const j = (await r.json().catch(() => ({}))) as { code?: string; jobid?: string };
+    if (!r.ok || j.code !== '00') throw new Error(`Netgsm gönderemedi: ${r.status} ${String(j.code ?? '').slice(0, 10)}`);
   }
 }
 

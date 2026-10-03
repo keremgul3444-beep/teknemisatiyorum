@@ -7,6 +7,7 @@ import { Prisma, type PrismaClient } from '@prisma/client';
 import { PrismaService } from '../common/prisma.service';
 import { env } from '../config/env';
 import { STORAGE, type Storage } from '../adapters/storage';
+import { reportError } from '../adapters/error-report';
 
 const KEEP = 7;
 const DAY_MS = 24 * 60 * 60_000;
@@ -71,7 +72,7 @@ export class BackupScheduler implements OnApplicationBootstrap, OnApplicationShu
         this.log.log(`Yedek alındı: ${f}`);
         if (env().BACKUP_OFFSITE === '1') { await pushOffsite(this.storage, f); this.log.log('Şifreli yedek buluta yazıldı'); }
       })
-      .catch((e) => this.log.error(`Yedek alınamadı: ${e}`));
+      .catch((e) => { this.log.error(`Yedek alınamadı: ${e}`); void reportError(e, { job: 'backup' }); });
     run();
     this.timer = setInterval(run, DAY_MS);
   }

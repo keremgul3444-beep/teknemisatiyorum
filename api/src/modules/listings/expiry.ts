@@ -3,6 +3,7 @@ import type { Listing } from '@prisma/client';
 import { PrismaService } from '../../common/prisma.service';
 import { NotificationsService } from '../notifications/notifications.module';
 import { env } from '../../config/env';
+import { reportError } from '../../adapters/error-report';
 
 const DAY_MS = 864e5;
 /** Onaylanan ya da yenilenen ilan bu kadar gün yayında kalır; satılmış ama işaretlenmemiş ilanlar sonsuza kadar durmaz. */
@@ -51,7 +52,7 @@ export class ListingExpiry implements OnApplicationBootstrap, OnApplicationShutd
 
   onApplicationBootstrap() {
     if (env().NODE_ENV === 'test') return;
-    const run = () => this.sweep().then((n) => n && this.log.log(`${n} ilanın süresi doldu`)).catch((e) => this.log.error(`Süre taraması yapılamadı: ${e}`));
+    const run = () => this.sweep().then((n) => n && this.log.log(`${n} ilanın süresi doldu`)).catch((e) => { this.log.error(`Süre taraması yapılamadı: ${e}`); void reportError(e, { job: 'expiry' }); });
     run();
     this.timer = setInterval(run, 60 * 60 * 1000);
   }

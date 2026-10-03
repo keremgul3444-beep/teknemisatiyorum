@@ -23,7 +23,7 @@ Bu rehber sırayla izlenir; her adımın sonunda ne görmen gerektiği yazılı.
 
 İki seçenek de kodda hazır (`api/src/adapters/sms.ts`):
 
-- **Netgsm** (`SMS_MODE=netgsm`): hesap aç, SMS başlığını (gönderici adı) onaylat, panelden API alt kullanıcısı oluştur. `SMS_USER` = abone numarası, `SMS_PASSWORD` = API alt kullanıcı şifresi, `SMS_SENDER_NAME` = onaylı başlık. Netgsm'in güncel API belgesine göre bir kez doğrula (adres ve yanıt kodları değişebilir); ilk girişte telefona kod gelmesi yeterli kanıttır.
+- **Netgsm** (`SMS_MODE=netgsm`): hesap aç, SMS başlığını (gönderici adı) onaylat, panelden API alt kullanıcısı oluştur (IP kısıtı koyarsan sunucunun IP'sini ekle). `SMS_USER` = abone numarası / kullanıcı kodu, `SMS_PASSWORD` = API alt kullanıcı şifresi, `SMS_SENDER_NAME` = onaylı başlık. Bağlantı Netgsm'in resmî kütüphanesindeki REST v2 ucuyla aynı (`/sms/rest/v2/send`, başarı `code: "00"`). Hata kodları: 30 yetki/IP, 40 başlık tanımsız, 80 gönderim sınırı. İlk girişte telefona kod gelmesi yeterli kanıttır.
 - **Twilio** (`SMS_MODE=twilio`): `SMS_USER` = Account SID, `SMS_PASSWORD` = Auth Token, `SMS_SENDER_NAME` = gönderen numara. Türkiye'ye teslimatta başlık kaydı gerekebilir.
 
 ## 3. Bulut depolama ve yedek (önerilir)
@@ -64,7 +64,7 @@ docker compose -f deploy/docker-compose.yml logs -f api
 API açılışta migration'ları uygular ve başlangıç verisini (yönetici, kurlar, paketler) yükler. Ayar eksikse hangi ayarın eksik olduğunu yazıp durur.
 
 Kontrol:
-- `curl https://api.alanadi.com/health` → `{"ok":true}`
+- `curl https://api.alanadi.com/health/ready` → `{"ok":true}` (veritabanıyla birlikte; `/health` yalnızca sürecin ayakta olduğunu söyler)
 - `https://alanadi.com` açılıyor, kilit simgesi var (Caddy sertifikayı ilk istekte alır; DNS yayılmadıysa birkaç dakika bekle).
 - Sitede telefonunla giriş yap: SMS geliyor mu? Yönetici numarasıyla girince `/yonetim` açılmalı.
 
@@ -74,11 +74,24 @@ EAS derlemesinde `EXPO_PUBLIC_API_URL=https://api.alanadi.com` ve `EXPO_PUBLIC_W
 
 ## 7. İzleme
 
-- Kesinti takibi: UptimeRobot (ücretsiz) ile `https://api.alanadi.com/health` ve `https://alanadi.com` 5 dakikada bir.
-- Hata takibi (önerilir): Sentry ya da benzeri; şu an kodda bağlı değil, hatalar `docker compose logs api` içinde.
+- Kesinti takibi: UptimeRobot (ücretsiz) ile `https://api.alanadi.com/health/ready` ve `https://alanadi.com` 5 dakikada bir. Veritabanı düşerse `/health/ready` 503 döner.
+- Hata takibi: `ERROR_DSN`'e Sentry ya da GlitchTip proje DSN'i yazılır. Beklenmeyen 500 hataları, arka plan işleri (emanet taraması, süre taraması, yedek, dosya temizliği) ve çöken süreç bildirilir. Gönderilen: hata türü, kısaltılmış mesaj, yığın izi, yol kalıbı (`/listings/:id`). Kimlik, telefon, sorgu dizesi gönderilmez. Sentry yurt dışında olduğu için KVKK açısından en temizi GlitchTip'i kendi sunucunda ya da AB'de barındırmak; Sentry seçilirse aydınlatma metnine eklenmeli.
+- Kayıtlar: `docker compose -f deploy/docker-compose.yml logs api`.
 - Disk: `df -h` ve `docker system df` ayda bir.
 
-## 8. Güncelleme
+## 8. Kapasite (yük testi, 2026-10-03)
+
+Tek API süreci, 4 çekirdek, 25 demo ilan; karışık okuma (ilan listesi, filtreli arama, ilan detayı, vitrin, sağlık):
+
+| Eşzamanlı bağlantı | İstek/sn | p50 | p99 | Hata |
+|---|---|---|---|---|
+| 10 | 365 | 20 ms | 66 ms | 0 |
+| 50 | 374 | 87 ms | 290 ms | 0 |
+| 200 | 360 | 296 ms | 1,1 sn | 0 |
+
+Doyma noktası saniyede ~370 istek; üstünde istekler kuyrukta bekler, hata vermez. API belleği yükte ~440 MB. Site sayfaları önbellekli olduğu için ziyaretçi başına API isteği azdır; açılış için tek sunucu yeterli. Tekrar ölçmek: API'yi açıp `autocannon` ile aynı yolları rastgele `X-Forwarded-For` ile çağır (IP başına dakikada 120 istek sınırı var).
+
+## 9. Güncelleme
 
 ```sh
 git pull
@@ -87,7 +100,7 @@ docker compose -f deploy/docker-compose.yml up -d --build
 
 Migration'lar açılışta otomatik uygulanır. Önce yedek almak için: `docker compose -f deploy/docker-compose.yml exec db pg_dump -U tms tms > yedek-$(date +%F).sql`.
 
-## 9. Canlıya çıkmadan önce hukuki kontrol listesi
+## 10. Canlıya çıkmadan önce hukuki kontrol listesi
 
 - KVKK aydınlatma ve açık rıza metinleri avukat onaylı; yurt dışına aktarım (Cloudflare R2, Expo push, Anthropic, Twilio seçilirse) metinlerde ve gerekiyorsa açık rızayla.
 - VERBİS kaydı, ticari ileti için İYS.

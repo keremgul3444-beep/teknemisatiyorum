@@ -50,6 +50,8 @@ const schema = z.object({
   PUSH_MODE: z.enum(['expo', 'off']).default('off'),
   /** Express "trust proxy": yalnızca bu ara katmandan gelen X-Forwarded-For'a güvenilir. */
   TRUST_PROXY: z.string().default('loopback'),
+  /** Hata takibi (Sentry/GlitchTip DSN'i). Boşsa hatalar yalnızca sunucu kaydına yazılır. */
+  ERROR_DSN: z.string().default(''),
 });
 
 export type Env = z.infer<typeof schema>;

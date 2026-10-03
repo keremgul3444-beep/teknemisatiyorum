@@ -1,4 +1,4 @@
-import { Controller, Get, Global, Module } from '@nestjs/common';
+import { Controller, Get, Global, Module, ServiceUnavailableException } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
@@ -24,11 +24,25 @@ import { PromotionsModule } from './modules/promotions/promotions.module';
 import { MarketplaceModule } from './modules/marketplace/marketplace.module';
 import { BackupScheduler } from './backup/backup';
 
+/** `/health`: süreç ayakta mı. `/health/ready`: veritabanıyla birlikte hizmet veriyor mu (kesinti takibi bunu yoklar). */
 @Controller('health')
 class HealthController {
+  constructor(private readonly prisma: PrismaService) {}
+
   @Public()
   @Get()
   health() {
+    return { ok: true };
+  }
+
+  @Public()
+  @Get('ready')
+  async ready() {
+    const ok = await Promise.race([
+      this.prisma.$queryRaw`SELECT 1`.then(() => true, () => false),
+      new Promise<boolean>((r) => setTimeout(() => r(false), 3000).unref()),
+    ]);
+    if (!ok) throw new ServiceUnavailableException();
     return { ok: true };
   }
 }

@@ -33,6 +33,13 @@ services:
     volumes:
       - storage:/data/storage
       - backups:/app/api/backups
+    # Veritabanıyla birlikte hizmet veriyor mu (imajda curl yok; Node'un fetch'i kullanılır).
+    healthcheck:
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:3000/health/ready').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
     depends_on:
       db: { condition: service_healthy }
 

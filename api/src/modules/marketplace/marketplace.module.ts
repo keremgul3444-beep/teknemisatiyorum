@@ -15,6 +15,7 @@ import { PromotionsModule } from '../promotions/promotions.module';
 import { EscrowService, JOB_AUTO_RELEASE_DAYS } from '../promotions/escrow.service';
 import { env } from '../../config/env';
 import { payBody, assertAccepted } from '../../common/legal';
+import { reportError } from '../../adapters/error-report';
 import { bookingView, captainTotal, jobView, providerView } from './views';
 
 const STAFF = { roles: ['moderator', 'admin'] as ('moderator' | 'admin')[] };
@@ -324,7 +325,7 @@ export class EscrowSweeper implements OnApplicationBootstrap, OnApplicationShutd
 
   onApplicationBootstrap() {
     if (env().NODE_ENV === 'test') return;
-    const run = () => this.sweep().then((n) => n && this.log.log(`${n} emanet ödeme süre sonunda aktarıldı`)).catch((e) => this.log.error(`Emanet taraması yapılamadı: ${e}`));
+    const run = () => this.sweep().then((n) => n && this.log.log(`${n} emanet ödeme süre sonunda aktarıldı`)).catch((e) => { this.log.error(`Emanet taraması yapılamadı: ${e}`); void reportError(e, { job: 'escrow-sweep' }); });
     this.timer = setInterval(run, 60 * 60 * 1000);
   }
 

@@ -7,6 +7,7 @@ import { env } from './config/env';
 import { PrismaService } from './common/prisma.service';
 import { backfillNationalIdHashes } from './modules/verification/backfill';
 import { normalizeListingLocations } from './modules/listings/location-backfill';
+import { reportError } from './adapters/error-report';
 
 /** Uygulamayı ortak ayarlarla yapılandırır; testler de aynı fonksiyonu kullanır. */
 export function configureApp(app: INestApplication) {
@@ -18,6 +19,13 @@ export function configureApp(app: INestApplication) {
 }
 
 async function bootstrap() {
+  // Yakalanmamış hatalar da hata takibine gider; çöken süreç bildirim gönderildikten sonra kapanır (Docker yeniden başlatır).
+  process.on('unhandledRejection', (e) => { console.error('Yakalanmamış söz reddi:', e); void reportError(e, { job: 'unhandledRejection' }); });
+  process.on('uncaughtException', (e) => {
+    console.error('Yakalanmamış hata:', e);
+    void reportError(e, { job: 'uncaughtException' }).finally(() => process.exit(1));
+    setTimeout(() => process.exit(1), 3000).unref();
+  });
   const app = configureApp(await NestFactory.create(AppModule, { rawBody: true }));
   // Kimlik tekliği kuralından önce doğrulanmış kullanıcıların izi doldurulur (tekrar çalışması zararsız).
   // Veritabanına o an ulaşılamasa da sunucu açılır; iş bir sonraki açılışta yeniden denenir.
