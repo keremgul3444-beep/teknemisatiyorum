@@ -4,6 +4,7 @@ import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/audit.service';
 import { AppError, Errors } from '../../common/errors';
 import { env } from '../../config/env';
+import { LEGAL_VERSION } from '../../common/legal';
 import { WEB_PAYMENT, assertPaymentsOn, type WebCallback, type WebPaymentProvider } from '../../adapters/payments';
 import { NotificationsService } from '../notifications/notifications.module';
 
@@ -39,6 +40,7 @@ export class EscrowService {
     const p = await this.prisma.servicePayment.create({ data: { ...o, feeKurus: feeOf(o.amountKurus) } });
     const { providerRef, checkoutUrl } = await this.web.createCheckout({ orderId: p.id, amountKurus: p.amountKurus + p.feeKurus, kind: 'service' });
     await this.prisma.servicePayment.update({ where: { id: p.id }, data: { providerRef } });
+    await this.audit.log(o.payerId, 'audit.preinfoAccepted', { version: LEGAL_VERSION }, 'servicePayment', p.id);
     return { paymentId: p.id, checkoutUrl, amountKurus: p.amountKurus, feeKurus: p.feeKurus };
   }
 

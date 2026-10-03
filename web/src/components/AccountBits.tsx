@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Locale } from '@/i18n';
 import { checkoutTarget } from '@/lib/checkout';
@@ -16,6 +16,28 @@ export function LogoutButton({ label, to }: { label: string; to: string }) {
   );
 }
 
+const Accepted = createContext(false);
+
+/**
+ * Ödeme öncesi onay: ön bilgilendirme formu ve mesafeli satış sözleşmesi okunup onaylanmadan satın alma düğmeleri
+ * çalışmaz; onay sunucuya da gönderilir ve sürümüyle kaydedilir.
+ */
+export function AcceptGate({ label, links, children }: { label: string; links: { href: string; text: string }[]; children: ReactNode }) {
+  const [ok, setOk] = useState(false);
+  return (
+    <Accepted.Provider value={ok}>
+      <label className="row" style={{ alignItems: 'flex-start', gap: 8, margin: '12px 0' }}>
+        <input type="checkbox" checked={ok} onChange={(e) => setOk(e.target.checked)} style={{ marginTop: 4 }} />
+        <span>{label}</span>
+      </label>
+      <p className="small" style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+        {links.map((l) => <a key={l.href} href={l.href} target="_blank" rel="noopener">{l.text}</a>)}
+      </p>
+      {children}
+    </Accepted.Provider>
+  );
+}
+
 /**
  * Öne çıkarma satın al: sipariş oluşturulur, ödeme sayfasına gidilir. Ödeme adresi yalnızca sitenin kendisi
  * ya da tanımlı ödeme sağlayıcısı olabilir (başka yere yönlendirme yok).
@@ -23,10 +45,11 @@ export function LogoutButton({ label, to }: { label: string; to: string }) {
 export function BuyButton({ listingId, productCode, label, errors, locale }: { listingId: string; productCode: string; label: string; errors: Record<string, string>; locale: Locale }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const accepted = useContext(Accepted);
   const buy = async () => {
     setBusy(true); setError('');
     try {
-      const r = await fetch('/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ listingId, productCode }) });
+      const r = await fetch('/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ listingId, productCode, accept: accepted }) });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) { setError(errors[String(j.messageKey ?? '').replace(/^errors\./, '')] ?? errors.generic); return; }
       const url = checkoutTarget(String(j.checkoutUrl ?? ''), window.location.origin, locale, process.env.NEXT_PUBLIC_PAYMENT_ORIGIN);
@@ -40,7 +63,7 @@ export function BuyButton({ listingId, productCode, label, errors, locale }: { l
   };
   return (
     <div>
-      <button className="btn" type="button" disabled={busy} onClick={buy}>{label}</button>
+      <button className="btn" type="button" disabled={busy || !accepted} onClick={buy}>{label}</button>
       {error ? <p role="alert" style={{ color: 'var(--c-danger)' }}>{error}</p> : null}
     </div>
   );

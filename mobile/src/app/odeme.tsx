@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { colors, fonts, radius, space } from '@/theme';
-import { Button, Card, Field, Header, Icon, NotFound, Screen, Section, T, showDemoToast } from '@/components';
+import { Button, Card, Field, Header, Icon, NotFound, PreinfoAccept, Screen, Section, T, showDemoToast } from '@/components';
 import { actions, formatPrice, isApiMode, useCaptainBookings, useJob, type Currency } from '@/services';
 import { attempt } from '@/services/errors';
 import { currentLang } from '@/i18n';
@@ -17,6 +17,8 @@ export default function Odeme() {
   const [loading, setLoading] = useState(false);
   /** Gerçek mod: güvenli ödeme sayfası tarayıcıda açıldı; dönünce durum tazelenir. */
   const [opened, setOpened] = useState(false);
+  /** Ön bilgilendirme ve mesafeli satış sözleşmesi onayı: işaretlenmeden ödemeye geçilmez. */
+  const [accepted, setAccepted] = useState(false);
 
   const offer = job?.offers.find((o) => o.id === job.acceptedOfferId);
   const base: { amount: number; cur: Currency } | null =
@@ -45,7 +47,7 @@ export default function Odeme() {
     return (
       <Screen footer={opened
         ? <Button icon="check" loading={loading} title={t('payment.returned')} onPress={afterCheckout} />
-        : <Button icon="lock" loading={loading} title={t('payment.toCheckout', { amount: formatPrice(total, base.cur, lang) })} onPress={checkout} />}>
+        : <Button icon="lock" loading={loading} disabled={!accepted} title={t('payment.toCheckout', { amount: formatPrice(total, base.cur, lang) })} onPress={checkout} />}>
         <Header title={t('payment.title')} />
         <Card>
           {[[t('payment.service'), base.amount], [t('payment.fee'), fee]].map(([k, v]) => (
@@ -59,6 +61,7 @@ export default function Odeme() {
           </View>
           {base.cur !== 'TRY' ? <T variant="caption" color={colors.muted}>{t('payment.fxNote')}</T> : null}
         </Card>
+        {opened ? null : <PreinfoAccept checked={accepted} onToggle={() => setAccepted((v) => !v)} />}
         <Card style={{ backgroundColor: colors.surface }}>
           {(['g1', 'g2', 'g3'] as const).map((g, i) => (
             <View key={g} style={{ flexDirection: 'row', gap: space(3), alignItems: 'center' }}>
@@ -89,7 +92,7 @@ export default function Odeme() {
   };
 
   return (
-    <Screen footer={<Button icon="lock" loading={loading} disabled={!valid} title={t('payment.pay', { amount: formatPrice(total, base.cur, lang) })} onPress={pay} />}>
+    <Screen footer={<Button icon="lock" loading={loading} disabled={!valid || !accepted} title={t('payment.pay', { amount: formatPrice(total, base.cur, lang) })} onPress={pay} />}>
       <Header title={t('payment.title')} />
       <Card>
         {[[t('payment.service'), base.amount], [t('payment.fee'), fee]].map(([k, v]) => (
@@ -128,6 +131,7 @@ export default function Odeme() {
             onChangeText={(v) => setCard((s) => ({ ...s, cvc: v.replace(/\D/g, '') }))} /></View>
         </View>
       </Section>
+      <PreinfoAccept checked={accepted} onToggle={() => setAccepted((v) => !v)} />
     </Screen>
   );
 }

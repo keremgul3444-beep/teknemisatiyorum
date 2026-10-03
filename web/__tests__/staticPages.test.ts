@@ -5,7 +5,7 @@ import { STATIC_PAGES } from '../src/lib/pages';
 import tr from '../src/i18n/tr.json';
 import en from '../src/i18n/en.json';
 
-const LEGAL = ['/kvkk', '/gizlilik', '/kullanim-kosullari', '/cerezler'];
+const LEGAL = ['/kvkk', '/gizlilik', '/kullanim-kosullari', '/cerezler', '/on-bilgilendirme', '/mesafeli-satis'];
 
 test('her sabit sayfanın dosyası, iki dilde başlığı ve açıklaması var; yasal sayfalar taslak şeridi taşır', () => {
   for (const p of STATIC_PAGES) {

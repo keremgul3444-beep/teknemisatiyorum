@@ -13,5 +13,7 @@ export const STATIC_PAGES = [
   { path: '/gizlilik', key: 'privacy', indexable: true },
   { path: '/kullanim-kosullari', key: 'terms', indexable: true },
   { path: '/cerezler', key: 'cookies', indexable: true },
+  { path: '/on-bilgilendirme', key: 'preinfo', indexable: true },
+  { path: '/mesafeli-satis', key: 'distanceSale', indexable: true },
 ] as const;
 export type StaticPageKey = (typeof STATIC_PAGES)[number]['key'];

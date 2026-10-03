@@ -1,8 +1,9 @@
+import { useState } from 'react';
 import { View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { colors, space } from '@/theme';
-import { Button, Card, EmptyState, Header, Screen, T, showDemoToast } from '@/components';
+import { Button, Card, EmptyState, Header, PreinfoAccept, Screen, T, showDemoToast } from '@/components';
 import { actions } from '@/services';
 import type { ApiProduct } from '@/services/api/mappers';
 import { useRemote } from '@/services/useRemote';
@@ -15,6 +16,7 @@ export default function OneCikar() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const products = useRemote(() => actions.products()).data ?? [];
+  const [accepted, setAccepted] = useState(false);
   const buy = (p: ApiProduct) => attempt(async () => {
     await actions.buyInApp(id, p);
     showDemoToast(t('promo.bought'));
@@ -24,7 +26,7 @@ export default function OneCikar() {
     <Screen>
       <Header title={t('promo.title')} />
       <T color={colors.muted}>{t('promo.intro')}</T>
-      {products.length === 0 ? <EmptyState icon="sparkle" title={t('promo.noProducts')} /> : null}
+      {products.length === 0 ? <EmptyState icon="sparkle" title={t('promo.noProducts')} /> : <PreinfoAccept checked={accepted} onToggle={() => setAccepted((v) => !v)} />}
       {products.map((p) => (
         <Card key={p.code}>
           <T variant="h3">{t(`promo.product.${p.code}`, { defaultValue: p.code })}</T>
@@ -34,7 +36,7 @@ export default function OneCikar() {
               <T variant="h2">{formatKurus(p.priceAppKurus, currentLang())}</T>
               {p.isTrialPrice ? <T variant="caption" color={colors.warning}>{t('promo.trialPrice')}</T> : null}
             </View>
-            <Button small title={t('promo.buyDev')} onPress={() => buy(p)} />
+            <Button small disabled={!accepted} title={t('promo.buyDev')} onPress={() => buy(p)} />
           </View>
         </Card>
       ))}

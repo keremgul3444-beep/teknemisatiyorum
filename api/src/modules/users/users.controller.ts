@@ -77,7 +77,7 @@ export class UsersController {
       p.brokerCase.findMany({ where: { userId: id } }),
       p.notification.findMany({ where: { userId: id } }),
       p.verificationRequest.findMany({ where: { userId: id }, select: { kind: true, status: true, rejectReason: true, createdAt: true, decidedAt: true, details: true } }),
-      p.auditLog.findMany({ where: { actorId: id, action: 'audit.marketingConsent' }, select: { params: true, at: true }, orderBy: { at: 'asc' } }),
+      p.auditLog.findMany({ where: { actorId: id, action: { in: ['audit.marketingConsent', 'audit.preinfoAccepted'] } }, select: { action: true, params: true, at: true }, orderBy: { at: 'asc' } }),
       p.listingReport.findMany({ where: { reporterId: id }, select: { listingId: true, reason: true, note: true, status: true, createdAt: true } }),
     ]);
     // Öne çıkarma siparişleri, firma üyelikleri ve 2. dalga (usta/kaptan profilleri, işler, teklifler, rezervasyonlar, ödemeler, değerlendirmeler).

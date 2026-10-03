@@ -14,6 +14,7 @@ import { FxService } from '../listings/fx.service';
 import { PromotionsModule } from '../promotions/promotions.module';
 import { EscrowService, JOB_AUTO_RELEASE_DAYS } from '../promotions/escrow.service';
 import { env } from '../../config/env';
+import { payBody, assertAccepted } from '../../common/legal';
 import { bookingView, captainTotal, jobView, providerView } from './views';
 
 const STAFF = { roles: ['moderator', 'admin'] as ('moderator' | 'admin')[] };
@@ -205,7 +206,8 @@ class JobsController {
   @Auth({ level: 1 })
   @Post('jobs/:id/pay')
   @HttpCode(200)
-  async pay(@CurrentUser() u: AuthUser, @Param('id') id: string) {
+  async pay(@CurrentUser() u: AuthUser, @Param('id') id: string, @Body(new ZodPipe(payBody)) b: z.infer<typeof payBody>) {
+    assertAccepted(b.accept);
     const j = await this.own(id, u.id);
     const q = j.quotes.find((x) => x.id === j.acceptedQuoteId);
     if (j.status === 'paid' || j.status === 'done') throw new AppError('ALREADY_PAID', 'errors.already_paid', 409);
@@ -399,7 +401,8 @@ class BookingsController {
   @Auth({ level: 1 })
   @Post('captain-bookings/:id/pay')
   @HttpCode(200)
-  async pay(@CurrentUser() u: AuthUser, @Param('id') id: string) {
+  async pay(@CurrentUser() u: AuthUser, @Param('id') id: string, @Body(new ZodPipe(payBody)) body: z.infer<typeof payBody>) {
+    assertAccepted(body.accept);
     const b = await this.own(id, u.id);
     if (b.status === 'paid' || b.status === 'done') throw new AppError('ALREADY_PAID', 'errors.already_paid', 409);
     if (b.status !== 'requested') throw notAllowed('BOOKING_CLOSED');

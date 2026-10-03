@@ -35,6 +35,8 @@ export function Footer({ locale, popular }: { locale: Locale; popular?: ReactNod
             <li><Link href={p('/gizlilik')}>{t(locale, 'footer.privacy')}</Link></li>
             <li><Link href={p('/kullanim-kosullari')}>{t(locale, 'footer.terms')}</Link></li>
             <li><Link href={p('/cerezler')}>{t(locale, 'footer.cookies')}</Link></li>
+            <li><Link href={p('/on-bilgilendirme')}>{t(locale, 'footer.preinfo')}</Link></li>
+            <li><Link href={p('/mesafeli-satis')}>{t(locale, 'footer.distanceSale')}</Link></li>
           </ul>
         </div>
         <div id="uygulama">

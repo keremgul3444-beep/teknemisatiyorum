@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { t, tDict, type Locale } from '@/i18n';
+import { localePath, t, tDict, type Locale } from '@/i18n';
 import { apiGet } from '@/lib/api';
 import { authedGet } from '@/lib/auth-server';
 import type { ListingView } from '@/lib/types';
-import { BuyButton } from '@/components/AccountBits';
+import { AcceptGate, BuyButton } from '@/components/AccountBits';
 
 type P = { params: Promise<{ locale: string; id: string }> };
 type Product = { code: string; kind: 'vitrin' | 'acil' | 'bump'; days: number | null; priceWebKurus: number; isTrialPrice: boolean };
@@ -31,6 +31,10 @@ export default async function OneCikar({ params }: P) {
       <p>{t(locale, 'promo.intro')}</p>
       {/* Ürünler alınamazsa boş ızgara yerine açık bir uyarı gösterilir. */}
       {!products?.length ? <p className="banner" role="status">{t(locale, 'promo.unavailable')}</p> : null}
+      <AcceptGate label={t(locale, 'promo.accept')} links={[
+        { href: localePath(locale, '/on-bilgilendirme'), text: t(locale, 'promo.preinfoLink') },
+        { href: localePath(locale, '/mesafeli-satis'), text: t(locale, 'promo.distanceLink') },
+      ]}>
       <div className="grid">
         {(products ?? []).map((p) => (
           <div key={p.code} className="card" style={{ display: 'grid', gap: 8 }}>
@@ -42,6 +46,7 @@ export default async function OneCikar({ params }: P) {
           </div>
         ))}
       </div>
+      </AcceptGate>
     </section>
   );
 }

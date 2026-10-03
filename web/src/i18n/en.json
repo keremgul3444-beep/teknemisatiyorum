@@ -34,7 +34,9 @@
     "popularGulet": "Gulets for sale",
     "popularCat": "Catamarans for sale",
     "joinUsta": "Join as a technician",
-    "joinKaptan": "Join as a skipper"
+    "joinKaptan": "Join as a skipper",
+    "preinfo": "Pre-contract information",
+    "distanceSale": "Distance sales contract"
   },
   "home": {
     "title": "Find the boat you dream of",
@@ -86,7 +88,10 @@
     "trialPrice": "Trial price",
     "buy": "Buy",
     "priceDrop": "Price drop",
-    "unavailable": "Promotion options could not be loaded right now. Please try again shortly."
+    "unavailable": "Promotion options could not be loaded right now. Please try again shortly.",
+    "accept": "I have read and accept the pre-contract information and the distance sales contract.",
+    "preinfoLink": "Pre-contract information",
+    "distanceLink": "Distance sales contract"
   },
   "boatType": {
     "motoryat": "Motor yacht",
@@ -386,27 +391,35 @@
     },
     "kvkk": {
       "title": "Privacy notice (KVKK)",
-      "description": "How your personal data is processed and your rights.",
+      "description": "How your personal data is processed, who it is shared with and your rights.",
       "sections": [
         {
           "h": "Data controller",
-          "b": "teknemisatıyorum.com (legal name and address to be added)."
+          "b": "The operator of teknemisatıyorum.com (legal name, address, registry number and contact address to be added)."
         },
         {
           "h": "Data we process",
-          "b": "Identity, contact, boat and listing details, transaction and payment records, device and session data."
+          "b": "Identity (name, surname, birth year; national ID number stored encrypted), contact (phone), listing and boat details, photos and documents (registration, technician and captain certificates), messages, job requests, quotes, bookings and reviews, transaction and payment records (card details are never stored on the platform; they are processed by the payment institution), device, session, push token and IP address."
         },
         {
-          "h": "Purposes",
-          "b": "Running membership, listing and service processes, security, fraud prevention and legal obligations."
+          "h": "Purposes and legal grounds",
+          "b": "Membership and performance of contract (KVKK art. 5/2-c): listings, messages, job requests, quotes, bookings, payments and escrow. Identity verification and fraud prevention (art. 5/2-f): name, surname, birth year and ID number are checked with the NVİ registry. Legal obligations (art. 5/2-ç): access logs, tax and consumer law records. Marketing messages only with your explicit consent (art. 5/1), which you can withdraw in settings at any time."
         },
         {
-          "h": "Transfers",
-          "b": "To the payment institution, hosting provider and authorities, only as needed."
+          "h": "Transfers within Türkiye",
+          "b": "To the payment institution, SMS provider, the General Directorate of Population (identity check) and authorised public bodies on request, only as needed. When you work with a technician or captain, the details the job requires (your name, job details, booking dates) are shared with them."
+        },
+        {
+          "h": "Transfers abroad",
+          "b": "Some of our providers run servers abroad: cloud file storage and encrypted backups (Cloudflare), push notifications (Expo: notification text and device token), the smart assistant (Anthropic: the search text you type). These transfers rely on the standard contract published by the Board under KVKK art. 9. Please do not type personal details into the assistant."
+        },
+        {
+          "h": "Retention",
+          "b": "When you delete your account, your profile, listings and messages are deleted or anonymised. Records the law requires us to keep (payment, invoice and access logs) are kept for the required period and then deleted."
         },
         {
           "h": "Your rights (KVKK art. 11)",
-          "b": "You may access, correct, delete and object to processing of your data and claim compensation."
+          "b": "You may access, correct and delete your data, object to processing and claim compensation. You can download a copy of your data and delete your account in the app. For other requests write to our contact address; we reply within 30 days at the latest."
         }
       ]
     },
@@ -457,6 +470,70 @@
         {
           "h": "Analytics cookies",
           "b": "Used only with your consent. No analytics tool is in use right now."
+        }
+      ]
+    },
+    "preinfo": {
+      "title": "Pre-contract information",
+      "description": "What you need to know before paying: service, price, performance and right of withdrawal.",
+      "sections": [
+        {
+          "h": "Seller and intermediary",
+          "b": "Promotion packages are sold by the operator of teknemisatıyorum.com (legal name, address, registry number and contact address to be added). For technician and captain services, the service is provided by the technician or captain named on the profile; the platform is an intermediary and holds the payment in escrow."
+        },
+        {
+          "h": "Service",
+          "b": "Promotion (Showcase, Urgent, Bump): your listing is promoted for the period shown on the payment page. Technician job: the work, duration and price in the quote you accepted. Captain booking: the dates and number of days you chose."
+        },
+        {
+          "h": "Price and payment",
+          "b": "The total on the payment page is the final price including taxes. For technician and captain payments the total consists of the service price and the platform fee. Euro prices are converted to Turkish lira at the rate at the time of payment. Card details are entered on the payment institution’s page and never stored on the platform."
+        },
+        {
+          "h": "Performance",
+          "b": "Promotion starts as soon as payment is confirmed. Technician and captain payments are held in escrow: they are released to the provider when you complete the job, or if you do not report a problem within 7 days after the technician marks the job done (3 days after the end of a captain booking). If you report a problem, the payment is held until the team reviews it."
+        },
+        {
+          "h": "Right of withdrawal",
+          "b": "Promotion is a service performed instantly online; since performance starts with your approval, the right of withdrawal does not apply (Distance Contracts Regulation art. 15). For technician and captain services you can ask for a refund before the work starts; report later problems with \"Report a problem\" and the team will review and refund where appropriate. Leisure services on a fixed date (captain bookings) may fall under the withdrawal exception."
+        },
+        {
+          "h": "Complaints and disputes",
+          "b": "Send complaints to our contact address. Disputes may be brought before the consumer arbitration committee of your place of residence within the monetary limits set yearly by the Ministry of Trade, and before consumer courts above them."
+        }
+      ]
+    },
+    "distanceSale": {
+      "title": "Distance sales contract",
+      "description": "Contract for services purchased on the platform.",
+      "sections": [
+        {
+          "h": "Parties",
+          "b": "Seller and intermediary: the operator of teknemisatıyorum.com (legal name, address, registry number and contact address to be added). Buyer: the member making the payment; their registered name and phone number are the contract details."
+        },
+        {
+          "h": "Subject",
+          "b": "The rights and obligations of the parties regarding the sale and performance of the service whose features and price are shown on the payment page, under Consumer Protection Law No. 6502 and the Distance Contracts Regulation."
+        },
+        {
+          "h": "Service, price and performance",
+          "b": "The features, total price, payment and performance terms are set out in the pre-contract information, which forms an integral part of this contract."
+        },
+        {
+          "h": "Escrow payment",
+          "b": "For technician and captain services the service contract is between the buyer and the provider. The platform holds the payment in escrow through a licensed payment institution and releases it to the provider or refunds the buyer under the terms in the pre-contract information."
+        },
+        {
+          "h": "Right of withdrawal",
+          "b": "The withdrawal terms in the pre-contract information apply."
+        },
+        {
+          "h": "Formation and storage",
+          "b": "The contract is formed when you tick the approval box before paying. The approval date and text version are recorded and included in your data copy; the text is published on this page."
+        },
+        {
+          "h": "Disputes",
+          "b": "Consumer arbitration committees within the monetary limits, and consumer courts above them, have jurisdiction."
         }
       ]
     }
@@ -542,7 +619,8 @@
     "already_paid": "This has already been paid.",
     "already_disputed": "You already reported a problem for this payment; the team is reviewing it.",
     "already_delivered": "You already marked this job as done.",
-    "payments_disabled": "Payments are currently unavailable. They will open soon."
+    "payments_disabled": "Payments are currently unavailable. They will open soon.",
+    "preinfo_required": "Please accept the pre-contract information and the distance sales contract before paying."
   },
   "login": {
     "title": "Log in",
@@ -898,7 +976,8 @@
     "providerCreated": "Provider profile opened ({{kind}})",
     "servicePaid": "Service payment held ({{kind}}): ₺{{amount}}",
     "paymentRefunded": "Service payment refunded: {{ref}}",
-    "paymentDisputed": "Service payment disputed: {{ref}}"
+    "paymentDisputed": "Service payment disputed: {{ref}}",
+    "preinfoAccepted": "Pre-contract information and contract accepted (version {{version}})"
   },
   "firm": {
     "title": "Company panel",

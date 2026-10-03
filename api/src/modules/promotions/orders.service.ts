@@ -5,6 +5,7 @@ import { AuditService } from '../../common/audit.service';
 import { AppError, Errors } from '../../common/errors';
 import { STORE_VERIFIER, WEB_PAYMENT, assertPaymentsOn, type StoreVerifier, type WebPaymentProvider } from '../../adapters/payments';
 import { applyProduct, revertProduct } from './promotion.rules';
+import { LEGAL_VERSION } from '../../common/legal';
 
 const PENDING_TTL_MS = 24 * 3600e3;
 export const notPublished = () => new AppError('LISTING_NOT_PUBLISHED', 'errors.listing_not_published', 409);
@@ -39,6 +40,7 @@ export class OrdersService {
     const o = await this.prisma.order.create({ data: { userId, listingId, productCode, channel: 'web', amountKurus: p.priceWebKurus } });
     const { providerRef, checkoutUrl } = await this.web.createCheckout({ orderId: o.id, amountKurus: o.amountKurus });
     await this.prisma.order.update({ where: { id: o.id }, data: { providerRef } });
+    await this.audit.log(userId, 'audit.preinfoAccepted', { version: LEGAL_VERSION }, 'order', o.id);
     return { orderId: o.id, checkoutUrl };
   }
 
@@ -55,6 +57,7 @@ export class OrdersService {
       return await this.prisma.$transaction(async (db) => {
         const o = await db.order.create({ data: { userId, listingId, productCode: p.code, channel: platform, amountKurus: p.priceAppKurus, providerRef } });
         await this.markPaid({ id: o.id }, new Date(), db);
+        await this.audit.log(userId, 'audit.preinfoAccepted', { version: LEGAL_VERSION }, 'order', o.id, db);
         return { orderId: o.id, status: 'paid' as const };
       });
     } catch (e) {

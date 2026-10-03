@@ -34,17 +34,17 @@ describe('usta işi: talep → teklif → kabul → emanet ödeme → tamam → 
     expect(q.status).toBe(201);
     expect((await t.http().post(`/jobs/${job.id}/quotes`).set(owner.auth).send({ priceTry: 5000, days: 1 })).status).toBe(404);
 
-    expect((await t.http().post(`/jobs/${job.id}/pay`).set(owner.auth)).body.code).toBe('JOB_NOT_ACCEPTED');
+    expect((await t.http().post(`/jobs/${job.id}/pay`).set(owner.auth).send({ accept: true })).body.code).toBe('JOB_NOT_ACCEPTED');
     await t.http().post(`/jobs/${job.id}/accept`).set(owner.auth).send({ quoteId: q.body.id }).expect(200);
     expect((await t.http().post(`/jobs/${job.id}/quotes`).set(usta.auth).send({ priceTry: 9000, days: 2 })).body.code).toBe('JOB_CLOSED');
-    const pay = (await t.http().post(`/jobs/${job.id}/pay`).set(owner.auth)).body;
+    const pay = (await t.http().post(`/jobs/${job.id}/pay`).set(owner.auth).send({ accept: true })).body;
     expect(pay).toMatchObject({ amountKurus: 1200000, feeKurus: 96000 });
     expect(pay.checkoutUrl).toContain(`pay=${pay.paymentId}`);
     // Başkası ödemeyi tamamlayamaz.
     expect((await t.http().post('/payments/web/dev-complete').set(usta.auth).send({ orderId: pay.paymentId, result: 'success' })).status).toBe(404);
     await devPay(owner.auth, pay.paymentId);
     expect((await t.http().get(`/jobs/${job.id}`).set(owner.auth)).body).toMatchObject({ status: 'paid', paymentStatus: 'held' });
-    expect((await t.http().post(`/jobs/${job.id}/pay`).set(owner.auth)).body.code).toBe('ALREADY_PAID');
+    expect((await t.http().post(`/jobs/${job.id}/pay`).set(owner.auth).send({ accept: true })).body.code).toBe('ALREADY_PAID');
 
     await t.http().post(`/jobs/${job.id}/complete`).set(owner.auth).expect(200);
     expect((await t.prisma.servicePayment.findUniqueOrThrow({ where: { id: pay.paymentId } })).status).toBe('released');
@@ -77,7 +77,7 @@ describe('kaptan rezervasyonu ve ekip iadesi', () => {
     const start = new Date(Date.now() + 10 * 864e5).toISOString().slice(0, 10);
     const b = (await t.http().post('/captain-bookings').set(guest.auth).send({ providerId: cap.profileId, start, days: 7 })).body;
     expect(b).toMatchObject({ totalEur: 1600, status: 'requested' });
-    const pay = (await t.http().post(`/captain-bookings/${b.id}/pay`).set(guest.auth)).body;
+    const pay = (await t.http().post(`/captain-bookings/${b.id}/pay`).set(guest.auth).send({ accept: true })).body;
     const rate = (await t.http().get('/fx')).body.EUR;
     expect(pay.amountKurus).toBe(Math.round(1600 * rate * 100));
     await devPay(guest.auth, pay.paymentId);
@@ -111,7 +111,7 @@ describe('emanet: otomatik aktarım, itiraz, askı ve hesap silme', () => {
     const job = (await t.http().post('/jobs').set(owner.auth).send({ category, title: 'Akü şarj etmiyor', description: 'Akü şarj olmuyor, alternatör kontrol.' })).body;
     const q = (await t.http().post(`/jobs/${job.id}/quotes`).set(usta.auth).send({ priceTry: 3000, days: 1 })).body;
     await t.http().post(`/jobs/${job.id}/accept`).set(owner.auth).send({ quoteId: q.id }).expect(200);
-    const pay = (await t.http().post(`/jobs/${job.id}/pay`).set(owner.auth)).body;
+    const pay = (await t.http().post(`/jobs/${job.id}/pay`).set(owner.auth).send({ accept: true })).body;
     await devPay(owner.auth, pay.paymentId);
     return { owner, usta, job, pay };
   }

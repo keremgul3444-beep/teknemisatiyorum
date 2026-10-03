@@ -33,3 +33,4 @@ export * from './Toggle';
 export * from './AdminBits';
 export { PromoBadges } from './PromoBadges';
 export * from './DisputeBox';
+export * from './PreinfoAccept';

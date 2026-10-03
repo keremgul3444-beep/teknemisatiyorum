@@ -75,7 +75,41 @@
     "linkCopied": "Link kopyalandı"
   },
   "legal": {
-    "draft": "Taslak metin — avukat onayı bekliyor"
+    "draft": "Taslak metin — avukat onayı bekliyor",
+    "preinfo": {
+      "title": "Ön bilgilendirme formu",
+      "description": "Ödeme yapmadan önce bilmen gerekenler: hizmet, fiyat, ifa ve cayma hakkı.",
+      "h1": "Satıcı ve aracı hizmet sağlayıcı",
+      "b1": "Öne çıkarma paketlerinin satıcısı teknemisatıyorum.com işletmecisi (unvan, adres, MERSİS no ve iletişim adresi eklenecek). Usta ve kaptan hizmetlerinde hizmeti veren, profilinde adı yazan usta ya da kaptandır; platform aracı hizmet sağlayıcıdır ve ödemeyi emanette tutar.",
+      "h2": "Hizmetin konusu",
+      "b2": "Öne çıkarma (Vitrin, Acil, Üste taşı): ilanının ödeme sayfasında yazan süre boyunca öne çıkarılması. Usta işi: kabul ettiğin teklifte yazan iş, süre ve fiyat. Kaptan rezervasyonu: seçtiğin tarih ve gün sayısı.",
+      "h3": "Fiyat ve ödeme",
+      "b3": "Ödeme sayfasında gösterilen toplam, vergiler dahil son fiyattır. Usta ve kaptan ödemelerinde toplam, hizmet bedeli ile platform hizmet bedelinden oluşur. Avro fiyatlar ödeme anındaki kurla Türk lirasına çevrilir. Kart bilgilerin ödeme kuruluşunun sayfasında girilir, platformda saklanmaz.",
+      "h4": "İfa",
+      "b4": "Öne çıkarma, ödeme onaylandığı anda başlar. Usta ve kaptan ödemelerinde para emanette bekler: sen işi tamamladığında, ya da usta işi bitirdiğini bildirdikten sonra 7 gün (kaptan rezervasyonunda bitişten sonra 3 gün) içinde sorun bildirmezsen hizmet verene aktarılır. Sorun bildirirsen ödeme ekip inceleyene kadar bekletilir.",
+      "h5": "Cayma hakkı",
+      "b5": "Öne çıkarma elektronik ortamda anında ifa edilen bir hizmettir; onayınla ifasına başlandığı için cayma hakkı kullanılamaz (Mesafeli Sözleşmeler Yönetmeliği m.15). Usta ve kaptan hizmetlerinde iş başlamadan önce iade talep edebilirsin; başladıktan sonraki sorunları \"Sorun bildir\" ile ilet, ekip inceler ve gerekirse iade eder. Belirli bir tarihte yapılacak boş zaman değerlendirme hizmetleri (kaptan rezervasyonu) cayma hakkı istisnası kapsamında olabilir.",
+      "h6": "Şikayet ve uyuşmazlık",
+      "b6": "Şikayetlerini iletişim adresimize yazabilirsin. Uyuşmazlıklarda Ticaret Bakanlığınca her yıl belirlenen parasal sınırlar içinde yerleşim yerindeki tüketici hakem heyetine, sınırın üstünde tüketici mahkemesine başvurabilirsin."
+    },
+    "distanceSale": {
+      "title": "Mesafeli satış sözleşmesi",
+      "description": "Platform üzerinden satın alınan hizmetlere ilişkin sözleşme.",
+      "h1": "Taraflar",
+      "b1": "Satıcı ve aracı hizmet sağlayıcı: teknemisatıyorum.com işletmecisi (unvan, adres, MERSİS no ve iletişim adresi eklenecek). Alıcı: ödemeyi yapan üye; kayıtlı adı ve telefon numarası sözleşme bilgisidir.",
+      "h2": "Konu",
+      "b2": "Ödeme sayfasında niteliği ve fiyatı gösterilen hizmetin satışı ve ifasına ilişkin tarafların hak ve yükümlülükleri; 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği uygulanır.",
+      "h3": "Hizmet, fiyat ve ifa",
+      "b3": "Hizmetin nitelikleri, toplam fiyatı, ödeme ve ifa koşulları ön bilgilendirme formunda yazılıdır; form bu sözleşmenin ayrılmaz parçasıdır.",
+      "h4": "Emanet ödeme",
+      "b4": "Usta ve kaptan hizmetlerinde hizmet sözleşmesi alıcı ile hizmet veren arasında kurulur. Platform ödemeyi lisanslı ödeme kuruluşu aracılığıyla emanette tutar; ön bilgilendirme formundaki koşullara göre hizmet verene aktarır ya da alıcıya iade eder.",
+      "h5": "Cayma hakkı",
+      "b5": "Ön bilgilendirme formundaki cayma hakkı hükümleri geçerlidir.",
+      "h6": "Kuruluş ve saklama",
+      "b6": "Sözleşme, ödeme öncesinde onay kutusunu işaretlemenle kurulur. Onay tarihi ve metin sürümü kaydedilir ve veri kopyanda yer alır; metin bu sayfada yayımlanır.",
+      "h7": "Uyuşmazlık",
+      "b7": "Parasal sınırlar içinde tüketici hakem heyetleri, sınırın üstünde tüketici mahkemeleri yetkilidir."
+    }
   },
   "listing": {
     "logbookCount": "Karne: {{count}} kayıt",
@@ -219,20 +253,23 @@
   },
   "kvkk": {
     "title": "Kişisel verilerin korunması",
-    "h1": "Veri sorumlusu",
-    "b1": "teknemisatıyorum.com (unvan ve adres eklenecek).",
-    "h2": "İşlenen veriler",
-    "b2": "Kimlik, iletişim, tekne ve ilan bilgileri, işlem ve ödeme kayıtları, cihaz ve oturum bilgileri.",
-    "h3": "İşleme amaçları",
-    "b3": "Üyelik, ilan ve hizmet süreçlerinin yürütülmesi, güvenlik, dolandırıcılığın önlenmesi ve yasal yükümlülükler.",
-    "h4": "Aktarım",
-    "b4": "Ödeme kuruluşu, barındırma sağlayıcısı ve yetkili kurumlarla, yalnızca gerektiği ölçüde.",
-    "h5": "Haklarınız (KVKK m.11)",
-    "b5": "Verilerinize erişme, düzeltme, silme, itiraz etme ve zararın giderilmesini talep etme hakkınız vardır.",
     "c1": "Aydınlatma metnini okudum",
     "c2": "Kampanya ve bilgilendirme mesajları almak istiyorum",
-    "c3": "Verilerimin yurt dışındaki sunuculara aktarılmasına izin veriyorum",
-    "saved": "Tercihlerin kaydedildi"
+    "saved": "Tercihlerin kaydedildi",
+    "h1": "Veri sorumlusu",
+    "b1": "teknemisatıyorum.com işletmecisi (unvan, adres, MERSİS no ve iletişim adresi eklenecek).",
+    "h2": "İşlenen veriler",
+    "b2": "Kimlik (ad, soyad, doğum yılı; T.C. kimlik numarası şifreli saklanır), iletişim (telefon), ilan ve tekne bilgileri, fotoğraf ve belgeler (ruhsat, usta ve kaptan yeterlilik belgeleri), mesajlar, iş talepleri, teklifler, rezervasyonlar ve değerlendirmeler, işlem ve ödeme kayıtları (kart bilgisi platformda tutulmaz, ödeme kuruluşunda işlenir), cihaz, oturum, bildirim jetonu ve IP adresi.",
+    "h3": "Amaçlar ve hukuki sebepler",
+    "b3": "Üyelik ve sözleşmenin kurulması ve ifası (KVKK m.5/2-c): ilan, mesaj, iş talebi, teklif, rezervasyon, ödeme ve emanet süreçleri. Kimlik doğrulama ve dolandırıcılığın önlenmesi (m.5/2-f): ad, soyad, doğum yılı ve kimlik numarası NVİ sorgusuyla doğrulanır. Hukuki yükümlülükler (m.5/2-ç): erişim kayıtları, vergi ve tüketici mevzuatı kayıtları. Kampanya ve bilgilendirme mesajları yalnızca açık rızanla (m.5/1); rızanı ayarlardan her an geri alabilirsin.",
+    "h4": "Yurt içine aktarım",
+    "b4": "Ödeme kuruluşu, SMS sağlayıcısı, Nüfus ve Vatandaşlık İşleri Genel Müdürlüğü (kimlik doğrulama sorgusu) ve talep eden yetkili kamu kurumlarıyla, yalnızca gerektiği ölçüde. Usta veya kaptanla iş yürütürken işin gerektirdiği bilgiler (adın, iş ayrıntısı, rezervasyon tarihi) karşı tarafla paylaşılır.",
+    "h5": "Yurt dışına aktarım",
+    "b5": "Bazı hizmet sağlayıcılarımızın sunucuları yurt dışındadır: bulut dosya depolama ve şifreli yedek (Cloudflare), anlık bildirim (Expo: bildirim metni ve cihaz jetonu), akıllı asistan (Anthropic: asistana yazdığın arama metni). Bu aktarımlar KVKK m.9 uyarınca Kurulca ilan edilen standart sözleşmeyle yapılır. Asistana kişisel bilgi yazmaman önerilir.",
+    "h6": "Saklama süresi",
+    "b6": "Hesabını silince profilin, ilanların ve mesajların silinir ya da anonimleştirilir. Mevzuatın saklamayı zorunlu tuttuğu kayıtlar (ödeme, fatura ve erişim kayıtları) ilgili süre boyunca saklanır, süre dolunca silinir.",
+    "h7": "Haklarınız (KVKK m.11)",
+    "b7": "Verilerine erişme, düzeltme, silme, işlemeye itiraz etme ve zararın giderilmesini talep etme hakkın var. Verilerinin kopyasını uygulamadan indirebilir, hesabını uygulamadan silebilirsin. Diğer talepler için iletişim adresimize yazabilirsin; en geç 30 gün içinde yanıtlanır."
   },
   "verify": {
     "idTitle": "Kimliğini doğrula",
@@ -583,7 +620,10 @@
     "returned": "Ödemeyi tamamladım",
     "checkoutNote": "Kart bilgilerin uygulamaya girilmez; ödeme, bankanın güvenli sayfasında yapılır. Para iş bitene kadar emanette bekler.",
     "openedNote": "Ödemeyi tarayıcıda tamamladıktan sonra buraya dönüp \"Ödemeyi tamamladım\"a dokun.",
-    "fxNote": "Ödeme Türk lirası ile alınır; tutar ödeme anındaki kurla çevrilir."
+    "fxNote": "Ödeme Türk lirası ile alınır; tutar ödeme anındaki kurla çevrilir.",
+    "accept": "Ön bilgilendirme formunu ve mesafeli satış sözleşmesini okudum, onaylıyorum.",
+    "preinfoLink": "Ön bilgilendirme formu",
+    "distanceLink": "Mesafeli satış sözleşmesi"
   },
   "captain": {
     "title": "Kaptan kiralama",
@@ -1143,7 +1183,8 @@
     "providerCreated": "Hizmet veren profili açıldı ({{kind}})",
     "servicePaid": "Hizmet ödemesi emanete alındı ({{kind}}): ₺{{amount}}",
     "paymentRefunded": "Hizmet ödemesi iade edildi: {{ref}}",
-    "paymentDisputed": "Hizmet ödemesine itiraz: {{ref}}"
+    "paymentDisputed": "Hizmet ödemesine itiraz: {{ref}}",
+    "preinfoAccepted": "Ön bilgilendirme ve sözleşme onaylandı (sürüm {{version}})"
   },
   "errors": {
     "generic": "Bir şeyler ters gitti, tekrar dene.",
@@ -1227,7 +1268,8 @@
     "no_quote": "Bu işe henüz teklif gelmedi; teklif gelince ustayla yazışabilirsin.",
     "already_disputed": "Bu ödeme için zaten sorun bildirdin; ekip inceliyor.",
     "already_delivered": "İşi bitirdiğini zaten bildirdin.",
-    "payments_disabled": "Ödemeler şu an kapalı. Kısa süre içinde açılacak."
+    "payments_disabled": "Ödemeler şu an kapalı. Kısa süre içinde açılacak.",
+    "preinfo_required": "Ödemeye geçmeden önce ön bilgilendirme formunu ve mesafeli satış sözleşmesini onaylaman gerekiyor."
   },
   "soon": {
     "title": "Yakında",

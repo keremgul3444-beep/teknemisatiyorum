@@ -34,7 +34,9 @@
     "popularGulet": "Satılık guletler",
     "popularCat": "Satılık katamaranlar",
     "joinUsta": "Usta olarak katıl",
-    "joinKaptan": "Kaptan olarak katıl"
+    "joinKaptan": "Kaptan olarak katıl",
+    "preinfo": "Ön bilgilendirme formu",
+    "distanceSale": "Mesafeli satış sözleşmesi"
   },
   "home": {
     "title": "Hayalindeki tekneyi bul",
@@ -86,7 +88,10 @@
     "trialPrice": "Deneme fiyatı",
     "buy": "Satın al",
     "priceDrop": "Fiyat düştü",
-    "unavailable": "Öne çıkarma seçenekleri şu an yüklenemedi. Biraz sonra yeniden dene."
+    "unavailable": "Öne çıkarma seçenekleri şu an yüklenemedi. Biraz sonra yeniden dene.",
+    "accept": "Ön bilgilendirme formunu ve mesafeli satış sözleşmesini okudum, onaylıyorum.",
+    "preinfoLink": "Ön bilgilendirme formu",
+    "distanceLink": "Mesafeli satış sözleşmesi"
   },
   "boatType": {
     "motoryat": "Motoryat",
@@ -386,27 +391,35 @@
     },
     "kvkk": {
       "title": "KVKK aydınlatma metni",
-      "description": "Kişisel verilerinin nasıl işlendiği ve hakların.",
+      "description": "Kişisel verilerinin nasıl işlendiği, kimlere aktarıldığı ve hakların.",
       "sections": [
         {
           "h": "Veri sorumlusu",
-          "b": "teknemisatıyorum.com (unvan ve adres eklenecek)."
+          "b": "teknemisatıyorum.com işletmecisi (unvan, adres, MERSİS no ve iletişim adresi eklenecek)."
         },
         {
           "h": "İşlenen veriler",
-          "b": "Kimlik, iletişim, tekne ve ilan bilgileri, işlem ve ödeme kayıtları, cihaz ve oturum bilgileri."
+          "b": "Kimlik (ad, soyad, doğum yılı; T.C. kimlik numarası şifreli saklanır), iletişim (telefon), ilan ve tekne bilgileri, fotoğraf ve belgeler (ruhsat, usta ve kaptan yeterlilik belgeleri), mesajlar, iş talepleri, teklifler, rezervasyonlar ve değerlendirmeler, işlem ve ödeme kayıtları (kart bilgisi platformda tutulmaz, ödeme kuruluşunda işlenir), cihaz, oturum, bildirim jetonu ve IP adresi."
         },
         {
-          "h": "İşleme amaçları",
-          "b": "Üyelik, ilan ve hizmet süreçlerinin yürütülmesi, güvenlik, dolandırıcılığın önlenmesi ve yasal yükümlülükler."
+          "h": "Amaçlar ve hukuki sebepler",
+          "b": "Üyelik ve sözleşmenin kurulması ve ifası (KVKK m.5/2-c): ilan, mesaj, iş talebi, teklif, rezervasyon, ödeme ve emanet süreçleri. Kimlik doğrulama ve dolandırıcılığın önlenmesi (m.5/2-f): ad, soyad, doğum yılı ve kimlik numarası NVİ sorgusuyla doğrulanır. Hukuki yükümlülükler (m.5/2-ç): erişim kayıtları, vergi ve tüketici mevzuatı kayıtları. Kampanya ve bilgilendirme mesajları yalnızca açık rızanla (m.5/1); rızanı ayarlardan her an geri alabilirsin."
         },
         {
-          "h": "Aktarım",
-          "b": "Ödeme kuruluşu, barındırma sağlayıcısı ve yetkili kurumlarla, yalnızca gerektiği ölçüde."
+          "h": "Yurt içine aktarım",
+          "b": "Ödeme kuruluşu, SMS sağlayıcısı, Nüfus ve Vatandaşlık İşleri Genel Müdürlüğü (kimlik doğrulama sorgusu) ve talep eden yetkili kamu kurumlarıyla, yalnızca gerektiği ölçüde. Usta veya kaptanla iş yürütürken işin gerektirdiği bilgiler (adın, iş ayrıntısı, rezervasyon tarihi) karşı tarafla paylaşılır."
+        },
+        {
+          "h": "Yurt dışına aktarım",
+          "b": "Bazı hizmet sağlayıcılarımızın sunucuları yurt dışındadır: bulut dosya depolama ve şifreli yedek (Cloudflare), anlık bildirim (Expo: bildirim metni ve cihaz jetonu), akıllı asistan (Anthropic: asistana yazdığın arama metni). Bu aktarımlar KVKK m.9 uyarınca Kurulca ilan edilen standart sözleşmeyle yapılır. Asistana kişisel bilgi yazmaman önerilir."
+        },
+        {
+          "h": "Saklama süresi",
+          "b": "Hesabını silince profilin, ilanların ve mesajların silinir ya da anonimleştirilir. Mevzuatın saklamayı zorunlu tuttuğu kayıtlar (ödeme, fatura ve erişim kayıtları) ilgili süre boyunca saklanır, süre dolunca silinir."
         },
         {
           "h": "Haklarınız (KVKK m.11)",
-          "b": "Verilerinize erişme, düzeltme, silme, itiraz etme ve zararın giderilmesini talep etme hakkınız vardır."
+          "b": "Verilerine erişme, düzeltme, silme, işlemeye itiraz etme ve zararın giderilmesini talep etme hakkın var. Verilerinin kopyasını uygulamadan indirebilir, hesabını uygulamadan silebilirsin. Diğer talepler için iletişim adresimize yazabilirsin; en geç 30 gün içinde yanıtlanır."
         }
       ]
     },
@@ -457,6 +470,70 @@
         {
           "h": "İstatistik çerezleri",
           "b": "Yalnızca iznin olursa kullanılır. Şu an hiçbir istatistik aracı kullanılmıyor."
+        }
+      ]
+    },
+    "preinfo": {
+      "title": "Ön bilgilendirme formu",
+      "description": "Ödeme yapmadan önce bilmen gerekenler: hizmet, fiyat, ifa ve cayma hakkı.",
+      "sections": [
+        {
+          "h": "Satıcı ve aracı hizmet sağlayıcı",
+          "b": "Öne çıkarma paketlerinin satıcısı teknemisatıyorum.com işletmecisi (unvan, adres, MERSİS no ve iletişim adresi eklenecek). Usta ve kaptan hizmetlerinde hizmeti veren, profilinde adı yazan usta ya da kaptandır; platform aracı hizmet sağlayıcıdır ve ödemeyi emanette tutar."
+        },
+        {
+          "h": "Hizmetin konusu",
+          "b": "Öne çıkarma (Vitrin, Acil, Üste taşı): ilanının ödeme sayfasında yazan süre boyunca öne çıkarılması. Usta işi: kabul ettiğin teklifte yazan iş, süre ve fiyat. Kaptan rezervasyonu: seçtiğin tarih ve gün sayısı."
+        },
+        {
+          "h": "Fiyat ve ödeme",
+          "b": "Ödeme sayfasında gösterilen toplam, vergiler dahil son fiyattır. Usta ve kaptan ödemelerinde toplam, hizmet bedeli ile platform hizmet bedelinden oluşur. Avro fiyatlar ödeme anındaki kurla Türk lirasına çevrilir. Kart bilgilerin ödeme kuruluşunun sayfasında girilir, platformda saklanmaz."
+        },
+        {
+          "h": "İfa",
+          "b": "Öne çıkarma, ödeme onaylandığı anda başlar. Usta ve kaptan ödemelerinde para emanette bekler: sen işi tamamladığında, ya da usta işi bitirdiğini bildirdikten sonra 7 gün (kaptan rezervasyonunda bitişten sonra 3 gün) içinde sorun bildirmezsen hizmet verene aktarılır. Sorun bildirirsen ödeme ekip inceleyene kadar bekletilir."
+        },
+        {
+          "h": "Cayma hakkı",
+          "b": "Öne çıkarma elektronik ortamda anında ifa edilen bir hizmettir; onayınla ifasına başlandığı için cayma hakkı kullanılamaz (Mesafeli Sözleşmeler Yönetmeliği m.15). Usta ve kaptan hizmetlerinde iş başlamadan önce iade talep edebilirsin; başladıktan sonraki sorunları \"Sorun bildir\" ile ilet, ekip inceler ve gerekirse iade eder. Belirli bir tarihte yapılacak boş zaman değerlendirme hizmetleri (kaptan rezervasyonu) cayma hakkı istisnası kapsamında olabilir."
+        },
+        {
+          "h": "Şikayet ve uyuşmazlık",
+          "b": "Şikayetlerini iletişim adresimize yazabilirsin. Uyuşmazlıklarda Ticaret Bakanlığınca her yıl belirlenen parasal sınırlar içinde yerleşim yerindeki tüketici hakem heyetine, sınırın üstünde tüketici mahkemesine başvurabilirsin."
+        }
+      ]
+    },
+    "distanceSale": {
+      "title": "Mesafeli satış sözleşmesi",
+      "description": "Platform üzerinden satın alınan hizmetlere ilişkin sözleşme.",
+      "sections": [
+        {
+          "h": "Taraflar",
+          "b": "Satıcı ve aracı hizmet sağlayıcı: teknemisatıyorum.com işletmecisi (unvan, adres, MERSİS no ve iletişim adresi eklenecek). Alıcı: ödemeyi yapan üye; kayıtlı adı ve telefon numarası sözleşme bilgisidir."
+        },
+        {
+          "h": "Konu",
+          "b": "Ödeme sayfasında niteliği ve fiyatı gösterilen hizmetin satışı ve ifasına ilişkin tarafların hak ve yükümlülükleri; 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği uygulanır."
+        },
+        {
+          "h": "Hizmet, fiyat ve ifa",
+          "b": "Hizmetin nitelikleri, toplam fiyatı, ödeme ve ifa koşulları ön bilgilendirme formunda yazılıdır; form bu sözleşmenin ayrılmaz parçasıdır."
+        },
+        {
+          "h": "Emanet ödeme",
+          "b": "Usta ve kaptan hizmetlerinde hizmet sözleşmesi alıcı ile hizmet veren arasında kurulur. Platform ödemeyi lisanslı ödeme kuruluşu aracılığıyla emanette tutar; ön bilgilendirme formundaki koşullara göre hizmet verene aktarır ya da alıcıya iade eder."
+        },
+        {
+          "h": "Cayma hakkı",
+          "b": "Ön bilgilendirme formundaki cayma hakkı hükümleri geçerlidir."
+        },
+        {
+          "h": "Kuruluş ve saklama",
+          "b": "Sözleşme, ödeme öncesinde onay kutusunu işaretlemenle kurulur. Onay tarihi ve metin sürümü kaydedilir ve veri kopyanda yer alır; metin bu sayfada yayımlanır."
+        },
+        {
+          "h": "Uyuşmazlık",
+          "b": "Parasal sınırlar içinde tüketici hakem heyetleri, sınırın üstünde tüketici mahkemeleri yetkilidir."
         }
       ]
     }
@@ -542,7 +619,8 @@
     "already_paid": "Bu ödeme zaten yapıldı.",
     "already_disputed": "Bu ödeme için zaten sorun bildirdin; ekip inceliyor.",
     "already_delivered": "İşi bitirdiğini zaten bildirdin.",
-    "payments_disabled": "Ödemeler şu an kapalı. Kısa süre içinde açılacak."
+    "payments_disabled": "Ödemeler şu an kapalı. Kısa süre içinde açılacak.",
+    "preinfo_required": "Ödemeye geçmeden önce ön bilgilendirme formunu ve mesafeli satış sözleşmesini onaylaman gerekiyor."
   },
   "login": {
     "title": "Giriş yap",
@@ -898,7 +976,8 @@
     "providerCreated": "Hizmet veren profili açıldı ({{kind}})",
     "servicePaid": "Hizmet ödemesi emanete alındı ({{kind}}): ₺{{amount}}",
     "paymentRefunded": "Hizmet ödemesi iade edildi: {{ref}}",
-    "paymentDisputed": "Hizmet ödemesine itiraz: {{ref}}"
+    "paymentDisputed": "Hizmet ödemesine itiraz: {{ref}}",
+    "preinfoAccepted": "Ön bilgilendirme ve sözleşme onaylandı (sürüm {{version}})"
   },
   "firm": {
     "title": "Firma paneli",

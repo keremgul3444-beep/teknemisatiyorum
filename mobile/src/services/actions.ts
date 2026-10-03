@@ -392,7 +392,7 @@ export const actions = {
     const platform = Platform.OS === 'android' ? 'android' : 'ios';
     const storeId = platform === 'ios' ? p.iosProductId : p.androidProductId;
     if (!storeId) throw new ApiError(400, 'BAD_RECEIPT', 'errors.bad_receipt');
-    await api.post('/orders/store', { listingId, platform, receipt: devReceipt(storeId) });
+    await api.post('/orders/store', { listingId, platform, receipt: devReceipt(storeId), accept: true });
     await syncMine();
   },
   /** Ana sayfa vitrin ve acil şeritleri. */
@@ -428,11 +428,12 @@ export const actions = {
   },
   /**
    * Ödeme: demoda anında; gerçek modda güvenli ödeme sayfası tarayıcıda açılır (kart bilgisi uygulamaya girmez).
+   * Yalnızca ödeme ekranında ön bilgilendirme onaylandıktan sonra çağrılır (sunucu onayı sürümüyle kaydeder).
    * Dönen `checkout` true ise kullanıcı tarayıcıda ödemeyi tamamlar, uygulamaya dönünce `syncServices` ile durum güncellenir.
    */
   async payJob(jobId: string): Promise<{ checkout: boolean }> {
     if (!isApiMode()) { g().payJob(jobId); return { checkout: false }; }
-    const r = await api.post<{ checkoutUrl: string }>(`/jobs/${jobId}/pay`);
+    const r = await api.post<{ checkoutUrl: string }>(`/jobs/${jobId}/pay`, { accept: true });
     await Linking.openURL(r.checkoutUrl);
     return { checkout: true };
   },
@@ -469,7 +470,7 @@ export const actions = {
   },
   async payCaptain(id: string): Promise<{ checkout: boolean }> {
     if (!isApiMode()) { g().payCaptain(id); return { checkout: false }; }
-    const r = await api.post<{ checkoutUrl: string }>(`/captain-bookings/${id}/pay`);
+    const r = await api.post<{ checkoutUrl: string }>(`/captain-bookings/${id}/pay`, { accept: true });
     await Linking.openURL(r.checkoutUrl);
     return { checkout: true };
   },
