@@ -4,11 +4,11 @@ import { matchListings, parseQuery, parsedQuerySchema, type Criterion, type Pars
 import { useStore } from './store';
 import { absolute, isApiMode } from './mode';
 import { api } from './api/instance';
-import { applyUser, syncAdmin, syncAll, syncListings, syncMine } from './api/sync';
-import { toBoat, toListing, toThread, type AdminOrder, type ApiBoat, type ApiListing, type ApiProduct, type ApiThread, type ApiUser } from './api/mappers';
+import { applyUser, syncAdmin, syncAll, syncListings, syncMine, syncServices } from './api/sync';
+import { toBoat, toListing, toThread, type AdminOrder, type ApiBoat, type ApiCaptainBooking, type ApiJob, type ApiListing, type ApiProduct, type ApiProvider, type ApiThread, type ApiUser } from './api/mappers';
 import { ApiError } from './api/client';
 import { devReceipt } from '@/features/promo';
-import type { AdminStatus, BoatInput, Listing, ListingDraft, RejectReason, ReportGroup, ReportReason, SubjectKind, TakedownReason } from './types';
+import type { AdminStatus, BoatInput, JobInput, Listing, ListingDraft, RejectReason, ReportGroup, ReportReason, SubjectKind, TakedownReason } from './types';
 import { useSession, type Prefs } from '@/session/role';
 import { resetRates } from './rates';
 import { createPublisher, type PublishExtra } from '@/features/publishListing';
@@ -20,6 +20,27 @@ let pushToken: string | null = null;
 
 const g = () => useStore.getState();
 const SUBJECT_TO_API: Partial<Record<SubjectKind, string>> = { ilan: 'listing', broker: 'broker' };
+/**
+ * Uygulamadaki sohbet konusu → sunucudaki konu. Usta işinde konu teklif (kabul edilen, yoksa ilk teklif);
+ * kaptanda rezervasyon varsa rezervasyon, yoksa kaptanın profili.
+ */
+function apiSubject(subject: { kind: SubjectKind; id: string }) {
+  if (subject.kind === 'is') {
+    const j = useStore.getState().jobs.find((x) => x.id === subject.id);
+    const quoteId = j?.acceptedOfferId ?? j?.offers[0]?.id;
+    if (!quoteId) throw new ApiError(409, 'NO_QUOTE', 'errors.no_quote');
+    return { subjectKind: 'job', subjectId: quoteId };
+  }
+  if (subject.kind === 'kaptan') {
+    const isBooking = useStore.getState().captainBookings.some((b) => b.id === subject.id);
+    return { subjectKind: isBooking ? 'captain' : 'provider', subjectId: subject.id };
+  }
+  return { subjectKind: SUBJECT_TO_API[subject.kind] ?? 'listing', subjectId: subject.id };
+}
+export interface AdminServicePayment {
+  id: string; payerId: string; providerId: string; providerName: string | null; subjectKind: string; subjectId: string;
+  amountKurus: number; feeKurus: number; status: string; createdAt: string; paidAt: string | null;
+}
 
 export interface AssistantResult { query: ParsedQuery; exact: Listing[]; near: { listing: Listing; missing: Criterion[] }[]; source: 'llm' | 'rules' | 'local' }
 
@@ -218,7 +239,7 @@ export const actions = {
   // ——— Mesajlar ———
   async startConversation(subject: { kind: SubjectKind; id: string; title: string }, withName: string) {
     if (!isApiMode()) return g().startConversation(subject, withName);
-    const r = await api.post<{ id: string }>('/conversations', { subjectKind: SUBJECT_TO_API[subject.kind] ?? 'listing', subjectId: subject.id });
+    const r = await api.post<{ id: string }>('/conversations', apiSubject(subject));
     await actions.openConversation(r.id);
     return r.id;
   },
@@ -389,14 +410,74 @@ export const actions = {
     await api.del(`/auth/sessions/${id}`);
   },
 
-  // ——— Yalnızca demo (2. dalga: usta, kaptan, ödeme) ———
-  createJob: async (...a: Parameters<ReturnType<typeof g>['createJob']>) => g().createJob(...a),
-  acceptOffer: async (jobId: string, offerId: string) => g().acceptOffer(jobId, offerId),
-  payJob: async (jobId: string) => g().payJob(jobId),
-  completeJob: async (jobId: string) => g().completeJob(jobId),
-  rateJob: async (jobId: string, stars: number) => g().rateJob(jobId, stars),
-  bookCaptain: async (...a: Parameters<ReturnType<typeof g>['bookCaptain']>) => g().bookCaptain(...a),
-  payCaptain: async (id: string) => g().payCaptain(id),
+  // ——— 2. dalga: usta işleri, kaptan rezervasyonları, emanet ödeme ———
+  syncServices: async () => { if (isApiMode()) await syncServices(); },
+  async createJob(input: JobInput) {
+    if (!isApiMode()) return g().createJob(input);
+    const j = await api.post<{ id: string }>('/jobs', { category: input.category, title: input.title, description: input.description, ...(input.boatId ? { boatId: input.boatId } : {}) });
+    await syncServices();
+    return j.id;
+  },
+  async acceptOffer(jobId: string, offerId: string) {
+    if (!isApiMode()) return g().acceptOffer(jobId, offerId);
+    await api.post(`/jobs/${jobId}/accept`, { quoteId: offerId });
+    await syncServices();
+  },
+  /**
+   * Ödeme: demoda anında; gerçek modda güvenli ödeme sayfası tarayıcıda açılır (kart bilgisi uygulamaya girmez).
+   * Dönen `checkout` true ise kullanıcı tarayıcıda ödemeyi tamamlar, uygulamaya dönünce `syncServices` ile durum güncellenir.
+   */
+  async payJob(jobId: string): Promise<{ checkout: boolean }> {
+    if (!isApiMode()) { g().payJob(jobId); return { checkout: false }; }
+    const r = await api.post<{ checkoutUrl: string }>(`/jobs/${jobId}/pay`);
+    await Linking.openURL(r.checkoutUrl);
+    return { checkout: true };
+  },
+  async completeJob(jobId: string) {
+    if (!isApiMode()) return g().completeJob(jobId);
+    await api.post(`/jobs/${jobId}/complete`);
+    await Promise.all([syncServices(), syncMine()]);
+  },
+  async rateJob(jobId: string, stars: number) {
+    if (!isApiMode()) return g().rateJob(jobId, stars);
+    await api.post(`/jobs/${jobId}/review`, { stars });
+    await syncServices();
+  },
+  async cancelJob(jobId: string) {
+    await api.post(`/jobs/${jobId}/cancel`);
+    await syncServices();
+  },
+  async bookCaptain(input: { captainId: string; start: string; days: number }) {
+    if (!isApiMode()) return g().bookCaptain(input);
+    const b = await api.post<{ id: string }>('/captain-bookings', { providerId: input.captainId, start: input.start, days: input.days });
+    await syncServices();
+    return b.id;
+  },
+  async payCaptain(id: string): Promise<{ checkout: boolean }> {
+    if (!isApiMode()) { g().payCaptain(id); return { checkout: false }; }
+    const r = await api.post<{ checkoutUrl: string }>(`/captain-bookings/${id}/pay`);
+    await Linking.openURL(r.checkoutUrl);
+    return { checkout: true };
+  },
+  async completeBooking(id: string) {
+    await api.post(`/captain-bookings/${id}/complete`);
+    await syncServices();
+  },
+  async rateBooking(id: string, stars: number) {
+    await api.post(`/captain-bookings/${id}/review`, { stars });
+    await syncServices();
+  },
+  // Hizmet veren tarafı (usta/kaptan paneli)
+  myProviders: () => api.get<ApiProvider[]>('/me/providers'),
+  saveProvider: (kind: 'usta' | 'kaptan', body: Record<string, unknown>) => api.put<ApiProvider>(`/me/provider/${kind}`, body),
+  providerJobs: () => api.get<{ open: ApiJob[]; quoted: ApiJob[] }>('/provider/jobs'),
+  sendQuote: (jobId: string, b: { priceTry: number; days: number; note: string }) => api.post(`/jobs/${jobId}/quotes`, b),
+  providerBookings: () => api.get<ApiCaptainBooking[]>('/provider/bookings'),
+  declineBooking: (id: string) => api.post(`/captain-bookings/${id}/decline`),
+  myServicePayments: () => api.get<{ id: string; subjectKind: string; subjectId: string; amountKurus: number; feeKurus: number; status: string; paidAt: string | null }[]>('/me/service-payments'),
+  adminServicePayments: (status?: string) => api.get<AdminServicePayment[]>(`/admin/service-payments${status ? `?status=${status}` : ''}`),
+  adminRefundService: (id: string) => api.post(`/admin/service-payments/${id}/refund`),
+  adminReleaseService: (id: string) => api.post(`/admin/service-payments/${id}/release`),
   /** Demo sohbetinde karşı tarafın otomatik yanıtı. */
   demoReply: (convId: string, text: string) => { if (!isApiMode()) g().sendMessage(convId, text, 'them'); },
   markRead: async (convId: string) => (isApiMode() ? actions.openConversation(convId) : g().markRead(convId)),

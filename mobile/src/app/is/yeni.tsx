@@ -6,9 +6,9 @@ import { colors, radius, space } from '@/theme';
 import { BoatImage, Button, Chip, Field, Header, Icon, Screen, Section, T } from '@/components';
 import { actions, USTA_CATEGORIES, useBoats, type UstaCategory } from '@/services';
 import { requireLevel } from '@/session/role';
-import { demoOnly } from '@/components/DemoOnly';
+import { attempt } from '@/services/errors';
 
-function IsYeni() {
+export default function IsYeni() {
   const { t } = useTranslation();
   const params = useLocalSearchParams<{ kategori?: string; baslik?: string }>();
   const boats = useBoats();
@@ -18,12 +18,13 @@ function IsYeni() {
   const [desc, setDesc] = useState('');
   const [photos, setPhotos] = useState(0);
   const [when, setWhen] = useState<'urgent' | 'thisWeek' | 'flexible'>('thisWeek');
-  const valid = boatId && cat && title.trim().length > 2;
+  // Sunucu kuralıyla aynı: başlık en az 3, açıklama en az 10 karakter (ustanın teklif verebilmesi için).
+  const valid = boatId && cat && title.trim().length > 2 && desc.trim().length >= 10;
 
   const send = async () => {
     if (!requireLevel(1) || !boatId || !cat) return;
-    const id = await actions.createJob({ category: cat, title: title.trim(), description: desc.trim(), boatId });
-    router.replace(`/is/${id}`);
+    const id = await attempt(() => actions.createJob({ category: cat, title: title.trim(), description: desc.trim(), boatId }));
+    if (id) router.replace(`/is/${id}`);
   };
 
   return (
@@ -49,7 +50,8 @@ function IsYeni() {
         </View>
       </Section>
       <Field label={t('job.titleLabel')} value={title} onChangeText={setTitle} placeholder={t('job.titlePh')} />
-      <Field label={t('job.description')} value={desc} onChangeText={setDesc} placeholder={t('job.descriptionPh')} multiline />
+      <Field label={t('job.description')} required value={desc} onChangeText={setDesc} placeholder={t('job.descriptionPh')} multiline maxLength={2000}
+        hint={desc.trim().length < 10 ? t('job.descriptionMin') : undefined} />
       <Section title={t('job.photos')}>
         <View style={{ flexDirection: 'row', gap: space(2) }}>
           {Array.from({ length: 4 }).map((_, i) => (
@@ -69,4 +71,3 @@ function IsYeni() {
   );
 }
 
-export default demoOnly(IsYeni);

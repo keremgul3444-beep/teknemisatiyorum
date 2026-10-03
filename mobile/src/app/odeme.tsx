@@ -4,17 +4,19 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { colors, fonts, radius, space } from '@/theme';
 import { Button, Card, Field, Header, Icon, NotFound, Screen, Section, T, showDemoToast } from '@/components';
-import { actions, formatPrice, useCaptainBookings, useJob, type Currency } from '@/services';
+import { actions, formatPrice, isApiMode, useCaptainBookings, useJob, type Currency } from '@/services';
+import { attempt } from '@/services/errors';
 import { currentLang } from '@/i18n';
-import { demoOnly } from '@/components/DemoOnly';
 
-function Odeme() {
+export default function Odeme() {
   const { t } = useTranslation();
   const { tur, id } = useLocalSearchParams<{ tur?: 'is' | 'kaptan'; id?: string }>();
   const job = useJob(tur === 'is' ? id : undefined);
   const booking = useCaptainBookings().find((b) => b.id === id);
   const [card, setCard] = useState({ no: '', exp: '', cvc: '' });
   const [loading, setLoading] = useState(false);
+  /** Gerçek mod: güvenli ödeme sayfası tarayıcıda açıldı; dönünce durum tazelenir. */
+  const [opened, setOpened] = useState(false);
 
   const offer = job?.offers.find((o) => o.id === job.acceptedOfferId);
   const base: { amount: number; cur: Currency } | null =
@@ -24,6 +26,56 @@ function Odeme() {
   const fee = Math.round(base.amount * 0.08);
   const total = base.amount + fee;
   const valid = card.no.replace(/\D/g, '').length >= 16 && card.exp.length >= 4 && card.cvc.length >= 3;
+
+  const done = () => (tur === 'is' && job ? router.dismissTo(`/is/${job.id}`) : router.replace('/profil/odemeler'));
+  // Gerçek mod: kart bilgisi uygulamaya girilmez; sanal POS sayfası açılır, sonucu sunucuya imzalı bildirim belirler.
+  const checkout = async () => {
+    setLoading(true);
+    const r = await attempt(() => (tur === 'is' && job ? actions.payJob(job.id) : actions.payCaptain(booking!.id)));
+    setLoading(false);
+    if (r) setOpened(true);
+  };
+  const afterCheckout = async () => {
+    setLoading(true);
+    await attempt(() => actions.syncServices());
+    setLoading(false);
+    done();
+  };
+  if (isApiMode()) {
+    return (
+      <Screen footer={opened
+        ? <Button icon="check" loading={loading} title={t('payment.returned')} onPress={afterCheckout} />
+        : <Button icon="lock" loading={loading} title={t('payment.toCheckout', { amount: formatPrice(total, base.cur, lang) })} onPress={checkout} />}>
+        <Header title={t('payment.title')} />
+        <Card>
+          {[[t('payment.service'), base.amount], [t('payment.fee'), fee]].map(([k, v]) => (
+            <View key={String(k)} style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <T color={colors.muted}>{k}</T><T>{formatPrice(Number(v), base.cur, lang)}</T>
+            </View>
+          ))}
+          <View style={{ height: 1, backgroundColor: colors.line }} />
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <T variant="h3">{t('payment.total')}</T><T variant="h3" color={colors.primary}>{formatPrice(total, base.cur, lang)}</T>
+          </View>
+          {base.cur !== 'TRY' ? <T variant="caption" color={colors.muted}>{t('payment.fxNote')}</T> : null}
+        </Card>
+        <Card style={{ backgroundColor: colors.surface }}>
+          {(['g1', 'g2', 'g3'] as const).map((g, i) => (
+            <View key={g} style={{ flexDirection: 'row', gap: space(3), alignItems: 'center' }}>
+              <View style={{ width: 26, height: 26, borderRadius: radius.pill, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }}>
+                <T variant="caption" color={colors.white} style={{ fontFamily: fonts.bodyBold }}>{i + 1}</T>
+              </View>
+              <T style={{ flex: 1 }}>{t(`payment.${g}`)}</T>
+            </View>
+          ))}
+        </Card>
+        <View style={{ flexDirection: 'row', gap: space(2), alignItems: 'flex-start' }}>
+          <Icon name="lock" size={16} color={colors.primary} />
+          <T variant="caption" color={colors.muted} style={{ flex: 1 }}>{t(opened ? 'payment.openedNote' : 'payment.checkoutNote')}</T>
+        </View>
+      </Screen>
+    );
+  }
 
   const pay = () => {
     setLoading(true);
@@ -80,4 +132,3 @@ function Odeme() {
   );
 }
 
-export default demoOnly(Odeme);

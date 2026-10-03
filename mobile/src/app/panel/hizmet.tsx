@@ -2,9 +2,14 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { colors, fonts, radius, space } from '@/theme';
-import { Button, Card, Field, Header, Icon, Screen, Section, StatusLine, T, showDemoToast } from '@/components';
+import { router } from 'expo-router';
+import { Button, Card, Chip, EmptyState, Field, Header, Icon, Screen, Section, StatusLine, T, showDemoToast } from '@/components';
+import { actions, formatPrice, USTA_CATEGORIES, type UstaCategory } from '@/services';
+import type { ApiJob, ApiProvider } from '@/services/api/mappers';
+import { useMode } from '@/services/mode';
+import { useRemote } from '@/services/useRemote';
+import { attempt } from '@/services/errors';
 import { currentLang } from '@/i18n';
-import { demoOnly } from '@/components/DemoOnly';
 
 const REQS = ['req1', 'req2', 'req3'] as const;
 const WEEK = [true, false, true, true, false, false, true];
@@ -87,4 +92,173 @@ function HizmetPaneli() {
   );
 }
 
-export default demoOnly(HizmetPaneli);
+export default function Hizmet() {
+  const mode = useMode((s) => s.mode);
+  return mode === 'api' ? <ApiPanel /> : <HizmetPaneli />;
+}
+
+/** Gerçek mod: hizmet veren profilleri (usta/kaptan), gelen işler ve teklifler, kaptan rezervasyonları. */
+function ApiPanel() {
+  const { t } = useTranslation();
+  const { data, reload } = useRemote(() => actions.myProviders());
+  const [editing, setEditing] = useState<'usta' | 'kaptan' | null>(null);
+  if (!data) return <Screen><Header title={t('panel.title')} /></Screen>;
+  const usta = data.find((p) => p.kind === 'usta');
+  const kaptan = data.find((p) => p.kind === 'kaptan');
+  return (
+    <Screen>
+      <Header title={t('panel.title')} />
+      {editing ? <ProfileForm kind={editing} current={editing === 'usta' ? usta : kaptan} onDone={() => { setEditing(null); reload(); }} /> : null}
+      {!editing && !data.length ? (
+        <Card>
+          <T variant="h3">{t('panel.becomeTitle')}</T>
+          <T color={colors.muted}>{t('panel.becomeBody')}</T>
+          <View style={{ flexDirection: 'row', gap: space(2) }}>
+            <View style={{ flex: 1 }}><Button title={t('panel.becomeUsta')} onPress={() => setEditing('usta')} /></View>
+            <View style={{ flex: 1 }}><Button variant="secondary" title={t('panel.becomeKaptan')} onPress={() => setEditing('kaptan')} /></View>
+          </View>
+        </Card>
+      ) : null}
+      {!editing ? data.map((p) => (
+        <Card key={p.id}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(3) }}>
+            <Icon name={p.kind === 'usta' ? 'wrench' : 'compass'} size={20} color={colors.primary} />
+            <View style={{ flex: 1 }}>
+              <T variant="h3">{p.name}</T>
+              <T variant="caption" color={p.status === 'active' ? colors.success : colors.warning}>{t(`panel.status.${p.status ?? 'pending'}`)}{p.rating ? ` · ★ ${p.rating} (${p.reviewCount})` : ''}</T>
+            </View>
+            <Button small variant="ghost" title={t('panel.edit')} onPress={() => setEditing(p.kind)} />
+          </View>
+          {p.status === 'pending' ? (
+            <View style={{ gap: space(2) }}>
+              <T variant="caption" color={colors.muted}>{t('panel.pendingNote')}</T>
+              <Button small variant="secondary" icon="doc" title={t('panel.uploadDocs')} onPress={() => router.push('/verify/professional')} />
+            </View>
+          ) : null}
+        </Card>
+      )) : null}
+      {!editing && data.length && !usta ? <Button variant="ghost" title={t('panel.becomeUsta')} onPress={() => setEditing('usta')} /> : null}
+      {!editing && data.length && !kaptan ? <Button variant="ghost" title={t('panel.becomeKaptan')} onPress={() => setEditing('kaptan')} /> : null}
+      {!editing && usta?.status === 'active' ? <UstaInbox /> : null}
+      {!editing && kaptan ? <CaptainInbox /> : null}
+    </Screen>
+  );
+}
+
+const list = (s: string) => s.split(',').map((x) => x.trim()).filter((x) => x.length >= 2);
+
+function ProfileForm({ kind, current, onDone }: { kind: 'usta' | 'kaptan'; current?: ApiProvider; onDone: () => void }) {
+  const { t } = useTranslation();
+  const [f, setF] = useState({
+    displayName: current?.name ?? '', region: current?.region ?? '', bio: current?.bio ?? '', priceNote: current?.priceNote ?? '', yearsExp: String(current?.yearsExp ?? ''),
+    dayRate: String(current?.dayRateEur ?? ''), weekRate: String(current?.weekRateEur ?? ''), languages: (current?.languages ?? []).join(', '), areas: (current?.areas ?? []).join(', '),
+  });
+  const [cats, setCats] = useState<UstaCategory[]>((current?.categories ?? []) as UstaCategory[]);
+  const [busy, setBusy] = useState(false);
+  const set = (k: keyof typeof f) => (v: string) => setF((s) => ({ ...s, [k]: v }));
+  const valid = f.displayName.trim().length >= 2 && f.region.trim().length >= 2 && (kind === 'usta' ? cats.length > 0 : Number(f.dayRate) > 0);
+  const save = async () => {
+    setBusy(true);
+    const body = {
+      displayName: f.displayName.trim(), region: f.region.trim(), bio: f.bio.trim(), priceNote: f.priceNote.trim(), yearsExp: Number(f.yearsExp) || 0,
+      languages: list(f.languages), areas: list(f.areas),
+      ...(kind === 'usta' ? { categories: cats } : { dayRateEur: Number(f.dayRate), ...(Number(f.weekRate) > 0 ? { weekRateEur: Number(f.weekRate) } : {}) }),
+    };
+    const r = await attempt(() => actions.saveProvider(kind, body));
+    setBusy(false);
+    if (r) onDone();
+  };
+  return (
+    <Card>
+      <T variant="h3">{t(kind === 'usta' ? 'panel.ustaProfile' : 'panel.kaptanProfile')}</T>
+      <Field label={t('panel.displayName')} required value={f.displayName} onChangeText={set('displayName')} maxLength={60} />
+      <Field label={t('panel.region')} required value={f.region} onChangeText={set('region')} maxLength={40} placeholder="Bodrum" />
+      {kind === 'usta' ? (
+        <Section title={t('panel.categories')}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space(2) }}>
+            {USTA_CATEGORIES.map((c) => <Chip key={c} label={t(`usta.cat.${c}`)} selected={cats.includes(c)} onPress={() => setCats((s) => (s.includes(c) ? s.filter((x) => x !== c) : [...s, c]))} />)}
+          </View>
+        </Section>
+      ) : (
+        <View style={{ flexDirection: 'row', gap: space(2) }}>
+          <View style={{ flex: 1 }}><Field label={t('panel.dayRate')} required value={f.dayRate} onChangeText={(v) => set('dayRate')(v.replace(/\D/g, ''))} keyboardType="numeric" /></View>
+          <View style={{ flex: 1 }}><Field label={t('panel.weekRate')} value={f.weekRate} onChangeText={(v) => set('weekRate')(v.replace(/\D/g, ''))} keyboardType="numeric" /></View>
+        </View>
+      )}
+      <Field label={t('panel.yearsExp')} value={f.yearsExp} onChangeText={(v) => set('yearsExp')(v.replace(/\D/g, '').slice(0, 2))} keyboardType="numeric" />
+      <Field label={t('panel.bio')} value={f.bio} onChangeText={set('bio')} multiline maxLength={1000} />
+      <Field label={t('panel.priceNote')} value={f.priceNote} onChangeText={set('priceNote')} maxLength={120} />
+      {kind === 'kaptan' ? <Field label={t('panel.languages')} value={f.languages} onChangeText={set('languages')} hint={t('panel.commaHint')} /> : null}
+      <Field label={t('panel.areas')} value={f.areas} onChangeText={set('areas')} hint={t('panel.commaHint')} />
+      <Button title={t('panel.saveProfile')} loading={busy} disabled={!valid} onPress={save} />
+      <Button variant="ghost" title={t('common.cancel')} onPress={onDone} />
+    </Card>
+  );
+}
+
+/** Usta: alanındaki açık işler (teklif ver) ve teklif verdiği işler. */
+function UstaInbox() {
+  const { t } = useTranslation();
+  const { data, reload } = useRemote(() => actions.providerJobs());
+  const [open, setOpen] = useState<string | null>(null);
+  const [q, setQ] = useState({ price: '', days: '', note: '' });
+  const lang = currentLang();
+  const send = async (job: ApiJob) => {
+    const r = await attempt(() => actions.sendQuote(job.id, { priceTry: Number(q.price), days: Number(q.days), note: q.note.trim() }));
+    if (r !== undefined) { setOpen(null); setQ({ price: '', days: '', note: '' }); showDemoToast(t('panel.sent')); reload(); }
+  };
+  return (
+    <>
+      <Section title={t('panel.incoming')}>
+        {data && !data.open.length ? <EmptyState icon="wrench" title={t('panel.noJobs')} /> : null}
+        {(data?.open ?? []).map((j) => (
+          <Card key={j.id}>
+            <T variant="h3">{j.title}</T>
+            <T variant="caption" color={colors.muted}>{t(`usta.cat.${j.category}`)}{j.region ? ` · ${j.region}` : ''}</T>
+            <T>{j.description}</T>
+            {open === j.id ? (
+              <View style={{ gap: space(2) }}>
+                <View style={{ flexDirection: 'row', gap: space(2) }}>
+                  <View style={{ flex: 1 }}><Field label={t('panel.price')} value={q.price} onChangeText={(v) => setQ((s) => ({ ...s, price: v.replace(/\D/g, '') }))} keyboardType="numeric" /></View>
+                  <View style={{ flex: 1 }}><Field label={t('panel.days')} value={q.days} onChangeText={(v) => setQ((s) => ({ ...s, days: v.replace(/\D/g, '') }))} keyboardType="numeric" /></View>
+                </View>
+                <Field label={t('panel.note')} value={q.note} onChangeText={(v) => setQ((s) => ({ ...s, note: v }))} maxLength={500} />
+                <Button small title={t('panel.send')} disabled={!(Number(q.price) >= 100) || !(Number(q.days) >= 1)} onPress={() => send(j)} />
+              </View>
+            ) : <Button small title={t('panel.giveOffer')} onPress={() => setOpen(j.id)} />}
+          </Card>
+        ))}
+      </Section>
+      {data?.quoted.length ? (
+        <Section title={t('panel.myQuotes')}>
+          {data.quoted.map((j) => (
+            <Card key={j.id}>
+              <T variant="h3">{j.title}</T>
+              <T variant="caption" color={colors.muted}>{t(`panel.jobStatus.${j.status}`)} · {j.quotes[0] ? formatPrice(j.quotes[0].priceTry, 'TRY', lang) : ''}</T>
+              {j.acceptedQuoteId && j.quotes.some((x) => x.id === j.acceptedQuoteId) ? <StatusLine text={t('panel.won')} /> : null}
+            </Card>
+          ))}
+        </Section>
+      ) : null}
+    </>
+  );
+}
+
+/** Kaptan: gelen rezervasyonlar; ödenmemiş talep geri çevrilebilir. */
+function CaptainInbox() {
+  const { t } = useTranslation();
+  const { data, reload } = useRemote(() => actions.providerBookings());
+  const lang = currentLang();
+  return (
+    <Section title={t('panel.bookings')}>
+      {data && !data.length ? <EmptyState icon="calendar" title={t('panel.noBookings')} /> : null}
+      {(data ?? []).map((b) => (
+        <Card key={b.id}>
+          <T variant="h3">{t('captain.selected', { start: b.start, count: b.days })}</T>
+          <T variant="caption" color={colors.muted}>{t(`panel.bookingStatus.${b.status}`)} · {formatPrice(b.totalEur, 'EUR', lang)}</T>
+          {b.status === 'requested' ? <Button small variant="ghost" title={t('panel.decline')} onPress={async () => { await attempt(() => actions.declineBooking(b.id)); reload(); }} /> : null}
+        </Card>
+      ))}
+    </Section>
+  );
+}

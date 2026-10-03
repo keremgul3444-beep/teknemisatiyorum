@@ -130,8 +130,12 @@ class JobsController {
   @Get('me/jobs')
   async mine(@CurrentUser() u: AuthUser) {
     const rows = await this.prisma.job.findMany({ where: { ownerId: u.id }, include: quoteInclude, orderBy: { createdAt: 'desc' }, take: 100 });
-    const pays = await this.prisma.servicePayment.findMany({ where: { subjectKind: 'job', subjectId: { in: rows.map((j) => j.id) }, status: { in: ['held', 'released', 'refunded'] } } });
-    return rows.map((j) => jobView(j, { userId: u.id }, pays.find((p) => p.subjectId === j.id)));
+    const ids = rows.map((j) => j.id);
+    const [pays, reviews] = await Promise.all([
+      this.prisma.servicePayment.findMany({ where: { subjectKind: 'job', subjectId: { in: ids }, status: { in: ['held', 'released', 'refunded'] } } }),
+      this.prisma.review.findMany({ where: { subjectKind: 'job', subjectId: { in: ids } }, select: { subjectId: true } }),
+    ]);
+    return rows.map((j) => jobView(j, { userId: u.id }, pays.find((p) => p.subjectId === j.id), reviews.some((r) => r.subjectId === j.id)));
   }
 
   /** Ustanın gelen kutusu: alanındaki açık işler (kendi işi hariç) ve teklif verdiği işler. */
@@ -153,7 +157,13 @@ class JobsController {
   async one(@CurrentUser() u: AuthUser, @Param('id') id: string) {
     const j = await this.prisma.job.findUnique({ where: { id }, include: quoteInclude });
     if (!j) throw Errors.notFound();
-    if (j.ownerId === u.id) return jobView(j, { userId: u.id }, await this.prisma.servicePayment.findFirst({ where: { subjectKind: 'job', subjectId: id, status: { in: ['held', 'released', 'refunded'] } } }));
+    if (j.ownerId === u.id) {
+      const [pay, reviewed] = await Promise.all([
+        this.prisma.servicePayment.findFirst({ where: { subjectKind: 'job', subjectId: id, status: { in: ['held', 'released', 'refunded'] } } }),
+        this.prisma.review.count({ where: { subjectKind: 'job', subjectId: id } }),
+      ]);
+      return jobView(j, { userId: u.id }, pay, reviewed > 0);
+    }
     const me = await this.prisma.providerProfile.findUnique({ where: { userId_kind: { userId: u.id, kind: 'usta' } } });
     const quoted = !!me && j.quotes.some((q) => q.providerId === me.id);
     const canQuote = !!me && me.status === 'active' && j.status === 'open' && me.categories.includes(j.category);
@@ -289,7 +299,8 @@ class BookingsController {
   @Get('me/captain-bookings')
   async mine(@CurrentUser() u: AuthUser) {
     const rows = await this.prisma.captainBooking.findMany({ where: { userId: u.id }, include: { provider: true }, orderBy: { createdAt: 'desc' }, take: 100 });
-    return rows.map((b) => bookingView(b, u.id));
+    const reviews = await this.prisma.review.findMany({ where: { subjectKind: 'captain', subjectId: { in: rows.map((b) => b.id) } }, select: { subjectId: true } });
+    return rows.map((b) => bookingView(b, u.id, reviews.some((r) => r.subjectId === b.id)));
   }
 
   /** Kaptanın takvimi: kendisine gelen rezervasyonlar (müşterinin adı yok; iletişim mesajla). */

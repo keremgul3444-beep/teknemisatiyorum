@@ -1,18 +1,20 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { space } from '@/theme';
 import { Chip, Header, ProviderCard, Screen } from '@/components';
-import { USTA_CATEGORIES, useProviders, type UstaCategory } from '@/services';
-import { demoOnly } from '@/components/DemoOnly';
+import { USTA_CATEGORIES, actions, useProviders, type UstaCategory } from '@/services';
+import { attempt } from '@/services/errors';
 
-function UstaList() {
+export default function UstaList() {
   const { t } = useTranslation();
   const params = useLocalSearchParams<{ kategori?: string }>();
   const initial = USTA_CATEGORIES.includes(params.kategori as UstaCategory) ? (params.kategori as UstaCategory) : undefined;
   const [cat, setCat] = useState<UstaCategory | undefined>(initial);
   const [sort, setSort] = useState<'rating' | 'reviews'>('rating');
+  // Gerçek modda liste açılışta tazelenir (yeni onaylanan ustalar).
+  useEffect(() => { attempt(() => actions.syncServices()); }, []);
   const list = [...useProviders('usta', cat)].sort((a, b) => (sort === 'rating' ? b.rating - a.rating : b.reviewCount - a.reviewCount));
 
   return (
@@ -31,4 +33,3 @@ function UstaList() {
   );
 }
 
-export default demoOnly(UstaList);

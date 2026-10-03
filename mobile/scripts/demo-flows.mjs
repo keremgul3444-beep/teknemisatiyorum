@@ -172,6 +172,7 @@ await flow(4, 'Usta işi → güvenli ödeme → karne', 'Hizmetler\'de dert yaz
   await fillPh('motorum su', 'motorum su alıyor');
   await (await top(page.getByRole('button', { name: 'Talep oluştur', exact: true }))).click(); await page.waitForTimeout(350);
   await see('Hizmet talebi');
+  await fillPh('Sorunu', 'Sintineye su geliyor, motor bölmesi ıslak.');
   await click('Talebi gönder');
   await see('Gelen teklifler (3)');
   await click('Kabul et', true);

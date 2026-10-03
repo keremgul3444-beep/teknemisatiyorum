@@ -1,19 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { colors, space } from '@/theme';
 import { Avatar, Button, Card, Header, Icon, NotFound, Rating, Screen, Section, Stepper, SuccessView, T } from '@/components';
-import { actions, formatPrice, JOB_STEPS, useJob, useAllProviders } from '@/services';
+import { actions, formatPrice, isApiMode, JOB_STEPS, useJob, useAllProviders } from '@/services';
+import { attempt } from '@/services/errors';
 import { currentLang } from '@/i18n';
-import { demoOnly } from '@/components/DemoOnly';
 
-function IsDetay() {
+export default function IsDetay() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const job = useJob(id);
   const providers = useAllProviders();
   const [stars, setStars] = useState(5);
+  // Ödeme sayfasından ya da bildirimden dönünce durum tazelenir.
+  useEffect(() => { attempt(() => actions.syncServices()); }, [id]);
   if (!job) return <NotFound />;
   const lang = currentLang();
   const usta = (pid?: string) => providers.find((p) => p.id === pid);
@@ -21,8 +23,8 @@ function IsDetay() {
   const current = job.status === 'degerlendirildi' ? JOB_STEPS.length - 1 : JOB_STEPS.indexOf(job.status);
   const chat = async () => {
     const u = usta(accepted?.providerId ?? job.offers[0]?.providerId);
-    const conv = await actions.startConversation({ kind: 'is', id: job.id, title: job.title }, u?.name ?? '—');
-    router.push(`/sohbet/${conv}`);
+    const conv = await attempt(() => actions.startConversation({ kind: 'is', id: job.id, title: job.title }, u?.name ?? '—'));
+    if (conv) router.push(`/sohbet/${conv}`);
   };
 
   return (
@@ -50,7 +52,7 @@ function IsDetay() {
                   </View>
                 </View>
                 <T variant="caption" color={colors.muted}>{o.note}</T>
-                <Button small title={t('job.accept')} onPress={() => actions.acceptOffer(job.id, o.id)} />
+                <Button small title={t('job.accept')} onPress={() => attempt(() => actions.acceptOffer(job.id, o.id))} />
               </Card>
             );
           })}
@@ -84,7 +86,7 @@ function IsDetay() {
         <Card>
           <T variant="h3">{t('job.inProgress')}</T>
           <T color={colors.muted}>{t('job.inProgressBody')}</T>
-          <Button icon="check" title={t('job.complete')} onPress={() => actions.completeJob(job.id)} />
+          <Button icon="check" title={t('job.complete')} onPress={() => attempt(() => actions.completeJob(job.id))} />
         </Card>
       ) : null}
 
@@ -97,7 +99,7 @@ function IsDetay() {
               <Pressable key={n} onPress={() => setStars(n)} hitSlop={6}><Icon name="star" size={34} color={colors.warning} filled={n <= stars} /></Pressable>
             ))}
           </View>
-          <Button title={t('job.rate')} onPress={() => actions.rateJob(job.id, stars)} />
+          <Button title={t('job.rate')} onPress={() => attempt(() => actions.rateJob(job.id, stars))} />
         </Card>
       ) : null}
 
@@ -106,9 +108,13 @@ function IsDetay() {
           actions={[{ title: t('job.seeLogbook'), onPress: () => router.push(`/teknelerim/${job.boatId}`) }]} />
       ) : null}
 
-      <Button variant="ghost" icon="mail" title={t('job.chat')} onPress={chat} />
+      {job.status === 'talep' ? <Card><T color={colors.muted}>{t('job.waitingQuotes')}</T></Card> : null}
+      {job.status === 'iptal' ? <Card><T color={colors.muted}>{t('job.cancelled')}</T></Card> : null}
+      {job.offers.length ? <Button variant="ghost" icon="mail" title={t('job.chat')} onPress={chat} /> : null}
+      {isApiMode() && (job.status === 'talep' || job.status === 'teklif' || job.status === 'onay') ? (
+        <Button variant="ghost" icon="x" title={t('job.cancel')} onPress={() => attempt(() => actions.cancelJob(job.id))} />
+      ) : null}
     </Screen>
   );
 }
 
-export default demoOnly(IsDetay);

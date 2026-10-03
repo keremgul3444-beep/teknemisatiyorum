@@ -54,6 +54,7 @@ describe('usta işi: talep → teklif → kabul → emanet ödeme → tamam → 
     await t.http().post(`/jobs/${job.id}/review`).set(owner.auth).send({ stars: 5, text: 'Hızlı ve temiz' }).expect(201);
     expect((await t.http().post(`/jobs/${job.id}/review`).set(owner.auth).send({ stars: 1 })).body.code).toBe('ALREADY_REVIEWED');
     expect((await t.http().get(`/providers/${usta.profileId}`)).body).toMatchObject({ rating: 5, reviewCount: 1 });
+    expect((await t.http().get('/me/jobs').set(owner.auth)).body.find((j: { id: string }) => j.id === job.id)).toMatchObject({ status: 'done', reviewed: true, paymentStatus: 'released' });
     expect(await t.prisma.notification.count({ where: { userId: usta.user.id, key: 'notif.paymentReleased' } })).toBe(1);
   });
 

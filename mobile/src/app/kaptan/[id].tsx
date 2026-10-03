@@ -7,9 +7,9 @@ import { Button, Card, Chip, Header, NotFound, ProviderProfile, Screen, Section,
 import { actions, formatPrice, useProvider } from '@/services';
 import { currentLang } from '@/i18n';
 import { requireLevel } from '@/session/role';
-import { demoOnly } from '@/components/DemoOnly';
+import { attempt } from '@/services/errors';
 
-function KaptanDetay() {
+export default function KaptanDetay() {
   const { t } = useTranslation();
   const { id, start, days: daysParam } = useLocalSearchParams<{ id: string; start?: string; days?: string }>();
   const p = useProvider(id);
@@ -18,12 +18,14 @@ function KaptanDetay() {
   const days = Math.max(1, Number(daysParam) || 1);
   const startDate = start ?? tomorrow;
   const weekly = days >= 7;
-  const total = weekly ? (p.weekRateEUR ?? 0) * Math.ceil(days / 7) : (p.dayRateEUR ?? 0) * days;
+  // Sunucudaki hesapla aynı: haftalık ücret yoksa 6 günlük ücret.
+  const total = weekly ? (p.weekRateEUR ?? (p.dayRateEUR ?? 0) * 6) * Math.ceil(days / 7) : (p.dayRateEUR ?? 0) * days;
   const lang = currentLang();
 
   const reserve = async () => {
     if (!requireLevel(2)) return;
-    const bid = await actions.bookCaptain({ captainId: p.id, start: startDate, days });
+    const bid = await attempt(() => actions.bookCaptain({ captainId: p.id, start: startDate, days }));
+    if (!bid) return;
     router.push({ pathname: '/odeme', params: { tur: 'kaptan', id: bid } });
   };
 
@@ -52,4 +54,3 @@ function KaptanDetay() {
   );
 }
 
-export default demoOnly(KaptanDetay);

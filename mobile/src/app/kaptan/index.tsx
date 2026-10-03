@@ -1,20 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { colors, space } from '@/theme';
 import { Chip, DateRangePicker, Header, ProviderCard, Screen, Section, T, type DateRange } from '@/components';
-import { useProviders } from '@/services';
+import { actions, useProviders } from '@/services';
+import { attempt } from '@/services/errors';
 import { currentLang } from '@/i18n';
-import { demoOnly } from '@/components/DemoOnly';
 
 const tomorrow = () => { const d = new Date(); d.setDate(d.getDate() + 1); d.setHours(12); return d.toISOString().slice(0, 10); };
 
-function KaptanList() {
+export default function KaptanList() {
   const { t } = useTranslation();
   const [range, setRange] = useState<DateRange | null>({ start: tomorrow(), days: 1 });
   const [region, setRegion] = useState<string | undefined>();
   const captains = useProviders('kaptan');
+  useEffect(() => { attempt(() => actions.syncServices()); }, []);
   const regions = [...new Set(captains.map((c) => c.region))];
   const list = captains.filter((c) => !region || c.region === region).sort((a, b) => b.rating - a.rating);
 
@@ -46,4 +47,3 @@ function KaptanList() {
   );
 }
 
-export default demoOnly(KaptanList);

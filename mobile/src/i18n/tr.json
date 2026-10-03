@@ -536,7 +536,8 @@
       "teklif": "Teklif",
       "onay": "Onay",
       "devam": "Devam",
-      "tamam": "Tamam"
+      "tamam": "Tamam",
+      "iptal": "İptal edildi"
     },
     "offers": "Gelen teklifler ({{count}})",
     "compare": "Teklifleri karşılaştır; ödemen iş bitene kadar güvende kalır.",
@@ -556,7 +557,11 @@
     "ratedBody": "Bu iş teknenin karnesine platform doğrulamalı olarak eklendi.",
     "seeLogbook": "Karneyi gör",
     "chat": "Usta ile mesajlaş",
-    "createdAt": "Açılış: {{date}}"
+    "createdAt": "Açılış: {{date}}",
+    "waitingQuotes": "Talebin alanındaki ustalara iletildi. Teklifler geldikçe burada görünür.",
+    "cancelled": "Bu iş talebi iptal edildi.",
+    "cancel": "Talebi iptal et",
+    "descriptionMin": "En az 10 karakter: ustalar doğru teklif verebilsin."
   },
   "payment": {
     "title": "Güvenli ödeme",
@@ -572,7 +577,12 @@
     "g2": "İş bitince sen onaylarsın",
     "g3": "Ancak o zaman karşı tarafa aktarılır",
     "pay": "{{amount}} öde",
-    "success": "Ödeme alındı, güvencede"
+    "success": "Ödeme alındı, güvencede",
+    "toCheckout": "Güvenli ödemeye geç · {{amount}}",
+    "returned": "Ödemeyi tamamladım",
+    "checkoutNote": "Kart bilgilerin uygulamaya girilmez; ödeme, bankanın güvenli sayfasında yapılır. Para iş bitene kadar emanette bekler.",
+    "openedNote": "Ödemeyi tarayıcıda tamamladıktan sonra buraya dönüp \"Ödemeyi tamamladım\"a dokun.",
+    "fxNote": "Ödeme Türk lirası ile alınır; tutar ödeme anındaki kurla çevrilir."
   },
   "captain": {
     "title": "Kaptan kiralama",
@@ -807,7 +817,11 @@
     "expired": "Süresi doldu",
     "renew": "Yenile",
     "expiresIn": "Yayın {{n}} gün sonra bitiyor",
-    "expiredNote": "İlan artık aramada görünmüyor. Yenilersen 90 gün daha yayında kalır."
+    "expiredNote": "İlan artık aramada görünmüyor. Yenilersen 90 gün daha yayında kalır.",
+    "bookingCancelled": "İptal edildi",
+    "payBooking": "Öde",
+    "completeBooking": "Kiralama tamamlandı",
+    "refunded": "İade edildi"
   },
   "settings": {
     "title": "Ayarlar",
@@ -874,7 +888,53 @@
     "renew": "Yenile",
     "req1": "Motor rölantide stop ediyor · Bodrum",
     "req2": "Dıştan takma bakım · Göcek",
-    "req3": "Pervane değişimi · Turgutreis"
+    "req3": "Pervane değişimi · Turgutreis",
+    "becomeTitle": "Hizmet veren ol",
+    "becomeBody": "Usta ya da kaptan olarak profil aç; belgen onaylanınca listede görünür, iş ve rezervasyon alırsın. Ödemen emanette güvende bekler.",
+    "becomeUsta": "Usta profili aç",
+    "becomeKaptan": "Kaptan profili aç",
+    "edit": "Düzenle",
+    "pendingNote": "Profilin belge onayından sonra listede görünür. Belgeni yüklemediysen şimdi yükle.",
+    "uploadDocs": "Belge yükle",
+    "ustaProfile": "Usta profili",
+    "kaptanProfile": "Kaptan profili",
+    "displayName": "Görünen ad",
+    "region": "Bölge",
+    "categories": "Uzmanlık alanları",
+    "dayRate": "Günlük ücret (€)",
+    "weekRate": "Haftalık ücret (€)",
+    "yearsExp": "Deneyim (yıl)",
+    "bio": "Kendini anlat",
+    "priceNote": "Fiyat notu",
+    "languages": "Diller",
+    "areas": "Çalıştığın bölgeler",
+    "commaHint": "Virgülle ayır",
+    "saveProfile": "Profili kaydet",
+    "noJobs": "Alanında şu an açık iş yok.",
+    "note": "Not",
+    "myQuotes": "Tekliflerim",
+    "won": "Teklifin kabul edildi",
+    "bookings": "Rezervasyonlar",
+    "noBookings": "Henüz rezervasyon yok.",
+    "decline": "Geri çevir",
+    "status": {
+      "pending": "Belge onayı bekleniyor",
+      "active": "Yayında",
+      "suspended": "Askıda"
+    },
+    "jobStatus": {
+      "open": "Teklif aşamasında",
+      "accepted": "Kabul edildi, ödeme bekleniyor",
+      "paid": "Ödeme emanette, iş sürüyor",
+      "done": "Tamamlandı",
+      "cancelled": "İptal edildi"
+    },
+    "bookingStatus": {
+      "requested": "Ödeme bekleniyor",
+      "paid": "Ödendi (emanette)",
+      "done": "Tamamlandı",
+      "cancelled": "İptal"
+    }
   },
   "corporate": {
     "title": "Firma paneli",
@@ -1030,7 +1090,14 @@
     },
     "previousReject": "Önceki red gerekçesi",
     "duplicateOther": "Bu fotoğraf başka bir satıcının ilanında da var: {{title}}",
-    "duplicateSame": "Bu fotoğraf aynı satıcının başka bir ilanında da var: {{title}}"
+    "duplicateSame": "Bu fotoğraf aynı satıcının başka bir ilanında da var: {{title}}",
+    "releaseNow": "Usta/kaptana aktar",
+    "payStatus": {
+      "held": "Emanette",
+      "released": "Aktarıldı",
+      "refunded": "İade edildi",
+      "failed": "Başarısız"
+    }
   },
   "audit": {
     "listingApproved": "İlan onaylandı: {{title}}",
@@ -1149,7 +1216,8 @@
     "booking_not_paid": "Rezervasyon henüz ödenmedi.",
     "booking_not_started": "Rezervasyon başlamadan tamamlanamaz.",
     "booking_not_done": "Rezervasyon tamamlanmadan değerlendirilemez.",
-    "already_paid": "Bu ödeme zaten yapıldı."
+    "already_paid": "Bu ödeme zaten yapıldı.",
+    "no_quote": "Bu işe henüz teklif gelmedi; teklif gelince ustayla yazışabilirsin."
   },
   "soon": {
     "title": "Yakında",

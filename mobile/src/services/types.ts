@@ -35,7 +35,7 @@ export interface Provider {
   dayRateEUR?: number; weekRateEUR?: number; languages?: string[]; yearsExp: number; areas?: string[];
 }
 
-export type JobStatus = 'talep' | 'teklif' | 'onay' | 'devam' | 'tamam' | 'degerlendirildi';
+export type JobStatus = 'talep' | 'teklif' | 'onay' | 'devam' | 'tamam' | 'degerlendirildi' | 'iptal';
 export const JOB_STEPS: JobStatus[] = ['talep', 'teklif', 'onay', 'devam', 'tamam'];
 export interface Offer { id: string; providerId: string; priceTRY: number; days: number; note: string }
 export interface Job {
@@ -61,7 +61,11 @@ export interface Conversation {
 }
 
 export interface SavedSearch { id: string; query: string; createdAt: string; newMatches: number }
-export interface CaptainBooking { id: string; captainId: string; start: string; days: number; totalEUR: number; paid: boolean }
+export interface CaptainBooking {
+  id: string; captainId: string; start: string; days: number; totalEUR: number; paid: boolean;
+  /** Gerçek modda sunucu durumu: requested | paid | done | cancelled; `reviewed` değerlendirildi mi. */
+  status?: 'requested' | 'paid' | 'done' | 'cancelled'; reviewed?: boolean;
+}
 export interface ExpertiseBooking { id: string; packageId: string; listingId?: string; date: string; slot: string; reportStatus?: string; score?: number | null }
 export interface ExpertisePackage { id: string; name: string; priceTRY: number; items: string[] }
 export interface BrokerCase { id: string; boatName: string; step: 0 | 1 | 2 | 3 | 4; askingEUR: number; createdAt: string }

@@ -1,7 +1,7 @@
 import type { Prefs } from '@/session/role';
 import type { BadgeKind, BoatType, Currency, Equipment, Flag } from '@tms/shared';
 import { absolute } from '../mode';
-import type { AdminItem, AuditEntry, Boat, BrokerCase, Conversation, ExpertiseBooking, ExpertisePackage, Listing, LogEntry, Promo, SavedSearch, Seller } from '../types';
+import type { AdminItem, AuditEntry, Boat, BrokerCase, CaptainBooking, Conversation, ExpertiseBooking, ExpertisePackage, Job, Listing, LogEntry, Promo, Provider, SavedSearch, Seller } from '../types';
 
 // Sunucu yanıt biçimleri (yalnızca kullanılan alanlar).
 export interface ApiListing {
@@ -64,7 +64,7 @@ export const toBoat = (b: ApiBoat): Boat => ({
   id: b.id, name: b.name, brand: b.brand, model: b.model, year: b.year, lengthM: b.lengthM, photoSeed: seedOf(b.id), logbook: b.entries.map(toEntry),
 });
 
-const SUBJECT: Record<string, Conversation['subject']['kind']> = { listing: 'ilan', broker: 'broker', expertise: 'broker' };
+const SUBJECT: Record<string, Conversation['subject']['kind']> = { listing: 'ilan', broker: 'broker', expertise: 'broker', job: 'is', captain: 'kaptan', provider: 'kaptan' };
 export const toConversation = (c: ApiConversationRow, prev?: Conversation): Conversation => ({
   id: c.id, withName: c.otherName ?? '—', subject: { kind: SUBJECT[c.subject.kind] ?? 'ilan', id: c.subject.id, title: c.subject.title },
   phoneShared: prev?.phoneShared ?? false, unread: c.unread, messages: prev?.messages ?? [], otherPhone: prev?.otherPhone ?? null,
@@ -107,3 +107,46 @@ export const toAdminVerification = (x: { id: string; kind: string; userName: str
   ({ id: `v:${x.id}`, kind: 'belge', title: x.kind, who: x.userName ?? '—', status: 'bekliyor', refId: x.id, fileIds: x.fileIds ?? [], details: x.details ?? null });
 export const toAudit = (a: { id: string; at: string; actorId: string | null; action: string; params: Record<string, string> | null }): AuditEntry =>
   ({ id: a.id, at: a.at.slice(0, 16).replace('T', ' '), who: a.actorId ?? '—', key: a.action, params: a.params ?? undefined });
+
+// ——— 2. dalga: hizmet verenler, işler, kaptan rezervasyonları ———
+
+export interface ApiProvider {
+  id: string; kind: 'usta' | 'kaptan'; name: string; categories: string[]; region: string; bio: string; priceNote: string; yearsExp: number;
+  languages: string[]; areas: string[]; dayRateEur: number | null; weekRateEur: number | null; rating: number | null; reviewCount: number; verified: boolean;
+  status?: 'pending' | 'active' | 'suspended';
+}
+export const toProvider = (p: ApiProvider): Provider => ({
+  id: p.id, kind: p.kind, name: p.name, categories: p.categories as Provider['categories'], rating: p.rating ?? 0, reviewCount: p.reviewCount,
+  region: p.region, verified: p.verified, docs: [], priceNote: p.priceNote, bio: p.bio, yearsExp: p.yearsExp,
+  dayRateEUR: p.dayRateEur ?? undefined, weekRateEUR: p.weekRateEur ?? (p.dayRateEur ? p.dayRateEur * 6 : undefined), languages: p.languages, areas: p.areas,
+});
+
+export interface ApiJob {
+  id: string; category: string; title: string; description: string; region: string; boatId?: string | null;
+  status: 'open' | 'accepted' | 'paid' | 'done' | 'cancelled'; acceptedQuoteId: string | null; createdAt: string;
+  quotes: { id: string; priceTry: number; days: number; note: string; provider: ApiProvider }[];
+  paymentStatus?: string | null; reviewed?: boolean;
+}
+/** Sunucu durumu → uygulamadaki adım: teklif gelmemiş açık iş "talep", teklif varsa "teklif". */
+export function jobStatusOf(j: Pick<ApiJob, 'status' | 'quotes' | 'reviewed'>): Job['status'] {
+  switch (j.status) {
+    case 'open': return j.quotes.length ? 'teklif' : 'talep';
+    case 'accepted': return 'onay';
+    case 'paid': return 'devam';
+    case 'done': return j.reviewed ? 'degerlendirildi' : 'tamam';
+    default: return 'iptal';
+  }
+}
+export const toJob = (j: ApiJob): Job => ({
+  id: j.id, category: j.category as Job['category'], title: j.title, description: j.description, boatId: j.boatId ?? '',
+  status: jobStatusOf(j), acceptedOfferId: j.acceptedQuoteId ?? undefined, createdAt: j.createdAt.slice(0, 10),
+  paid: j.paymentStatus === 'held' || j.paymentStatus === 'released',
+  offers: j.quotes.map((q) => ({ id: q.id, providerId: q.provider.id, priceTRY: q.priceTry, days: q.days, note: q.note })),
+});
+
+export interface ApiCaptainBooking {
+  id: string; start: string; days: number; totalEur: number; status: 'requested' | 'paid' | 'done' | 'cancelled'; captain: ApiProvider; reviewed?: boolean;
+}
+export const toCaptainBooking = (b: ApiCaptainBooking): CaptainBooking => ({
+  id: b.id, captainId: b.captain.id, start: b.start, days: b.days, totalEUR: b.totalEur, paid: b.status === 'paid' || b.status === 'done', status: b.status, reviewed: b.reviewed,
+});

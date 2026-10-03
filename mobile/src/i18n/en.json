@@ -536,7 +536,8 @@
       "teklif": "Quotes",
       "onay": "Approval",
       "devam": "Ongoing",
-      "tamam": "Done"
+      "tamam": "Done",
+      "iptal": "Cancelled"
     },
     "offers": "Quotes received ({{count}})",
     "compare": "Compare quotes; your payment stays protected until the job is done.",
@@ -556,7 +557,11 @@
     "ratedBody": "This job was added to the boat's logbook as platform-verified.",
     "seeLogbook": "View logbook",
     "chat": "Message technician",
-    "createdAt": "Opened: {{date}}"
+    "createdAt": "Opened: {{date}}",
+    "waitingQuotes": "Your request was sent to technicians in this field. Quotes will appear here.",
+    "cancelled": "This job request was cancelled.",
+    "cancel": "Cancel request",
+    "descriptionMin": "At least 10 characters so technicians can quote accurately."
   },
   "payment": {
     "title": "Secure payment",
@@ -572,7 +577,12 @@
     "g2": "You approve when the work is done",
     "g3": "Only then is it released to the provider",
     "pay": "Pay {{amount}}",
-    "success": "Payment received and protected"
+    "success": "Payment received and protected",
+    "toCheckout": "Go to secure payment · {{amount}}",
+    "returned": "I completed the payment",
+    "checkoutNote": "Your card details never enter the app; you pay on the bank’s secure page. The money is held until the job is done.",
+    "openedNote": "After completing the payment in the browser, come back and tap “I completed the payment”.",
+    "fxNote": "Payment is charged in Turkish lira at the exchange rate at the time of payment."
   },
   "captain": {
     "title": "Hire a captain",
@@ -807,7 +817,11 @@
     "expired": "Expired",
     "renew": "Renew",
     "expiresIn": "Listing ends in {{n}} days",
-    "expiredNote": "The listing no longer shows in search. Renew it to keep it live for 90 more days."
+    "expiredNote": "The listing no longer shows in search. Renew it to keep it live for 90 more days.",
+    "bookingCancelled": "Cancelled",
+    "payBooking": "Pay",
+    "completeBooking": "Charter completed",
+    "refunded": "Refunded"
   },
   "settings": {
     "title": "Settings",
@@ -874,7 +888,53 @@
     "renew": "Renew",
     "req1": "Engine stalls at idle · Bodrum",
     "req2": "Outboard service · Göcek",
-    "req3": "Propeller replacement · Turgutreis"
+    "req3": "Propeller replacement · Turgutreis",
+    "becomeTitle": "Become a provider",
+    "becomeBody": "Open a technician or captain profile; once your document is approved you appear in listings and receive jobs and bookings. Your payment is held safely in escrow.",
+    "becomeUsta": "Open technician profile",
+    "becomeKaptan": "Open captain profile",
+    "edit": "Edit",
+    "pendingNote": "Your profile appears in listings after document approval. Upload your document now if you haven’t.",
+    "uploadDocs": "Upload document",
+    "ustaProfile": "Technician profile",
+    "kaptanProfile": "Captain profile",
+    "displayName": "Display name",
+    "region": "Region",
+    "categories": "Specialties",
+    "dayRate": "Day rate (€)",
+    "weekRate": "Week rate (€)",
+    "yearsExp": "Experience (years)",
+    "bio": "About you",
+    "priceNote": "Price note",
+    "languages": "Languages",
+    "areas": "Areas you cover",
+    "commaHint": "Separate with commas",
+    "saveProfile": "Save profile",
+    "noJobs": "No open jobs in your field right now.",
+    "note": "Note",
+    "myQuotes": "My quotes",
+    "won": "Your quote was accepted",
+    "bookings": "Bookings",
+    "noBookings": "No bookings yet.",
+    "decline": "Decline",
+    "status": {
+      "pending": "Awaiting document approval",
+      "active": "Live",
+      "suspended": "Suspended"
+    },
+    "jobStatus": {
+      "open": "Collecting quotes",
+      "accepted": "Accepted, awaiting payment",
+      "paid": "Paid into escrow, in progress",
+      "done": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "bookingStatus": {
+      "requested": "Awaiting payment",
+      "paid": "Paid (in escrow)",
+      "done": "Completed",
+      "cancelled": "Cancelled"
+    }
   },
   "corporate": {
     "title": "Company panel",
@@ -1030,7 +1090,14 @@
     },
     "previousReject": "Previous rejection reason",
     "duplicateOther": "This photo also appears in another seller’s listing: {{title}}",
-    "duplicateSame": "This photo also appears in another listing by the same seller: {{title}}"
+    "duplicateSame": "This photo also appears in another listing by the same seller: {{title}}",
+    "releaseNow": "Release to provider",
+    "payStatus": {
+      "held": "Held",
+      "released": "Released",
+      "refunded": "Refunded",
+      "failed": "Failed"
+    }
   },
   "audit": {
     "listingApproved": "Listing approved: {{title}}",
@@ -1149,7 +1216,8 @@
     "booking_not_paid": "The booking hasn’t been paid yet.",
     "booking_not_started": "The booking can be completed once it has started.",
     "booking_not_done": "You can review once the booking is done.",
-    "already_paid": "This has already been paid."
+    "already_paid": "This has already been paid.",
+    "no_quote": "No quotes yet; you can message a technician once a quote arrives."
   },
   "soon": {
     "title": "Coming soon",

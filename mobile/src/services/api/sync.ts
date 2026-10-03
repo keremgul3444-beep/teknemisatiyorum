@@ -3,8 +3,8 @@ import { api } from './instance';
 import { ApiError } from './client';
 import { setRates, type Rates } from '../rates';
 import {
-  toAdminListing, toAdminVerification, toAudit, toBoat, toBooking, toBroker, toConversation, toListing, toPackage, toSaved, toSeller,
-  type ApiBoat, type ApiConversationRow, type ApiListing, type ApiUser,
+  toAdminListing, toAdminVerification, toAudit, toBoat, toBooking, toBroker, toCaptainBooking, toConversation, toJob, toListing, toPackage, toProvider, toSaved, toSeller,
+  type ApiBoat, type ApiCaptainBooking, type ApiConversationRow, type ApiJob, type ApiListing, type ApiProvider, type ApiUser,
 } from './mappers';
 import { DEFAULT_PREFS, useSession } from '@/session/role';
 import type { Role } from '../types';
@@ -65,6 +65,20 @@ export async function syncMine() {
   });
 }
 
+/**
+ * 2. dalga: belgesi onaylı usta ve kaptanlar (herkese açık), girişliyse kendi işleri ve kaptan rezervasyonları.
+ * İşlerdeki tekliflerin ustaları da listeye eklenir (ad ve puan için).
+ */
+export async function syncServices() {
+  const [ustas, captains] = await Promise.all([api.get<ApiProvider[]>('/providers?kind=usta'), api.get<ApiProvider[]>('/providers?kind=kaptan')]);
+  const byId = new Map([...ustas, ...captains].map((p) => [p.id, toProvider(p)]));
+  if (!useSession.getState().loggedIn) { set({ providers: [...byId.values()], jobs: [], captainBookings: [] }); return; }
+  const [jobs, bookings] = await Promise.all([api.get<ApiJob[]>('/me/jobs'), api.get<ApiCaptainBooking[]>('/me/captain-bookings')]);
+  jobs.forEach((j) => j.quotes.forEach((q) => byId.set(q.provider.id, byId.get(q.provider.id) ?? toProvider(q.provider))));
+  bookings.forEach((b) => byId.set(b.captain.id, byId.get(b.captain.id) ?? toProvider(b.captain)));
+  set({ providers: [...byId.values()], jobs: jobs.map(toJob), captainBookings: bookings.map(toCaptainBooking) });
+}
+
 export async function syncAdmin() {
   if (!useSession.getState().staff) return;
   const [listings, verifications, audit] = await Promise.all([
@@ -77,7 +91,7 @@ export async function syncAdmin() {
 
 /**
  * Gerçek moda geçişte ya da girişten sonra: sahte veriyi boşaltır, sunucudan yükler.
- * Usta/kaptan/ödeme (2. dalga) dilimleri boş kalır; o ekranlar gerçek modda "yakında" gösterir.
+ * Usta, kaptan ve iş dilimleri de sunucudan gelir (2. dalga); firmalar firma panelinde ayrıca yüklenir.
  */
 export async function syncAll() {
   set({ jobs: [], captainBookings: [], providers: [], companies: [] });
@@ -94,5 +108,6 @@ export async function syncAll() {
   set({ expertisePackages: pk.map(toPackage), favorites: [], savedSearches: [], boats: [], conversations: [], expertiseBookings: [], brokerCases: [], adminItems: [], audit: [] });
   await syncListings();
   await syncMine();
+  await syncServices();
   await syncAdmin();
 }
