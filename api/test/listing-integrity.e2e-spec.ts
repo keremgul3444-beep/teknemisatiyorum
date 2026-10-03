@@ -69,3 +69,12 @@ test('yeniden gönderilen ilanda moderatör önceki red gerekçesini görür', a
   const q = await t.http().get('/admin/queue?kind=listing').set(m.auth);
   expect(q.body.find((x: { id: string }) => x.id === l.id).previousRejectReason).toBe('blurry');
 });
+
+test('kimlik doğrulamada günde en fazla 5 başarısız deneme', async () => {
+  const u = await loginAs(t);
+  const bad = { tckn: '12345678901', firstName: 'A', lastName: 'B', birthYear: 1990 };
+  for (let i = 0; i < 5; i++) expect((await t.http().post('/verification/identity').set(u.auth).send(bad)).body.code).toBe('INVALID_TCKN');
+  const over = await t.http().post('/verification/identity').set(u.auth).send(bad);
+  expect(over.status).toBe(429);
+  expect(over.body.code).toBe('IDENTITY_ATTEMPTS');
+});

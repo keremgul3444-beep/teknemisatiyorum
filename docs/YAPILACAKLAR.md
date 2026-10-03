@@ -28,7 +28,7 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 ## Uygulama ve arka uç
 - [ ] API uçtan uca testleri yerelde çalıştırılmalı (`cd api; npx jest --runInBand`); bulut oturumunda çalışmıyor
 - [ ] Usta / kaptan / iş / güvenli ödeme arka ucu (2. dalga); sonra sitede usta-kaptan rehber sayfaları
-- [ ] Gerçek kimlik doğrulama (NVİ / e-Devlet); şu an T.C. yalnızca algoritmayla kontrol ediliyor
+- [ ] NVİ bağlantısı kodda hazır (`IDENTITY_MODE=nvi`); canlı sunucudan bir kez gerçek bilgilerle denenmeli (bulut oturumundan NVİ'ye erişilmedi)
 - [ ] Anlık bildirimi gerçek telefonda dene: EAS projesi (`extra.eas.projectId`) + geliştirme derlemesi gerekir (Expo Go'da uzak bildirim çalışmıyor); sunucuda `PUSH_MODE=expo`
 - [ ] Mağaza derlemesi (EAS build) ve mağaza başvurusu; şu an yalnızca Expo Go
 - [ ] Veri kopyası telefonda dosya olarak paylaşılsın (çok büyük kopyada paylaşım menüsü sınırı)

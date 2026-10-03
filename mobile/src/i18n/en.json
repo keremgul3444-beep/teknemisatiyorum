@@ -1038,7 +1038,8 @@
     "listingSold": "Listing marked as sold: {{title}}",
     "listingWithdrawn": "Listing withdrawn by owner: {{title}}",
     "privateFileViewed": "Protected document opened",
-    "listingRenewed": "Listing renewed: {{title}}"
+    "listingRenewed": "Listing renewed: {{title}}",
+    "identityFailed": "Identity verification failed"
   },
   "errors": {
     "generic": "Something went wrong, please try again.",
@@ -1098,7 +1099,9 @@
     "image_too_large": "This photo’s resolution is too high. Choose a smaller photo.",
     "too_many_drafts": "You have too many unfinished listings. Finish or delete one first.",
     "price_change_limit": "You’ve changed the price enough this week. Try again in a few days.",
-    "not_renewable": "This listing can’t be renewed yet; you can renew it in its last 14 days."
+    "not_renewable": "This listing can’t be renewed yet; you can renew it in its last 14 days.",
+    "identity_attempts": "Too many failed attempts today. Check your details and try again tomorrow.",
+    "identity_service_down": "The identity service is unavailable right now. Please try again shortly."
   },
   "soon": {
     "title": "Coming soon",

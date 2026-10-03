@@ -6,7 +6,7 @@ import { PrismaService } from '../../common/prisma.service';
 import { AuditService } from '../../common/audit.service';
 import { AppError, Errors } from '../../common/errors';
 import { blindIndex, encrypt } from '../../common/crypto';
-import { IDENTITY_VERIFIER, type IdentityVerifier } from '../../adapters/identity';
+import { IDENTITY_VERIFIER, IdentityServiceDown, type IdentityVerifier } from '../../adapters/identity';
 import { MediaService } from '../media/media.service';
 import { userView } from '../users/user.view';
 
@@ -24,6 +24,8 @@ const requestBody = z.object({
   details: z.object({ engineSerialLast4: z.string().trim().regex(/^[A-Za-z0-9]{2,6}$/) }).optional(),
 });
 
+/** Günde en fazla bu kadar başarısız T.C. doğrulama denemesi. */
+const MAX_IDENTITY_FAILS_PER_DAY = 5;
 const tcknInUse = () => new AppError('TCKN_IN_USE', 'errors.tckn_in_use', 409);
 
 @Controller('verification')
@@ -44,7 +46,17 @@ export class VerificationController {
   @HttpCode(200)
   async verifyIdentity(@CurrentUser() u: AuthUser, @Body(new ZodPipe(identityBody)) b: z.infer<typeof identityBody>) {
     if ('tckn' in b) {
-      if (!(await this.identity.verify(b))) throw Errors.bad('INVALID_TCKN');
+      // Başarısız deneme sınırı: NVİ sorgusu başkasının ad/doğum yılını tahmin etmek için kullanılamasın.
+      const failed = await this.prisma.auditLog.count({ where: { actorId: u.id, action: 'audit.identityFailed', at: { gt: new Date(Date.now() - 864e5) } } });
+      if (failed >= MAX_IDENTITY_FAILS_PER_DAY) throw Errors.tooMany('IDENTITY_ATTEMPTS');
+      const ok = await this.identity.verify(b).catch((e) => {
+        if (e instanceof IdentityServiceDown) throw new AppError('IDENTITY_SERVICE_DOWN', 'errors.identity_service_down', 503);
+        throw e;
+      });
+      if (!ok) {
+        await this.audit.log(u.id, 'audit.identityFailed', {}, 'user', u.id);
+        throw Errors.bad('INVALID_TCKN');
+      }
       // Bir kimlik numarası tek hesaba bağlanır (sahte çoklu hesap önlemi); eşzamanlı denemeyi tekil dizin yakalar.
       const hash = blindIndex(b.tckn);
       const taken = await this.prisma.user.findFirst({ where: { nationalIdHash: hash, id: { not: u.id } }, select: { id: true } });
