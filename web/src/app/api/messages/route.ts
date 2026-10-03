@@ -9,9 +9,11 @@ const bad = () => NextResponse.json({ code: 'VALIDATION', messageKey: 'errors.va
  * Oturum yoksa 401 döner; sayfa girişe yönlendirir. Satıcının telefon numarası hiçbir zaman dönmez.
  */
 export async function POST(req: Request) {
-  const { listingId, text } = await readJson(req);
-  if (typeof listingId !== 'string' || !ID.test(listingId) || typeof text !== 'string' || !text.trim() || text.length > 2000) return bad();
-  const start = await relay(req, '/conversations', { subjectKind: 'listing', subjectId: listingId }, { auth: true });
+  const { listingId, providerId, text } = await readJson(req);
+  // Konu: ilan (satıcı) ya da hizmet veren profili (usta/kaptan).
+  const subject = typeof providerId === 'string' ? { subjectKind: 'provider', subjectId: providerId } : { subjectKind: 'listing', subjectId: listingId };
+  if (typeof subject.subjectId !== 'string' || !ID.test(subject.subjectId) || typeof text !== 'string' || !text.trim() || text.length > 2000) return bad();
+  const start = await relay(req, '/conversations', subject, { auth: true });
   if (start.res) return start.res;
   const id = String(start.ok.id);
   const token = start.fresh?.accessToken;

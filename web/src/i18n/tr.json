@@ -650,6 +650,23 @@
       "failed": "Kartından para çekilmedi. Tekrar deneyebilirsin.",
       "refunded": "Bu sipariş iade edildi.",
       "cancelled": "Bu sipariş zaman aşımına uğradı; yeniden satın alabilirsin."
+    },
+    "serviceAmount": "Hizmet bedeli",
+    "serviceFee": "Platform payı",
+    "escrowNote": "Para iş bitene kadar emanette bekler; işi onayladığında hizmet verene aktarılır.",
+    "backToApp": "Uygulamaya dönüp \"Ödemeyi tamamladım\"a dokunabilirsin.",
+    "serviceRetry": "Uygulamadan yeniden deneyebilirsin.",
+    "servicePending": "Banka onayı birkaç saniye içinde gelir; sayfa kendini yeniler.",
+    "service": {
+      "job": "Usta işi (emanet ödeme)",
+      "captain": "Kaptan rezervasyonu (emanet ödeme)"
+    },
+    "servicePayStatus": {
+      "pending": "Ödeme onayı bekleniyor",
+      "held": "Ödemen emanete alındı",
+      "released": "Ödeme hizmet verene aktarıldı",
+      "refunded": "Ödeme iade edildi",
+      "failed": "Ödeme başarısız"
     }
   },
   "gallery": {
@@ -892,5 +909,25 @@
       "tersane": "Tersane",
       "servis": "Servis"
     }
+  },
+  "providers": {
+    "new": "Yeni",
+    "years": "{{n}} yıl deneyim",
+    "verified": "Belgesi onaylı",
+    "dayRate": "Günlük €{{n}}",
+    "weekRate": "Haftalık €{{n}}",
+    "categories": "Uzmanlık alanları",
+    "all": "Tümü",
+    "emptyUsta": "Bu alanda henüz belgesi onaylı usta yok. Usta isen hemen katıl.",
+    "emptyKaptan": "Henüz belgesi onaylı kaptan yok. Kaptan isen hemen katıl.",
+    "requestInApp": "Uygulamada teklif iste",
+    "bookInApp": "Uygulamada rezervasyon yap",
+    "languages": "Diller",
+    "areas": "Bölgeler",
+    "contactTitle": "Mesaj gönder",
+    "suggestion": "Merhaba {{name}}, teknem için bilgi almak istiyorum.",
+    "sent": "Mesajın iletildi. Yanıtı burada ve uygulamada görürsün.",
+    "reviews": "Değerlendirmeler",
+    "noReviews": "Henüz değerlendirme yok."
   }
 }

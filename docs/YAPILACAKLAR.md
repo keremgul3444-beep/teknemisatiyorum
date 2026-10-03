@@ -24,8 +24,8 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 - [ ] Uygulamanın "Öne çıkar" ekranını uçtan uca tarayıcı testiyle dene (bu turda bellek yetersizliğinden uygulama önizlemesi açılmadı; aynı sunucu ucu kabul testinde denendi)
 
 ## Uygulama ve arka uç
-- [ ] API uçtan uca testleri yerelde çalıştırılmalı (`cd api; npx jest --runInBand`); bulut oturumunda çalışmıyor
-- [ ] Usta / kaptan / iş / güvenli ödeme arka ucu (2. dalga); sonra sitede usta-kaptan rehber sayfaları
+- [ ] API uçtan uca testleri: bulut oturumunda sistem PostgreSQL 16 ile 40 dosya / 216+ test geçti; yerelde gömülü veritabanıyla bir kez `cd api; npx jest --runInBand` çalıştırılmalı
+- [ ] 2. dalga canlı öncesi: emanet ödemenin hizmet verene gerçek aktarımı (sanal POS alt üye işyeri / pazaryeri modeli) sağlayıcı anlaşmasıyla bağlanmalı; şu an durum platformda izleniyor
 - [ ] NVİ bağlantısı kodda hazır (`IDENTITY_MODE=nvi`); canlı sunucudan bir kez gerçek bilgilerle denenmeli (bulut oturumundan NVİ'ye erişilmedi)
 - [ ] Anlık bildirimi gerçek telefonda dene: EAS projesi (`extra.eas.projectId`) + geliştirme derlemesi gerekir (Expo Go'da uzak bildirim çalışmıyor); sunucuda `PUSH_MODE=expo`
 - [ ] Mağaza derlemesi (EAS build) ve mağaza başvurusu; şu an yalnızca Expo Go

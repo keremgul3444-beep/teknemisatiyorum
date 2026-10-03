@@ -79,7 +79,9 @@ export const actions = {
     const r = await api.post<{ accessToken: string; refreshToken: string; user: ApiUser }>('/auth/verify', { phone, code, deviceName });
     await api.setTokens(r.accessToken, r.refreshToken);
     applyUser(r.user);
+    // Girişten sonra kişisel veriler: ilanlar/mesajlar, işler ve rezervasyonlar (2. dalga), ekipse yönetim kuyruğu.
     await syncMine();
+    await syncServices();
     await syncAdmin();
     await actions.registerPush();
   },

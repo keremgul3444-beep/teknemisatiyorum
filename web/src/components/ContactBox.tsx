@@ -7,11 +7,11 @@ type Labels = { title: string; placeholder: string; send: string; sent: string; 
  * Siteden satıcıya mesaj. Oturum yoksa girişe (bu sayfaya geri dönecek şekilde) yönlendirir.
  * Satıcının telefonu gösterilmez; yazışma sitede Hesabım > Mesajlar'da ve uygulamada sürer.
  */
-export function ContactBox({ listingId, labels, errors, loginHref, threadHref, suggestion }: {
-  listingId: string; labels: Labels; errors: Record<string, string>; loginHref: string; threadHref: string; suggestion: string;
+export function ContactBox({ listingId, providerId, labels, errors, loginHref, threadHref, suggestion }: {
+  listingId?: string; providerId?: string; labels: Labels; errors: Record<string, string>; loginHref: string; threadHref: string; suggestion: string;
 }) {
   // Hazır bir ilk cümleyle açılır; girişe gidip dönen kullanıcının yazdığı metin kaybolmaz (yalnızca bu sekmede tutulur).
-  const key = `tms.contact.${listingId}`;
+  const key = `tms.contact.${listingId ?? providerId}`;
   const [text, setText] = useState(suggestion);
   useEffect(() => {
     try {
@@ -27,7 +27,7 @@ export function ContactBox({ listingId, labels, errors, loginHref, threadHref, s
   const send = async () => {
     setBusy(true); setError('');
     try {
-      const r = await fetch('/api/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ listingId, text }) });
+      const r = await fetch('/api/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(providerId ? { providerId, text } : { listingId, text }) });
       const j = await r.json().catch(() => ({}));
       if (r.status === 401) {
         try { sessionStorage.setItem(key, text); } catch { /* yok sayılır */ }

@@ -650,6 +650,23 @@
       "failed": "No money was charged. You can try again.",
       "refunded": "This order was refunded.",
       "cancelled": "This order timed out; you can buy again."
+    },
+    "serviceAmount": "Service amount",
+    "serviceFee": "Platform fee",
+    "escrowNote": "The money is held until the job is done; it is released to the provider when you confirm.",
+    "backToApp": "Go back to the app and tap “I completed the payment”.",
+    "serviceRetry": "You can try again from the app.",
+    "servicePending": "The bank confirmation arrives in a few seconds; this page refreshes itself.",
+    "service": {
+      "job": "Technician job (escrow payment)",
+      "captain": "Captain booking (escrow payment)"
+    },
+    "servicePayStatus": {
+      "pending": "Waiting for payment confirmation",
+      "held": "Your payment is held in escrow",
+      "released": "Payment released to the provider",
+      "refunded": "Payment refunded",
+      "failed": "Payment failed"
     }
   },
   "gallery": {
@@ -892,5 +909,25 @@
       "tersane": "Shipyard",
       "servis": "Service"
     }
+  },
+  "providers": {
+    "new": "New",
+    "years": "{{n}} years’ experience",
+    "verified": "Documents verified",
+    "dayRate": "€{{n}} per day",
+    "weekRate": "€{{n}} per week",
+    "categories": "Specialties",
+    "all": "All",
+    "emptyUsta": "No verified technicians in this field yet. Join now if you are one.",
+    "emptyKaptan": "No verified captains yet. Join now if you are one.",
+    "requestInApp": "Request a quote in the app",
+    "bookInApp": "Book in the app",
+    "languages": "Languages",
+    "areas": "Areas",
+    "contactTitle": "Send a message",
+    "suggestion": "Hello {{name}}, I’d like some information for my boat.",
+    "sent": "Your message was sent. You’ll see the reply here and in the app.",
+    "reviews": "Reviews",
+    "noReviews": "No reviews yet."
   }
 }
