@@ -84,6 +84,7 @@ Paket kimliği iOS ve Android'de `com.teknemisatiyorum.app` (`mobile/app.json`; 
 - Kesinti takibi: UptimeRobot (ücretsiz) ile `https://api.alanadi.com/health/ready` ve `https://alanadi.com` 5 dakikada bir. Veritabanı düşerse `/health/ready` 503 döner.
 - Hata takibi: `ERROR_DSN`'e Sentry ya da GlitchTip proje DSN'i yazılır. Beklenmeyen 500 hataları, arka plan işleri (emanet taraması, süre taraması, yedek, dosya temizliği) ve çöken süreç bildirilir. Gönderilen: hata türü, kısaltılmış mesaj, yığın izi, yol kalıbı (`/listings/:id`). Kimlik, telefon, sorgu dizesi gönderilmez. Sentry yurt dışında olduğu için KVKK açısından en temizi GlitchTip'i kendi sunucunda ya da AB'de barındırmak; Sentry seçilirse aydınlatma metnine eklenmeli.
 - Kayıtlar: `docker compose -f deploy/docker-compose.yml logs api`.
+- Ziyaretçi ölçümü (Umami, isteğe bağlı, kendi sunucunda, çerezsiz): `deploy/.env`'e `UMAMI_APP_SECRET` (`openssl rand -hex 32`) yaz; `docker compose -f deploy/docker-compose.yml --profile analytics up -d`. Kurulum önceden yapıldıysa önce veritabanını aç: `docker compose -f deploy/docker-compose.yml exec db createdb -U tms umami`. Panel için DNS'e `stats.alanadi.com` A kaydı ekle ve `deploy/Caddyfile`'daki `stats` bloğunun yorumunu kaldır. Panele `admin` / `umami` ile gir, **şifreyi hemen değiştir**, site ekle, çıkan Website ID'yi `UMAMI_WEBSITE_ID`'ye yaz ve `up -d web` (yeniden derleme gerekmez). Ölçüm yalnızca çerez çubuğunda "Kabul et" diyen ziyaretçide çalışır.
 - Disk: `df -h` ve `docker system df` ayda bir.
 
 ## 8. Kapasite (yük testi, 2026-10-03)

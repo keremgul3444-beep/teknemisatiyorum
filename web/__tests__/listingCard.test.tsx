@@ -1,7 +1,10 @@
-import { render, screen } from '@testing-library/react';
-import { expect, test } from 'vitest';
+import { cleanup, render, screen } from '@testing-library/react';
+import { afterEach, expect, test } from 'vitest';
 import { ListingCard } from '../src/components/ListingCard';
 import type { ListingView } from '../src/lib/types';
+
+// Test bitmeden bileşen sökülür: React'in zamanlanmış işi ortam kapandıktan sonra çalışıp "window is not defined" atmasın.
+afterEach(() => cleanup());
 
 const base: Omit<ListingView, 'promo'> = {
   id: 'ck1', brand: 'Bavaria', model: 'C46', year: 2014, lengthM: 14, type: 'yelkenli', price: 90000, currency: 'EUR',

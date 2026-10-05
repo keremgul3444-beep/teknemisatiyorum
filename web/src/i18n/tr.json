@@ -473,8 +473,8 @@
           "b": "Oturum ve çerez tercihinin saklanması için gereklidir; kapatılamaz."
         },
         {
-          "h": "İstatistik çerezleri",
-          "b": "Yalnızca iznin olursa kullanılır. Şu an hiçbir istatistik aracı kullanılmıyor."
+          "h": "İstatistik",
+          "b": "Yalnızca \"Kabul et\" dersen, hangi sayfaların ziyaret edildiğini toplu olarak ölçeriz (Umami, kendi sunucumuzda). Çerez kullanmaz, IP adresini saklamaz, seni tanımlamaz ve verileri kimseyle paylaşmaz. Tercihini tarayıcıdan çerezleri silerek değiştirebilirsin."
         }
       ]
     },
@@ -737,7 +737,8 @@
     "noNotifications": "Henüz bildirimin yok.",
     "unreadCount": "{{n}} yeni",
     "inApp": "Ayrıntısı uygulamada",
-    "anyListing": "Tüm ilanlar"
+    "anyListing": "Tüm ilanlar",
+    "whatsapp": "WhatsApp'tan yaz"
   },
   "pay": {
     "devTitle": "Deneme ödemesi",

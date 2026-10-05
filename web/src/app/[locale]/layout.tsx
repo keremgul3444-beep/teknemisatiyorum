@@ -4,6 +4,7 @@ import { Bricolage_Grotesque, Figtree } from 'next/font/google';
 import { cssVariableMap } from '@tms/shared';
 import { isLocale, localePath, LOCALES, t, type Locale } from '@/i18n';
 import { CookieConsent } from '@/components/CookieConsent';
+import { Analytics } from '@/components/Analytics';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import '../globals.css';
@@ -29,6 +30,7 @@ export default async function RootLayout({ children, params }: { children: React
           title: t(locale as Locale, 'consent.title'), text: t(locale as Locale, 'consent.text'), necessaryOnly: t(locale as Locale, 'consent.necessaryOnly'),
           accept: t(locale as Locale, 'consent.accept'), more: t(locale as Locale, 'consent.more'), moreHref: localePath(locale as Locale, '/cerezler'),
         }} />
+        <Analytics />
       </body>
     </html>
   );

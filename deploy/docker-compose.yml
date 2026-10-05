@@ -10,7 +10,10 @@ services:
       POSTGRES_USER: tms
       POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD gerekli}
       POSTGRES_DB: tms
-    volumes: [pgdata:/var/lib/postgresql/data]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # İlk kurulumda çalışır: ölçüm veritabanı (umami).
+      - ./db-init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U tms']
       interval: 5s
@@ -57,6 +60,8 @@ services:
       TRUSTED_PROXY_HOPS: '1'
       # İlan bağlantıları telefonda uygulamada açılsın (mağaza hesapları açılınca doldurulur).
       APPLE_TEAM_ID: ${APPLE_TEAM_ID:-}
+      # Ölçüm (isteğe bağlı): Umami'de oluşturulan sitenin kimliği; boşsa ölçüm yüklenmez.
+      UMAMI_WEBSITE_ID: ${UMAMI_WEBSITE_ID:-}
       ANDROID_CERT_SHA256: ${ANDROID_CERT_SHA256:-}
     depends_on: [api]
 
@@ -70,6 +75,18 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
     depends_on: [web, api]
+
+  # Ziyaretçi ölçümü (isteğe bağlı, çerezsiz): docker compose -f deploy/docker-compose.yml --profile analytics up -d
+  # Site betiği ve gönderimi /stats yolundan buraya aktarır; panel stats.<alan adı> (Caddyfile'da açılır).
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    profiles: [analytics]
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://tms:${DB_PASSWORD}@db:5432/umami
+      APP_SECRET: ${UMAMI_APP_SECRET:-}
+    depends_on:
+      db: { condition: service_healthy }
 
 volumes:
   pgdata:

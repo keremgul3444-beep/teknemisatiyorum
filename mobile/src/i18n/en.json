@@ -706,7 +706,9 @@
     "blockConfirm": "This person won’t be able to message you in this chat, and you won’t be able to message them. Block?",
     "blockedByMe": "You blocked this person.",
     "blockedByThem": "Messages can no longer be sent in this chat.",
-    "paymentRisk": "This message asks for a payment. Don’t send a deposit or transfer before seeing the boat and signing a contract."
+    "paymentRisk": "This message asks for a payment. Don’t send a deposit or transfer before seeing the boat and signing a contract.",
+    "whatsapp": "Message on WhatsApp",
+    "call": "Call"
   },
   "profile": {
     "guestTitle": "Log in to your account",

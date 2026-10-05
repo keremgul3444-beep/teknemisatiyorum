@@ -23,7 +23,7 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 ## Web sitesi
 - [ ] Aşama 2 ödeme: gerçek sanal POS ve gerçek Apple/Google ödemesi (hesaplar açılınca, deneme modunun yerine takılır)
 - [ ] Blog / içerik yazıları (SEO için değerli, ayrı içerik işi)
-- [ ] İstatistik aracı seçimi (Google Analytics ya da gizlilik dostu alternatif) — karar senin; çerez onayı altyapısı hazır
+- [ ] Ziyaretçi ölçümü: Umami kodda hazır (çerez onayıyla, `/stats`); sunucuda `--profile analytics` ile aç ve site kimliğini gir (`docs/CANLIYA-CIKIS.md` 7. bölüm)
 - [ ] Canlı sunucuda hız ölçümünü (Lighthouse) tekrarla; yerel ölçüm: ana sayfa 96, ilan 92
 - [ ] Uygulamanın "Öne çıkar" ekranını uçtan uca tarayıcı testiyle dene (bu turda bellek yetersizliğinden uygulama önizlemesi açılmadı; aynı sunucu ucu kabul testinde denendi)
 

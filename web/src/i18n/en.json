@@ -473,8 +473,8 @@
           "b": "Needed for sessions and to store your cookie choice; they can't be turned off."
         },
         {
-          "h": "Analytics cookies",
-          "b": "Used only with your consent. No analytics tool is in use right now."
+          "h": "Statistics",
+          "b": "Only if you choose \"Accept\" do we measure, in aggregate, which pages are visited (Umami, on our own server). It uses no cookies, does not store your IP address, does not identify you and shares nothing with anyone. You can change your choice by clearing cookies in your browser."
         }
       ]
     },
@@ -737,7 +737,8 @@
     "noNotifications": "No notifications yet.",
     "unreadCount": "{{n}} new",
     "inApp": "Details in the app",
-    "anyListing": "All listings"
+    "anyListing": "All listings",
+    "whatsapp": "Message on WhatsApp"
   },
   "pay": {
     "devTitle": "Trial payment",

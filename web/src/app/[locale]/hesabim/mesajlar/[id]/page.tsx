@@ -6,6 +6,7 @@ import { authedGet } from '@/lib/auth-server';
 import { ApiError } from '@/lib/api';
 import { paymentRisk } from '@tms/shared';
 import { BlockButton, ReplyForm } from '@/components/AccountBits';
+import { whatsappUrl } from '@tms/shared';
 
 type P = { params: Promise<{ locale: string; id: string }> };
 type Thread = {
@@ -33,7 +34,9 @@ export default async function Sohbet({ params }: P) {
     <section className="section" style={{ maxWidth: 720 }}>
       <p className="small"><Link href={localePath(locale, '/hesabim/mesajlar')}>{t(locale, 'account.messages')}</Link></p>
       <h1 style={{ fontSize: 26 }}>{th.subject.title}</h1>
-      <p className="muted">{th.otherName ?? '—'}{th.otherPhone ? <> · <a href={`tel:${th.otherPhone}`}>{th.otherPhone}</a></> : null}</p>
+      <p className="muted">{th.otherName ?? '—'}{th.otherPhone ? <> · <a href={`tel:${th.otherPhone}`}>{th.otherPhone}</a></> : null}
+        {th.otherPhone && whatsappUrl(th.otherPhone, th.subject.title) ? <> · <a href={whatsappUrl(th.otherPhone, th.subject.title)!} target="_blank" rel="noopener noreferrer">{t(locale, 'account.whatsapp')}</a></> : null}
+      </p>
       <div style={{ display: 'grid', gap: 8, margin: '16px 0' }}>
         {th.messages.map((m) => (
           <div key={m.id} className="card" style={{ justifySelf: m.mine ? 'end' : 'start', maxWidth: '85%', background: m.mine ? 'var(--c-surface)' : 'var(--c-card)', padding: '10px 14px' }}>

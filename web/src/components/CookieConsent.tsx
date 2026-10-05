@@ -2,12 +2,13 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { CONSENT_COOKIE, CONSENT_MAX_AGE, readConsent, serializeConsent } from '@/lib/consent';
+import { CONSENT_EVENT } from './Analytics';
 
 type Labels = { title: string; text: string; necessaryOnly: string; accept: string; more: string; moreHref: string };
 
 /**
- * Çerez izni çubuğu. Varsayılan ve öne çıkan seçenek "yalnızca zorunlu"; istatistik aracı seçilene kadar
- * "kabul et" de hiçbir izleme betiği yüklemez, yalnızca tercihi kaydeder.
+ * Çerez izni çubuğu. Varsayılan ve öne çıkan seçenek "yalnızca zorunlu". "Kabul et" ölçümü (Umami) açar;
+ * ölçüm ayarlı değilse yalnızca tercihi kaydeder.
  */
 export function CookieConsent({ labels }: { labels: Labels }) {
   const [open, setOpen] = useState(false);
@@ -20,6 +21,7 @@ export function CookieConsent({ labels }: { labels: Labels }) {
     const secure = location.protocol === 'https:' ? '; Secure' : '';
     document.cookie = `${CONSENT_COOKIE}=${encodeURIComponent(serializeConsent({ necessary: true, analytics, at: new Date().toISOString() }))}; Path=/; Max-Age=${CONSENT_MAX_AGE}; SameSite=Lax${secure}`;
     setOpen(false);
+    window.dispatchEvent(new Event(CONSENT_EVENT));
   };
   return (
     <div role="dialog" aria-label={labels.title} aria-live="polite" className="card" style={{ position: 'fixed', left: 16, right: 16, bottom: 16, zIndex: 50, maxWidth: 720, margin: '0 auto', boxShadow: '0 8px 30px rgba(0,0,0,.12)' }}>

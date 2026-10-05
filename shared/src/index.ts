@@ -11,3 +11,4 @@ export * from './design';
 export * from './location';
 export * from './safety';
 export * from './listingText';
+export * from './contact';

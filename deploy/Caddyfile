@@ -9,6 +9,11 @@ www.{$DOMAIN} {
 	redir https://{$DOMAIN}{uri} permanent
 }
 
+# Ölçüm paneli (Umami; --profile analytics ile açıldıysa). DNS'te stats.<alan adı> A kaydı ekleyip aşağıyı aç:
+# stats.{$DOMAIN} {
+# 	reverse_proxy umami:3000
+# }
+
 api.{$DOMAIN} {
 	encode zstd gzip
 	request_body {

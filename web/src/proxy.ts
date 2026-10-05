@@ -82,5 +82,5 @@ async function listingGone(pathname: string): Promise<boolean> {
 
 export const config = {
   // Statik dosyalar, API rotaları, görseller ve site haritası dil yönlendirmesinden geçmez.
-  matcher: ['/((?!_next|api|media|\\.well-known|favicon.ico|robots.txt|sitemap.xml|icon|apple-icon).*)'],
+  matcher: ['/((?!_next|api|media|stats|\\.well-known|favicon.ico|robots.txt|sitemap.xml|icon|apple-icon).*)'],
 };

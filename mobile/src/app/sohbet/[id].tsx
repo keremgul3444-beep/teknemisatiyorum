@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
 import { router, useIsFocused, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { paymentRisk } from '@tms/shared';
+import { paymentRisk, whatsappUrl } from '@tms/shared';
 import { colors, fonts, radius, space } from '@/theme';
 import { Button, Header, Icon, NotFound, T } from '@/components';
 import { actions, useConversation, type SubjectKind } from '@/services';
@@ -53,6 +53,14 @@ export default function Sohbet() {
             <T variant="caption" style={{ flex: 1, fontFamily: fonts.bodySemi }} numberOfLines={1}>{t(`messages.kind.${c.subject.kind}`)} · {c.subject.title}</T>
             <Icon name="chevron" size={16} color={colors.muted} />
           </Pressable>
+          {c.otherPhone ? (
+            <View style={{ flexDirection: 'row', gap: space(2) }}>
+              <View style={{ flex: 1 }}><Button small variant="secondary" icon="phone" title={t('messages.call')} onPress={() => void Linking.openURL(`tel:${c.otherPhone}`).catch(() => undefined)} /></View>
+              {whatsappUrl(c.otherPhone, c.subject.title) ? (
+                <View style={{ flex: 1 }}><Button small variant="secondary" icon="send" title={t('messages.whatsapp')} onPress={() => void Linking.openURL(whatsappUrl(c.otherPhone!, c.subject.title)!).catch(() => undefined)} /></View>
+              ) : null}
+            </View>
+          ) : null}
           {confirm ? (
             <View style={{ backgroundColor: colors.surface, borderRadius: radius.button, padding: space(3), gap: space(2) }}>
               <T variant="caption">{t('messages.sharePhoneConfirm')}</T>

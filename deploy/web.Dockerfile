@@ -19,6 +19,9 @@ ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 # derlemede API'ye ulaşılamaz, sayfalar istek anında (ve önbellek süresiyle) API'den okunur.
 ARG API_URL=http://api:3000
 ENV API_URL=$API_URL
+# Ölçüm (Umami) iç adresi: /stats yönlendirmesi derlemede sabitlenir.
+ARG UMAMI_URL=http://umami:3000
+ENV UMAMI_URL=$UMAMI_URL
 RUN npm run build -w @tms/shared && npm run build -w web
 WORKDIR /app/web
 ENV NODE_ENV=production

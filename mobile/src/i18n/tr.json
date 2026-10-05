@@ -706,7 +706,9 @@
     "blockConfirm": "Bu kişi sana bu sohbetten yazamayacak, sen de yazamayacaksın. Engellensin mi?",
     "blockedByMe": "Bu kişiyi engelledin.",
     "blockedByThem": "Bu sohbete artık mesaj gönderilemiyor.",
-    "paymentRisk": "Bu mesajda ödeme isteği var. Tekneyi görmeden ve sözleşme yapmadan kapora ya da havale gönderme."
+    "paymentRisk": "Bu mesajda ödeme isteği var. Tekneyi görmeden ve sözleşme yapmadan kapora ya da havale gönderme.",
+    "whatsapp": "WhatsApp'tan yaz",
+    "call": "Ara"
   },
   "profile": {
     "guestTitle": "Hesabına giriş yap",
