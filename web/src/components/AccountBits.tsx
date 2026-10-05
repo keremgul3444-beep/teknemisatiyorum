@@ -26,9 +26,9 @@ export function AcceptGate({ label, links, children }: { label: string; links: {
   const [ok, setOk] = useState(false);
   return (
     <Accepted.Provider value={ok}>
-      <label className="row" style={{ alignItems: 'flex-start', gap: 8, margin: '12px 0' }}>
-        <input type="checkbox" checked={ok} onChange={(e) => setOk(e.target.checked)} style={{ marginTop: 4 }} />
-        <span>{label}</span>
+      <label style={{ display: 'flex', flexWrap: 'nowrap', alignItems: 'flex-start', gap: 8, margin: '12px 0' }}>
+        <input type="checkbox" checked={ok} onChange={(e) => setOk(e.target.checked)} style={{ marginTop: 4, flex: 'none' }} />
+        <span style={{ flex: 1 }}>{label}</span>
       </label>
       <p className="small" style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
         {links.map((l) => <a key={l.href} href={l.href} target="_blank" rel="noopener">{l.text}</a>)}

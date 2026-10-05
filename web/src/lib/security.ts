@@ -15,6 +15,8 @@ export function securityHeaders(o: { nonce?: string; isProd: boolean; isDev?: bo
     "style-src 'self' 'unsafe-inline'",
     `img-src 'self' data: blob: ${API_ORIGIN}${MEDIA_ORIGIN ? ` ${MEDIA_ORIGIN}` : ''}`,
     "font-src 'self'",
+    // İlan videosu gömülü oynatıcıları (yalnızca bu üç kaynak).
+    'frame-src https://www.youtube-nocookie.com https://player.vimeo.com https://www.instagram.com',
     `connect-src 'self'${o.isDev ? ' ws:' : ''}`,
     "object-src 'none'",
     "frame-ancestors 'none'",

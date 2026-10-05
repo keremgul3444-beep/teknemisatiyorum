@@ -1,4 +1,4 @@
-import { MAX_ENGINE_HOURS, MAX_LISTING_PHOTOS, type BoatType, type Currency, type Equipment, type Flag } from '@tms/shared';
+import { MAX_ENGINE_HOURS, MAX_LISTING_PHOTOS, parseVideoUrl, type BoatType, type Currency, type Equipment, type Flag } from '@tms/shared';
 
 /** Sitedeki ilan formu: uygulamadaki sihirbazla aynı kurallar (mobile/src/features/listingForm.ts). */
 export const SELL_STEPS = ['photos', 'basics', 'equipment', 'price', 'review'] as const;
@@ -9,18 +9,20 @@ export interface SellFields {
   type: BoatType | ''; currency: Currency; location: string; flag: Flag | ''; equipment: Equipment[]; tradeIn: boolean; negotiable: boolean;
   /** Firma adına verilen ilan (boş: bireysel). */
   companyId: string;
+  /** YouTube / Vimeo / Instagram bağlantısı (isteğe bağlı). */
+  videoUrl: string;
 }
 
 export const emptySell = (): SellFields => ({
   brand: '', model: '', year: '', length: '', cabins: '', engine: '', engineHours: '', description: '', price: '',
-  type: '', currency: 'EUR', location: '', flag: '', equipment: [], tradeIn: false, negotiable: false, companyId: '',
+  type: '', currency: 'EUR', location: '', flag: '', equipment: [], tradeIn: false, negotiable: false, companyId: '', videoUrl: '',
 });
 
 /** "12,4" → 12.4; fiyattaki binlik noktalar atlanır. Boş → NaN. */
 export const decimal = (s: string) => (s.trim() ? Number(s.replace(',', '.')) : NaN);
 export const digits = (s: string) => s.replace(/\D/g, '');
 
-export type SellErrors = Partial<Record<'photos' | 'brand' | 'model' | 'year' | 'length' | 'type' | 'engineHours' | 'price' | 'location', string>>;
+export type SellErrors = Partial<Record<'photos' | 'brand' | 'model' | 'year' | 'length' | 'type' | 'engineHours' | 'price' | 'location' | 'videoUrl', string>>;
 
 /** Adım doğrulaması: alan → hata anahtarı (sell.err.*). */
 export function validateSell(step: number, f: SellFields, photoCount: number, now = new Date()): SellErrors {
@@ -37,6 +39,7 @@ export function validateSell(step: number, f: SellFields, photoCount: number, no
     else if (!(len > 2 && len <= 200)) e.length = 'length';
     if (!f.type) e.type = 'type';
     if (f.engineHours && !(Number(f.engineHours) <= MAX_ENGINE_HOURS)) e.engineHours = 'engineHours';
+    if (f.videoUrl.trim() && !parseVideoUrl(f.videoUrl)) e.videoUrl = 'video';
   }
   if (step === 3) {
     if (!(Number(digits(f.price)) > 0)) e.price = 'price';
@@ -56,6 +59,7 @@ export function toDraft(f: SellFields) {
     currency: f.currency, type: f.type || 'motoryat', location: f.location, equipment: f.equipment,
     cabins: Number(f.cabins) || 0, engine: f.engine.trim(), description: f.description.trim(),
     engineHours: f.engineHours ? Number(f.engineHours) : null, flag: f.flag || null, tradeIn: f.tradeIn, negotiable: f.negotiable,
+    videoUrl: f.videoUrl.trim() || null,
     ...(f.companyId ? { companyId: f.companyId } : {}),
   };
 }
@@ -88,13 +92,14 @@ export function restoreSell(raw: string | null): SellFields | null {
 export function fromListing(l: {
   brand: string; model: string; year: number; lengthM: number; cabins?: number; engine?: string; engineHours?: number | null; description: string;
   price: number; type: string; currency: Currency; location: string; flag?: Flag | null; equipment: string[]; tradeIn?: boolean; negotiable?: boolean;
+  videoUrl?: string | null;
 }, locale: 'tr' | 'en' = 'tr'): SellFields {
   return {
     ...emptySell(),
     brand: l.brand, model: l.model, year: String(l.year), length: locale === 'tr' ? String(l.lengthM).replace('.', ',') : String(l.lengthM),
     cabins: l.cabins ? String(l.cabins) : '', engine: l.engine ?? '', engineHours: l.engineHours != null ? String(l.engineHours) : '',
     description: l.description, price: String(l.price), type: l.type as BoatType, currency: l.currency, location: l.location,
-    flag: l.flag ?? '', equipment: l.equipment as Equipment[], tradeIn: !!l.tradeIn, negotiable: !!l.negotiable,
+    flag: l.flag ?? '', equipment: l.equipment as Equipment[], tradeIn: !!l.tradeIn, negotiable: !!l.negotiable, videoUrl: l.videoUrl ?? '',
   };
 }
 

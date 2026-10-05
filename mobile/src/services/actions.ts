@@ -175,6 +175,12 @@ export const actions = {
     if (before?.rawStatus === 'rejected') await api.post(`/listings/${id}/submit`).catch((e: { status?: number }) => { if (e.status !== 409) throw e; });
     await syncMine();
   },
+  /** Finansman / sigorta / nakliye teklif talebi (açık izinle; sunucu ad ve telefonu hesaptan alır). Demoda kaydedilmez. */
+  async requestLead(input: { kind: 'finance' | 'insurance' | 'transport'; listingId?: string; note: string }): Promise<boolean> {
+    if (!isApiMode()) return true;
+    await api.post('/leads', { ...input, consent: true });
+    return true;
+  },
   /** Sihirbazda açıklama taslağı: sunucuda modelle (yoksa kural tabanlı); demoda kural tabanlı. Kaydetmez. */
   async describeListing(facts: ListingFacts): Promise<{ text: string; source: 'llm' | 'rules' }> {
     if (!isApiMode()) return { text: rulesDescription(facts), source: 'rules' };

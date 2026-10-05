@@ -57,7 +57,7 @@ export function listingView(l: ListingRow, viewerId?: string, companyName?: stri
     webUrl: `${env().WEB_URL}/ilan/${l.id}`,
     brand: l.brand, model: l.model, year: l.year, lengthM: l.lengthM, type: l.type,
     price: l.price, currency: l.currency, location: l.location, equipment: l.equipment,
-    cabins: l.cabins, engine: l.engine, description: l.description, descriptionEn: l.descriptionEn ?? null,
+    cabins: l.cabins, engine: l.engine, description: l.description, descriptionEn: l.descriptionEn ?? null, videoUrl: l.videoUrl ?? null,
     engineHours: l.engineHours, flag: l.flag, tradeIn: l.tradeIn, negotiable: l.negotiable,
     status: l.status, badges: l.badges, rejectReason: viewerId === l.ownerId ? l.rejectReason : undefined,
     removedReason: viewerId === l.ownerId ? l.removedReason : undefined,

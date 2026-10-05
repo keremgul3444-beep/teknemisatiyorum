@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Headers, HttpCode, Ip, Param, Patch, Post, Put, Query } from '@nestjs/common';
 import { z } from 'zod';
-import { BOAT_TYPES, CURRENCIES, EQUIPMENT, FLAGS, MAX_ENGINE_HOURS, MAX_REPORTS_PER_DAY, REPORT_REASONS, normalizeLocation, parsedQuerySchema } from '@tms/shared';
+import { BOAT_TYPES, CURRENCIES, EQUIPMENT, FLAGS, MAX_ENGINE_HOURS, MAX_REPORTS_PER_DAY, REPORT_REASONS, normalizeLocation, parsedQuerySchema, parseVideoUrl } from '@tms/shared';
 import { Auth, CurrentUser, OptionalUser, Public, type AuthUser } from '../../common/decorators';
 import { ZodPipe } from '../../common/zod.pipe';
 import { PrismaService } from '../../common/prisma.service';
@@ -14,6 +14,14 @@ import { ListingTexts } from './listing-writer.service';
 
 /** Kullanıcı başına açık (gönderilmemiş) taslak sınırı. */
 const MAX_OPEN_DRAFTS = 5;
+
+/** Video: yalnızca YouTube, Vimeo, Instagram; tek biçime çevrilip saklanır. */
+const videoField = z.string().trim().max(300).nullable().transform((v, ctx) => {
+  if (!v) return null;
+  const p = parseVideoUrl(v);
+  if (!p) { ctx.addIssue({ code: 'custom', message: 'video' }); return z.NEVER; }
+  return p.url;
+});
 
 export const draftSchema = z.object({
   brand: z.string().trim().min(1).max(60),
@@ -32,6 +40,7 @@ export const draftSchema = z.object({
   flag: z.enum(FLAGS).nullable().default(null),
   tradeIn: z.boolean().default(false),
   negotiable: z.boolean().default(false),
+  videoUrl: videoField.default(null),
   companyId: z.string().optional(),
   boatId: z.string().optional(),
 });
@@ -54,6 +63,7 @@ const patchSchema = draftSchema.partial().extend({
   flag: draftSchema.shape.flag.unwrap().optional(),
   tradeIn: draftSchema.shape.tradeIn.unwrap().optional(),
   negotiable: draftSchema.shape.negotiable.unwrap().optional(),
+  videoUrl: videoField.optional(),
   /** null: ilan firmadan çıkarılır, bireysel satıcı adıyla görünür. */
   companyId: z.string().nullable().optional(),
 });

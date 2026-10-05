@@ -22,6 +22,7 @@ import { ServicesModule } from './modules/services/services.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { PromotionsModule } from './modules/promotions/promotions.module';
 import { MarketplaceModule } from './modules/marketplace/marketplace.module';
+import { LeadsModule } from './modules/leads/leads.module';
 import { BackupScheduler } from './backup/backup';
 
 /** `/health`: süreç ayakta mı. `/health/ready`: veritabanıyla birlikte hizmet veriyor mu (kesinti takibi bunu yoklar). */
@@ -64,6 +65,7 @@ class HealthController {
     AdminModule,
     PromotionsModule,
     MarketplaceModule,
+    LeadsModule,
   ],
   controllers: [HealthController],
   providers: [

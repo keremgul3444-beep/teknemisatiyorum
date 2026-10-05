@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FlatList, Pressable, ScrollView, Share, View, useWindowDimensions } from 'react-native';
+import { FlatList, Linking, Pressable, ScrollView, Share, View, useWindowDimensions } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -145,12 +145,31 @@ export default function IlanDetay() {
             </Section>
           ) : null}
 
+          {l.videoUrl ? (
+            <Section title={t('listing.video')}>
+              <Button variant="secondary" icon="eye" title={t('listing.watchVideo')} onPress={() => void Linking.openURL(l.videoUrl!).catch(() => undefined)} />
+            </Section>
+          ) : null}
+
           {l.description && l.description !== '—' ? (
             <Section title={t('listing.description')}>
               {/* İngilizce arayüzde onayda üretilen çeviri (varsa). */}
               <T color={colors.muted}>{i18n.language === 'en' && l.descriptionEn ? l.descriptionEn : l.description}</T>
               {i18n.language === 'en' && l.descriptionEn ? <T variant="caption" color={colors.muted}>{t('listing.translatedNote')}</T> : null}
             </Section>
+          ) : null}
+
+          {!(l.isMine || l.sellerId === 'me') && l.status !== 'satildi' ? (
+            <Card onPress={() => router.push({ pathname: '/teklif', params: { ilan: l.id } })}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(3) }}>
+                <Icon name="briefcase" size={22} color={colors.primary} />
+                <View style={{ flex: 1 }}>
+                  <T variant="bodySemi">{t('lead.title')}</T>
+                  <T variant="caption" color={colors.muted}>{t('lead.short')}</T>
+                </View>
+                <Icon name="chevron" size={16} color={colors.muted} />
+              </View>
+            </Card>
           ) : null}
 
           <Section title={t('listing.logbook')}>

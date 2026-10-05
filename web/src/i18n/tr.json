@@ -235,7 +235,9 @@
     "sellerAnon": "Satıcı",
     "safety": "Güvenlik: kapora ya da ödemeyi platform dışında, görmediğin tekne için yapma. Devirde ödemeyi banka havalesiyle, açıklamaya tekne adı ve ruhsat numarasını yazarak yap.",
     "translatedNote": "Otomatik çeviri; satıcının yazdığı metin Türkçe.",
-    "originalNote": "Satıcının yazdığı özgün metin (Türkçe)."
+    "originalNote": "Satıcının yazdığı özgün metin (Türkçe).",
+    "video": "Video",
+    "videoTitle": "{{title}} tanıtım videosu"
   },
   "gone": {
     "title": "Bu ilan artık yayında değil",
@@ -412,7 +414,7 @@
         },
         {
           "h": "Yurt içine aktarım",
-          "b": "Ödeme kuruluşu, SMS sağlayıcısı, Nüfus ve Vatandaşlık İşleri Genel Müdürlüğü (kimlik doğrulama sorgusu) ve talep eden yetkili kamu kurumlarıyla, yalnızca gerektiği ölçüde. Usta veya kaptanla iş yürütürken işin gerektirdiği bilgiler (adın, iş ayrıntısı, rezervasyon tarihi) karşı tarafla paylaşılır."
+          "b": "Ödeme kuruluşu, SMS sağlayıcısı, Nüfus ve Vatandaşlık İşleri Genel Müdürlüğü (kimlik doğrulama sorgusu) ve talep eden yetkili kamu kurumlarıyla, yalnızca gerektiği ölçüde. Usta veya kaptanla iş yürütürken işin gerektirdiği bilgiler (adın, iş ayrıntısı, rezervasyon tarihi) karşı tarafla paylaşılır. Finansman, sigorta ya da nakliye teklifi istersen, açık iznine dayanarak adın, telefonun ve ilgili ilan bilgisi yalnızca o iş için anlaşmalı iş ortağına iletilir."
         },
         {
           "h": "Yurt dışına aktarım",
@@ -631,7 +633,9 @@
     "import_empty": "Dosyada yüklenebilecek satır yok.",
     "import_running": "Bu firmanın bir yüklemesi sürüyor; bitince yeniden dene.",
     "import_limit": "Bugünlük toplu yükleme sınırına ulaştın.",
-    "import_too_many": "Tek seferde en fazla {{max}} satır yüklenebilir."
+    "import_too_many": "Tek seferde en fazla {{max}} satır yüklenebilir.",
+    "lead_limit": "Bugünlük teklif talebi sınırına ulaştın.",
+    "phone_required": "Bu işlem için hesabında telefon numarası olmalı."
   },
   "login": {
     "title": "Giriş yap",
@@ -862,7 +866,8 @@
       "type": "Tekne tipini seç.",
       "engineHours": "Motor saati 100.000'den fazla olamaz.",
       "price": "Fiyat yaz.",
-      "location": "Konum seç."
+      "location": "Konum seç.",
+      "video": "Yalnızca YouTube, Vimeo ya da Instagram bağlantısı."
     },
     "seller": "Satıcı",
     "sellerSelf": "Bireysel (kendi adıma)",
@@ -876,7 +881,9 @@
     "writeHint": "Kısa notlarını yazıp bas; girdiğin bilgilerden bir taslak hazırlanır.",
     "writeNeeds": "Önce marka, model, yıl, boy ve tipi gir.",
     "writeDoneLlm": "Taslak hazır. Okuyup düzelt; yalnızca doğru bilgileri bırak.",
-    "writeDoneRules": "Bilgilerinden kısa bir taslak hazırlandı; istersen genişlet."
+    "writeDoneRules": "Bilgilerinden kısa bir taslak hazırlandı; istersen genişlet.",
+    "video": "Video bağlantısı (isteğe bağlı)",
+    "videoHint": "YouTube, Vimeo ya da Instagram bağlantısı. İlan sayfasında oynatılır."
   },
   "admin": {
     "title": "Yönetim",
@@ -977,7 +984,21 @@
       "refunded": "İade edildi",
       "failed": "Başarısız"
     },
-    "reregistered": "Silinmiş sorunlu bir hesabın numarası ya da kimliğiyle açıldı"
+    "reregistered": "Silinmiş sorunlu bir hesabın numarası ya da kimliğiyle açıldı",
+    "navLeads": "Teklif talepleri",
+    "leadKind": {
+      "finance": "Finansman",
+      "insurance": "Sigorta",
+      "transport": "Nakliye"
+    },
+    "leadStatus": {
+      "new": "Yeni",
+      "forwarded": "İletildi",
+      "closed": "Kapandı"
+    },
+    "forward": "İletildi olarak işaretle",
+    "close": "Kapat",
+    "noLeads": "Talep yok."
   },
   "audit": {
     "listingApproved": "İlan onaylandı: {{title}}",
@@ -1020,7 +1041,9 @@
     "paymentDisputed": "Hizmet ödemesine itiraz: {{ref}}",
     "preinfoAccepted": "Ön bilgilendirme ve sözleşme onaylandı (sürüm {{version}})",
     "reregistered": "Silinmiş sorunlu hesabın izi eşleşti ({{via}})",
-    "listingsImported": "Toplu yükleme: {{created}}/{{total}} ilan onaya gönderildi"
+    "listingsImported": "Toplu yükleme: {{created}}/{{total}} ilan onaya gönderildi",
+    "leadRequested": "Teklif talebi: {{kind}}",
+    "leadHandled": "Teklif talebi işlendi: {{status}}"
   },
   "firm": {
     "title": "Firma paneli",
@@ -1168,5 +1191,18 @@
     "jobDelivered": "Usta işi bitirdiğini bildirdi: {{title}}. {{days}} gün içinde onaylamaz ya da sorun bildirmezsen ödeme ustaya aktarılır.",
     "paymentDisputed": "Müşteri bir sorun bildirdi; ödeme ekip incelemesine alındı.",
     "autoReleased": "Süre dolduğu için emanetteki ödeme hizmet verene aktarıldı."
+  },
+  "lead": {
+    "title": "Finansman, sigorta ya da nakliye teklifi al",
+    "intro": "Talebini anlaşmalı iş ortağımıza iletiriz; seninle telefonla iletişime geçer. Ücretsiz, bağlayıcı değil.",
+    "finance": "Finansman",
+    "insurance": "Sigorta",
+    "transport": "Nakliye",
+    "note": "Not (isteğe bağlı): peşinat, nereden nereye, ne zaman…",
+    "consent": "Adımın, telefonumun ve bu ilanın bilgilerinin teklif için iş ortağıyla paylaşılmasına izin veriyorum.",
+    "send": "Teklif iste",
+    "sent": "Talebin alındı. İş ortağımız kısa süre içinde seni arayacak.",
+    "login": "Giriş yap",
+    "loginHint": "Teklif istemek için giriş yap."
   }
 }

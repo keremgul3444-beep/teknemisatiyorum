@@ -235,7 +235,9 @@
     "sellerAnon": "Seller",
     "safety": "Safety: never pay a deposit or any money outside the platform for a boat you have not seen. At transfer, pay by bank transfer with the boat name and registration number in the reference.",
     "translatedNote": "Automatic translation; the seller wrote the original in Turkish.",
-    "originalNote": "Original text by the seller (in Turkish)."
+    "originalNote": "Original text by the seller (in Turkish).",
+    "video": "Video",
+    "videoTitle": "{{title}} video"
   },
   "gone": {
     "title": "This listing is no longer live",
@@ -412,7 +414,7 @@
         },
         {
           "h": "Transfers within Türkiye",
-          "b": "To the payment institution, SMS provider, the General Directorate of Population (identity check) and authorised public bodies on request, only as needed. When you work with a technician or captain, the details the job requires (your name, job details, booking dates) are shared with them."
+          "b": "To the payment institution, SMS provider, the General Directorate of Population (identity check) and authorised public bodies on request, only as needed. When you work with a technician or captain, the details the job requires (your name, job details, booking dates) are shared with them. If you ask for a finance, insurance or transport quote, your name, phone and the listing details are passed, with your explicit consent, only to the contracted partner for that request."
         },
         {
           "h": "Transfers abroad",
@@ -631,7 +633,9 @@
     "import_empty": "The file has no rows that can be imported.",
     "import_running": "An import for this company is already running; try again when it finishes.",
     "import_limit": "You have reached today's bulk import limit.",
-    "import_too_many": "At most {{max}} rows can be imported at once."
+    "import_too_many": "At most {{max}} rows can be imported at once.",
+    "lead_limit": "You have reached today's quote request limit.",
+    "phone_required": "A phone number is required on your account for this."
   },
   "login": {
     "title": "Log in",
@@ -862,7 +866,8 @@
       "type": "Choose the boat type.",
       "engineHours": "Engine hours can’t exceed 100,000.",
       "price": "Enter a price.",
-      "location": "Choose a location."
+      "location": "Choose a location.",
+      "video": "Only YouTube, Vimeo or Instagram links."
     },
     "seller": "Seller",
     "sellerSelf": "Individual (myself)",
@@ -876,7 +881,9 @@
     "writeHint": "Add a few notes and press; a draft is prepared from the details you entered.",
     "writeNeeds": "Enter brand, model, year, length and type first.",
     "writeDoneLlm": "Draft ready. Read it and correct it; keep only what is true.",
-    "writeDoneRules": "A short draft was prepared from your details; extend it if you like."
+    "writeDoneRules": "A short draft was prepared from your details; extend it if you like.",
+    "video": "Video link (optional)",
+    "videoHint": "A YouTube, Vimeo or Instagram link. It plays on the listing page."
   },
   "admin": {
     "title": "Admin",
@@ -977,7 +984,21 @@
       "refunded": "Refunded",
       "failed": "Failed"
     },
-    "reregistered": "Opened with the phone or ID of a deleted problem account"
+    "reregistered": "Opened with the phone or ID of a deleted problem account",
+    "navLeads": "Quote requests",
+    "leadKind": {
+      "finance": "Finance",
+      "insurance": "Insurance",
+      "transport": "Transport"
+    },
+    "leadStatus": {
+      "new": "New",
+      "forwarded": "Forwarded",
+      "closed": "Closed"
+    },
+    "forward": "Mark as forwarded",
+    "close": "Close",
+    "noLeads": "No requests."
   },
   "audit": {
     "listingApproved": "Listing approved: {{title}}",
@@ -1020,7 +1041,9 @@
     "paymentDisputed": "Service payment disputed: {{ref}}",
     "preinfoAccepted": "Pre-contract information and contract accepted (version {{version}})",
     "reregistered": "Matched a deleted problem account ({{via}})",
-    "listingsImported": "Bulk import: {{created}}/{{total}} listings sent for review"
+    "listingsImported": "Bulk import: {{created}}/{{total}} listings sent for review",
+    "leadRequested": "Quote request: {{kind}}",
+    "leadHandled": "Quote request handled: {{status}}"
   },
   "firm": {
     "title": "Company panel",
@@ -1168,5 +1191,18 @@
     "jobDelivered": "The technician marked the job done: {{title}}. If you don’t confirm or report a problem within {{days}} days, the payment is released.",
     "paymentDisputed": "The customer reported a problem; the payment is under team review.",
     "autoReleased": "The held payment was released to the provider after the waiting period."
+  },
+  "lead": {
+    "title": "Get a finance, insurance or transport quote",
+    "intro": "We pass your request to our contracted partner, who will call you. Free and non-binding.",
+    "finance": "Finance",
+    "insurance": "Insurance",
+    "transport": "Transport",
+    "note": "Note (optional): down payment, from where to where, when…",
+    "consent": "I agree that my name, phone and this listing's details are shared with the partner for a quote.",
+    "send": "Request a quote",
+    "sent": "Request received. Our partner will call you shortly.",
+    "login": "Log in",
+    "loginHint": "Log in to request a quote."
   }
 }

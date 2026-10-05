@@ -6,7 +6,7 @@ export { USTA_CATEGORIES } from '@tms/shared';
 export interface Listing {
   id: string; brand: string; model: string; year: number; lengthM: number; price: number; currency: Currency;
   type: BoatType; location: string; equipment: Equipment[]; badges: BadgeKind[]; sellerId: string;
-  logbookCount: number; description: string; descriptionEn?: string | null; status: ListingStatus; photoSeed: number; cabins: number; engine: string;
+  logbookCount: number; description: string; descriptionEn?: string | null; videoUrl?: string | null; status: ListingStatus; photoSeed: number; cabins: number; engine: string;
   /** Motor saati ve bayrak (null = belirtilmedi); takasa açık, pazarlık payı var. Eski kayıtlarda alan olmayabilir. */
   engineHours?: number | null; flag?: Flag | null; tradeIn?: boolean; negotiable?: boolean;
   /** Gerçek modda: sunucudaki fotoğraflar, ham durum (draft/pending/rejected…), ilan sahibi mi, bağlı tekne ve karne özeti. */
@@ -24,7 +24,7 @@ export interface Listing {
 }
 export interface Promo { featured: boolean; urgent: boolean; featuredUntil?: string; urgentUntil?: string }
 export type ListingDraft = Pick<Listing, 'brand' | 'model' | 'year' | 'lengthM' | 'price' | 'currency' | 'type' | 'location' | 'equipment' | 'cabins' | 'engine' | 'description'
-  | 'engineHours' | 'flag' | 'tradeIn' | 'negotiable'>;
+  | 'engineHours' | 'flag' | 'tradeIn' | 'negotiable' | 'videoUrl'>;
 
 export type ProviderKind = 'usta' | 'kaptan' | 'eksper';
 

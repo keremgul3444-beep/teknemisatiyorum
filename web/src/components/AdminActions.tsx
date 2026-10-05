@@ -138,3 +138,17 @@ export function PaymentDecision({ id, L, errors }: { id: string; L: Dict; errors
     </div>
   );
 }
+
+/** Teklif talebi: iş ortağına iletildi / kapandı. */
+export function LeadStatus({ id, status, L, errors }: { id: string; status: string; L: Dict; errors: Dict }) {
+  const a = useAction(errors);
+  return (
+    <div style={{ display: 'grid', gap: 8 }}>
+      <div className="row">
+        {status === 'new' ? <button type="button" className="btn" disabled={a.busy} onClick={() => void a.run(`leads/${id}/status`, { status: 'forwarded' })}>{L.forward}</button> : null}
+        {status !== 'closed' ? <button type="button" className="btn ghost" disabled={a.busy} onClick={() => void a.run(`leads/${id}/status`, { status: 'closed' })}>{L.close}</button> : null}
+      </div>
+      <Err text={a.error} />
+    </div>
+  );
+}

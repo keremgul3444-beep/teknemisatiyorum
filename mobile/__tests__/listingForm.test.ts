@@ -11,7 +11,7 @@ const photos = (k: number): PhotoItem[] => Array.from({ length: k }, (_, i) => (
 const filled = (): WizardState => ({
   ...emptyWizard(),
   photos: photos(2),
-  f: { brand: 'Bavaria', model: 'Cruiser 41', year: '2016', length: '12,4', cabins: '3', engine: 'Volvo D2', engineHours: '850', description: ' Bakımlı ', price: '149000' },
+  f: { brand: 'Bavaria', model: 'Cruiser 41', year: '2016', length: '12,4', cabins: '3', engine: 'Volvo D2', engineHours: '850', description: ' Bakımlı ', price: '149000', videoUrl: '' },
   type: 'yelkenli', location: 'Bodrum', flag: 'tr', tradeIn: true,
 });
 
@@ -54,7 +54,7 @@ describe('doğrulama', () => {
 test('taslak sunucu biçimine çevrilir', () => {
   expect(toDraft(filled())).toEqual({
     brand: 'Bavaria', model: 'Cruiser 41', year: 2016, lengthM: 12.4, price: 149000, currency: 'EUR', type: 'yelkenli', location: 'Bodrum',
-    equipment: [], cabins: 3, engine: 'Volvo D2', description: 'Bakımlı', engineHours: 850, flag: 'tr', tradeIn: true, negotiable: false,
+    equipment: [], cabins: 3, engine: 'Volvo D2', description: 'Bakımlı', engineHours: 850, flag: 'tr', tradeIn: true, negotiable: false, videoUrl: null,
   });
   expect(toDraft({ ...filled(), f: { ...filled().f, engineHours: '' }, flag: undefined })).toMatchObject({ engineHours: null, flag: null });
 });
@@ -132,4 +132,13 @@ test('açıklama taslağı isteği ve demo taslağı', () => {
   const f = describeFacts(s);
   expect(f).toMatchObject({ brand: 'Özel', model: 'Gulet 24', year: 2005, lengthM: 24, type: 'gulet', location: 'Marmaris', notes: 'yeni yelkenler' });
   expect(rulesDescription(f)).toBe("2005 model Özel Gulet 24, 24 metre gulet. Tekne Marmaris'te. yeni yelkenler");
+});
+
+test('video bağlantısı: geçersizse açıklama adımında uyarı, geçerliyse taslağa girer', () => {
+  const { validateStep, toDraft, emptyWizard } = require('@/features/listingForm');
+  const s = { ...emptyWizard(), f: { ...emptyWizard().f, videoUrl: 'https://kotu.site/v' } };
+  expect(validateStep(2, s).videoUrl).toBe('wizard.err.video');
+  const ok = { ...s, f: { ...s.f, videoUrl: 'https://youtu.be/dQw4w9WgXcQ' } };
+  expect(validateStep(2, ok).videoUrl).toBeUndefined();
+  expect(toDraft(ok).videoUrl).toBe('https://youtu.be/dQw4w9WgXcQ');
 });

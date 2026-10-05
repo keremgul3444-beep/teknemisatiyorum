@@ -150,7 +150,9 @@
     "soldNote": "Bu tekne satıldı",
     "removedTitle": "İlanın yayından kaldırıldı",
     "removedBody": "İtiraz için iletisim@teknemisatiyorum.com adresine yaz.",
-    "translatedNote": "Otomatik çeviri; satıcının yazdığı metin Türkçe."
+    "translatedNote": "Otomatik çeviri; satıcının yazdığı metin Türkçe.",
+    "watchVideo": "Videoyu izle",
+    "video": "Video"
   },
   "usta": {
     "freeSurvey": "Keşif ücretsiz",
@@ -264,7 +266,7 @@
     "h3": "Amaçlar ve hukuki sebepler",
     "b3": "Üyelik ve sözleşmenin kurulması ve ifası (KVKK m.5/2-c): ilan, mesaj, iş talebi, teklif, rezervasyon, ödeme ve emanet süreçleri. Kimlik doğrulama ve dolandırıcılığın önlenmesi (m.5/2-f): ad, soyad, doğum yılı ve kimlik numarası NVİ sorgusuyla doğrulanır. Hukuki yükümlülükler (m.5/2-ç): erişim kayıtları, vergi ve tüketici mevzuatı kayıtları. Kampanya ve bilgilendirme mesajları yalnızca açık rızanla (m.5/1); rızanı ayarlardan her an geri alabilirsin.",
     "h4": "Yurt içine aktarım",
-    "b4": "Ödeme kuruluşu, SMS sağlayıcısı, Nüfus ve Vatandaşlık İşleri Genel Müdürlüğü (kimlik doğrulama sorgusu) ve talep eden yetkili kamu kurumlarıyla, yalnızca gerektiği ölçüde. Usta veya kaptanla iş yürütürken işin gerektirdiği bilgiler (adın, iş ayrıntısı, rezervasyon tarihi) karşı tarafla paylaşılır.",
+    "b4": "Ödeme kuruluşu, SMS sağlayıcısı, Nüfus ve Vatandaşlık İşleri Genel Müdürlüğü (kimlik doğrulama sorgusu) ve talep eden yetkili kamu kurumlarıyla, yalnızca gerektiği ölçüde. Usta veya kaptanla iş yürütürken işin gerektirdiği bilgiler (adın, iş ayrıntısı, rezervasyon tarihi) karşı tarafla paylaşılır. Finansman, sigorta ya da nakliye teklifi istersen, açık iznine dayanarak adın, telefonun ve ilgili ilan bilgisi yalnızca o iş için anlaşmalı iş ortağına iletilir.",
     "h5": "Yurt dışına aktarım",
     "b5": "Bazı hizmet sağlayıcılarımızın sunucuları yurt dışındadır: bulut dosya depolama ve şifreli yedek (Cloudflare), anlık bildirim (Expo: bildirim metni ve cihaz jetonu), akıllı asistan (Anthropic: asistana yazdığın arama metni). Bu aktarımlar KVKK m.9 uyarınca Kurulca ilan edilen standart sözleşmeyle yapılır. Asistana kişisel bilgi yazmaman önerilir.",
     "h6": "Saklama süresi",
@@ -515,7 +517,8 @@
       "engineHours": "Motor saati çok yüksek görünüyor.",
       "price": "Fiyatı yaz.",
       "location": "Teknenin nerede olduğunu seç.",
-      "fix": "Devam etmek için işaretli alanları tamamla."
+      "fix": "Devam etmek için işaretli alanları tamamla.",
+      "video": "Yalnızca YouTube, Vimeo ya da Instagram bağlantısı."
     },
     "uploading": "Fotoğraflar yükleniyor: {{done}}/{{total}}",
     "draftPhotosMissing": "{{count}} fotoğraf bu telefonda artık bulunamadı, yeniden eklemen gerekiyor.",
@@ -535,7 +538,8 @@
     "writeHint": "Kısa notlarını yazıp bas; girdiğin bilgilerden bir taslak hazırlanır.",
     "writeNeeds": "Önce marka, model, yıl, boy ve tipi gir.",
     "writeDoneLlm": "Taslak hazır. Okuyup düzelt; yalnızca doğru bilgileri bırak.",
-    "writeDoneRules": "Bilgilerinden kısa bir taslak hazırlandı; istersen genişlet."
+    "writeDoneRules": "Bilgilerinden kısa bir taslak hazırlandı; istersen genişlet.",
+    "video": "Video bağlantısı (YouTube, Vimeo, Instagram)"
   },
   "boatAdd": {
     "title": "Tekne ekle",
@@ -1195,7 +1199,9 @@
     "paymentDisputed": "Hizmet ödemesine itiraz: {{ref}}",
     "preinfoAccepted": "Ön bilgilendirme ve sözleşme onaylandı (sürüm {{version}})",
     "reregistered": "Silinmiş sorunlu hesabın izi eşleşti ({{via}})",
-    "listingsImported": "Toplu yükleme: {{created}}/{{total}} ilan onaya gönderildi"
+    "listingsImported": "Toplu yükleme: {{created}}/{{total}} ilan onaya gönderildi",
+    "leadRequested": "Teklif talebi: {{kind}}",
+    "leadHandled": "Teklif talebi işlendi: {{status}}"
   },
   "errors": {
     "generic": "Bir şeyler ters gitti, tekrar dene.",
@@ -1286,7 +1292,9 @@
     "import_empty": "Dosyada yüklenebilecek satır yok.",
     "import_running": "Bu firmanın bir yüklemesi sürüyor; bitince yeniden dene.",
     "import_limit": "Bugünlük toplu yükleme sınırına ulaştın.",
-    "import_too_many": "Tek seferde en fazla {{max}} satır yüklenebilir."
+    "import_too_many": "Tek seferde en fazla {{max}} satır yüklenebilir.",
+    "lead_limit": "Bugünlük teklif talebi sınırına ulaştın.",
+    "phone_required": "Bu işlem için hesabında telefon numarası olmalı."
   },
   "soon": {
     "title": "Yakında",
@@ -1402,5 +1410,18 @@
     "title": "Yeni sürüm gerekli",
     "body": "Bu sürüm artık desteklenmiyor. Devam etmek için uygulamayı güncelle.",
     "button": "Güncelle"
+  },
+  "lead": {
+    "title": "Finansman, sigorta ya da nakliye teklifi al",
+    "short": "Anlaşmalı iş ortağımız seni arar; ücretsiz, bağlayıcı değil.",
+    "intro": "Talebini anlaşmalı iş ortağımıza iletiriz; seninle telefonla iletişime geçer. Ücretsiz, bağlayıcı değil.",
+    "finance": "Finansman",
+    "insurance": "Sigorta",
+    "transport": "Nakliye",
+    "note": "Not (isteğe bağlı): peşinat, nereden nereye, ne zaman",
+    "consent": "Adımın, telefonumun ve bu ilanın bilgilerinin teklif için iş ortağıyla paylaşılmasına izin veriyorum.",
+    "send": "Teklif iste",
+    "sentTitle": "Talebin alındı",
+    "sent": "İş ortağımız kısa süre içinde seni arayacak."
   }
 }

@@ -1,4 +1,4 @@
-import { MAX_ENGINE_HOURS, MAX_LISTING_PHOTOS, type BoatType, type Currency, type Equipment, type Flag, type ListingFacts } from '@tms/shared';
+import { MAX_ENGINE_HOURS, MAX_LISTING_PHOTOS, parseVideoUrl, type BoatType, type Currency, type Equipment, type Flag, type ListingFacts } from '@tms/shared';
 import type { Listing, ListingDraft } from '@/services/types';
 
 export { MAX_LISTING_PHOTOS };
@@ -13,6 +13,8 @@ export interface PhotoItem { id: string; uri?: string; seed: number; fileId?: st
 export interface WizardFields {
   brand: string; model: string; year: string; length: string; cabins: string; engine: string; engineHours: string;
   description: string; price: string;
+  /** YouTube / Vimeo / Instagram bağlantısı (isteğe bağlı). */
+  videoUrl: string;
 }
 export interface WizardState {
   step: number;
@@ -29,7 +31,7 @@ export interface WizardState {
 
 export const emptyWizard = (): WizardState => ({
   step: 0, photos: [],
-  f: { brand: '', model: '', year: '', length: '', cabins: '', engine: '', engineHours: '', description: '', price: '' },
+  f: { brand: '', model: '', year: '', length: '', cabins: '', engine: '', engineHours: '', description: '', price: '', videoUrl: '' },
   equipment: [], currency: 'EUR', tradeIn: false, negotiable: false, broker: false,
   doc: false, docUri: null, engineDoc: false, engineDocUri: null, engineSerial: '',
 });
@@ -69,7 +71,7 @@ export function groupThousands(digits: string, lang: string): string {
 
 // ——— Doğrulama: alan → çeviri anahtarı ———
 
-export type StepErrors = Partial<Record<'photos' | 'brand' | 'model' | 'year' | 'length' | 'type' | 'engineHours' | 'price' | 'location', string>>;
+export type StepErrors = Partial<Record<'photos' | 'brand' | 'model' | 'year' | 'length' | 'type' | 'engineHours' | 'price' | 'location' | 'videoUrl', string>>;
 
 export function validateStep(step: number, s: WizardState, now = new Date()): StepErrors {
   const e: StepErrors = {};
@@ -86,6 +88,7 @@ export function validateStep(step: number, s: WizardState, now = new Date()): St
     if (!s.type) e.type = 'wizard.err.type';
     if (s.f.engineHours && !(Number(s.f.engineHours) <= MAX_ENGINE_HOURS)) e.engineHours = 'wizard.err.engineHours';
   }
+  if (step === 2 && s.f.videoUrl.trim() && !parseVideoUrl(s.f.videoUrl)) e.videoUrl = 'wizard.err.video';
   if (step === 3) {
     if (!(parseNum(s.f.price) > 0)) e.price = 'wizard.err.price';
     if (!s.location) e.location = 'wizard.err.location';
@@ -110,7 +113,7 @@ export function fromListing(l: Listing, lang = 'tr'): WizardState {
     f: {
       brand: l.brand, model: l.model, year: String(l.year), length: dec(l.lengthM), cabins: l.cabins ? String(l.cabins) : '',
       engine: l.engine === '—' ? '' : l.engine, engineHours: l.engineHours != null ? String(l.engineHours) : '',
-      description: l.description === '—' ? '' : l.description, price: String(Math.round(l.price)),
+      description: l.description === '—' ? '' : l.description, price: String(Math.round(l.price)), videoUrl: l.videoUrl ?? '',
     },
     type: l.type, equipment: [...l.equipment], currency: l.currency, location: l.location, flag: l.flag ?? undefined,
     tradeIn: !!l.tradeIn, negotiable: !!l.negotiable,
@@ -137,6 +140,7 @@ export function toDraft(s: WizardState): ListingDraft {
     price: parseNum(s.f.price), currency: s.currency, type: s.type ?? 'motoryat', location: s.location ?? '', equipment: s.equipment,
     cabins: Number(s.f.cabins) || 0, engine: s.f.engine.trim(), description: s.f.description.trim(),
     engineHours: s.f.engineHours ? Number(s.f.engineHours) : null, flag: s.flag ?? null, tradeIn: s.tradeIn, negotiable: s.negotiable,
+    videoUrl: s.f.videoUrl.trim() || null,
     ...(s.companyId ? { companyId: s.companyId } : {}),
   };
 }

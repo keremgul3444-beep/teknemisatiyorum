@@ -24,6 +24,7 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 - [ ] Aşama 2 ödeme: gerçek sanal POS ve gerçek Apple/Google ödemesi (hesaplar açılınca, deneme modunun yerine takılır)
 - [ ] Blog / içerik yazıları (SEO için değerli, ayrı içerik işi)
 - [ ] Ziyaretçi ölçümü: Umami kodda hazır (çerez onayıyla, `/stats`); sunucuda `--profile analytics` ile aç ve site kimliğini gir (`docs/CANLIYA-CIKIS.md` 7. bölüm)
+- [ ] Teklif talepleri (finansman, sigorta, nakliye): iş ortaklarıyla anlaşma; talepler `/yonetim/talepler`'de toplanır, paylaşım KVKK metnine eklendi, avukat onayı gerekir
 - [ ] Canlı sunucuda hız ölçümünü (Lighthouse) tekrarla; yerel ölçüm: ana sayfa 96, ilan 92
 - [ ] Uygulamanın "Öne çıkar" ekranını uçtan uca tarayıcı testiyle dene (bu turda bellek yetersizliğinden uygulama önizlemesi açılmadı; aynı sunucu ucu kabul testinde denendi)
 

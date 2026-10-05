@@ -150,7 +150,9 @@
     "soldNote": "This boat has been sold",
     "removedTitle": "Your listing was taken down",
     "removedBody": "To appeal, write to iletisim@teknemisatiyorum.com.",
-    "translatedNote": "Automatic translation; the seller wrote the original in Turkish."
+    "translatedNote": "Automatic translation; the seller wrote the original in Turkish.",
+    "watchVideo": "Watch the video",
+    "video": "Video"
   },
   "usta": {
     "freeSurvey": "Free inspection",
@@ -264,7 +266,7 @@
     "h3": "Purposes and legal grounds",
     "b3": "Membership and performance of contract (KVKK art. 5/2-c): listings, messages, job requests, quotes, bookings, payments and escrow. Identity verification and fraud prevention (art. 5/2-f): name, surname, birth year and ID number are checked with the NVİ registry. Legal obligations (art. 5/2-ç): access logs, tax and consumer law records. Marketing messages only with your explicit consent (art. 5/1), which you can withdraw in settings at any time.",
     "h4": "Transfers within Türkiye",
-    "b4": "To the payment institution, SMS provider, the General Directorate of Population (identity check) and authorised public bodies on request, only as needed. When you work with a technician or captain, the details the job requires (your name, job details, booking dates) are shared with them.",
+    "b4": "To the payment institution, SMS provider, the General Directorate of Population (identity check) and authorised public bodies on request, only as needed. When you work with a technician or captain, the details the job requires (your name, job details, booking dates) are shared with them. If you ask for a finance, insurance or transport quote, your name, phone and the listing details are passed, with your explicit consent, only to the contracted partner for that request.",
     "h5": "Transfers abroad",
     "b5": "Some of our providers run servers abroad: cloud file storage and encrypted backups (Cloudflare), push notifications (Expo: notification text and device token), the smart assistant (Anthropic: the search text you type). These transfers rely on the standard contract published by the Board under KVKK art. 9. Please do not type personal details into the assistant.",
     "h6": "Retention",
@@ -515,7 +517,8 @@
       "engineHours": "Engine hours look too high.",
       "price": "Enter the price.",
       "location": "Choose where the boat is.",
-      "fix": "Complete the highlighted fields to continue."
+      "fix": "Complete the highlighted fields to continue.",
+      "video": "Only YouTube, Vimeo or Instagram links."
     },
     "uploading": "Uploading photos: {{done}}/{{total}}",
     "draftPhotosMissing": "{{count}} photo(s) are no longer on this phone; please add them again.",
@@ -535,7 +538,8 @@
     "writeHint": "Add a few notes and press; a draft is prepared from the details you entered.",
     "writeNeeds": "Enter brand, model, year, length and type first.",
     "writeDoneLlm": "Draft ready. Read it and correct it; keep only what is true.",
-    "writeDoneRules": "A short draft was prepared from your details; extend it if you like."
+    "writeDoneRules": "A short draft was prepared from your details; extend it if you like.",
+    "video": "Video link (YouTube, Vimeo, Instagram)"
   },
   "boatAdd": {
     "title": "Add a boat",
@@ -1195,7 +1199,9 @@
     "paymentDisputed": "Service payment disputed: {{ref}}",
     "preinfoAccepted": "Pre-contract information and contract accepted (version {{version}})",
     "reregistered": "Matched a deleted problem account ({{via}})",
-    "listingsImported": "Bulk import: {{created}}/{{total}} listings sent for review"
+    "listingsImported": "Bulk import: {{created}}/{{total}} listings sent for review",
+    "leadRequested": "Quote request: {{kind}}",
+    "leadHandled": "Quote request handled: {{status}}"
   },
   "errors": {
     "generic": "Something went wrong, please try again.",
@@ -1286,7 +1292,9 @@
     "import_empty": "The file has no rows that can be imported.",
     "import_running": "An import for this company is already running; try again when it finishes.",
     "import_limit": "You have reached today's bulk import limit.",
-    "import_too_many": "At most {{max}} rows can be imported at once."
+    "import_too_many": "At most {{max}} rows can be imported at once.",
+    "lead_limit": "You have reached today's quote request limit.",
+    "phone_required": "A phone number is required on your account for this."
   },
   "soon": {
     "title": "Coming soon",
@@ -1402,5 +1410,18 @@
     "title": "Update required",
     "body": "This version is no longer supported. Update the app to continue.",
     "button": "Update"
+  },
+  "lead": {
+    "title": "Get a finance, insurance or transport quote",
+    "short": "Our contracted partner will call you; free and non-binding.",
+    "intro": "We pass your request to our contracted partner, who will call you. Free and non-binding.",
+    "finance": "Finance",
+    "insurance": "Insurance",
+    "transport": "Transport",
+    "note": "Note (optional): down payment, from where to where, when",
+    "consent": "I agree that my name, phone and this listing's details are shared with the partner for a quote.",
+    "send": "Request a quote",
+    "sentTitle": "Request received",
+    "sent": "Our partner will call you shortly."
   }
 }

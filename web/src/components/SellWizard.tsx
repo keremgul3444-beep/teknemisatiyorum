@@ -259,6 +259,8 @@ export function SellWizard({ L, err, errors, types, equipment, verified, doneHre
           <div style={{ display: 'grid', gap: 6 }}>
             <label htmlFor="sell-desc">{L.description}</label>
             <textarea id="sell-desc" className="input" rows={5} maxLength={4000} placeholder={L.descriptionPh} value={f.description} onChange={(e) => set('description', e.target.value)} />
+            {input('videoUrl', L.video, { placeholder: 'https://youtu.be/…', max: 300, error: 'videoUrl' })}
+            <span className="small muted">{L.videoHint}</span>
             <div className="row small" style={{ alignItems: 'center' }}>
               <button type="button" className="btn ghost" disabled={writing} onClick={() => void writeDescription()}>{writing ? L.writing : L.writeForMe}</button>
               <span className="muted" role="status">{writeNote || L.writeHint}</span>

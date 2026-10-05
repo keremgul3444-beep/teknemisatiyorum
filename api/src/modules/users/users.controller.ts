@@ -81,7 +81,7 @@ export class UsersController {
       p.listingReport.findMany({ where: { reporterId: id }, select: { listingId: true, reason: true, note: true, status: true, createdAt: true } }),
     ]);
     // Öne çıkarma siparişleri, firma üyelikleri ve 2. dalga (usta/kaptan profilleri, işler, teklifler, rezervasyonlar, ödemeler, değerlendirmeler).
-    const [orders, companies, providers, jobs, captainBookings, servicePayments, reviewsWritten] = await Promise.all([
+    const [orders, companies, providers, jobs, captainBookings, servicePayments, reviewsWritten, leads] = await Promise.all([
       p.order.findMany({ where: { userId: id }, select: { id: true, listingId: true, productCode: true, channel: true, amountKurus: true, status: true, createdAt: true, paidAt: true, refundedAt: true } }),
       p.companyMember.findMany({ where: { userId: id }, select: { role: true, company: { select: { name: true, kind: true, city: true } } } }),
       p.providerProfile.findMany({ where: { userId: id }, include: { quotes: { select: { jobId: true, priceTry: true, days: true, note: true, createdAt: true } } } }),
@@ -89,6 +89,7 @@ export class UsersController {
       p.captainBooking.findMany({ where: { userId: id }, select: { id: true, start: true, days: true, totalEur: true, status: true, createdAt: true } }),
       p.servicePayment.findMany({ where: { payerId: id }, select: { subjectKind: true, subjectId: true, amountKurus: true, feeKurus: true, status: true, createdAt: true, paidAt: true, releasedAt: true, refundedAt: true } }),
       p.review.findMany({ where: { authorId: id }, select: { subjectKind: true, stars: true, text: true, createdAt: true } }),
+      p.leadRequest.findMany({ where: { userId: id }, select: { kind: true, listingId: true, note: true, status: true, consentAt: true, createdAt: true } }),
     ]);
     await this.audit.log(id, 'audit.dataExported', {}, 'user', id);
     return {
@@ -96,7 +97,7 @@ export class UsersController {
       sessions, listings, boats, favorites, savedSearches, expertiseBookings, brokerCases, notifications, verificationRequests, consentHistory,
       // Kişinin gönderdiği ilan bildirimleri ve varsa hesabının askıya alınma kaydı.
       reports, suspension: user.suspendedAt ? { at: user.suspendedAt, reason: user.suspendReason } : null,
-      orders, companies, providers, jobs, captainBookings, servicePayments, reviewsWritten,
+      orders, companies, providers, jobs, captainBookings, servicePayments, reviewsWritten, leads,
       // Sohbetler: kişinin gönderdiği ve aldığı mesajlar (karşı tarafın numarası yok).
       conversations: convs.map(({ messages, ...c }) => ({ ...c, messages: messages.map(({ senderId, ...m }) => ({ ...m, mine: senderId === id })) })),
     };

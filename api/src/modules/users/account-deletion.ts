@@ -26,7 +26,8 @@ export async function deleteAccount(prisma: PrismaClient, userId: string, o: { r
     prisma.session.updateMany({ where: { userId, revokedAt: null }, data: { revokedAt: now } }),
   ]);
   await retireServices(prisma, userId, { anonymize: true });
-  // Firma üyelikleri biter (sahibi olduğu firma diğer üyeler için kalır).
+  // Firma üyelikleri biter (sahibi olduğu firma diğer üyeler için kalır); teklif talepleri (ad, telefon) silinir.
   await prisma.companyMember.deleteMany({ where: { userId } });
+  await prisma.leadRequest.deleteMany({ where: { userId } });
   await o.purgeFiles(userId);
 }

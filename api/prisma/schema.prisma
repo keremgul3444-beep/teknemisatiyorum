@@ -141,6 +141,26 @@ model Company {
   members   CompanyMember[]
 }
 
+/// Finansman, sigorta ya da nakliye teklifi talebi: ekip iş ortağına iletir (kişinin açık izniyle).
+model LeadRequest {
+  id        String    @id @default(cuid())
+  userId    String
+  listingId String?
+  /// finance | insurance | transport
+  kind      String
+  name      String?
+  phone     String?
+  note      String    @default("")
+  /// new | forwarded | closed
+  status    String    @default("new")
+  consentAt DateTime
+  createdAt DateTime  @default(now())
+  handledAt DateTime?
+
+  @@index([status, createdAt])
+  @@index([userId, createdAt])
+}
+
 /// Firma toplu ilan yüklemesi: satırlar arka planda işlenir (fotoğraflar indirilir, ilanlar onaya gönderilir).
 model ImportJob {
   id         String    @id @default(cuid())
@@ -222,6 +242,8 @@ model Listing {
   description   String         @default("")
   /// Onayda üretilen İngilizce açıklama (yabancı alıcılar için); açıklama değişince silinir, yeniden onayda yenilenir.
   descriptionEn String?
+  /// Tanıtım videosu bağlantısı (YouTube, Vimeo, Instagram; tek biçimde saklanır).
+  videoUrl      String?
   /// Motor saati; null = satıcı belirtmedi.
   engineHours   Int?
   /// Bayrak: 'tr' | 'foreign'; null = belirtilmedi.

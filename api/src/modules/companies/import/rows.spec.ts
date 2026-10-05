@@ -24,7 +24,7 @@ test('şablon satırı eksiksiz bir ilan taslağına çevrilir', () => {
   expect(r).toEqual({ ok: { row: 2, photos: ['https://ornek.com/foto1.jpg', 'https://ornek.com/foto2.jpg'], draft: {
     brand: 'Bavaria', model: 'Cruiser 41', location: 'Bodrum', year: 2016, lengthM: 12.4, price: 145000, type: 'yelkenli', currency: 'EUR',
     cabins: 3, engine: 'Volvo Penta D2-40', engineHours: 850, flag: 'tr', tradeIn: false, negotiable: true, equipment: ['jenerator', 'otopilot'],
-    description: 'Tek sahibinden, bakımlı.',
+    description: 'Tek sahibinden, bakımlı.', videoUrl: 'https://youtu.be/dQw4w9WgXcQ',
   } } });
 });
 

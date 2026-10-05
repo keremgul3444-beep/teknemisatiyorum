@@ -22,6 +22,7 @@ const COLUMNS: Record<string, string[]> = {
   equipment: ['donanim', 'equipment'],
   description: ['aciklama', 'description'],
   photos: ['fotograflar', 'fotograf', 'foto', 'photos', 'photo urls', 'resimler'],
+  videoUrl: ['video', 'video url', 'video baglantisi', 'youtube'],
 };
 
 /** Karşılaştırma anahtarı: küçük harf, Türkçe karakterler sadeleşir, ayraçlar boşluk olur. */
@@ -117,6 +118,7 @@ export function toImportRow(cells: string[], index: Record<string, number>, row:
     else d.equipment = [...new Set(eq as Equipment[])];
   }
   if (get('description')) d.description = get('description');
+  if (get('videoUrl')) d.videoUrl = get('videoUrl');
   const photos = get('photos').split(/[\s|]+/).map((s) => s.trim()).filter(Boolean);
   if (!photos.length) err('photos', 'required');
   else if (photos.length > MAX_LISTING_PHOTOS) err('photos', 'tooMany');
@@ -126,6 +128,6 @@ export function toImportRow(cells: string[], index: Record<string, number>, row:
 
 /** Şablon (site "örnek dosyayı indir"): Türkçe Excel'in açtığı `;` ayraçlı, BOM'lu UTF-8. */
 export const TEMPLATE_CSV = '﻿' + [
-  'marka;model;yil;boy_m;tip;fiyat;para;konum;kabin;motor;motor_saati;bayrak;takas;pazarlik;donanim;aciklama;fotograflar',
-  'Bavaria;Cruiser 41;2016;12,4;Yelkenli;145.000;EUR;Bodrum;3;Volvo Penta D2-40;850;Türk;Hayır;Evet;Jeneratör, Otopilot;Tek sahibinden, bakımlı.;https://ornek.com/foto1.jpg | https://ornek.com/foto2.jpg',
+  'marka;model;yil;boy_m;tip;fiyat;para;konum;kabin;motor;motor_saati;bayrak;takas;pazarlik;donanim;aciklama;fotograflar;video',
+  'Bavaria;Cruiser 41;2016;12,4;Yelkenli;145.000;EUR;Bodrum;3;Volvo Penta D2-40;850;Türk;Hayır;Evet;Jeneratör, Otopilot;Tek sahibinden, bakımlı.;https://ornek.com/foto1.jpg | https://ornek.com/foto2.jpg;https://youtu.be/dQw4w9WgXcQ',
 ].join('\r\n') + '\r\n';

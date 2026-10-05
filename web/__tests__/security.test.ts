@@ -14,7 +14,10 @@ test('önbellekli herkese açık sayfalar: nonce yok ama dış betik de yok', ()
   const h = securityHeaders({ isProd: false });
   const csp = h['Content-Security-Policy'];
   expect(csp).toMatch(/script-src 'self' 'unsafe-inline'/);
-  expect(csp).not.toMatch(/https?:\/\/(?!127\.0\.0\.1)/);
+  // Dış kaynaklı betik yok; dış adres yalnızca ilan videosu çerçevelerinde (üç bilinen oynatıcı).
+  const directives = Object.fromEntries(csp.split('; ').map((d) => [d.split(' ')[0], d]));
+  for (const [name, d] of Object.entries(directives)) if (name !== 'frame-src') expect([name, d]).not.toEqual([name, expect.stringMatching(/https?:\/\/(?!127\.0\.0\.1)/)]);
+  expect(directives['frame-src']).toBe('frame-src https://www.youtube-nocookie.com https://player.vimeo.com https://www.instagram.com');
   expect(csp).toContain("object-src 'none'");
   expect(h['Strict-Transport-Security']).toBeUndefined();
 });

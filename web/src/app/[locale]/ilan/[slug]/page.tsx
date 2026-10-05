@@ -11,6 +11,8 @@ import { AppLink, Breadcrumbs, JsonLd, ListingGrid, Section, appHref } from '@/c
 import { ViewBeacon } from '@/components/ViewBeacon';
 import { Gallery } from '@/components/Gallery';
 import { ContactBox } from '@/components/ContactBox';
+import { LeadBox } from '@/components/LeadBox';
+import { VideoEmbed } from '@/components/VideoEmbed';
 import { FavoriteButton } from '@/components/FavoriteButton';
 import { PromoBadges } from '@/components/PromoBadges';
 
@@ -107,6 +109,7 @@ export default async function IlanDetay({ params }: P) {
                 <FavoriteButton id={l.id} loginHref={loginHref} labels={{ add: t(locale, 'listing.favAdd'), remove: t(locale, 'listing.favRemove') }} />
                 <AppLink locale={locale} path={`ekspertiz?ilan=${encodeURIComponent(l.id)}`} secondary>{t(locale, 'listing.requestSurvey')}</AppLink>
               </div>
+              <LeadBox listingId={l.id} errors={tDict(locale, 'errors')} loginHref={loginHref} labels={tDict(locale, 'lead') as never} />
             </div>
           )}
           <table className="card specs" style={{ padding: 0 }}>
@@ -143,6 +146,7 @@ export default async function IlanDetay({ params }: P) {
           </div>
         </div>
       </article>
+      {l.videoUrl ? <Section title={t(locale, 'listing.video')}><VideoEmbed url={l.videoUrl} title={t(locale, 'listing.videoTitle', { title })} /></Section> : null}
       {l.description ? (
         <Section title={t(locale, 'listing.description')}>
           {/* İngilizce sayfada onayda üretilen çeviri; yoksa Türkçe özgün metin (notuyla). */}

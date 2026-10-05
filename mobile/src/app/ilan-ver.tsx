@@ -368,6 +368,7 @@ export default function IlanVer() {
               onPress={() => update({ equipment: s.equipment.includes(e) ? s.equipment.filter((x) => x !== e) : [...s.equipment, e] })} />)}
           </View>
           <Field label={t('wizard.description')} value={s.f.description} onChangeText={set('description')} placeholder={t('wizard.descriptionPh')} multiline maxLength={4000} />
+          <Field label={t('wizard.video')} value={s.f.videoUrl} onChangeText={set('videoUrl')} placeholder="https://youtu.be/…" autoCapitalize="none" keyboardType="url" maxLength={300} error={err('videoUrl')} />
           <Button small variant="secondary" icon="sparkle" loading={writing} title={t('wizard.writeForMe')} onPress={() => void writeDescription()} />
           <T variant="caption" color={colors.muted}>{writeNote || t('wizard.writeHint')}</T>
         </>
