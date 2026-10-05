@@ -220,6 +220,8 @@ model Listing {
   cabins        Int            @default(0)
   engine        String         @default("")
   description   String         @default("")
+  /// Onayda üretilen İngilizce açıklama (yabancı alıcılar için); açıklama değişince silinir, yeniden onayda yenilenir.
+  descriptionEn String?
   /// Motor saati; null = satıcı belirtmedi.
   engineHours   Int?
   /// Bayrak: 'tr' | 'foreign'; null = belirtilmedi.

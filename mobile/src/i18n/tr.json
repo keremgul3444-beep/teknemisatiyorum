@@ -149,7 +149,8 @@
     "rejectedBody": "Sorunu düzeltip ilanı yeniden onaya gönderebilirsin.",
     "soldNote": "Bu tekne satıldı",
     "removedTitle": "İlanın yayından kaldırıldı",
-    "removedBody": "İtiraz için iletisim@teknemisatiyorum.com adresine yaz."
+    "removedBody": "İtiraz için iletisim@teknemisatiyorum.com adresine yaz.",
+    "translatedNote": "Otomatik çeviri; satıcının yazdığı metin Türkçe."
   },
   "usta": {
     "freeSurvey": "Keşif ücretsiz",
@@ -529,7 +530,12 @@
     "verifyBannerCta": "Kimliğini doğrula",
     "photoLabelCover": "Fotoğraf {{n}} / {{total}}, kapak",
     "seller": "Satıcı",
-    "sellerSelf": "Bireysel"
+    "sellerSelf": "Bireysel",
+    "writeForMe": "Açıklamayı benim için yaz",
+    "writeHint": "Kısa notlarını yazıp bas; girdiğin bilgilerden bir taslak hazırlanır.",
+    "writeNeeds": "Önce marka, model, yıl, boy ve tipi gir.",
+    "writeDoneLlm": "Taslak hazır. Okuyup düzelt; yalnızca doğru bilgileri bırak.",
+    "writeDoneRules": "Bilgilerinden kısa bir taslak hazırlandı; istersen genişlet."
   },
   "boatAdd": {
     "title": "Tekne ekle",

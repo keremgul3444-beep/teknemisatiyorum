@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { BOAT_TYPES, CURRENCIES, EQUIPMENT, LOCATIONS, type Equipment } from '@tms/shared';
 import {
-  MAX_LISTING_PHOTOS, SELL_STEPS, changedDraft, digits, emptySell, firstInvalid, move, restoreSell, toCover, toDraft, validateSell, type SellErrors, type SellFields,
+  MAX_LISTING_PHOTOS, SELL_STEPS, changedDraft, describeFacts, digits, emptySell, firstInvalid, move, restoreSell, toCover, toDraft, validateSell, type SellErrors, type SellFields,
 } from '@/lib/listingForm';
 
 type Dict = Record<string, string>;
@@ -35,6 +35,8 @@ export function SellWizard({ L, err, errors, types, equipment, verified, doneHre
   const [isVerified, setVerified] = useState(verified);
   const [idf, setIdf] = useState({ tckn: '', firstName: '', lastName: '', birthYear: '' });
   const [done, setDone] = useState(false);
+  const [writing, setWriting] = useState(false);
+  const [writeNote, setWriteNote] = useState('');
   // Yarıda kalan gönderim: açılan taslak ve yüklenen fotoğraflar tekrar denemede yeniden kullanılır.
   const server = useRef<{ id?: string; uploaded: Map<string, string> }>({ uploaded: new Map() });
   const restored = useRef(false);
@@ -83,6 +85,22 @@ export function SellWizard({ L, err, errors, types, equipment, verified, doneHre
     return j;
   };
   const json = (body: unknown, method = 'POST'): RequestInit => ({ method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+
+  /** Açıklama taslağı: kutudaki yazı not olarak gider, dönen taslak kutuya yazılır (satıcı düzenler). */
+  const writeDescription = async () => {
+    const facts = describeFacts(f);
+    if (!facts) { setWriteNote(L.writeNeeds); return; }
+    setWriting(true); setWriteNote('');
+    try {
+      const j = await post('/api/sell/describe', json(facts));
+      set('description', String(j.text ?? '').slice(0, 4000));
+      setWriteNote(j.source === 'llm' ? L.writeDoneLlm : L.writeDoneRules);
+    } catch (e) {
+      setWriteNote((e as Error).message);
+    } finally {
+      setWriting(false);
+    }
+  };
 
   const verifyIdentity = async () => {
     setBusy(true); setError('');
@@ -241,6 +259,10 @@ export function SellWizard({ L, err, errors, types, equipment, verified, doneHre
           <div style={{ display: 'grid', gap: 6 }}>
             <label htmlFor="sell-desc">{L.description}</label>
             <textarea id="sell-desc" className="input" rows={5} maxLength={4000} placeholder={L.descriptionPh} value={f.description} onChange={(e) => set('description', e.target.value)} />
+            <div className="row small" style={{ alignItems: 'center' }}>
+              <button type="button" className="btn ghost" disabled={writing} onClick={() => void writeDescription()}>{writing ? L.writing : L.writeForMe}</button>
+              <span className="muted" role="status">{writeNote || L.writeHint}</span>
+            </div>
           </div>
         </section>
       ) : null}

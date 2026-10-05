@@ -3,7 +3,7 @@ import type { Currency } from '@tms/shared';
 /** API'nin ilan görünümü (api/src/modules/listings/listing.view.ts). */
 export type ListingView = {
   id: string; brand: string; model: string; year: number; lengthM: number; type: string; price: number; currency: Currency;
-  location: string; equipment: string[]; cabins?: number; engine?: string; description: string; status: string; badges: string[];
+  location: string; equipment: string[]; cabins?: number; engine?: string; description: string; descriptionEn?: string | null; status: string; badges: string[];
   engineHours?: number | null; flag?: 'tr' | 'foreign' | null; tradeIn?: boolean; negotiable?: boolean;
   photos: { id: string; url: string }[];
   seller: { id: string; name: string | null; since: number; companyName: string | null; verified?: boolean };

@@ -123,3 +123,13 @@ describe('tüm adım denetimi ve kaybolan dosyalar', () => {
     expect(dropMissingFiles(s, () => false).state.step).toBe(0);
   });
 });
+
+test('açıklama taslağı isteği ve demo taslağı', () => {
+  const { describeFacts, emptyWizard } = require('@/features/listingForm');
+  const { rulesDescription } = require('@tms/shared');
+  expect(describeFacts(emptyWizard())).toBeNull();
+  const s = { ...emptyWizard(), type: 'gulet', location: 'Marmaris', f: { ...emptyWizard().f, brand: 'Özel', model: 'Gulet 24', year: '2005', length: '24', description: 'yeni yelkenler' } };
+  const f = describeFacts(s);
+  expect(f).toMatchObject({ brand: 'Özel', model: 'Gulet 24', year: 2005, lengthM: 24, type: 'gulet', location: 'Marmaris', notes: 'yeni yelkenler' });
+  expect(rulesDescription(f)).toBe("2005 model Özel Gulet 24, 24 metre gulet. Tekne Marmaris'te. yeni yelkenler");
+});

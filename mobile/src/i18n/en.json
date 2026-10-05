@@ -149,7 +149,8 @@
     "rejectedBody": "Fix the issue and send the listing for review again.",
     "soldNote": "This boat has been sold",
     "removedTitle": "Your listing was taken down",
-    "removedBody": "To appeal, write to iletisim@teknemisatiyorum.com."
+    "removedBody": "To appeal, write to iletisim@teknemisatiyorum.com.",
+    "translatedNote": "Automatic translation; the seller wrote the original in Turkish."
   },
   "usta": {
     "freeSurvey": "Free inspection",
@@ -529,7 +530,12 @@
     "verifyBannerCta": "Verify ID",
     "photoLabelCover": "Photo {{n}} of {{total}}, cover",
     "seller": "Seller",
-    "sellerSelf": "Individual"
+    "sellerSelf": "Individual",
+    "writeForMe": "Write the description for me",
+    "writeHint": "Add a few notes and press; a draft is prepared from the details you entered.",
+    "writeNeeds": "Enter brand, model, year, length and type first.",
+    "writeDoneLlm": "Draft ready. Read it and correct it; keep only what is true.",
+    "writeDoneRules": "A short draft was prepared from your details; extend it if you like."
   },
   "boatAdd": {
     "title": "Add a boat",

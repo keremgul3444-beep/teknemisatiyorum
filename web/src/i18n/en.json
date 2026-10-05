@@ -233,7 +233,9 @@
     "memberSince": "Member since {{year}}",
     "sellerVerified": "ID verified",
     "sellerAnon": "Seller",
-    "safety": "Safety: never pay a deposit or any money outside the platform for a boat you have not seen. At transfer, pay by bank transfer with the boat name and registration number in the reference."
+    "safety": "Safety: never pay a deposit or any money outside the platform for a boat you have not seen. At transfer, pay by bank transfer with the boat name and registration number in the reference.",
+    "translatedNote": "Automatic translation; the seller wrote the original in Turkish.",
+    "originalNote": "Original text by the seller (in Turkish)."
   },
   "gone": {
     "title": "This listing is no longer live",
@@ -867,7 +869,13 @@
     "editNote": "A moderate price change keeps the listing live. Other changes and photos go through a short review.",
     "editDoneTitle": "Changes saved",
     "editDoneBody": "If review is needed, the listing goes live again shortly; we will notify you.",
-    "saveEdit": "Save changes"
+    "saveEdit": "Save changes",
+    "writeForMe": "Write the description for me",
+    "writing": "Writing…",
+    "writeHint": "Add a few notes and press; a draft is prepared from the details you entered.",
+    "writeNeeds": "Enter brand, model, year, length and type first.",
+    "writeDoneLlm": "Draft ready. Read it and correct it; keep only what is true.",
+    "writeDoneRules": "A short draft was prepared from your details; extend it if you like."
   },
   "admin": {
     "title": "Admin",

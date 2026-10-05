@@ -1,6 +1,6 @@
 import { Linking, Platform, Share } from 'react-native';
 import type { CompanyDetail } from '@/features/company';
-import { matchListings, parseQuery, parsedQuerySchema, type Criterion, type ParsedQuery } from '@tms/shared';
+import { matchListings, parseQuery, parsedQuerySchema, rulesDescription, type Criterion, type ListingFacts, type ParsedQuery } from '@tms/shared';
 import { useStore } from './store';
 import { absolute, isApiMode } from './mode';
 import { api } from './api/instance';
@@ -174,6 +174,11 @@ export const actions = {
     // Yalnızca fiyatı değişen reddedilmiş ilan reddedilmiş kalır; satıcı düzelttiği için yeniden onaya gönderilir.
     if (before?.rawStatus === 'rejected') await api.post(`/listings/${id}/submit`).catch((e: { status?: number }) => { if (e.status !== 409) throw e; });
     await syncMine();
+  },
+  /** Sihirbazda açıklama taslağı: sunucuda modelle (yoksa kural tabanlı); demoda kural tabanlı. Kaydetmez. */
+  async describeListing(facts: ListingFacts): Promise<{ text: string; source: 'llm' | 'rules' }> {
+    if (!isApiMode()) return { text: rulesDescription(facts), source: 'rules' };
+    return api.post<{ text: string; source: 'llm' | 'rules' }>('/listings/describe', facts);
   },
   /** Satıcı ilanını yayından kaldırır (geri alınamaz; İlanlarım'da görünmez). */
   async withdrawListing(id: string) {

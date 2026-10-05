@@ -15,6 +15,7 @@ import { nextExpiry } from '../listings/expiry';
 import { photoDuplicates } from '../listings/duplicates';
 import { ListingsModule } from '../listings/listings.module';
 import { ListingsService } from '../listings/listings.service';
+import { ListingTexts } from '../listings/listing-writer.service';
 import { reportError } from '../../adapters/error-report';
 import { ModerationController } from './moderation.controller';
 
@@ -49,6 +50,7 @@ class AdminController {
     private readonly logbook: LogbookService,
     private readonly sms: DevSmsSender,
     private readonly listings: ListingsService,
+    private readonly texts: ListingTexts,
   ) {}
 
   @Auth(STAFF)
@@ -124,6 +126,8 @@ class AdminController {
     await this.notifications.push(l.ownerId, approve ? 'notif.listingApproved' : 'notif.listingRejected', { title, listingId: id, ...(approve ? {} : { reason: b.reason }) });
     // Kayıtlı aramalara yeni ilan bildirimi yanıtı bekletmez (çok sayıda aramada da karar anında döner).
     if (approve) this.listings.notifySearchMatches(id).catch((e) => void reportError(e, { job: 'search-match' }));
+    // Yabancı alıcılar için İngilizce açıklama (anahtar yoksa yapılmaz; hata ilanı etkilemez).
+    if (approve) this.texts.translateListing(id).catch((e) => void reportError(e, { job: 'translate' }));
     // Kayıt hangi sürüme ve fiyata karar verildiğini de tutar (sonradan "onaylanan buydu" denetimi için).
     await this.audit.log(u.id, approve ? 'audit.listingApproved' : 'audit.listingRejected',
       { title, version: b.version, price: `${l.price} ${l.currency}`, ...(approve ? {} : { reason: b.reason ?? '' }) }, 'listing', id);

@@ -233,7 +233,9 @@
     "memberSince": "{{year}} yılından beri üye",
     "sellerVerified": "Kimliği doğrulanmış",
     "sellerAnon": "Satıcı",
-    "safety": "Güvenlik: kapora ya da ödemeyi platform dışında, görmediğin tekne için yapma. Devirde ödemeyi banka havalesiyle, açıklamaya tekne adı ve ruhsat numarasını yazarak yap."
+    "safety": "Güvenlik: kapora ya da ödemeyi platform dışında, görmediğin tekne için yapma. Devirde ödemeyi banka havalesiyle, açıklamaya tekne adı ve ruhsat numarasını yazarak yap.",
+    "translatedNote": "Otomatik çeviri; satıcının yazdığı metin Türkçe.",
+    "originalNote": "Satıcının yazdığı özgün metin (Türkçe)."
   },
   "gone": {
     "title": "Bu ilan artık yayında değil",
@@ -867,7 +869,13 @@
     "editNote": "Yalnızca fiyatı ölçülü değiştirirsen ilan yayında kalır. Diğer değişiklikler ve fotoğraflar kısa bir onaydan geçer.",
     "editDoneTitle": "Değişiklikler kaydedildi",
     "editDoneBody": "Onay gerekiyorsa ilan kısa süre sonra yeniden yayına girer; sonucu bildirimle haber veririz.",
-    "saveEdit": "Değişiklikleri kaydet"
+    "saveEdit": "Değişiklikleri kaydet",
+    "writeForMe": "Açıklamayı benim için yaz",
+    "writing": "Yazılıyor…",
+    "writeHint": "Kısa notlarını yazıp bas; girdiğin bilgilerden bir taslak hazırlanır.",
+    "writeNeeds": "Önce marka, model, yıl, boy ve tipi gir.",
+    "writeDoneLlm": "Taslak hazır. Okuyup düzelt; yalnızca doğru bilgileri bırak.",
+    "writeDoneRules": "Bilgilerinden kısa bir taslak hazırlandı; istersen genişlet."
   },
   "admin": {
     "title": "Yönetim",

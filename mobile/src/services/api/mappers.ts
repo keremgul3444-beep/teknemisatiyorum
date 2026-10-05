@@ -6,7 +6,7 @@ import type { AdminItem, AuditEntry, Boat, BrokerCase, CaptainBooking, Conversat
 // Sunucu yanıt biçimleri (yalnızca kullanılan alanlar).
 export interface ApiListing {
   id: string; brand: string; model: string; year: number; lengthM: number; type: string; price: number; currency: Currency;
-  location: string; equipment: string[]; cabins: number; engine: string; description: string; status: string; badges: string[];
+  location: string; equipment: string[]; cabins: number; engine: string; description: string; descriptionEn?: string | null; status: string; badges: string[];
   engineHours?: number | null; flag?: string | null; tradeIn?: boolean; negotiable?: boolean;
   rejectReason?: string | null; removedReason?: string | null; expiresAt?: string | null; photos: { id: string; url: string }[];
   seller: { id: string; name: string | null; since: number; companyName: string | null; verified?: boolean };
@@ -47,7 +47,7 @@ export function toListing(l: ApiListing): Listing {
   return {
     id: l.id, brand: l.brand, model: l.model, year: l.year, lengthM: l.lengthM, price: l.price, currency: l.currency,
     type: l.type as BoatType, location: l.location, equipment: l.equipment as Equipment[], badges: l.badges as BadgeKind[],
-    sellerId: l.seller.id, logbookCount: l.logbook?.count ?? 0, description: l.description,
+    sellerId: l.seller.id, logbookCount: l.logbook?.count ?? 0, description: l.description, descriptionEn: l.descriptionEn ?? null,
     status: STATUS[l.status] ?? 'onay-bekliyor', rawStatus: l.status, photoSeed: seedOf(l.id), cabins: l.cabins, engine: l.engine,
     photoUrls: l.photos.map((p) => absolute(p.url)), photoIds: l.photos.map((p) => p.id), isMine: l.isMine, boatId: l.logbook?.boatId ?? null,
     logbookLatest: l.logbook?.latest.map(toEntry) ?? [], rejectReason: l.rejectReason ?? null,

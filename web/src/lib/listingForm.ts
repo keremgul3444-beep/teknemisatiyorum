@@ -104,3 +104,17 @@ export function changedDraft(before: SellFields, after: SellFields): Record<stri
   const b = toDraft({ ...after, companyId: '' }) as Record<string, unknown>;
   return Object.fromEntries(Object.keys(b).filter((k) => JSON.stringify(a[k]) !== JSON.stringify(b[k])).map((k) => [k, b[k]]));
 }
+
+/** Açıklama taslağı isteği: yazılı açıklama satıcının notu olarak gider. Zorunlu bilgiler eksikse null. */
+export function describeFacts(f: SellFields) {
+  const year = Number(f.year);
+  const lengthM = decimal(f.length);
+  if (!f.brand.trim() || !f.model.trim() || !(year >= 1900) || !(lengthM > 0) || !f.type) return null;
+  return {
+    brand: f.brand.trim(), model: f.model.trim(), year, lengthM, type: f.type, equipment: f.equipment,
+    ...(f.location ? { location: f.location } : {}), ...(Number(f.cabins) ? { cabins: Number(f.cabins) } : {}),
+    ...(f.engine.trim() ? { engine: f.engine.trim() } : {}), ...(f.engineHours ? { engineHours: Number(f.engineHours) } : {}),
+    ...(f.flag ? { flag: f.flag } : {}), ...(f.tradeIn ? { tradeIn: true } : {}), ...(f.negotiable ? { negotiable: true } : {}),
+    ...(f.description.trim() ? { notes: f.description.trim().slice(0, 600) } : {}),
+  };
+}

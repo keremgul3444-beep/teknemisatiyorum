@@ -6,7 +6,7 @@ export { USTA_CATEGORIES } from '@tms/shared';
 export interface Listing {
   id: string; brand: string; model: string; year: number; lengthM: number; price: number; currency: Currency;
   type: BoatType; location: string; equipment: Equipment[]; badges: BadgeKind[]; sellerId: string;
-  logbookCount: number; description: string; status: ListingStatus; photoSeed: number; cabins: number; engine: string;
+  logbookCount: number; description: string; descriptionEn?: string | null; status: ListingStatus; photoSeed: number; cabins: number; engine: string;
   /** Motor saati ve bayrak (null = belirtilmedi); takasa açık, pazarlık payı var. Eski kayıtlarda alan olmayabilir. */
   engineHours?: number | null; flag?: Flag | null; tradeIn?: boolean; negotiable?: boolean;
   /** Gerçek modda: sunucudaki fotoğraflar, ham durum (draft/pending/rejected…), ilan sahibi mi, bağlı tekne ve karne özeti. */

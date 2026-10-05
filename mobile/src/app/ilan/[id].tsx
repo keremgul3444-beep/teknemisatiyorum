@@ -13,7 +13,7 @@ import { attempt } from '@/services/errors';
 
 /** İlan detayı ("Liman"): fotoğraf üstte, başlık ve fiyat, büyük rakamlı üç özellik, sonra ayrıntılar. */
 export default function IlanDetay() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const l = useListing(id);
   const seller = useSeller(l?.sellerId);
@@ -145,7 +145,13 @@ export default function IlanDetay() {
             </Section>
           ) : null}
 
-          {l.description && l.description !== '—' ? <Section title={t('listing.description')}><T color={colors.muted}>{l.description}</T></Section> : null}
+          {l.description && l.description !== '—' ? (
+            <Section title={t('listing.description')}>
+              {/* İngilizce arayüzde onayda üretilen çeviri (varsa). */}
+              <T color={colors.muted}>{i18n.language === 'en' && l.descriptionEn ? l.descriptionEn : l.description}</T>
+              {i18n.language === 'en' && l.descriptionEn ? <T variant="caption" color={colors.muted}>{t('listing.translatedNote')}</T> : null}
+            </Section>
+          ) : null}
 
           <Section title={t('listing.logbook')}>
             <Card onPress={l.isMine && l.boatId ? () => router.push(`/teknelerim/${l.boatId}`) : undefined}>

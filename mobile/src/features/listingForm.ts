@@ -1,4 +1,4 @@
-import { MAX_ENGINE_HOURS, MAX_LISTING_PHOTOS, type BoatType, type Currency, type Equipment, type Flag } from '@tms/shared';
+import { MAX_ENGINE_HOURS, MAX_LISTING_PHOTOS, type BoatType, type Currency, type Equipment, type Flag, type ListingFacts } from '@tms/shared';
 import type { Listing, ListingDraft } from '@/services/types';
 
 export { MAX_LISTING_PHOTOS };
@@ -197,4 +197,18 @@ export function restoreDraft(raw: string | null): WizardState | null {
   } catch {
     return null;
   }
+}
+
+/** Açıklama taslağı isteği: yazılı açıklama satıcının notu olarak gider. Zorunlu bilgiler eksikse null. */
+export function describeFacts(s: WizardState): ListingFacts | null {
+  const year = Number(s.f.year);
+  const lengthM = parseNum(s.f.length);
+  if (!s.f.brand.trim() || !s.f.model.trim() || !(year >= 1900) || !(lengthM > 0) || !s.type) return null;
+  return {
+    brand: s.f.brand.trim(), model: s.f.model.trim(), year, lengthM, type: s.type, equipment: s.equipment,
+    ...(s.location ? { location: s.location } : {}), ...(Number(s.f.cabins) ? { cabins: Number(s.f.cabins) } : {}),
+    ...(s.f.engine.trim() ? { engine: s.f.engine.trim() } : {}), ...(s.f.engineHours ? { engineHours: Number(s.f.engineHours) } : {}),
+    ...(s.flag ? { flag: s.flag } : {}), ...(s.tradeIn ? { tradeIn: true } : {}), ...(s.negotiable ? { negotiable: true } : {}),
+    ...(s.f.description.trim() ? { notes: s.f.description.trim().slice(0, 600) } : {}),
+  };
 }

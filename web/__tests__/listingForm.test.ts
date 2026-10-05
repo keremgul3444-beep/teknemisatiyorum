@@ -46,3 +46,10 @@ test('düzenleme: ilan forma dolar; yalnızca değişen alanlar gönderilir', as
   expect(changedDraft(f, { ...f, description: 'Yeni boya', equipment: ['gps', 'radar'] as never })).toEqual({ description: 'Yeni boya', equipment: ['gps', 'radar'] });
   expect(fromListing({ ...l, engineHours: null, flag: null, cabins: 0 }, 'en')).toMatchObject({ length: '12.4', engineHours: '', flag: '', cabins: '' });
 });
+
+test('açıklama taslağı isteği: zorunlu bilgiler eksikse yok; yazılı açıklama not olarak gider', async () => {
+  const { describeFacts, emptySell } = await import('../src/lib/listingForm');
+  expect(describeFacts(emptySell())).toBeNull();
+  const f = { ...emptySell(), brand: 'Bavaria', model: 'C41', year: '2016', length: '12,4', type: 'yelkenli' as const, description: 'tek sahibinden', equipment: ['gps'] as never };
+  expect(describeFacts(f)).toEqual({ brand: 'Bavaria', model: 'C41', year: 2016, lengthM: 12.4, type: 'yelkenli', equipment: ['gps'], notes: 'tek sahibinden' });
+});

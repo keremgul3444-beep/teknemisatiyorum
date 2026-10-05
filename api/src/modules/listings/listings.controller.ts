@@ -10,6 +10,7 @@ import { MediaService } from '../media/media.service';
 import { ListingsService, MAX_PHOTOS } from './listings.service';
 import { listingInclude, priceNeedsReview, PRICE_CHANGES_PER_WEEK, type ListingRow } from './listing.view';
 import { canRenew, nextExpiry } from './expiry';
+import { ListingTexts } from './listing-writer.service';
 
 /** Kullanıcı başına açık (gönderilmemiş) taslak sınırı. */
 const MAX_OPEN_DRAFTS = 5;
@@ -33,6 +34,15 @@ export const draftSchema = z.object({
   negotiable: z.boolean().default(false),
   companyId: z.string().optional(),
   boatId: z.string().optional(),
+});
+/** Açıklama taslağı için bilgiler (kaydedilmez). */
+const describeSchema = z.object({
+  brand: z.string().trim().min(1).max(60), model: z.string().trim().min(1).max(60), year: z.number().int().min(1900).max(2100),
+  lengthM: z.number().positive().max(200), type: z.enum(BOAT_TYPES), location: z.string().trim().max(40).optional(),
+  cabins: z.number().int().min(0).max(50).optional(), engine: z.string().trim().max(80).optional(),
+  engineHours: z.number().int().min(0).max(MAX_ENGINE_HOURS).nullable().optional(), flag: z.enum(FLAGS).nullable().optional(),
+  equipment: z.array(z.enum(EQUIPMENT)).max(8).default([]), tradeIn: z.boolean().optional(), negotiable: z.boolean().optional(),
+  notes: z.string().max(600).optional(),
 });
 // Kısmi güncellemede varsayılanlar uygulanmaz: yalnızca fiyat gönderen istek donanımı/açıklamayı silmesin.
 const patchSchema = draftSchema.partial().extend({
@@ -81,6 +91,7 @@ export class ListingsController {
     private readonly prisma: PrismaService,
     private readonly media: MediaService,
     private readonly audit: AuditService,
+    private readonly texts: ListingTexts,
   ) {}
 
   @Public()
@@ -159,6 +170,14 @@ export class ListingsController {
     return Promise.all(rows.map((l) => this.listings.view(l, u.id, stats.get(l.id))));
   }
 
+  /** Sihirbazda "açıklamayı benim için yaz": girilen bilgilerden taslak (modelle, yoksa kural tabanlı). Kaydetmez. */
+  @Auth({ level: 1 })
+  @Post('listings/describe')
+  @HttpCode(200)
+  describe(@CurrentUser() u: AuthUser, @Body(new ZodPipe(describeSchema)) b: z.infer<typeof describeSchema>) {
+    return this.texts.describe(u.id, b);
+  }
+
   /** Taslak için seviye 1 yeter; onaya göndermek seviye 2 ister (aşağıda, sunucuda). */
   @Auth({ level: 1 })
   @Post('listings')
@@ -197,7 +216,7 @@ export class ListingsController {
     const identityChanged = IDENTITY_FIELDS.some((k) => b[k] !== undefined && b[k] !== l[k]);
     const badges = identityChanged ? l.badges.filter((x) => !BOAT_BOUND_BADGES.includes(x)) : l.badges;
     await this.prisma.$transaction([
-      this.prisma.listing.update({ where: { id }, data: { ...b, status, ...(badges.length !== l.badges.length ? { badges } : {}) } }),
+      this.prisma.listing.update({ where: { id }, data: { ...b, status, ...(badges.length !== l.badges.length ? { badges } : {}), ...(b.description !== undefined && b.description !== l.description ? { descriptionEn: null } : {}) } }),
       ...(priceChanged ? [this.prisma.priceHistory.create({ data: { listingId: id, price: l.price, currency: l.currency } })] : []),
     ]);
     await this.audit.log(u.id, 'audit.listingEdited', { fields: Object.keys(b).sort().join(','), status }, 'listing', id);

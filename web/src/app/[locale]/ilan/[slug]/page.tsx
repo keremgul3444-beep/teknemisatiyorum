@@ -143,7 +143,13 @@ export default async function IlanDetay({ params }: P) {
           </div>
         </div>
       </article>
-      {l.description ? <Section title={t(locale, 'listing.description')}><p style={{ whiteSpace: 'pre-line' }}>{l.description}</p></Section> : null}
+      {l.description ? (
+        <Section title={t(locale, 'listing.description')}>
+          {/* İngilizce sayfada onayda üretilen çeviri; yoksa Türkçe özgün metin (notuyla). */}
+          <p style={{ whiteSpace: 'pre-line' }} lang={locale === 'en' && l.descriptionEn ? 'en' : 'tr'}>{locale === 'en' && l.descriptionEn ? l.descriptionEn : l.description}</p>
+          {locale === 'en' ? <p className="muted small">{t(locale, l.descriptionEn ? 'listing.translatedNote' : 'listing.originalNote')}</p> : null}
+        </Section>
+      ) : null}
       {others.length ? <Section title={t(locale, 'listing.similar')}><ListingGrid items={others} locale={locale} /></Section> : null}
     </>
   );

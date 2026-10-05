@@ -10,3 +10,4 @@ export * from './seed/listings';
 export * from './design';
 export * from './location';
 export * from './safety';
+export * from './listingText';

@@ -14,7 +14,7 @@ import { attempt } from '@/services/errors';
 import { pickImage, pickImages } from '@/services/pickImage';
 import {
   MAX_LISTING_PHOTOS, WIZARD_STEPS, addPhotos, digitsOnly, draftChanges, dropMissingFiles, emptyWizard, firstInvalidStep, fromListing,
-  groupThousands, makeCover, movePhoto, photosChanged, removePhoto, toDraft, validateStep, type StepErrors, type WizardFields, type WizardState,
+  describeFacts, groupThousands, makeCover, movePhoto, photosChanged, removePhoto, toDraft, validateStep, type StepErrors, type WizardFields, type WizardState,
 } from '@/features/listingForm';
 import { clearListingDraft, loadListingDraft, saveListingDraft } from '@/features/listingDraftStore';
 import { clearDraftFiles, draftFileExists, keepDraftFile } from '@/features/draftFiles';
@@ -92,6 +92,17 @@ export default function IlanVer() {
   const [companies, setCompanies] = useState<{ id: string; name: string }[]>([]);
   useEffect(() => { if (isApiMode()) attempt(() => actions.myCompanies()).then((c) => { if (c) setCompanies(c); }); }, []);
   const set = (k: keyof WizardFields) => (v: string) => setS((cur) => ({ ...cur, f: { ...cur.f, [k]: v } }));
+  const [writing, setWriting] = useState(false);
+  const [writeNote, setWriteNote] = useState('');
+  /** Açıklama taslağı: kutudaki yazı not olarak gider; dönen taslak kutuya yazılır, satıcı düzenler. */
+  const writeDescription = async () => {
+    const facts = describeFacts(s);
+    if (!facts) { setWriteNote(t('wizard.writeNeeds')); return; }
+    setWriting(true); setWriteNote('');
+    const r = await attempt(() => actions.describeListing(facts));
+    setWriting(false);
+    if (r) { set('description')(r.text.slice(0, 4000)); setWriteNote(t(r.source === 'llm' ? 'wizard.writeDoneLlm' : 'wizard.writeDoneRules')); }
+  };
   const step = s.step;
   const errors: StepErrors = validateStep(step, s);
   const err = (k: keyof StepErrors) => (showErrors && errors[k] ? t(errors[k]!) : undefined);
@@ -357,6 +368,8 @@ export default function IlanVer() {
               onPress={() => update({ equipment: s.equipment.includes(e) ? s.equipment.filter((x) => x !== e) : [...s.equipment, e] })} />)}
           </View>
           <Field label={t('wizard.description')} value={s.f.description} onChangeText={set('description')} placeholder={t('wizard.descriptionPh')} multiline maxLength={4000} />
+          <Button small variant="secondary" icon="sparkle" loading={writing} title={t('wizard.writeForMe')} onPress={() => void writeDescription()} />
+          <T variant="caption" color={colors.muted}>{writeNote || t('wizard.writeHint')}</T>
         </>
       ) : null}
 
