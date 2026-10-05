@@ -55,6 +55,9 @@ services:
       NEXT_PUBLIC_SITE_URL: https://${DOMAIN}
       # Ziyaretçi IP'si: Caddy'nin eklediği son halka.
       TRUSTED_PROXY_HOPS: '1'
+      # İlan bağlantıları telefonda uygulamada açılsın (mağaza hesapları açılınca doldurulur).
+      APPLE_TEAM_ID: ${APPLE_TEAM_ID:-}
+      ANDROID_CERT_SHA256: ${ANDROID_CERT_SHA256:-}
     depends_on: [api]
 
   caddy:

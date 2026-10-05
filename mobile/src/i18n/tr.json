@@ -1271,7 +1271,8 @@
     "already_disputed": "Bu ödeme için zaten sorun bildirdin; ekip inceliyor.",
     "already_delivered": "İşi bitirdiğini zaten bildirdin.",
     "payments_disabled": "Ödemeler şu an kapalı. Kısa süre içinde açılacak.",
-    "preinfo_required": "Ödemeye geçmeden önce ön bilgilendirme formunu ve mesafeli satış sözleşmesini onaylaman gerekiyor."
+    "preinfo_required": "Ödemeye geçmeden önce ön bilgilendirme formunu ve mesafeli satış sözleşmesini onaylaman gerekiyor.",
+    "upgrade_required": "Uygulamanın yeni sürümünü yüklemen gerekiyor."
   },
   "soon": {
     "title": "Yakında",
@@ -1382,5 +1383,10 @@
     "hint": "İş yapılmadıysa ya da eksikse yaz. Otomatik ödeme durur, ekip iki tarafla görüşüp karar verir.",
     "send": "Bildir",
     "sent": "Sorun bildirdin; ödeme beklemede, ekip inceliyor."
+  },
+  "update": {
+    "title": "Yeni sürüm gerekli",
+    "body": "Bu sürüm artık desteklenmiyor. Devam etmek için uygulamayı güncelle.",
+    "button": "Güncelle"
   }
 }

@@ -19,6 +19,10 @@ interface Options {
   onLoggedOut: () => void;
   /** Sunucu daha yüksek doğrulama seviyesi isteyince çağrılır. */
   onLevelRequired: (level: number) => void;
+  /** Uygulama sürümü (`X-App-Version`); sunucu en düşük sürümün altındaysa 426 döner. */
+  appVersion?: string;
+  /** 426: zorunlu güncelleme (mağaza bağlantılarıyla). */
+  onUpgradeRequired?: (p: { min?: string; ios?: string; android?: string }) => void;
 }
 
 /** Yalnızca giriş akışının kendi uç noktaları yenilemeye girmez; çıkış ve cihazlar gibi oturum uç noktaları girer. */
@@ -36,6 +40,7 @@ export function createApiClient(o: Options) {
   async function raw(path: string, init: RequestInit, access: string | null) {
     const headers: Record<string, string> = { ...(init.headers as Record<string, string>) };
     if (access) headers.Authorization = `Bearer ${access}`;
+    if (o.appVersion) headers['X-App-Version'] = o.appVersion;
     if (init.body && !(init.body instanceof FormData)) headers['Content-Type'] = 'application/json';
     try {
       return await fetchFn(`${o.baseUrl}${path}`, { ...init, headers });
@@ -78,6 +83,7 @@ export function createApiClient(o: Options) {
     if (!res.ok) {
       const e = new ApiError(res.status, body.code ?? `HTTP_${res.status}`, body.messageKey ?? 'errors.generic', body.params);
       if (e.code === 'LEVEL_REQUIRED') o.onLevelRequired(Number(e.params?.level ?? 1));
+      if (res.status === 426) o.onUpgradeRequired?.((e.params ?? {}) as { min?: string; ios?: string; android?: string });
       throw e;
     }
     return body as T;

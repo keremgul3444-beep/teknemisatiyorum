@@ -76,6 +76,21 @@ class NotificationsController {
     return this.prisma.notification.findMany({ where: { userId: u.id }, orderBy: { createdAt: 'desc' }, take: 50 });
   }
 
+  /** Site menüsü ve Hesabım için okunmamış bildirim sayısı. */
+  @Auth()
+  @Get('unread-count')
+  async unread(@CurrentUser() u: AuthUser) {
+    return { count: await this.prisma.notification.count({ where: { userId: u.id, readAt: null } }) };
+  }
+
+  /** Bildirim sayfası açılınca hepsi okundu sayılır. */
+  @Auth()
+  @Post('read-all')
+  @HttpCode(204)
+  async readAll(@CurrentUser() u: AuthUser) {
+    await this.prisma.notification.updateMany({ where: { userId: u.id, readAt: null }, data: { readAt: new Date() } });
+  }
+
   @Auth()
   @Post(':id/read')
   @HttpCode(204)

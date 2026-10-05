@@ -52,6 +52,11 @@ const schema = z.object({
   TRUST_PROXY: z.string().default('loopback'),
   /** Hata takibi (Sentry/GlitchTip DSN'i). Boşsa hatalar yalnızca sunucu kaydına yazılır. */
   ERROR_DSN: z.string().default(''),
+  /** Zorunlu güncelleme: bu sürümün altındaki uygulamalar "Güncelle" ekranı görür (boşsa kapalı). */
+  MIN_APP_VERSION: z.string().regex(/^(\d+(\.\d+){0,2})?$/).default(''),
+  /** Güncelle düğmesinin açacağı mağaza sayfaları. */
+  APP_STORE_URL_IOS: z.string().default(''),
+  APP_STORE_URL_ANDROID: z.string().default(''),
 });
 
 export type Env = z.infer<typeof schema>;

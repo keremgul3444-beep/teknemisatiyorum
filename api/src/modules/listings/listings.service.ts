@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
-import { failures, MAX_LISTING_PHOTOS, normalizeLocation, type BoatType, type Equipment, type ParsedQuery, type Criterion } from '@tms/shared';
+import { failures, MAX_LISTING_PHOTOS, normalizeLocation, parsedQuerySchema, type BoatType, type Equipment, type ParsedQuery, type Criterion } from '@tms/shared';
 import { PrismaService } from '../../common/prisma.service';
 import { Errors } from '../../common/errors';
 import { FxService } from './fx.service';
@@ -163,6 +163,40 @@ export class ListingsService {
     ]);
     const priceDrops = dropped.filter((l) => priceDropOf(l, now)).sort((a, b) => b.priceHistory[0].at.getTime() - a.priceHistory[0].at.getTime()).slice(0, 8);
     return { featured: shuffle(featured).slice(0, 8), urgent: urgent.sort((a, b) => freshness(b) - freshness(a)).slice(0, 8), priceDrops };
+  }
+
+  /**
+   * İlan yayına girince (onay): filtresine uyan kayıtlı araması olan herkese (sahibi hariç) bildirim. Kişi başına tek
+   * bildirim (birden çok araması uysa da); aynı ilan için daha önce bildirim almış olana yeniden gitmez (düzenleme
+   * sonrası yeniden onay). Bildirim tercihi (eşleşme bildirimleri) kapalıysa gönderilmez. Kaç kişiye gittiğini döner.
+   */
+  async notifySearchMatches(listingId: string) {
+    const l = await this.prisma.listing.findUnique({ where: { id: listingId }, select: { ...MATCH_SELECT, ownerId: true, brand: true, model: true, status: true } });
+    if (!l || l.status !== 'published') return 0;
+    const rates = await this.fx.rates();
+    const searches = await this.prisma.savedSearch.findMany({ where: { userId: { not: l.ownerId } }, select: { userId: true, filter: true } });
+    // Silinmiş ya da askıdaki hesaplara gönderilmez.
+    const active = new Set((await this.prisma.user.findMany({
+      where: { id: { in: [...new Set(searches.map((s) => s.userId))] }, deletedAt: null, suspendedAt: null }, select: { id: true },
+    })).map((u) => u.id));
+    const users = new Set<string>();
+    for (const s of searches) {
+      if (!active.has(s.userId)) continue;
+      if (users.has(s.userId)) continue;
+      const parsed = parsedQuerySchema.safeParse(s.filter);
+      if (!parsed.success) continue;
+      const q = parsed.data.location ? { ...parsed.data, location: normalizeLocation(parsed.data.location) } : parsed.data;
+      if (failures(asMatchable(l), q, rates).length === 0) users.add(s.userId);
+    }
+    if (!users.size) return 0;
+    const already = await this.prisma.notification.findMany({
+      where: { userId: { in: [...users] }, key: 'notif.searchMatch', params: { path: ['listingId'], equals: listingId } },
+      select: { userId: true },
+    });
+    already.forEach((n) => users.delete(n.userId));
+    const params = { listingId, title: `${l.brand} ${l.model}` };
+    await Promise.all([...users].map((u) => this.notifications.push(u, 'notif.searchMatch', params)));
+    return users.size;
   }
 
   /** Gerçek bir indirimde ilanı favorileyenlere (sahibi hariç) uygulama içi bildirim; önceki fiyat referans fiyattır. */

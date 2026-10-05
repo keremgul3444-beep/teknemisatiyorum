@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { localePath, t, type Locale } from '@/i18n';
+import { localePath, t, tDict, type Locale } from '@/i18n';
 import { apiGet } from '@/lib/api';
 import { apiListingsPath, flatten, queryToSearchParams, searchParamsToQuery, type RawSearchParams, type SearchState } from '@/lib/queries';
 import { pageMetadata } from '@/lib/seo';
 import type { SearchResult } from '@/lib/types';
 import { ListingGrid, Section, Unavailable } from '@/components/bits';
 import { Filters } from '@/components/Filters';
+import { SaveSearchButton } from '@/components/AccountLists';
+import { describeQuery } from '@/lib/notifications';
 
 type P = { params: Promise<{ locale: string }>; searchParams: Promise<RawSearchParams> };
 
@@ -24,7 +26,15 @@ export default async function Ilanlar({ params, searchParams }: P) {
   const r = await apiGet<SearchResult>(apiListingsPath(state), { revalidate: 60 }).catch(() => null);
   return (
     <>
-      <section className="section"><h1>{t(locale, 'listings.title')}</h1><Filters locale={locale} state={state} /></section>
+      <section className="section">
+        <h1>{t(locale, 'listings.title')}</h1>
+        <Filters locale={locale} state={state} />
+        <div style={{ marginTop: 12 }}>
+          <SaveSearchButton text={describeQuery(state.q, locale, tDict(locale, 'boatType'), t(locale, 'account.anyListing'))} filter={state.q}
+            L={{ save: t(locale, 'listings.saveSearch'), saved: t(locale, 'listings.searchSaved'), savedLink: t(locale, 'listings.searchSavedLink') }}
+            errors={tDict(locale, 'errors')} loginHref={localePath(locale, '/giris')} listHref={localePath(locale, '/hesabim/aramalar')} />
+        </div>
+      </section>
       {!r ? <Unavailable locale={locale} /> : (
         <>
           {r.featuredTop.length ? <Section title={t(locale, 'home.showcase')}><ListingGrid items={r.featuredTop} locale={locale} priorityFirst /></Section> : null}

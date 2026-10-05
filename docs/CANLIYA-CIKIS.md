@@ -70,7 +70,14 @@ Kontrol:
 
 ## 6. Mobil uygulama
 
-EAS derlemesinde `EXPO_PUBLIC_API_URL=https://api.alanadi.com` ve `EXPO_PUBLIC_WEB_URL=https://alanadi.com` verilir (EAS ortam değişkeni ya da `eas.json` içindeki `env`). Anlık bildirim için `PUSH_MODE=expo` açık ve `app.json`'da `extra.eas.projectId` dolu olmalı.
+Paket kimliği iOS ve Android'de `com.teknemisatiyorum.app` (`mobile/app.json`; mağazaya ilk yüklemeden sonra değiştirilemez). Derleme ayarları `mobile/eas.json`: `preview` (deneme, Android APK) ve `production` (mağaza). Alan adı farklıysa `eas.json` içindeki `EXPO_PUBLIC_API_URL` / `EXPO_PUBLIC_WEB_URL` ve `app.json` içindeki `associatedDomains` / `intentFilters` güncellenir.
+
+1. Apple Developer ve Google Play Console hesapları.
+2. `cd mobile && npx eas-cli login && npx eas-cli init` (Expo proje kimliğini `app.json`'a yazar; anlık bildirim bunsuz çalışmaz).
+3. Deneme: `npx eas-cli build -p android --profile preview` → çıkan APK telefona kurulur.
+4. Mağaza: `npx eas-cli build -p all --profile production`, sonra `npx eas-cli submit -p ios` / `-p android`.
+5. İlan bağlantıları uygulamada açılsın: `deploy/.env`'e `APPLE_TEAM_ID` (Apple Developer > Membership) ve `ANDROID_CERT_SHA256` (Play Console > Uygulama bütünlüğü > uygulama imzalama anahtarı SHA-256) yazılır. Kontrol: `https://alanadi.com/.well-known/apple-app-site-association` ve `/.well-known/assetlinks.json` açılmalı.
+6. Zorunlu güncelleme: eski sürümün çalışmaması gereken bir değişiklikte `MIN_APP_VERSION` yeni sürüme çekilir (ör. `1.1.0`); eski uygulamalar "Güncelle" ekranı görür ve `APP_STORE_URL_*` sayfası açılır. Mağaza onayı beklenirken yükseltme: önce yeni sürüm yayına girsin.
 
 ## 7. İzleme
 

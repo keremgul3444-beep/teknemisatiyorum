@@ -7,7 +7,14 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.teknemisatiyorum.app",
+      "associatedDomains": [
+        "applinks:teknemisatiyorum.com"
+      ],
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -16,7 +23,30 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.teknemisatiyorum.app",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "teknemisatiyorum.com",
+              "pathPrefix": "/ilan/"
+            },
+            {
+              "scheme": "https",
+              "host": "teknemisatiyorum.com",
+              "pathPrefix": "/en/ilan/"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -43,6 +73,14 @@
         {
           "icon": "./assets/android-icon-monochrome.png",
           "color": "#0B3B5C"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "İlan ve belge fotoğraflarını seçebilmen için galerine erişim gerekiyor.",
+          "cameraPermission": false,
+          "microphonePermission": false
         }
       ]
     ],

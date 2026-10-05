@@ -189,7 +189,10 @@
     "pages": "Sayfalar",
     "prev": "← Önceki",
     "next": "Sonraki →",
-    "pageOf": "Sayfa {{a}} / {{b}}"
+    "pageOf": "Sayfa {{a}} / {{b}}",
+    "saveSearch": "Bu aramayı kaydet",
+    "searchSaved": "Arama kaydedildi. Yeni ilan gelince haber veririz.",
+    "searchSavedLink": "Kayıtlı aramalarım"
   },
   "landing": {
     "title": "Satılık {{type}}",
@@ -620,7 +623,8 @@
     "already_disputed": "Bu ödeme için zaten sorun bildirdin; ekip inceliyor.",
     "already_delivered": "İşi bitirdiğini zaten bildirdin.",
     "payments_disabled": "Ödemeler şu an kapalı. Kısa süre içinde açılacak.",
-    "preinfo_required": "Ödemeye geçmeden önce ön bilgilendirme formunu ve mesafeli satış sözleşmesini onaylaman gerekiyor."
+    "preinfo_required": "Ödemeye geçmeden önce ön bilgilendirme formunu ve mesafeli satış sözleşmesini onaylaman gerekiyor.",
+    "upgrade_required": "Uygulamanın yeni sürümünü yüklemen gerekiyor."
   },
   "login": {
     "title": "Giriş yap",
@@ -643,7 +647,7 @@
     "orders": "Siparişlerim",
     "ordersBody": "Öne çıkarma siparişlerin ve durumları.",
     "logout": "Çıkış yap",
-    "noListings": "Henüz ilanın yok. İlan vermek için uygulamayı kullan.",
+    "noListings": "Henüz ilanın yok.",
     "noOrders": "Henüz siparişin yok.",
     "promote": "Öne çıkar",
     "notPublished": "Öne çıkarmak için ilan yayında olmalı",
@@ -711,7 +715,22 @@
     "admin": "Yönetim",
     "adminBody": "Onaylar, bildirimler, kullanıcılar",
     "edit": "Düzenle",
-    "document": "Ruhsat yükle"
+    "document": "Ruhsat yükle",
+    "favorites": "Favorilerim",
+    "favoritesBody": "Beğendiğin ilanlar",
+    "noFavorites": "Henüz favori ilanın yok. İlan sayfasındaki kalple ekleyebilirsin.",
+    "searches": "Kayıtlı aramalarım",
+    "searchesBody": "Yeni ilan gelince haber veririz",
+    "noSearches": "Kayıtlı araman yok. İlanlar sayfasında filtreleri seçip \"Bu aramayı kaydet\"e bas.",
+    "newMatches": "{{n}} yeni ilan",
+    "seeResults": "Sonuçları gör",
+    "remove": "Sil",
+    "notifications": "Bildirimler",
+    "notificationsBody": "İlanların, mesajların ve aramaların",
+    "noNotifications": "Henüz bildirimin yok.",
+    "unreadCount": "{{n}} yeni",
+    "inApp": "Ayrıntısı uygulamada",
+    "anyListing": "Tüm ilanlar"
   },
   "pay": {
     "devTitle": "Deneme ödemesi",
@@ -1052,5 +1071,30 @@
     "sentTitle": "Belge incelemeye gönderildi",
     "sentBody": "Sonucu bildirimle haber veririz.",
     "back": "İlanlarım'a dön"
+  },
+  "notif": {
+    "brokerAdvanced": "{{boat}} broker dosyası {{step}}. adıma geçti",
+    "docApproved": "Belgen onaylandı",
+    "docRejected": "Belgen reddedildi",
+    "listingApproved": "İlanın yayında: {{title}}",
+    "listingRejected": "İlanın reddedildi: {{title}}",
+    "newMessage": "Yeni mesaj: {{title}}",
+    "reportReady": "Ekspertiz raporun hazır · {{score}}/100",
+    "searchMatch": "Kayıtlı aramana yeni ilan: {{title}}",
+    "priceDrop": "Favorindeki ilanın fiyatı düştü: {{title}}",
+    "listingRemoved": "İlanın yayından kaldırıldı: {{title}}",
+    "listingExpiring": "İlanının süresi {{days}} gün içinde doluyor: {{title}}",
+    "listingExpired": "İlanının süresi doldu, yenileyebilirsin: {{title}}",
+    "newJob": "Alanında yeni iş talebi: {{title}}",
+    "newQuote": "İşine yeni teklif geldi: {{title}}",
+    "quoteAccepted": "Teklifin kabul edildi: {{title}}",
+    "servicePaid": "Ödeme emanete alındı; işe başlayabilirsin",
+    "paymentReleased": "Ödemen hesabına aktarıldı: ₺{{amount}}",
+    "paymentRefunded": "Ödemen iade edildi: ₺{{amount}}",
+    "bookingRequested": "Yeni rezervasyon talebi: {{start}} · {{days}} gün",
+    "bookingDeclined": "Kaptan rezervasyon talebini geri çevirdi",
+    "jobDelivered": "Usta işi bitirdiğini bildirdi: {{title}}. {{days}} gün içinde onaylamaz ya da sorun bildirmezsen ödeme ustaya aktarılır.",
+    "paymentDisputed": "Müşteri bir sorun bildirdi; ödeme ekip incelemesine alındı.",
+    "autoReleased": "Süre dolduğu için emanetteki ödeme hizmet verene aktarıldı."
   }
 }

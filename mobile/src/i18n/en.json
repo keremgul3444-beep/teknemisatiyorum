@@ -1271,7 +1271,8 @@
     "already_disputed": "You already reported a problem for this payment; the team is reviewing it.",
     "already_delivered": "You already marked this job as done.",
     "payments_disabled": "Payments are currently unavailable. They will open soon.",
-    "preinfo_required": "Please accept the pre-contract information and the distance sales contract before paying."
+    "preinfo_required": "Please accept the pre-contract information and the distance sales contract before paying.",
+    "upgrade_required": "Please install the latest version of the app."
   },
   "soon": {
     "title": "Coming soon",
@@ -1382,5 +1383,10 @@
     "hint": "Tell us if the work wasn’t done or is incomplete. Automatic payment stops and the team decides after talking to both sides.",
     "send": "Report",
     "sent": "You reported a problem; the payment is on hold while the team reviews it."
+  },
+  "update": {
+    "title": "Update required",
+    "body": "This version is no longer supported. Update the app to continue.",
+    "button": "Update"
   }
 }

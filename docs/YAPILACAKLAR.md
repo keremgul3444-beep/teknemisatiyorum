@@ -32,7 +32,7 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 - [ ] 2. dalga canlı öncesi: emanet ödemenin hizmet verene gerçek aktarımı (sanal POS alt üye işyeri / pazaryeri modeli) sağlayıcı anlaşmasıyla bağlanmalı; şu an durum platformda izleniyor
 - [ ] NVİ bağlantısı kodda hazır (`IDENTITY_MODE=nvi`); canlı sunucudan bir kez gerçek bilgilerle denenmeli (bulut oturumundan NVİ'ye erişilmedi)
 - [ ] Anlık bildirimi gerçek telefonda dene: EAS projesi (`extra.eas.projectId`) + geliştirme derlemesi gerekir (Expo Go'da uzak bildirim çalışmıyor); sunucuda `PUSH_MODE=expo`
-- [ ] Mağaza derlemesi (EAS build) ve mağaza başvurusu; şu an yalnızca Expo Go
+- [ ] Mağaza derlemesi ve başvurusu: kod hazır (`eas.json`, paket kimliği, zorunlu güncelleme, ilan bağlantıları); `eas init` + Apple/Google hesapları ve mağaza metinleri/görselleri senden (`docs/CANLIYA-CIKIS.md` 6. adım)
 - [ ] Kapalı beta deneme hesaplarının temizliği: canlıda bir kez `scripts/cleanup-accounts.ts <numaralar>` (önce önizleme, sonra `--apply`)
 
 ## Web/öne çıkarma — incelemeden ertelenen küçük maddeler

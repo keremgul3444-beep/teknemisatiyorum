@@ -1,9 +1,11 @@
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 import { router } from 'expo-router';
 import { createApiClient, type TokenStore } from './client';
 import { API_URL } from '../mode';
 import { useSession, levelRedirect } from '@/session/role';
+import { useUpgrade } from '@/features/upgrade';
 
 const KEY_A = 'tms.access';
 const KEY_R = 'tms.refresh';
@@ -32,4 +34,6 @@ export const api = createApiClient({
     const to = levelRedirect(level as 1 | 2 | 3);
     if (to) router.push(to as never);
   },
+  appVersion: Constants.expoConfig?.version,
+  onUpgradeRequired: (p) => useUpgrade.getState().require(p),
 });

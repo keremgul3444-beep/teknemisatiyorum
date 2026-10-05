@@ -84,3 +84,17 @@ test('I-1: oturum uç noktaları (çıkış, cihazlar) da süresi dolunca yenile
   await api.post('/auth/logout');
   expect(calls.map((c) => c.url)).toEqual(['http://api/auth/logout', 'http://api/auth/refresh', 'http://api/auth/logout']);
 });
+
+test('sürüm başlığı gönderilir; 426 zorunlu güncellemeyi tetikler', async () => {
+  const calls: RequestInit[] = [];
+  const onUpgradeRequired = jest.fn();
+  const fetchFn = jest.fn(async (_url: string, init: RequestInit) => {
+    calls.push(init);
+    return { ok: false, status: 426, json: async () => ({ code: 'UPGRADE_REQUIRED', messageKey: 'errors.upgrade_required', params: { min: '1.4.0', android: 'https://play' } }) } as Response;
+  });
+  const store: TokenStore = { get: async () => ({ access: null, refresh: null }), set: async () => {}, clear: async () => {} };
+  const api = createApiClient({ baseUrl: 'http://api', fetchFn: fetchFn as unknown as typeof fetch, tokens: store, onLoggedOut: jest.fn(), onLevelRequired: jest.fn(), appVersion: '1.3.0', onUpgradeRequired });
+  await expect(api.get('/listings')).rejects.toMatchObject({ code: 'UPGRADE_REQUIRED' });
+  expect((calls[0].headers as Record<string, string>)['X-App-Version']).toBe('1.3.0');
+  expect(onUpgradeRequired).toHaveBeenCalledWith({ min: '1.4.0', android: 'https://play' });
+});

@@ -14,7 +14,10 @@ export async function generateMetadata({ params }: P): Promise<Metadata> {
 
 export default async function Hesabim({ params }: P) {
   const { locale } = (await params) as { locale: Locale };
-  const me = await authedGet<Me>(locale, '/me', '/hesabim');
+  const [me, unread] = await Promise.all([
+    authedGet<Me>(locale, '/me', '/hesabim'),
+    authedGet<{ count: number }>(locale, '/notifications/unread-count', '/hesabim').catch(() => ({ count: 0 })),
+  ]);
   const p = (x: string) => localePath(locale, x);
   return (
     <section className="section" style={{ maxWidth: 720 }}>
@@ -24,6 +27,12 @@ export default async function Hesabim({ params }: P) {
         <Link className="card" href={p('/hesabim/ilan-ver')}><h3>{t(locale, 'account.sell')}</h3><p className="muted small">{t(locale, 'account.sellBody')}</p></Link>
         <Link className="card" href={p('/hesabim/ilanlar')}><h3>{t(locale, 'account.listings')}</h3><p className="muted small">{t(locale, 'account.listingsBody')}</p></Link>
         <Link className="card" href={p('/hesabim/mesajlar')}><h3>{t(locale, 'account.messages')}</h3><p className="muted small">{t(locale, 'account.messagesBody')}</p></Link>
+        <Link className="card" href={p('/hesabim/bildirimler')}>
+          <h3>{t(locale, 'account.notifications')} {unread.count ? <span className="pill urgent">{t(locale, 'account.unreadCount', { n: unread.count })}</span> : null}</h3>
+          <p className="muted small">{t(locale, 'account.notificationsBody')}</p>
+        </Link>
+        <Link className="card" href={p('/hesabim/favoriler')}><h3>{t(locale, 'account.favorites')}</h3><p className="muted small">{t(locale, 'account.favoritesBody')}</p></Link>
+        <Link className="card" href={p('/hesabim/aramalar')}><h3>{t(locale, 'account.searches')}</h3><p className="muted small">{t(locale, 'account.searchesBody')}</p></Link>
         <Link className="card" href={p('/firma')}><h3>{t(locale, 'account.firm')}</h3><p className="muted small">{t(locale, 'account.firmBody')}</p></Link>
         {me.roles?.some((r) => r === 'admin' || r === 'moderator') ? <Link className="card" href={p('/yonetim')}><h3>{t(locale, 'account.admin')}</h3><p className="muted small">{t(locale, 'account.adminBody')}</p></Link> : null}
         <Link className="card" href={p('/hesabim/siparisler')}><h3>{t(locale, 'account.orders')}</h3><p className="muted small">{t(locale, 'account.ordersBody')}</p></Link>

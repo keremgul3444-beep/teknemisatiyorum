@@ -189,7 +189,10 @@
     "pages": "Pages",
     "prev": "← Previous",
     "next": "Next →",
-    "pageOf": "Page {{a}} of {{b}}"
+    "pageOf": "Page {{a}} of {{b}}",
+    "saveSearch": "Save this search",
+    "searchSaved": "Search saved. We will let you know when new listings arrive.",
+    "searchSavedLink": "My saved searches"
   },
   "landing": {
     "title": "{{type}} for sale",
@@ -620,7 +623,8 @@
     "already_disputed": "You already reported a problem for this payment; the team is reviewing it.",
     "already_delivered": "You already marked this job as done.",
     "payments_disabled": "Payments are currently unavailable. They will open soon.",
-    "preinfo_required": "Please accept the pre-contract information and the distance sales contract before paying."
+    "preinfo_required": "Please accept the pre-contract information and the distance sales contract before paying.",
+    "upgrade_required": "Please install the latest version of the app."
   },
   "login": {
     "title": "Log in",
@@ -643,7 +647,7 @@
     "orders": "My orders",
     "ordersBody": "Your promotion orders and their status.",
     "logout": "Log out",
-    "noListings": "You have no listings yet. Use the app to post one.",
+    "noListings": "You have no listings yet.",
     "noOrders": "No orders yet.",
     "promote": "Promote",
     "notPublished": "The listing must be live to be promoted",
@@ -711,7 +715,22 @@
     "admin": "Admin",
     "adminBody": "Approvals, reports, users",
     "edit": "Edit",
-    "document": "Upload registration"
+    "document": "Upload registration",
+    "favorites": "My favourites",
+    "favoritesBody": "Listings you liked",
+    "noFavorites": "No favourites yet. Use the heart on a listing page to add one.",
+    "searches": "My saved searches",
+    "searchesBody": "We let you know when new listings arrive",
+    "noSearches": "No saved searches. Choose filters on the listings page and press \"Save this search\".",
+    "newMatches": "{{n}} new listings",
+    "seeResults": "See results",
+    "remove": "Delete",
+    "notifications": "Notifications",
+    "notificationsBody": "Your listings, messages and searches",
+    "noNotifications": "No notifications yet.",
+    "unreadCount": "{{n}} new",
+    "inApp": "Details in the app",
+    "anyListing": "All listings"
   },
   "pay": {
     "devTitle": "Trial payment",
@@ -1052,5 +1071,30 @@
     "sentTitle": "Document sent for review",
     "sentBody": "We will notify you of the result.",
     "back": "Back to my listings"
+  },
+  "notif": {
+    "brokerAdvanced": "{{boat}} broker case moved to step {{step}}",
+    "docApproved": "Your document was approved",
+    "docRejected": "Your document was rejected",
+    "listingApproved": "Your listing is live: {{title}}",
+    "listingRejected": "Your listing was rejected: {{title}}",
+    "newMessage": "New message: {{title}}",
+    "reportReady": "Your survey report is ready · {{score}}/100",
+    "searchMatch": "New listing for your saved search: {{title}}",
+    "priceDrop": "A favourite dropped its price: {{title}}",
+    "listingRemoved": "Your listing was taken down: {{title}}",
+    "listingExpiring": "Your listing expires in {{days}} days: {{title}}",
+    "listingExpired": "Your listing expired, renew it anytime: {{title}}",
+    "newJob": "New job in your field: {{title}}",
+    "newQuote": "New quote for your job: {{title}}",
+    "quoteAccepted": "Your quote was accepted: {{title}}",
+    "servicePaid": "Payment is held in escrow; you can start",
+    "paymentReleased": "Your payment was released: ₺{{amount}}",
+    "paymentRefunded": "Your payment was refunded: ₺{{amount}}",
+    "bookingRequested": "New booking request: {{start}} · {{days}} days",
+    "bookingDeclined": "The captain declined your booking request",
+    "jobDelivered": "The technician marked the job done: {{title}}. If you don’t confirm or report a problem within {{days}} days, the payment is released.",
+    "paymentDisputed": "The customer reported a problem; the payment is under team review.",
+    "autoReleased": "The held payment was released to the provider after the waiting period."
   }
 }
