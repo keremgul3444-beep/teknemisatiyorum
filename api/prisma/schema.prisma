@@ -141,6 +141,26 @@ model Company {
   members   CompanyMember[]
 }
 
+/// Firma toplu ilan yüklemesi: satırlar arka planda işlenir (fotoğraflar indirilir, ilanlar onaya gönderilir).
+model ImportJob {
+  id         String    @id @default(cuid())
+  companyId  String
+  userId     String
+  /// queued | running | done | failed
+  status     String    @default("queued")
+  total      Int
+  created    Int       @default(0)
+  /// İşlenecek satırlar: [{ row, draft, photos }]
+  input      Json
+  /// Satır sonuçları: [{ row, ok, listingId?, error? }]
+  results    Json      @default("[]")
+  createdAt  DateTime  @default(now())
+  finishedAt DateTime?
+
+  @@index([companyId, createdAt])
+  @@index([status])
+}
+
 model CompanyMember {
   companyId String
   userId    String

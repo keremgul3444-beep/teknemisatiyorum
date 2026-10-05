@@ -61,7 +61,13 @@ export default async function Firma({ params, searchParams }: P) {
           {manager ? <AddMember companyId={d.id} L={L} errors={errors} /> : null}
         </div>
         <div style={{ display: 'grid', gap: 12 }}>
-          <div className="spread"><h2 style={{ margin: 0 }}>{t(locale, 'firm.listings')}</h2><Link className="btn" href={localePath(locale, '/hesabim/ilan-ver')}>{t(locale, 'sell.title')}</Link></div>
+          <div className="spread">
+            <h2 style={{ margin: 0 }}>{t(locale, 'firm.listings')}</h2>
+            <div className="row">
+              <Link className="btn ghost" href={`${localePath(locale, '/firma/toplu')}?c=${d.id}`}>{t(locale, 'firm.import.title')}</Link>
+              <Link className="btn" href={localePath(locale, '/hesabim/ilan-ver')}>{t(locale, 'sell.title')}</Link>
+            </div>
+          </div>
           {d.listings.length === 0 ? <p className="muted">{t(locale, 'firm.noListings')}</p> : d.listings.map((l) => (
             <div key={l.id} className="card spread" style={{ gap: 12 }}>
               <div>

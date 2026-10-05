@@ -1186,7 +1186,8 @@
     "paymentRefunded": "Hizmet ödemesi iade edildi: {{ref}}",
     "paymentDisputed": "Hizmet ödemesine itiraz: {{ref}}",
     "preinfoAccepted": "Ön bilgilendirme ve sözleşme onaylandı (sürüm {{version}})",
-    "reregistered": "Silinmiş sorunlu hesabın izi eşleşti ({{via}})"
+    "reregistered": "Silinmiş sorunlu hesabın izi eşleşti ({{via}})",
+    "listingsImported": "Toplu yükleme: {{created}}/{{total}} ilan onaya gönderildi"
   },
   "errors": {
     "generic": "Bir şeyler ters gitti, tekrar dene.",
@@ -1272,7 +1273,12 @@
     "already_delivered": "İşi bitirdiğini zaten bildirdin.",
     "payments_disabled": "Ödemeler şu an kapalı. Kısa süre içinde açılacak.",
     "preinfo_required": "Ödemeye geçmeden önce ön bilgilendirme formunu ve mesafeli satış sözleşmesini onaylaman gerekiyor.",
-    "upgrade_required": "Uygulamanın yeni sürümünü yüklemen gerekiyor."
+    "upgrade_required": "Uygulamanın yeni sürümünü yüklemen gerekiyor.",
+    "import_columns": "Dosyada zorunlu sütunlar eksik: {{missing}}",
+    "import_empty": "Dosyada yüklenebilecek satır yok.",
+    "import_running": "Bu firmanın bir yüklemesi sürüyor; bitince yeniden dene.",
+    "import_limit": "Bugünlük toplu yükleme sınırına ulaştın.",
+    "import_too_many": "Tek seferde en fazla {{max}} satır yüklenebilir."
   },
   "soon": {
     "title": "Yakında",

@@ -28,6 +28,9 @@ export const MEDIA_LIMITS = {
   orphanVisibleMs: DAY_MS,
   /** İlana ya da başvuruya bağlanmamış dosya bu süreden sonra silinir. */
   orphanSweepMs: 7 * DAY_MS,
+  /** Firma toplu yüklemesi (100 ilana kadar × 20 fotoğraf): ayrı, daha geniş pay. */
+  bulkUploadsPerDay: 2500,
+  bulkBytesPerUser: 6 * 1024 * 1024 * 1024,
 } as const;
 
 @Injectable()
@@ -39,8 +42,8 @@ export class MediaService {
    * Resimler yeniden kodlanır: yön düzeltilir, uzun kenar 2000 px'e indirilir, EXIF (konum dahil) atılır.
    * PDF yalnızca korumalı belgeler için kabul edilir.
    */
-  async upload(ownerId: string, buf: Buffer, visibility: Visibility) {
-    await this.assertQuota(ownerId, buf.length);
+  async upload(ownerId: string, buf: Buffer, visibility: Visibility, opts: { bulk?: boolean } = {}) {
+    await this.assertQuota(ownerId, buf.length, opts.bulk);
     let out: Buffer;
     let mime: string;
     if (visibility === 'private' && buf.subarray(0, 5).toString('latin1') === '%PDF-') {
@@ -63,13 +66,13 @@ export class MediaService {
   }
 
   /** Günlük yükleme sayısı ve toplam disk payı. */
-  private async assertQuota(ownerId: string, incoming: number) {
+  private async assertQuota(ownerId: string, incoming: number, bulk = false) {
     const [today, used] = await Promise.all([
       this.prisma.file.count({ where: { ownerId, createdAt: { gt: new Date(Date.now() - DAY_MS) } } }),
       this.prisma.file.aggregate({ where: { ownerId }, _sum: { size: true } }),
     ]);
-    if (today >= MEDIA_LIMITS.uploadsPerDay) throw Errors.tooMany('UPLOAD_LIMIT');
-    if ((used._sum.size ?? 0) + incoming > MEDIA_LIMITS.bytesPerUser) throw Errors.conflict('STORAGE_QUOTA');
+    if (today >= (bulk ? MEDIA_LIMITS.bulkUploadsPerDay : MEDIA_LIMITS.uploadsPerDay)) throw Errors.tooMany('UPLOAD_LIMIT');
+    if ((used._sum.size ?? 0) + incoming > (bulk ? MEDIA_LIMITS.bulkBytesPerUser : MEDIA_LIMITS.bytesPerUser)) throw Errors.conflict('STORAGE_QUOTA');
   }
 
   /**

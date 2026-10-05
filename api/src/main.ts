@@ -12,6 +12,8 @@ import { appVersionGate } from './common/app-version';
 
 /** Uygulamayı ortak ayarlarla yapılandırır; testler de aynı fonksiyonu kullanır. */
 export function configureApp(app: INestApplication) {
+  // Toplu ilan yüklemesinin CSV'si (100 satır, uzun açıklamalarla) varsayılan 100 KB'ı aşabilir.
+  (app as INestApplication & { useBodyParser?: (t: string, o: { limit: string }) => void }).useBodyParser?.('json', { limit: '1mb' });
   // Geliştirmede istekler Metro proxy'sinden (127.0.0.1) gelir; gerçek istemci IP'si X-Forwarded-For'dan okunur.
   (app.getHttpAdapter().getInstance() as { set(k: string, v: unknown): void }).set('trust proxy', env().TRUST_PROXY);
   app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));

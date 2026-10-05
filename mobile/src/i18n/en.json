@@ -1186,7 +1186,8 @@
     "paymentRefunded": "Service payment refunded: {{ref}}",
     "paymentDisputed": "Service payment disputed: {{ref}}",
     "preinfoAccepted": "Pre-contract information and contract accepted (version {{version}})",
-    "reregistered": "Matched a deleted problem account ({{via}})"
+    "reregistered": "Matched a deleted problem account ({{via}})",
+    "listingsImported": "Bulk import: {{created}}/{{total}} listings sent for review"
   },
   "errors": {
     "generic": "Something went wrong, please try again.",
@@ -1272,7 +1273,12 @@
     "already_delivered": "You already marked this job as done.",
     "payments_disabled": "Payments are currently unavailable. They will open soon.",
     "preinfo_required": "Please accept the pre-contract information and the distance sales contract before paying.",
-    "upgrade_required": "Please install the latest version of the app."
+    "upgrade_required": "Please install the latest version of the app.",
+    "import_columns": "Required columns are missing: {{missing}}",
+    "import_empty": "The file has no rows that can be imported.",
+    "import_running": "An import for this company is already running; try again when it finishes.",
+    "import_limit": "You have reached today's bulk import limit.",
+    "import_too_many": "At most {{max}} rows can be imported at once."
   },
   "soon": {
     "title": "Coming soon",

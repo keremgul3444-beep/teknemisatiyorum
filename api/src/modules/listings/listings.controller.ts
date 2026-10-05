@@ -14,7 +14,7 @@ import { canRenew, nextExpiry } from './expiry';
 /** Kullanıcı başına açık (gönderilmemiş) taslak sınırı. */
 const MAX_OPEN_DRAFTS = 5;
 
-const draftSchema = z.object({
+export const draftSchema = z.object({
   brand: z.string().trim().min(1).max(60),
   model: z.string().trim().min(1).max(60),
   year: z.number().int().min(1900).max(2100),
