@@ -19,7 +19,9 @@ export function ListingCard({ listing: l, locale, priority }: { listing: Listing
             loading={priority ? 'eager' : 'lazy'} fetchPriority={priority ? 'high' : 'auto'} decoding="async"
             style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : null}
-        <span style={{ position: 'absolute', top: 12, left: 12 }}><PromoBadges promo={l.promo} priceDrop={l.priceDrop} locale={locale} /></span>
+        <span style={{ position: 'absolute', top: 12, left: 12 }}>
+          {l.status === 'sold' ? <span className="pill">{t(locale, 'listing.sold')}</span> : <PromoBadges promo={l.promo} priceDrop={l.priceDrop} locale={locale} />}
+        </span>
       </div>
       <div className="info">
         <div className="spread" style={{ flexWrap: 'nowrap' }}>

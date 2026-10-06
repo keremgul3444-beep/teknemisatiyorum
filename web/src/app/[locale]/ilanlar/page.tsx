@@ -9,6 +9,7 @@ import { ListingGrid, Section, Unavailable } from '@/components/bits';
 import { Filters } from '@/components/Filters';
 import { SaveSearchButton } from '@/components/AccountLists';
 import { describeQuery } from '@/lib/notifications';
+import { isEmptyQuery } from '@tms/shared';
 
 type P = { params: Promise<{ locale: string }>; searchParams: Promise<RawSearchParams> };
 
@@ -29,17 +30,20 @@ export default async function Ilanlar({ params, searchParams }: P) {
       <section className="section">
         <h1>{t(locale, 'listings.title')}</h1>
         <Filters locale={locale} state={state} />
-        <div style={{ marginTop: 12 }}>
-          <SaveSearchButton text={describeQuery(state.q, locale, tDict(locale, 'boatType'), t(locale, 'account.anyListing'))} filter={state.q}
+        {/* Boş arama kaydedilmez (her yeni ilanda bildirim giderdi); süzgeç varsa temizleme bağlantısı. */}
+        {isEmptyQuery(state.q) && !state.urgent && !state.drop ? null : <div className="row" style={{ marginTop: 12, alignItems: 'center' }}>
+          {isEmptyQuery(state.q) ? null : <SaveSearchButton text={describeQuery(state.q, locale, tDict(locale, 'boatType'), t(locale, 'account.anyListing'))} filter={state.q}
             L={{ save: t(locale, 'listings.saveSearch'), saved: t(locale, 'listings.searchSaved'), savedLink: t(locale, 'listings.searchSavedLink') }}
-            errors={tDict(locale, 'errors')} loginHref={localePath(locale, '/giris')} listHref={localePath(locale, '/hesabim/aramalar')} />
-        </div>
+            errors={tDict(locale, 'errors')} loginHref={localePath(locale, '/giris')} listHref={localePath(locale, '/hesabim/aramalar')} />}
+          <Link className="small" href={localePath(locale, '/ilanlar')}>{t(locale, 'listings.clear')}</Link>
+        </div>}
       </section>
       {!r ? <Unavailable locale={locale} /> : (
         <>
           {r.featuredTop.length ? <Section title={t(locale, 'home.showcase')}><ListingGrid items={r.featuredTop} locale={locale} priorityFirst /></Section> : null}
           <Section title={t(locale, 'listings.count', { n: r.total })}>
-            {r.items.length ? <ListingGrid items={r.items} locale={locale} priorityFirst={!r.featuredTop.length} /> : <p className="muted">{t(locale, 'listings.empty')}</p>}
+            {r.items.length ? <ListingGrid items={r.items} locale={locale} priorityFirst={!r.featuredTop.length} />
+              : <p className="muted">{t(locale, 'listings.empty')} <Link href={localePath(locale, '/ilanlar')}>{t(locale, 'listings.clear')}</Link></p>}
           </Section>
           <Pager locale={locale} state={state} total={r.total} />
         </>

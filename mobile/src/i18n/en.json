@@ -50,7 +50,8 @@
     "belge": "Documents match",
     "reddedildi": "Rejected",
     "kaldirildi": "Removed",
-    "suresidoldu": "Expired"
+    "suresidoldu": "Expired",
+    "satildi": "Sold"
   },
   "boatType": {
     "motoryat": "Motor yacht",
@@ -330,7 +331,8 @@
     "sellTitle": "Want to sell your boat?",
     "sellBody": "List for free or let us sell it for you.",
     "priceDropsTitle": "Price drops",
-    "priceDropsBody": "Listings reduced in the last 30 days."
+    "priceDropsBody": "Listings reduced in the last 30 days.",
+    "urgentTitle": "Urgent sales"
   },
   "assistant": {
     "label": "SMART ASSISTANT",
@@ -880,7 +882,8 @@
     "refunded": "Refunded",
     "autoRelease": "If you don’t report a problem, the payment is released to the captain on {{date}}.",
     "priceReviewHint": "A price change this large goes back to review; the listing is hidden until approved.",
-    "rejectNote": "Moderator note: {{note}}"
+    "rejectNote": "Moderator note: {{note}}",
+    "promoWarn": "Remaining promotion time is not refunded."
   },
   "settings": {
     "title": "Settings",
@@ -997,7 +1000,9 @@
     "markDelivered": "Job done",
     "delivered": "Marked done; waiting for customer confirmation or the deadline",
     "docInReview": "Your document is under review; your profile goes live once approved.",
-    "docRejected": "Document not approved. {{reason}}"
+    "docRejected": "Document not approved. {{reason}}",
+    "withdraw": "Withdraw",
+    "withdrawConfirm": "The owner has not paid yet. If you withdraw, your quote is removed and the job reopens for quotes."
   },
   "corporate": {
     "title": "Company panel",
@@ -1346,7 +1351,14 @@
     "autoReleased": "The held payment was released to the provider after the waiting period.",
     "staffReport": "New report: {{title}}",
     "staffDispute": "A payment was disputed and needs a decision (₺{{amount}}).",
-    "providerSuspended": "Your service profile was paused by the team: {{name}}"
+    "providerSuspended": "Your service profile was paused by the team: {{name}}",
+    "quoteDeclined": "The owner chose another quote: {{title}}",
+    "jobCancelled": "The owner cancelled the job: {{title}}",
+    "quoteWithdrawn": "The provider withdrew; your job is open for quotes again: {{title}}",
+    "bookingCancelled": "The customer cancelled the charter request.",
+    "importDone": "Bulk import finished: {{created}}/{{total}} listings sent for review.",
+    "companyAdded": "You were added to {{company}}.",
+    "companyRemoved": "You were removed from {{company}}; your listings there are now personal."
   },
   "notifs": {
     "title": "Notifications",

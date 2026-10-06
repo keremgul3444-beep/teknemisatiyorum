@@ -433,6 +433,11 @@ export const actions = {
     await api.post('/orders/store', { listingId, platform, receipt: devReceipt(storeId), accept: true });
     await syncMine();
   },
+  /** Okunmamış bildirim sayısı (ana sayfadaki zil). */
+  async unreadCount(): Promise<number> {
+    if (!isApiMode() || !useSession.getState().loggedIn) return 0;
+    return (await api.get<{ count: number }>('/notifications/unread-count')).count;
+  },
   /** Ana sayfa vitrin ve acil şeritleri. */
   async showcase(): Promise<{ featured: Listing[]; urgent: Listing[] }> {
     if (!isApiMode()) return { featured: g().listings.filter((l) => l.promo?.featured), urgent: g().listings.filter((l) => l.promo?.urgent) };
@@ -524,6 +529,8 @@ export const actions = {
   myProviders: () => api.get<ApiProvider[]>('/me/providers'),
   saveProvider: (kind: 'usta' | 'kaptan', body: Record<string, unknown>) => api.put<ApiProvider>(`/me/provider/${kind}`, body),
   providerJobs: () => api.get<{ open: ApiJob[]; quoted: ApiJob[] }>('/provider/jobs'),
+  /** Usta, kabul edilmiş ama ödenmemiş işten çekilir. */
+  withdrawQuote: (jobId: string) => api.post(`/jobs/${jobId}/withdraw`),
   sendQuote: (jobId: string, b: { priceTry: number; days: number; note: string }) => api.post(`/jobs/${jobId}/quotes`, b),
   providerBookings: () => api.get<ApiCaptainBooking[]>('/provider/bookings'),
   declineBooking: (id: string) => api.post(`/captain-bookings/${id}/decline`),

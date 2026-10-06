@@ -9,6 +9,7 @@ import { maskPhone } from '@tms/shared';
 import { phoneSchema } from '../auth/phone';
 import { ListingsService } from '../listings/listings.service';
 import { listingInclude } from '../listings/listing.view';
+import { NotificationsService } from '../notifications/notifications.module';
 
 const companyBody = z.object({
   name: z.string().trim().min(2).max(80),
@@ -19,7 +20,7 @@ const memberBody = z.object({ phone: phoneSchema, role: z.enum(['admin', 'staff'
 
 @Controller('companies')
 export class CompaniesController {
-  constructor(private readonly prisma: PrismaService, private readonly audit: AuditService, private readonly listings: ListingsService) {}
+  constructor(private readonly prisma: PrismaService, private readonly audit: AuditService, private readonly listings: ListingsService, private readonly notifications: NotificationsService) {}
 
   @Auth({ level: 2 })
   @Post()
@@ -50,6 +51,10 @@ export class CompaniesController {
       update: { role: b.role },
     });
     await this.audit.log(u.id, 'audit.memberChanged', { role: b.role, before: cur?.role ?? '-' }, 'company', id);
+    if (!cur) {
+      const c = await this.prisma.company.findUnique({ where: { id }, select: { name: true } });
+      await this.notifications.push(target.id, 'notif.companyAdded', { company: c?.name ?? '' });
+    }
     return m;
   }
 
@@ -99,6 +104,8 @@ export class CompaniesController {
       this.prisma.listing.updateMany({ where: { companyId: id, ownerId: userId }, data: { companyId: null } }),
     ]);
     await this.audit.log(u.id, 'audit.memberRemoved', { role: target.role }, 'company', id);
+    const c = await this.prisma.company.findUnique({ where: { id }, select: { name: true } });
+    await this.notifications.push(userId, 'notif.companyRemoved', { company: c?.name ?? '' });
   }
 
   private async member(companyId: string, userId: string) {

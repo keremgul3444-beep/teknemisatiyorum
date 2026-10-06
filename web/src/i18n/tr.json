@@ -143,7 +143,8 @@
     "exact": "Tam uyan ({{n}})",
     "noExact": "Tam uyan ilan yok — aşağıda yakın sonuçlar var.",
     "near": "Bir kriter hariç uyanlar",
-    "missing": "Uymayan: {{what}}"
+    "missing": "Uymayan: {{what}}",
+    "openFilters": "Süzgeçlerde aç"
   },
   "badge": {
     "ekspertizli": "Ekspertizli",
@@ -192,7 +193,8 @@
     "pageOf": "Sayfa {{a}} / {{b}}",
     "saveSearch": "Bu aramayı kaydet",
     "searchSaved": "Arama kaydedildi. Yeni ilan gelince haber veririz.",
-    "searchSavedLink": "Kayıtlı aramalarım"
+    "searchSavedLink": "Kayıtlı aramalarım",
+    "clear": "Süzgeçleri temizle"
   },
   "landing": {
     "title": "Satılık {{type}}",
@@ -237,7 +239,9 @@
     "translatedNote": "Otomatik çeviri; satıcının yazdığı metin Türkçe.",
     "originalNote": "Satıcının yazdığı özgün metin (Türkçe).",
     "video": "Video",
-    "videoTitle": "{{title}} tanıtım videosu"
+    "videoTitle": "{{title}} tanıtım videosu",
+    "share": "Paylaş",
+    "linkCopied": "Bağlantı kopyalandı"
   },
   "gone": {
     "title": "Bu ilan artık yayında değil",
@@ -653,7 +657,8 @@
     "resend": "Kodu tekrar gönder",
     "resendIn": "Tekrar gönder ({{s}} sn)",
     "codeSent": "Numarana 6 haneli kod gönderdik.",
-    "betaHint": "Kapalı beta: kod SMS yerine otomatik doldurulur."
+    "betaHint": "Kapalı beta: kod SMS yerine otomatik doldurulur.",
+    "kvkk": "Giriş yaparak KVKK aydınlatma metnini okuduğunu kabul edersin."
   },
   "account": {
     "title": "Hesabım",
@@ -759,7 +764,9 @@
     "promoWarn": "Kalan öne çıkarma süresi iade edilmez.",
     "rejectNote": "Moderatör notu: {{note}}",
     "docPending": "Ruhsat incelemede.",
-    "docRejected": "Ruhsat onaylanmadı. {{reason}}"
+    "docRejected": "Ruhsat onaylanmadı. {{reason}}",
+    "settings": "Ayarlar",
+    "settingsBody": "Ad, bildirimler, gizlilik, verilerim ve hesabı silme."
   },
   "pay": {
     "devTitle": "Deneme ödemesi",
@@ -889,7 +896,7 @@
     "seller": "Satıcı",
     "sellerSelf": "Bireysel (kendi adıma)",
     "editTitle": "İlanı düzenle",
-    "editNote": "Yalnızca fiyatı ölçülü değiştirirsen ilan yayında kalır. Diğer değişiklikler ve fotoğraflar kısa bir onaydan geçer.",
+    "editNote": "Yalnızca fiyatı ölçülü değiştirirsen ilan yayında kalır. Diğer değişiklikler ve fotoğraflar kısa bir onaydan geçer; onay süresince ilan aramada görünmez, yayın tarihi ve süresi korunur.",
     "editDoneTitle": "Değişiklikler kaydedildi",
     "editDoneBody": "Onay gerekiyorsa ilan kısa süre sonra yeniden yayına girer; sonucu bildirimle haber veririz.",
     "saveEdit": "Değişiklikleri kaydet",
@@ -1283,7 +1290,14 @@
     "autoReleased": "Süre dolduğu için emanetteki ödeme hizmet verene aktarıldı.",
     "staffReport": "Yeni şikâyet: {{title}}",
     "staffDispute": "Bir ödemede sorun bildirildi; karar bekliyor (₺{{amount}}).",
-    "providerSuspended": "Hizmet profilin ekip tarafından durduruldu: {{name}}"
+    "providerSuspended": "Hizmet profilin ekip tarafından durduruldu: {{name}}",
+    "quoteDeclined": "İş sahibi başka bir teklifi seçti: {{title}}",
+    "jobCancelled": "İş sahibi işi iptal etti: {{title}}",
+    "quoteWithdrawn": "Usta teklifini geri çekti; işin yeniden teklif almaya açık: {{title}}",
+    "bookingCancelled": "Müşteri kiralama talebini iptal etti.",
+    "importDone": "Toplu yükleme bitti: {{created}}/{{total}} ilan onaya gönderildi.",
+    "companyAdded": "{{company}} firmasına eklendin.",
+    "companyRemoved": "{{company}} firmasından çıkarıldın; firmadaki ilanların bireysel ilana döndü."
   },
   "lead": {
     "title": "Finansman, sigorta ya da nakliye teklifi al",
@@ -1297,5 +1311,45 @@
     "sent": "Talebin alındı. İş ortağımız kısa süre içinde seni arayacak.",
     "login": "Giriş yap",
     "loginHint": "Teklif istemek için giriş yap."
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "name": "Adın",
+    "save": "Kaydet",
+    "saved": "Kaydedildi.",
+    "prefsTitle": "Bildirim ve gizlilik",
+    "notifyMessages": "Yeni mesaj bildirimleri",
+    "notifyMatches": "Kayıtlı aramama uyan yeni ilanlar",
+    "phoneVisible": "Numaram, ilanlarıma yazan herkese görünsün",
+    "marketingConsent": "Ticari ileti izni (kampanya ve duyurular)",
+    "notifyMarketing": "Kampanya bildirimleri (önce ticari ileti izni gerekir)",
+    "dataTitle": "Verilerim",
+    "dataBody": "Hesabındaki tüm verilerin bir kopyasını JSON dosyası olarak indirebilirsin (KVKK md. 11).",
+    "export": "Verilerimi indir",
+    "kvkk": "KVKK aydınlatma metni",
+    "deleteAccount": "Hesabımı sil",
+    "deleteWarn": "Hesabın silinince ilanların yayından kalkar, mesajların ve kayıtlı aramaların silinir. Bu geri alınamaz.",
+    "deleteType": "Onaylamak için SİL yaz",
+    "deleteWord": "SİL",
+    "deleteConfirm": "Hesabı kalıcı olarak sil",
+    "cancel": "Vazgeç"
+  },
+  "report": {
+    "action": "İlanı bildir",
+    "body": "Neden bildiriyorsun? Bildirimin satıcıya gösterilmez; ekibimiz inceler.",
+    "note": "Not (isteğe bağlı)",
+    "notePh": "Ör. satıcı kapora için IBAN gönderdi",
+    "send": "Bildir",
+    "done": "Ekibimiz ilanı inceleyecek. Teşekkürler.",
+    "login": "Giriş yap",
+    "loginHint": "Teklif istemek için giriş yap.",
+    "cancel": "Vazgeç",
+    "reasons": {
+      "scam": "Dolandırıcılık şüphesi",
+      "wrong_info": "Bilgiler ya da fotoğraflar yanlış",
+      "sold": "Tekne satılmış",
+      "offensive": "Uygunsuz içerik",
+      "other": "Diğer"
+    }
   }
 }

@@ -20,6 +20,10 @@ export function notifTarget(key: string, params: Record<string, string> | null):
     case 'notif.paymentDisputed': case 'notif.bookingRequested': return '/panel/hizmet';
     case 'notif.bookingDeclined': return '/profil/islerim';
     case 'notif.paymentRefunded': return '/profil/odemeler';
+    case 'notif.quoteDeclined': case 'notif.jobCancelled': case 'notif.bookingCancelled': return '/panel/hizmet';
+    case 'notif.quoteWithdrawn': return p.jobId ? `/is/${p.jobId}` : '/profil/islerim';
+    case 'notif.companyAdded': case 'notif.importDone': return '/panel/kurumsal';
+    case 'notif.companyRemoved': return '/profil/ilanlarim';
     case 'notif.staffReport': return '/admin/sikayetler';
     case 'notif.staffDispute': return '/admin/odemeler';
     case 'notif.providerSuspended': return '/panel/hizmet';

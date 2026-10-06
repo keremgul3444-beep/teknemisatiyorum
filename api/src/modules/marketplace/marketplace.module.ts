@@ -202,6 +202,8 @@ class JobsController {
     const r = await this.prisma.job.updateMany({ where: { id, status: 'open' }, data: { status: 'accepted', acceptedQuoteId: q.id } });
     if (!r.count) throw notAllowed('JOB_CLOSED');
     await this.notifications.push(q.provider.userId, 'notif.quoteAccepted', { jobId: id, title: j.title });
+    // Diğer teklif verenler beklemede kalmasın.
+    for (const other of j.quotes.filter((x) => x.id !== q.id)) await this.notifications.push(other.provider.userId, 'notif.quoteDeclined', { jobId: id, title: j.title });
     return { id, status: 'accepted', acceptedQuoteId: q.id };
   }
 
@@ -267,10 +269,34 @@ class JobsController {
   @Post('jobs/:id/cancel')
   @HttpCode(200)
   async cancel(@CurrentUser() u: AuthUser, @Param('id') id: string) {
-    await this.own(id, u.id);
+    const j = await this.own(id, u.id);
     const r = await this.prisma.job.updateMany({ where: { id, status: { in: ['open', 'accepted'] } }, data: { status: 'cancelled' } });
     if (!r.count) throw notAllowed('JOB_CLOSED');
+    // Teklifi kabul edilmiş usta iptalden haberdar olur.
+    const accepted = j.status === 'accepted' ? j.quotes.find((x) => x.id === j.acceptedQuoteId) : undefined;
+    if (accepted) await this.notifications.push(accepted.provider.userId, 'notif.jobCancelled', { jobId: id, title: j.title });
     return { id, status: 'cancelled' };
+  }
+
+  /**
+   * Usta, kabul edilmiş ama ödenmemiş işten çekilir (sahibi ödemeyi yapmıyorsa beklemede kalmasın): teklifi silinir,
+   * iş yeniden teklif almaya açılır, sahibine haber gider. Ödeme sayfası açıksa gelen ödeme emanete alınmaz, iade edilir.
+   */
+  @Auth()
+  @Post('jobs/:id/withdraw')
+  @HttpCode(200)
+  async withdraw(@CurrentUser() u: AuthUser, @Param('id') id: string) {
+    const j = await this.prisma.job.findUnique({ where: { id }, include: quoteInclude });
+    const q = j?.quotes.find((x) => x.id === j.acceptedQuoteId);
+    if (!j || !q || q.provider.userId !== u.id) throw Errors.notFound();
+    const r = await this.prisma.$transaction(async (tx) => {
+      const n = await tx.job.updateMany({ where: { id, status: 'accepted', acceptedQuoteId: q.id }, data: { status: 'open', acceptedQuoteId: null } });
+      if (n.count) await tx.quote.delete({ where: { id: q.id } });
+      return n.count;
+    });
+    if (!r) throw notAllowed('JOB_NOT_ACCEPTED');
+    await this.notifications.push(j.ownerId, 'notif.quoteWithdrawn', { jobId: id, title: j.title });
+    return { id, status: 'open' };
   }
 
   @Auth({ level: 1 })
@@ -432,9 +458,11 @@ class BookingsController {
   @Post('captain-bookings/:id/cancel')
   @HttpCode(200)
   async cancel(@CurrentUser() u: AuthUser, @Param('id') id: string) {
-    await this.own(id, u.id);
+    const b = await this.own(id, u.id);
     const r = await this.prisma.captainBooking.updateMany({ where: { id, status: 'requested' }, data: { status: 'cancelled' } });
     if (!r.count) throw notAllowed('BOOKING_CLOSED');
+    const cap = await this.prisma.providerProfile.findUnique({ where: { id: b.providerId }, select: { userId: true } });
+    if (cap) await this.notifications.push(cap.userId, 'notif.bookingCancelled', { bookingId: id });
     return { id, status: 'cancelled' };
   }
 

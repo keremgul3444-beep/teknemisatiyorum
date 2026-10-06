@@ -209,6 +209,7 @@ function UstaInbox() {
   const { t } = useTranslation();
   const { data, reload } = useRemote(() => actions.providerJobs());
   const [open, setOpen] = useState<string | null>(null);
+  const [withdrawing, setWithdrawing] = useState<string | null>(null);
   const [q, setQ] = useState({ price: '', days: '', note: '' });
   const lang = currentLang();
   const send = async (job: ApiJob) => {
@@ -244,6 +245,18 @@ function UstaInbox() {
               <T variant="h3">{j.title}</T>
               <T variant="caption" color={colors.muted}>{t(`panel.jobStatus.${j.status}`)} · {j.quotes[0] ? formatPrice(j.quotes[0].priceTry, 'TRY', lang) : ''}</T>
               {j.acceptedQuoteId && j.quotes.some((x) => x.id === j.acceptedQuoteId) ? <StatusLine text={t('panel.won')} /> : null}
+              {/* Kabul edilmiş ama ödenmemiş iş: usta çekilebilir (iş yeniden teklife açılır). */}
+              {j.status === 'accepted' && j.quotes.some((x) => x.id === j.acceptedQuoteId) ? (
+                withdrawing === j.id ? (
+                  <View style={{ gap: space(2) }}>
+                    <T variant="caption">{t('panel.withdrawConfirm')}</T>
+                    <View style={{ flexDirection: 'row', gap: space(2) }}>
+                      <View style={{ flex: 1 }}><Button small variant="secondary" title={t('common.cancel')} onPress={() => setWithdrawing(null)} /></View>
+                      <View style={{ flex: 1 }}><Button small title={t('panel.withdraw')} onPress={async () => { await attempt(() => actions.withdrawQuote(j.id)); setWithdrawing(null); reload(); }} /></View>
+                    </View>
+                  </View>
+                ) : <Button small variant="ghost" title={t('panel.withdraw')} onPress={() => setWithdrawing(j.id)} />
+              ) : null}
               {j.status === 'paid' && j.quotes.some((x) => x.id === j.acceptedQuoteId) ? (j.deliveredAt
                 ? <T variant="caption" color={colors.muted}>{t('panel.delivered')}</T>
                 : <Button small icon="check" title={t('panel.markDelivered')} onPress={async () => { await attempt(() => actions.markDelivered(j.id)); reload(); }} />) : null}

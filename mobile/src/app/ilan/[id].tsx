@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { colors, fonts, radius, space } from '@/theme';
 import { Avatar, Badge, BoatImage, Button, Card, Chip, Icon, NotFound, PromoBadges, Section, T, goBack, showDemoToast } from '@/components';
-import { actions, formatPrice, useFavorites, useListing, useSeller } from '@/services';
+import { actions, formatPrice, isApiMode, useFavorites, useListing, useSeller } from '@/services';
 import { currentLang, tx } from '@/i18n';
 import { WEB_URL } from '@/services/mode';
 import { requireLevel } from '@/session/role';
@@ -28,7 +28,9 @@ export default function IlanDetay() {
   if (!l) return <NotFound />;
   const lang = currentLang();
   const galleryW = Math.min(width, 600);
-  const photoCount = l.photoUrls?.length || 4;
+  // Gerçek modda fotoğrafsız ilan tek yer tutucuyla gösterilir (sahte "1/4" yok); demo modunda örnek kareler.
+  const placeholderFrames = isApiMode() ? [0] : [0, 1, 2, 3];
+  const photoCount = l.photoUrls?.length || placeholderFrames.length;
 
   const message = async () => {
     if (!requireLevel(1)) return;
@@ -65,7 +67,7 @@ export default function IlanDetay() {
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
       <ScrollView contentContainerStyle={{ paddingBottom: space(8) }}>
         <View>
-          <FlatList horizontal pagingEnabled data={l.photoUrls?.length ? l.photoUrls.map((_, i) => i) : [0, 1, 2, 3]} keyExtractor={(i) => String(i)} showsHorizontalScrollIndicator={false}
+          <FlatList horizontal pagingEnabled data={l.photoUrls?.length ? l.photoUrls.map((_, i) => i) : placeholderFrames} keyExtractor={(i) => String(i)} showsHorizontalScrollIndicator={false}
             onScroll={(e) => setPage(Math.round(e.nativeEvent.contentOffset.x / galleryW))} scrollEventThrottle={32}
             style={{ width: galleryW }} renderItem={({ item }) => <View style={{ width: galleryW }}><BoatImage seed={l.photoSeed} frame={item} height={300} uri={l.photoUrls?.[item]} /></View>} />
           <View style={{ position: 'absolute', top: space(3), left: space(4), right: space(4), flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -77,9 +79,11 @@ export default function IlanDetay() {
           </View>
           <View style={{ position: 'absolute', bottom: space(3), left: space(4), right: space(4), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
             <PromoBadges promo={l.promo} priceDrop={l.priceDrop} />
-            <View style={{ backgroundColor: colors.overlay, borderRadius: radius.pill, paddingHorizontal: space(2.5), paddingVertical: space(1) }}>
-              <T variant="caption" color={colors.white} style={{ fontFamily: fonts.bodySemi }}>{page + 1}/{photoCount}</T>
-            </View>
+            {photoCount > 1 ? (
+              <View style={{ backgroundColor: colors.overlay, borderRadius: radius.pill, paddingHorizontal: space(2.5), paddingVertical: space(1) }}>
+                <T variant="caption" color={colors.white} style={{ fontFamily: fonts.bodySemi }}>{page + 1}/{photoCount}</T>
+              </View>
+            ) : null}
           </View>
         </View>
 

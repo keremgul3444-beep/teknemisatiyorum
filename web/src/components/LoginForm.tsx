@@ -12,6 +12,8 @@ type Labels = {
 export function LoginForm({ labels, errors, next }: { labels: Labels; errors: Record<string, string>; next: string }) {
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
+  // Kapalı betada kod SMS yerine yanıtla gelir ve kutuya yazılır; yalnızca o durumda bunu söyleyen not görünür.
+  const [autoFilled, setAutoFilled] = useState(false);
   const [step, setStep] = useState<'phone' | 'code'>('phone');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -41,7 +43,7 @@ export function LoginForm({ labels, errors, next }: { labels: Labels; errors: Re
   const sendCode = async () => {
     const j = await post('/api/auth/otp', { phone: full });
     if (!j) return;
-    if (j.devCode) setCode(j.devCode);
+    if (j.devCode) { setCode(j.devCode); setAutoFilled(true); }
     setStep('code'); setLeft(60);
   };
   const verify = async () => {
@@ -65,7 +67,7 @@ export function LoginForm({ labels, errors, next }: { labels: Labels; errors: Re
           <p className="muted small">{labels.codeSent}</p>
           <label htmlFor="code">{labels.code}</label>
           <input id="code" className="input" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} />
-          <p className="muted small">{labels.betaHint}</p>
+          {autoFilled ? <p className="muted small">{labels.betaHint}</p> : null}
           <button className="btn" type="button" disabled={busy || code.length !== 6} onClick={verify}>{labels.verify}</button>
           <button className="btn ghost" type="button" disabled={busy || left > 0} onClick={sendCode}>{left > 0 ? labels.resendIn.replace('{{s}}', String(left)) : labels.resend}</button>
         </>

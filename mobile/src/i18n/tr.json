@@ -50,7 +50,8 @@
     "belge": "Belgeleri eşleşti",
     "reddedildi": "Reddedildi",
     "kaldirildi": "Kaldırıldı",
-    "suresidoldu": "Süresi doldu"
+    "suresidoldu": "Süresi doldu",
+    "satildi": "Satıldı"
   },
   "boatType": {
     "motoryat": "Motoryat",
@@ -330,7 +331,8 @@
     "sellTitle": "Tekneni satmak mı istiyorsun?",
     "sellBody": "Ücretsiz ilan ver ya da satışı bize bırak.",
     "priceDropsTitle": "Fiyatı düşenler",
-    "priceDropsBody": "Son 30 günde fiyatı inen ilanlar."
+    "priceDropsBody": "Son 30 günde fiyatı inen ilanlar.",
+    "urgentTitle": "Acil satılıklar"
   },
   "assistant": {
     "label": "AKILLI ASİSTAN",
@@ -880,7 +882,8 @@
     "refunded": "İade edildi",
     "autoRelease": "Sorun bildirmezsen ödeme {{date}} tarihinde kaptana aktarılır.",
     "priceReviewHint": "Bu kadar büyük fiyat değişikliği yeniden onaya gider; onaylanana kadar ilan yayında görünmez.",
-    "rejectNote": "Moderatör notu: {{note}}"
+    "rejectNote": "Moderatör notu: {{note}}",
+    "promoWarn": "Kalan öne çıkarma süresi iade edilmez."
   },
   "settings": {
     "title": "Ayarlar",
@@ -997,7 +1000,9 @@
     "markDelivered": "İşi bitirdim",
     "delivered": "Bitti bildirildi; müşteri onayı ya da süre sonu bekleniyor",
     "docInReview": "Belgen incelemede; onaylanınca profilin listede görünür.",
-    "docRejected": "Belge onaylanmadı. {{reason}}"
+    "docRejected": "Belge onaylanmadı. {{reason}}",
+    "withdraw": "İşten çekil",
+    "withdrawConfirm": "İş sahibi henüz ödeme yapmadı. Çekilirsen teklifin silinir ve iş yeniden teklife açılır."
   },
   "corporate": {
     "title": "Firma paneli",
@@ -1346,7 +1351,14 @@
     "autoReleased": "Süre dolduğu için emanetteki ödeme hizmet verene aktarıldı.",
     "staffReport": "Yeni şikâyet: {{title}}",
     "staffDispute": "Bir ödemede sorun bildirildi; karar bekliyor (₺{{amount}}).",
-    "providerSuspended": "Hizmet profilin ekip tarafından durduruldu: {{name}}"
+    "providerSuspended": "Hizmet profilin ekip tarafından durduruldu: {{name}}",
+    "quoteDeclined": "İş sahibi başka bir teklifi seçti: {{title}}",
+    "jobCancelled": "İş sahibi işi iptal etti: {{title}}",
+    "quoteWithdrawn": "Usta teklifini geri çekti; işin yeniden teklif almaya açık: {{title}}",
+    "bookingCancelled": "Müşteri kiralama talebini iptal etti.",
+    "importDone": "Toplu yükleme bitti: {{created}}/{{total}} ilan onaya gönderildi.",
+    "companyAdded": "{{company}} firmasına eklendin.",
+    "companyRemoved": "{{company}} firmasından çıkarıldın; firmadaki ilanların bireysel ilana döndü."
   },
   "notifs": {
     "title": "Bildirimler",

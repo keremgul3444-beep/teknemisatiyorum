@@ -143,7 +143,8 @@
     "exact": "Exact matches ({{n}})",
     "noExact": "No exact matches — close results below.",
     "near": "Matching all but one criterion",
-    "missing": "Doesn't match: {{what}}"
+    "missing": "Doesn't match: {{what}}",
+    "openFilters": "Open in filters"
   },
   "badge": {
     "ekspertizli": "Surveyed",
@@ -192,7 +193,8 @@
     "pageOf": "Page {{a}} of {{b}}",
     "saveSearch": "Save this search",
     "searchSaved": "Search saved. We will let you know when new listings arrive.",
-    "searchSavedLink": "My saved searches"
+    "searchSavedLink": "My saved searches",
+    "clear": "Clear filters"
   },
   "landing": {
     "title": "{{type}} for sale",
@@ -237,7 +239,9 @@
     "translatedNote": "Automatic translation; the seller wrote the original in Turkish.",
     "originalNote": "Original text by the seller (in Turkish).",
     "video": "Video",
-    "videoTitle": "{{title}} video"
+    "videoTitle": "{{title}} video",
+    "share": "Share",
+    "linkCopied": "Link copied"
   },
   "gone": {
     "title": "This listing is no longer live",
@@ -653,7 +657,8 @@
     "resend": "Resend code",
     "resendIn": "Resend ({{s}} s)",
     "codeSent": "We sent a 6-digit code to your number.",
-    "betaHint": "Closed beta: the code fills in automatically instead of SMS."
+    "betaHint": "Closed beta: the code fills in automatically instead of SMS.",
+    "kvkk": "By logging in you confirm you have read the privacy notice (KVKK)."
   },
   "account": {
     "title": "My account",
@@ -759,7 +764,9 @@
     "promoWarn": "Remaining promotion time is not refunded.",
     "rejectNote": "Moderator note: {{note}}",
     "docPending": "Registration document under review.",
-    "docRejected": "Registration document not approved. {{reason}}"
+    "docRejected": "Registration document not approved. {{reason}}",
+    "settings": "Settings",
+    "settingsBody": "Name, notifications, privacy, your data and account deletion."
   },
   "pay": {
     "devTitle": "Trial payment",
@@ -889,7 +896,7 @@
     "seller": "Seller",
     "sellerSelf": "Individual (myself)",
     "editTitle": "Edit listing",
-    "editNote": "A moderate price change keeps the listing live. Other changes and photos go through a short review.",
+    "editNote": "Only a moderate price change keeps the listing live. Other changes and photos go through a short review; the listing is hidden from search until approved, and its publish date and remaining time are kept.",
     "editDoneTitle": "Changes saved",
     "editDoneBody": "If review is needed, the listing goes live again shortly; we will notify you.",
     "saveEdit": "Save changes",
@@ -1283,7 +1290,14 @@
     "autoReleased": "The held payment was released to the provider after the waiting period.",
     "staffReport": "New report: {{title}}",
     "staffDispute": "A payment was disputed and needs a decision (₺{{amount}}).",
-    "providerSuspended": "Your service profile was paused by the team: {{name}}"
+    "providerSuspended": "Your service profile was paused by the team: {{name}}",
+    "quoteDeclined": "The owner chose another quote: {{title}}",
+    "jobCancelled": "The owner cancelled the job: {{title}}",
+    "quoteWithdrawn": "The provider withdrew; your job is open for quotes again: {{title}}",
+    "bookingCancelled": "The customer cancelled the charter request.",
+    "importDone": "Bulk import finished: {{created}}/{{total}} listings sent for review.",
+    "companyAdded": "You were added to {{company}}.",
+    "companyRemoved": "You were removed from {{company}}; your listings there are now personal."
   },
   "lead": {
     "title": "Get a finance, insurance or transport quote",
@@ -1297,5 +1311,45 @@
     "sent": "Request received. Our partner will call you shortly.",
     "login": "Log in",
     "loginHint": "Log in to request a quote."
+  },
+  "settings": {
+    "title": "Settings",
+    "name": "Your name",
+    "save": "Save",
+    "saved": "Saved.",
+    "prefsTitle": "Notifications and privacy",
+    "notifyMessages": "New message notifications",
+    "notifyMatches": "New listings matching my saved searches",
+    "phoneVisible": "Show my number to anyone who messages me about a listing",
+    "marketingConsent": "Marketing consent (campaigns and announcements)",
+    "notifyMarketing": "Campaign notifications (needs marketing consent first)",
+    "dataTitle": "My data",
+    "dataBody": "Download a copy of all your account data as a JSON file (KVKK art. 11).",
+    "export": "Download my data",
+    "kvkk": "Privacy notice (KVKK)",
+    "deleteAccount": "Delete my account",
+    "deleteWarn": "Deleting your account takes your listings offline and deletes your messages and saved searches. This cannot be undone.",
+    "deleteType": "Type DELETE to confirm",
+    "deleteWord": "DELETE",
+    "deleteConfirm": "Delete account permanently",
+    "cancel": "Cancel"
+  },
+  "report": {
+    "action": "Report listing",
+    "body": "Why are you reporting it? The seller does not see your report; our team reviews it.",
+    "note": "Note (optional)",
+    "notePh": "e.g. the seller sent an IBAN for a deposit",
+    "send": "Report",
+    "done": "Our team will review the listing. Thank you.",
+    "login": "Log in",
+    "loginHint": "Log in to request a quote.",
+    "cancel": "Cancel",
+    "reasons": {
+      "scam": "Suspected scam",
+      "wrong_info": "Wrong details or photos",
+      "sold": "Boat already sold",
+      "offensive": "Inappropriate content",
+      "other": "Other"
+    }
   }
 }

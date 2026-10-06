@@ -7,13 +7,15 @@ import { formatPrice, idFromSlug, listingSlug } from '@/lib/format';
 import { apiListingsPath, citySlug, landingQuery } from '@/lib/queries';
 import { breadcrumbJsonLd, listingJsonLd, listingMetadata, siteUrl } from '@/lib/seo';
 import type { ListingView, SearchResult } from '@/lib/types';
-import { AppLink, Breadcrumbs, JsonLd, ListingGrid, Section, appHref } from '@/components/bits';
+import { AppLink, Breadcrumbs, JsonLd, ListingGrid, Section } from '@/components/bits';
 import { ViewBeacon } from '@/components/ViewBeacon';
 import { Gallery } from '@/components/Gallery';
 import { ContactBox } from '@/components/ContactBox';
 import { LeadBox } from '@/components/LeadBox';
+import { ReportListing } from '@/components/ReportListing';
 import { VideoEmbed } from '@/components/VideoEmbed';
 import { FavoriteButton } from '@/components/FavoriteButton';
+import { ShareButton } from '@/components/ShareButton';
 import { PromoBadges } from '@/components/PromoBadges';
 
 export const revalidate = 60;
@@ -107,6 +109,7 @@ export default async function IlanDetay({ params }: P) {
               }} />
               <div className="row">
                 <FavoriteButton id={l.id} loginHref={loginHref} labels={{ add: t(locale, 'listing.favAdd'), remove: t(locale, 'listing.favRemove') }} />
+                <ShareButton url={`${site}${here}`} title={title} labels={{ share: t(locale, 'listing.share'), copied: t(locale, 'listing.linkCopied') }} />
                 <AppLink locale={locale} path={`ekspertiz?ilan=${encodeURIComponent(l.id)}`} secondary>{t(locale, 'listing.requestSurvey')}</AppLink>
               </div>
               <LeadBox listingId={l.id} errors={tDict(locale, 'errors')} loginHref={loginHref} labels={tDict(locale, 'lead') as never} />
@@ -142,7 +145,7 @@ export default async function IlanDetay({ params }: P) {
               {l.seller.verified ? <span className="pill featured">{t(locale, 'listing.sellerVerified')}</span> : null}
             </div>
             <p className="notice" style={{ margin: 0 }}><span aria-hidden="true">!</span>{t(locale, 'listing.safety')}</p>
-            {live ? <a className="small" href={appHref(`bildir/${encodeURIComponent(l.id)}`)}>{t(locale, 'listing.report')}</a> : null}
+            {live ? <ReportListing listingId={l.id} errors={tDict(locale, 'errors')} loginHref={loginHref} labels={{ ...tDict(locale, 'report'), reasons: tDict(locale, 'report.reasons') } as never} /> : null}
           </div>
         </div>
       </article>

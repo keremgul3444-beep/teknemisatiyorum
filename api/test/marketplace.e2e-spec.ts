@@ -58,6 +58,26 @@ describe('usta işi: talep → teklif → kabul → emanet ödeme → tamam → 
     expect(await t.prisma.notification.count({ where: { userId: usta.user.id, key: 'notif.paymentReleased' } })).toBe(1);
   });
 
+  test('kabulde diğer teklif verenlere haber; usta ödenmemiş işten çekilir, iş yeniden açılır; iptal ustaya bildirilir', async () => {
+    const owner = await loginAs(t, { level: 2 });
+    const a = await provider('usta', { categories: ['jelkot'] });
+    const b = await provider('usta', { categories: ['jelkot'] });
+    const job = (await t.http().post('/jobs').set(owner.auth).send({ category: 'jelkot', title: 'Jelkot çatlağı', description: 'Baş tarafta jelkot çatlakları var.' })).body;
+    const qa = (await t.http().post(`/jobs/${job.id}/quotes`).set(a.auth).send({ priceTry: 4000, days: 2 })).body;
+    await t.http().post(`/jobs/${job.id}/quotes`).set(b.auth).send({ priceTry: 4500, days: 2 }).expect(201);
+    await t.http().post(`/jobs/${job.id}/accept`).set(owner.auth).send({ quoteId: qa.id }).expect(200);
+    expect(await t.prisma.notification.count({ where: { userId: b.user.id, key: 'notif.quoteDeclined' } })).toBe(1);
+    expect((await t.http().post(`/jobs/${job.id}/withdraw`).set(b.auth)).status).toBe(404);
+    await t.http().post(`/jobs/${job.id}/withdraw`).set(a.auth).expect(200);
+    expect(await t.prisma.job.findUniqueOrThrow({ where: { id: job.id } })).toMatchObject({ status: 'open', acceptedQuoteId: null });
+    expect(await t.prisma.quote.count({ where: { jobId: job.id } })).toBe(1);
+    expect(await t.prisma.notification.count({ where: { userId: owner.user.id, key: 'notif.quoteWithdrawn' } })).toBe(1);
+    const qb = await t.prisma.quote.findFirstOrThrow({ where: { jobId: job.id } });
+    await t.http().post(`/jobs/${job.id}/accept`).set(owner.auth).send({ quoteId: qb.id }).expect(200);
+    await t.http().post(`/jobs/${job.id}/cancel`).set(owner.auth).expect(200);
+    expect(await t.prisma.notification.count({ where: { userId: b.user.id, key: 'notif.jobCancelled' } })).toBe(1);
+  });
+
   test('onaysız usta listede görünmez ve teklif veremez; başkasının işini göremez', async () => {
     const owner = await loginAs(t, { level: 2 });
     const u = await loginAs(t, { level: 2 });

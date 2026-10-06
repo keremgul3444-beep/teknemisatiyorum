@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const url = (id: string, w: 400 | 800 | 1600) => `/media/${id}?w=${w}`;
 
@@ -12,6 +12,15 @@ export function Gallery({ photos, alt, labels }: {
 }) {
   const [open, setOpen] = useState<number | null>(null);
   const n = photos.length;
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const boxRef = useRef<HTMLDivElement>(null);
+  const opener = useRef<HTMLElement | null>(null);
+  const isOpen = open !== null;
+  // Klavye kullanıcısı için: açılınca odak kapatma düğmesine, Tab görüntüleyicinin içinde döner, kapanınca açan bağlantıya geri.
+  useEffect(() => {
+    if (isOpen) { closeRef.current?.focus(); return; }
+    opener.current?.focus();
+  }, [isOpen]);
   const go = useCallback((d: number) => setOpen((i) => (i === null ? null : (i + d + n) % n)), [n]);
   useEffect(() => {
     if (open === null) return;
@@ -19,6 +28,12 @@ export function Gallery({ photos, alt, labels }: {
       if (e.key === 'Escape') setOpen(null);
       if (e.key === 'ArrowRight') go(1);
       if (e.key === 'ArrowLeft') go(-1);
+      if (e.key === 'Tab' && boxRef.current) {
+        const f = [...boxRef.current.querySelectorAll<HTMLElement>('button')];
+        const i = f.indexOf(document.activeElement as HTMLElement);
+        e.preventDefault();
+        f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length]?.focus();
+      }
     };
     document.addEventListener('keydown', onKey);
     const prev = document.body.style.overflow;
@@ -27,7 +42,7 @@ export function Gallery({ photos, alt, labels }: {
   }, [open, go]);
   if (!n) return null;
   const [first, ...rest] = photos;
-  const openAt = (i: number) => (e: React.MouseEvent) => { e.preventDefault(); setOpen(i); };
+  const openAt = (i: number) => (e: React.MouseEvent) => { e.preventDefault(); opener.current = e.currentTarget as HTMLElement; setOpen(i); };
   return (
     <>
       <a href={url(first.id, 1600)} onClick={openAt(0)} aria-label={`${labels.open}: ${alt[0]}`}>
@@ -44,9 +59,9 @@ export function Gallery({ photos, alt, labels }: {
         </div>
       ) : null}
       {open !== null ? (
-        <div className="lightbox" role="dialog" aria-modal="true" aria-label={alt[open]} onClick={() => setOpen(null)}>
+        <div ref={boxRef} className="lightbox" role="dialog" aria-modal="true" aria-label={alt[open]} onClick={() => setOpen(null)}>
           <img src={url(photos[open].id, 1600)} alt={alt[open]} onClick={(e) => e.stopPropagation()} />
-          <button type="button" className="lb-close" onClick={() => setOpen(null)} aria-label={labels.close}>×</button>
+          <button ref={closeRef} type="button" className="lb-close" onClick={() => setOpen(null)} aria-label={labels.close}>×</button>
           {n > 1 ? (
             <>
               <button type="button" className="lb-prev" onClick={(e) => { e.stopPropagation(); go(-1); }} aria-label={labels.prev}>‹</button>

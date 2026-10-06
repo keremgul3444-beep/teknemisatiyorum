@@ -7,6 +7,7 @@ import { reportError } from '../../../adapters/error-report';
 import { MediaService } from '../../media/media.service';
 import { draftSchema } from '../../listings/listings.controller';
 import type { ImportRow } from './rows';
+import { NotificationsService } from '../../notifications/notifications.module';
 
 export type RowResult = { row: number; ok: boolean; listingId?: string; error?: string };
 
@@ -24,6 +25,7 @@ export class ImportRunner implements OnApplicationBootstrap {
     private readonly prisma: PrismaService,
     private readonly media: MediaService,
     private readonly audit: AuditService,
+    private readonly notifications: NotificationsService,
     @Inject(IMAGE_FETCHER) private readonly fetchImage: ImageFetcher,
   ) {}
 
@@ -62,6 +64,7 @@ export class ImportRunner implements OnApplicationBootstrap {
     }
     await this.prisma.importJob.update({ where: { id: jobId }, data: { status: 'done', finishedAt: new Date() } });
     await this.audit.log(job.userId, 'audit.listingsImported', { created: String(created), total: String(job.total) }, 'company', job.companyId);
+    await this.notifications.push(job.userId, 'notif.importDone', { created: String(created), total: String(job.total), companyId: job.companyId });
   }
 
   private async row(userId: string, companyId: string, r: ImportRow): Promise<RowResult> {

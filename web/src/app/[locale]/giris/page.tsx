@@ -1,5 +1,6 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
-import { t, tDict, type Locale } from '@/i18n';
+import { localePath, t, tDict, type Locale } from '@/i18n';
 import { safeNext } from '@/lib/session';
 import { LoginForm } from '@/components/LoginForm';
 
@@ -21,6 +22,7 @@ export default async function Giris({ params, searchParams }: P) {
       <p className="muted">{l('subtitle')}</p>
       <LoginForm next={next} errors={tDict(locale, 'errors')}
         labels={{ phone: l('phone'), sendCode: l('sendCode'), code: l('code'), verify: l('verify'), resend: l('resend'), resendIn: l('resendIn'), codeSent: l('codeSent'), betaHint: l('betaHint') }} />
+      <p className="muted small" style={{ marginTop: 16 }}><Link href={localePath(locale, '/kvkk')}>{l('kvkk')}</Link></p>
     </section>
   );
 }

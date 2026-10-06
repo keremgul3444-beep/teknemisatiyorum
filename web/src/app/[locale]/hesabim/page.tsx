@@ -36,6 +36,7 @@ export default async function Hesabim({ params }: P) {
         <Link className="card" href={p('/firma')}><h3>{t(locale, 'account.firm')}</h3><p className="muted small">{t(locale, 'account.firmBody')}</p></Link>
         {me.roles?.some((r) => r === 'admin' || r === 'moderator') ? <Link className="card" href={p('/yonetim')}><h3>{t(locale, 'account.admin')}</h3><p className="muted small">{t(locale, 'account.adminBody')}</p></Link> : null}
         <Link className="card" href={p('/hesabim/siparisler')}><h3>{t(locale, 'account.orders')}</h3><p className="muted small">{t(locale, 'account.ordersBody')}</p></Link>
+        <Link className="card" href={p('/hesabim/ayarlar')}><h3>{t(locale, 'account.settings')}</h3><p className="muted small">{t(locale, 'account.settingsBody')}</p></Link>
       </div>
       <div style={{ marginTop: 24 }}><LogoutButton label={t(locale, 'account.logout')} to={p('/')} /></div>
     </section>

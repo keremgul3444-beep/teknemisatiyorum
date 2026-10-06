@@ -30,6 +30,13 @@ const TEXTS: Record<'tr' | 'en', Record<string, string>> = {
     'notif.staffReport': 'Yeni şikâyet: {{title}}',
     'notif.staffDispute': 'Bir ödemede sorun bildirildi; karar bekliyor (₺{{amount}}).',
     'notif.providerSuspended': 'Hizmet profilin ekip tarafından durduruldu: {{name}}',
+    'notif.quoteDeclined': 'İş sahibi başka bir teklifi seçti: {{title}}',
+    'notif.jobCancelled': 'İş sahibi işi iptal etti: {{title}}',
+    'notif.quoteWithdrawn': 'Usta teklifini geri çekti; işin yeniden teklif almaya açık: {{title}}',
+    'notif.bookingCancelled': 'Müşteri kiralama talebini iptal etti.',
+    'notif.importDone': 'Toplu yükleme bitti: {{created}}/{{total}} ilan onaya gönderildi.',
+    'notif.companyAdded': '{{company}} firmasına eklendin.',
+    'notif.companyRemoved': '{{company}} firmasından çıkarıldın; firmadaki ilanların bireysel ilana döndü.',
   },
   en: {
     'notif.newMessage': 'New message: {{title}}',
@@ -58,6 +65,13 @@ const TEXTS: Record<'tr' | 'en', Record<string, string>> = {
     'notif.staffReport': 'New report: {{title}}',
     'notif.staffDispute': 'A payment was disputed and needs a decision (₺{{amount}}).',
     'notif.providerSuspended': 'Your service profile was paused by the team: {{name}}',
+    'notif.quoteDeclined': 'The owner chose another quote: {{title}}',
+    'notif.jobCancelled': 'The owner cancelled the job: {{title}}',
+    'notif.quoteWithdrawn': 'The provider withdrew; your job is open for quotes again: {{title}}',
+    'notif.bookingCancelled': 'The customer cancelled the charter request.',
+    'notif.importDone': 'Bulk import finished: {{created}}/{{total}} listings sent for review.',
+    'notif.companyAdded': 'You were added to {{company}}.',
+    'notif.companyRemoved': 'You were removed from {{company}}; your listings there are now personal.',
   },
 };
 const TITLE: Record<'tr' | 'en', string> = { tr: 'teknemisatıyorum', en: 'teknemisatıyorum' };

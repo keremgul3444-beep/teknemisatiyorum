@@ -23,7 +23,11 @@ export default function Kesfet() {
   const listings = useListings().filter((l) => l.status === 'yayinda');
   const forYou = [...listings].sort((a, b) => b.badges.length - a.badges.length || b.year - a.year).slice(0, 6);
   // Ücretli vitrin şeridi (gerçek modda sunucudan; demo modunda boş).
-  const featured = useRemote(() => actions.showcase()).data?.featured ?? [];
+  const show = useRemote(() => actions.showcase()).data;
+  const featured = show?.featured ?? [];
+  const urgent = show?.urgent ?? [];
+  // Zilde okunmamış bildirim sayısı (gerçek modda).
+  const unread = useRemote(() => actions.unreadCount()).data ?? 0;
   const ask = (text: string) => text.trim() && router.push({ pathname: '/asistan', params: { q: text.trim() } });
 
   return (
@@ -36,11 +40,16 @@ export default function Kesfet() {
         <Pressable onPress={() => router.push('/profil/bildirimler')} accessibilityRole="button" accessibilityLabel={t('profile.notifications')} hitSlop={4}
           style={{ width: 44, height: 44, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center' }}>
           <Icon name="bell" size={20} color={colors.text} />
+          {unread ? (
+            <View style={{ position: 'absolute', top: -2, right: -2, minWidth: 18, height: 18, borderRadius: radius.pill, paddingHorizontal: 4, backgroundColor: colors.danger, alignItems: 'center', justifyContent: 'center' }}>
+              <T variant="caption" style={{ fontSize: 11, lineHeight: 14, color: colors.white, fontFamily: fonts.bodyBold }}>{unread > 99 ? '99+' : String(unread)}</T>
+            </View>
+          ) : null}
         </Pressable>
       </View>
 
       <View style={{ gap: space(1.5) }}>
-        <AssistantInput value={q} onChangeText={setQ} onSubmit={() => ask(q || t('assistant.ex1'))} placeholder={t('assistant.placeholder')}
+        <AssistantInput value={q} onChangeText={setQ} onSubmit={() => { const v = q.trim() || t('assistant.ex1'); setQ(v); ask(v); }} placeholder={t('assistant.placeholder')}
           label={t('assistant.label')} buttonLabel={t('assistant.search')} />
         <T variant="caption" color={colors.muted} style={{ paddingHorizontal: space(1) }}>{t('assistant.hint')}</T>
       </View>
@@ -64,6 +73,13 @@ export default function Kesfet() {
       {featured.length ? (
         <Section title={t('promo.showcase')}>
           <FlatList horizontal data={featured} keyExtractor={(l) => l.id} showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: space(3) }} renderItem={({ item }) => <ListingCard listing={item} width={280} />} />
+        </Section>
+      ) : null}
+
+      {urgent.length ? (
+        <Section title={t('home.urgentTitle')}>
+          <FlatList horizontal data={urgent} keyExtractor={(l) => l.id} showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ gap: space(3) }} renderItem={({ item }) => <ListingCard listing={item} width={280} />} />
         </Section>
       ) : null}

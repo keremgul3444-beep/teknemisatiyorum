@@ -4,7 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { colors, space } from '@/theme';
 import { AssistantInput, Button, Chip, EmptyState, Header, Icon, ListingCard, QueryChips, Screen, Section, T, showDemoToast } from '@/components';
-import { actions, useListings, type AssistantResult } from '@/services';
+import { actions, isApiMode, useListings, type AssistantResult } from '@/services';
 import { criterionLabel, isEmptyQuery } from '@tms/shared';
 import { requireLevel } from '@/session/role';
 import { attempt } from '@/services/errors';
@@ -17,13 +17,15 @@ export default function Asistan() {
   const listings = useListings();
   // Sonuç hangi sorgu ve ilan listesi için alındıysa onunla saklanır; "yükleniyor" bundan türetilir.
   const [fetched, setFetched] = useState<{ q: string; listings: unknown; r: AssistantResult | null } | null>(null);
+  // Gerçek modda arama sunucuda: depodaki ilan listesi değişti diye yeniden sorulmaz (asistan kotası harcanmasın).
+  const dep = isApiMode() ? null : listings;
   useEffect(() => {
     if (!q.trim()) return;
     let alive = true;
-    attempt(() => actions.assistantSearch(q)).then((r) => { if (alive) setFetched({ q, listings, r: r ?? null }); });
+    attempt(() => actions.assistantSearch(q)).then((r) => { if (alive) setFetched({ q, listings: dep, r: r ?? null }); });
     return () => { alive = false; };
-  }, [q, listings]);
-  const current = !!q.trim() && fetched?.q === q && fetched.listings === listings;
+  }, [q, dep]);
+  const current = !!q.trim() && fetched?.q === q && fetched.listings === dep;
   const result = current ? fetched!.r : null;
   const loading = !!q.trim() && !current;
   const parsed = result?.query ?? { equipment: [] };

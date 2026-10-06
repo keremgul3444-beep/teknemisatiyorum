@@ -80,6 +80,7 @@ function ManageRow({ listing: l }: { listing: Listing }) {
     return (
       <View style={{ gap: space(2) }}>
         <T variant="caption">{t('mine.withdrawConfirm', { title: `${l.brand} ${l.model}` })}</T>
+        {l.promo?.featured || l.promo?.urgent ? <T variant="caption" color={colors.warning}>{t('mine.promoWarn')}</T> : null}
         <View style={{ flexDirection: 'row', gap: space(2) }}>
           <View style={{ flex: 1 }}><Button small variant="secondary" title={t('common.cancel')} onPress={() => setMode(null)} /></View>
           <View style={{ flex: 1 }}><Button small variant="danger" title={t('mine.withdraw')} loading={busy} onPress={() => run(() => actions.withdrawListing(l.id))} /></View>

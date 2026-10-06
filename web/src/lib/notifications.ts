@@ -14,6 +14,8 @@ export function webNotifTarget(key: string, params: Record<string, string> | nul
       return '/hesabim/ilanlar';
     // Ruhsat ilana bağlı; kimlik ve usta/kaptan belgesi hesabın kendisine.
     case 'notif.docApproved': case 'notif.docRejected': return p.kind === 'ruhsat' ? '/hesabim/ilanlar' : '/hesabim';
+    case 'notif.importDone': return '/firma/toplu';
+    case 'notif.companyAdded': return '/firma';
     case 'notif.staffReport': return '/yonetim/bildirimler';
     case 'notif.staffDispute': return '/yonetim/odemeler';
     default: return null;
