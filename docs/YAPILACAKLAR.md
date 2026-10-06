@@ -25,6 +25,8 @@ Kullanıcı hatırlatma istedi: her büyük aşama sonunda bu liste gözden geç
 - [ ] Blog / içerik yazıları (SEO için değerli, ayrı içerik işi)
 - [ ] Ziyaretçi ölçümü: Umami kodda hazır (çerez onayıyla, `/stats`); sunucuda `--profile analytics` ile aç ve site kimliğini gir (`docs/CANLIYA-CIKIS.md` 7. bölüm)
 - [ ] Teklif talepleri (finansman, sigorta, nakliye): iş ortaklarıyla anlaşma; talepler `/yonetim/talepler`'de toplanır, paylaşım KVKK metnine eklendi, avukat onayı gerekir
+- [ ] Gerçek ödeme açılınca: emanete alınmadan iade sayılan ödemelerin parası sağlayıcıda da iade edilmeli (`docs/denetim-2026-10-06.md`, Canlıda dikkat)
+- [ ] Denetimden kalan ürün işleri (kaptan onay adımı, onaylı sürümü yayında tutma, firma personel ilanları): `docs/denetim-2026-10-06.md`
 - [ ] Canlı sunucuda hız ölçümünü (Lighthouse) tekrarla; yerel ölçüm: ana sayfa 96, ilan 92
 - [ ] Uygulamanın "Öne çıkar" ekranını uçtan uca tarayıcı testiyle dene (bu turda bellek yetersizliğinden uygulama önizlemesi açılmadı; aynı sunucu ucu kabul testinde denendi)
 
