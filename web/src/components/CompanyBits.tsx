@@ -77,3 +77,18 @@ export function RemoveMember({ companyId, userId, L, errors }: { companyId: stri
     </span>
   );
 }
+
+/** Personel: firmadan ayrıl (ikinci dokunuşla onay). Ayrılınca panel listesi yenilenir. */
+export function LeaveCompany({ companyId, L, errors, to }: { companyId: string; L: Dict; errors: Dict; to: string }) {
+  const c = useCall(errors);
+  const [sure, setSure] = useState(false);
+  return (
+    <span className="row small">
+      {sure
+        ? <><span>{L.leaveConfirm}</span><button type="button" className="btn ghost" disabled={c.busy} onClick={async () => { if (await c.call(`/api/firma/${companyId}/leave`, 'POST')) window.location.assign(to); }}>{L.leave}</button>
+          <button type="button" className="linklike" onClick={() => setSure(false)}>{L.cancel}</button></>
+        : <button type="button" className="linklike" onClick={() => setSure(true)}>{L.leave}</button>}
+      <Err text={c.error} />
+    </span>
+  );
+}

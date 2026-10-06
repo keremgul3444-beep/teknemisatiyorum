@@ -1144,7 +1144,8 @@
     "reviewHidden": "Yorum gizlendi ({{stars}} yıldız)",
     "reviewShown": "Yorum yeniden açıldı ({{stars}} yıldız)",
     "providerSuspended": "Hizmet profili durduruldu: {{name}}",
-    "providerActivated": "Hizmet profili açıldı: {{name}}"
+    "providerActivated": "Hizmet profili açıldı: {{name}}",
+    "memberLeft": "Firmadan ayrıldı"
   },
   "firm": {
     "title": "Firma paneli",
@@ -1230,7 +1231,9 @@
       "row": "Satır",
       "field": "Alan",
       "companyId": "Firma"
-    }
+    },
+    "leave": "Firmadan ayrıl",
+    "leaveConfirm": "Firmadan ayrılınca firma adına verdiğin ilanlar firmada kalır."
   },
   "providers": {
     "new": "Yeni",
@@ -1301,7 +1304,7 @@
     "bookingCancelled": "Müşteri kiralama talebini iptal etti.",
     "importDone": "Toplu yükleme bitti: {{created}}/{{total}} ilan onaya gönderildi.",
     "companyAdded": "{{company}} firmasına eklendin.",
-    "companyRemoved": "{{company}} firmasından çıkarıldın; firmadaki ilanların bireysel ilana döndü.",
+    "companyRemoved": "{{company}} firmasından çıkarıldın; firma adına verdiğin ilanlar firmada kaldı.",
     "bookingAccepted": "Kaptan kiralama talebini onayladı; ödemeyi yapabilirsin.",
     "editApproved": "Düzenlemen onaylandı, yayında: {{title}}",
     "editRejected": "Düzenlemen onaylanmadı; ilan önceki hâliyle yayında: {{title}}"

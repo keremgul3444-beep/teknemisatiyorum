@@ -209,6 +209,7 @@ export const actions = {
   createCompany: (b: { name: string; kind: string; city: string }) => api.post<{ id: string }>('/companies', b),
   addCompanyMember: (id: string, phone: string, role: 'admin' | 'staff') => api.post(`/companies/${id}/members`, { phone, role }),
   removeCompanyMember: (id: string, userId: string) => api.del(`/companies/${id}/members/${userId}`),
+  leaveCompany: (id: string) => api.post(`/companies/${id}/leave`),
   /** Süresi dolan ya da dolmak üzere olan ilanı 90 gün uzatır (onaya düşmez). */
   async renewListing(id: string) {
     if (!isApiMode()) return g().renewListing(id);

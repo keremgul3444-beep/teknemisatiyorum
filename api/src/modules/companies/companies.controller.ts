@@ -89,7 +89,7 @@ export class CompaniesController {
     };
   }
 
-  /** Personeli firmadan çıkar (sahip ya da yönetici; sahip çıkarılamaz). Kişinin firmadaki ilanları bireysel ilana döner. */
+  /** Personeli firmadan çıkar (sahip ya da yönetici; sahip çıkarılamaz). Kişinin firma adına verdiği ilanlar firmada kalır (firma sahibine geçer). */
   @Auth({ level: 2 })
   @Delete(':id/members/:userId')
   @HttpCode(204)
@@ -99,13 +99,33 @@ export class CompaniesController {
     const target = await this.prisma.companyMember.findUnique({ where: { companyId_userId: { companyId: id, userId } } });
     if (!target) throw Errors.notFound();
     if (target.role === 'owner') throw new AppError('OWNER_LOCKED', 'errors.owner_locked', 409);
-    await this.prisma.$transaction([
-      this.prisma.companyMember.delete({ where: { companyId_userId: { companyId: id, userId } } }),
-      this.prisma.listing.updateMany({ where: { companyId: id, ownerId: userId }, data: { companyId: null } }),
-    ]);
-    await this.audit.log(u.id, 'audit.memberRemoved', { role: target.role }, 'company', id);
+    const moved = await this.leave(id, userId);
+    await this.audit.log(u.id, 'audit.memberRemoved', { role: target.role, listings: String(moved) }, 'company', id);
     const c = await this.prisma.company.findUnique({ where: { id }, select: { name: true } });
     await this.notifications.push(userId, 'notif.companyRemoved', { company: c?.name ?? '' });
+  }
+
+  /** Personel firmadan kendisi ayrılır (sahip ayrılamaz). Firma adına verdiği ilanlar firmada kalır. */
+  @Auth()
+  @Post(':id/leave')
+  @HttpCode(204)
+  async leaveSelf(@CurrentUser() u: AuthUser, @Param('id') id: string) {
+    const me = await this.member(id, u.id);
+    if (me.role === 'owner') throw new AppError('OWNER_LOCKED', 'errors.owner_locked', 409);
+    const moved = await this.leave(id, u.id);
+    await this.audit.log(u.id, 'audit.memberLeft', { listings: String(moved) }, 'company', id);
+  }
+
+  /** Üyelik silinir; kişinin firma adına verdiği ilanlar firma sahibine geçer (envanter firmanındır). */
+  private async leave(companyId: string, userId: string) {
+    const owner = await this.prisma.companyMember.findFirst({ where: { companyId, role: 'owner' } });
+    const [, moved] = await this.prisma.$transaction([
+      this.prisma.companyMember.delete({ where: { companyId_userId: { companyId, userId } } }),
+      owner
+        ? this.prisma.listing.updateMany({ where: { companyId, ownerId: userId, status: { notIn: ['removed', 'sold'] } }, data: { ownerId: owner.userId } })
+        : this.prisma.listing.updateMany({ where: { companyId, ownerId: userId }, data: { companyId: null } }),
+    ]);
+    return moved.count;
   }
 
   private async member(companyId: string, userId: string) {

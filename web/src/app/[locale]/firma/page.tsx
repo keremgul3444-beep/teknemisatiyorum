@@ -4,7 +4,7 @@ import type { Currency } from '@tms/shared';
 import { localePath, t, tDict, type Locale } from '@/i18n';
 import { authedGet } from '@/lib/auth-server';
 import { formatPrice } from '@/lib/format';
-import { AddMember, CreateCompany, RemoveMember } from '@/components/CompanyBits';
+import { AddMember, CreateCompany, LeaveCompany, RemoveMember } from '@/components/CompanyBits';
 
 type P = { params: Promise<{ locale: string }>; searchParams: Promise<{ c?: string }> };
 type Mine = { id: string; name: string }[];
@@ -42,6 +42,7 @@ export default async function Firma({ params, searchParams }: P) {
     <section className="section">
       <h1>{d.name}</h1>
       <p className="muted">{t(locale, `firm.kinds.${d.kind}`)} · {d.city} · {t(locale, `firm.role_${d.myRole}`)}</p>
+      {d.myRole !== 'owner' ? <p><LeaveCompany companyId={d.id} L={tDict(locale, 'firm')} errors={tDict(locale, 'errors')} to={localePath(locale, '/hesabim')} /></p> : null}
       {mine.length > 1 ? (
         <nav className="row small" style={{ marginBottom: 16 }}>
           {mine.map((x) => <Link key={x.id} className="chip" aria-current={x.id === d.id ? 'page' : undefined} href={`${localePath(locale, '/firma')}?c=${x.id}`}>{x.name}</Link>)}

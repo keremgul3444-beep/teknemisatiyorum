@@ -5,7 +5,7 @@ import { colors, radius, space } from '@/theme';
 import { router } from 'expo-router';
 import { Avatar, BoatImage, Button, Card, Chip, EmptyState, Field, Header, Icon, ListingCard, Screen, Section, T, showDemoToast } from '@/components';
 import { actions, formatPrice, useCompanies, useListings } from '@/services';
-import { useMode } from '@/services/mode';
+import { isApiMode, useMode } from '@/services/mode';
 import { useRemote } from '@/services/useRemote';
 import { attempt } from '@/services/errors';
 import { currentLang } from '@/i18n';
@@ -99,6 +99,7 @@ function CreateCompany({ onCreated }: { onCreated: () => void }) {
 
 function CompanyView({ d, reload }: { d: CompanyDetail; reload: () => void }) {
   const { t } = useTranslation();
+  const [leaving, setLeaving] = useState(false);
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState<'staff' | 'admin'>('staff');
   const [removing, setRemoving] = useState<string | null>(null);
@@ -113,6 +114,16 @@ function CompanyView({ d, reload }: { d: CompanyDetail; reload: () => void }) {
             <T variant="caption" color={colors.muted}>{t(`corporate.kind.${d.kind}`)} · {d.city} · {t(`corporate.role.${d.myRole}`)}</T>
           </View>
         </View>
+        {d.myRole !== 'owner' && isApiMode() ? (
+          <View style={{ paddingHorizontal: space(4), paddingBottom: space(4), gap: space(2) }}>
+            {leaving ? <T variant="caption">{t('corporate.leaveConfirm')}</T> : null}
+            <View style={{ flexDirection: 'row', gap: space(2) }}>
+              {leaving ? <View style={{ flex: 1 }}><Button small variant="secondary" title={t('common.cancel')} onPress={() => setLeaving(false)} /></View> : null}
+              <View style={{ flex: 1 }}><Button small variant={leaving ? 'danger' : 'ghost'} title={t('corporate.leave')}
+                onPress={async () => { if (!leaving) return setLeaving(true); const ok = await attempt(async () => { await actions.leaveCompany(d.id); return true; }); if (ok) router.back(); }} /></View>
+            </View>
+          </View>
+        ) : null}
       </Card>
 
       <Section title={t('corporate.staff')}>

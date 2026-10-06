@@ -10,7 +10,7 @@ const listing = (ownerId: string, companyId: string) => t.prisma.listing.create(
   equipment: [], badges: [], cabins: 1, engine: '', description: '', ownerId, companyId, status: 'published', publishedAt: new Date(),
 } });
 
-test('firma paneli: üyeler görür, istatistik yalnız yöneticiye; personel çıkarılınca ilanı bireysele döner', async () => {
+test('firma paneli: üyeler görür, istatistik yalnız yöneticiye; personel çıkarılınca firma ilanı firmada kalır', async () => {
   const owner = await loginAs(t, { level: 2 });
   const staff = await loginAs(t, { level: 2 });
   const outsider = await loginAs(t, { level: 2 });
@@ -30,5 +30,15 @@ test('firma paneli: üyeler görür, istatistik yalnız yöneticiye; personel ç
   expect((await t.http().delete(`/companies/${c.id}/members/${owner.user.id}`).set(owner.auth)).body.code).toBe('OWNER_LOCKED');
   expect((await t.http().delete(`/companies/${c.id}/members/${owner.user.id}`).set(staff.auth)).status).toBe(404);
   await t.http().delete(`/companies/${c.id}/members/${staff.user.id}`).set(owner.auth).expect(204);
-  expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } })).companyId).toBeNull();
+  // Envanter firmanın: ilan firmada kalır, firma sahibine geçer; personele bildirim gider.
+  expect(await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } })).toMatchObject({ companyId: c.id, ownerId: owner.user.id });
+  expect(await t.prisma.notification.count({ where: { userId: staff.user.id, key: 'notif.companyRemoved' } })).toBe(1);
+
+  // Personel kendisi ayrılabilir; sahip ayrılamaz.
+  const s2 = await loginAs(t, { level: 2 });
+  await t.http().post(`/companies/${c.id}/members`).set(owner.auth).send({ phone: s2.user.phone, role: 'staff' }).expect(201);
+  const l2 = await listing(s2.user.id, c.id);
+  await t.http().post(`/companies/${c.id}/leave`).set(s2.auth).expect(204);
+  expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: l2.id } })).ownerId).toBe(owner.user.id);
+  expect((await t.http().post(`/companies/${c.id}/leave`).set(owner.auth)).body.code).toBe('OWNER_LOCKED');
 });

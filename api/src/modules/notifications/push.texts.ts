@@ -39,7 +39,7 @@ const TEXTS: Record<'tr' | 'en', Record<string, string>> = {
     'notif.editRejected': 'Düzenlemen onaylanmadı; ilan önceki hâliyle yayında: {{title}}',
     'notif.importDone': 'Toplu yükleme bitti: {{created}}/{{total}} ilan onaya gönderildi.',
     'notif.companyAdded': '{{company}} firmasına eklendin.',
-    'notif.companyRemoved': '{{company}} firmasından çıkarıldın; firmadaki ilanların bireysel ilana döndü.',
+    'notif.companyRemoved': '{{company}} firmasından çıkarıldın; firma adına verdiğin ilanlar firmada kaldı.',
   },
   en: {
     'notif.newMessage': 'New message: {{title}}',
@@ -77,7 +77,7 @@ const TEXTS: Record<'tr' | 'en', Record<string, string>> = {
     'notif.editRejected': 'Your edit was not approved; the listing stays live as before: {{title}}',
     'notif.importDone': 'Bulk import finished: {{created}}/{{total}} listings sent for review.',
     'notif.companyAdded': 'You were added to {{company}}.',
-    'notif.companyRemoved': 'You were removed from {{company}}; your listings there are now personal.',
+    'notif.companyRemoved': 'You were removed from {{company}}; listings you posted for the company stay with it.',
   },
 };
 const TITLE: Record<'tr' | 'en', string> = { tr: 'teknemisatıyorum', en: 'teknemisatıyorum' };

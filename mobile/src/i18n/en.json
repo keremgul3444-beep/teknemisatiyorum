@@ -1047,7 +1047,9 @@
       "rejected": "Rejected",
       "sold": "Sold",
       "expired": "Expired"
-    }
+    },
+    "leave": "Leave company",
+    "leaveConfirm": "If you leave, listings you posted for the company stay with it."
   },
   "admin": {
     "title": "Admin · Prototype",
@@ -1225,7 +1227,8 @@
     "reviewHidden": "Review hidden ({{stars}} stars)",
     "reviewShown": "Review shown again ({{stars}} stars)",
     "providerSuspended": "Service profile paused: {{name}}",
-    "providerActivated": "Service profile activated: {{name}}"
+    "providerActivated": "Service profile activated: {{name}}",
+    "memberLeft": "Left the company"
   },
   "errors": {
     "generic": "Something went wrong, please try again.",
@@ -1364,7 +1367,7 @@
     "bookingCancelled": "The customer cancelled the charter request.",
     "importDone": "Bulk import finished: {{created}}/{{total}} listings sent for review.",
     "companyAdded": "You were added to {{company}}.",
-    "companyRemoved": "You were removed from {{company}}; your listings there are now personal.",
+    "companyRemoved": "You were removed from {{company}}; listings you posted for the company stay with it.",
     "bookingAccepted": "The skipper accepted your charter request; you can pay now.",
     "editApproved": "Your edit was approved and is live: {{title}}",
     "editRejected": "Your edit was not approved; the listing stays live as before: {{title}}"
