@@ -107,6 +107,11 @@ export const actions = {
     applyUser(u);
     return { pending: u.verifyLevel < 2 };
   },
+  /** Belge başvurularım (yeniden eskiye): durum ve red gerekçesi. */
+  async myVerificationRequests() {
+    if (!isApiMode()) return [];
+    return api.get<{ id: string; kind: string; status: 'pending' | 'approved' | 'rejected'; listingId: string | null; rejectReason: string | null; rejectNote: string | null }[]>('/verification/requests/mine');
+  },
   async submitProfessional(kind: 'usta' | 'kaptan' | 'eksper' | 'firma', fileUris: string[]) {
     if (!isApiMode()) {
       useSession.getState().setVerifyLevel(3);

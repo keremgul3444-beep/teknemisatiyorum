@@ -635,7 +635,9 @@
     "import_limit": "You have reached today's bulk import limit.",
     "import_too_many": "At most {{max}} rows can be imported at once.",
     "lead_limit": "You have reached today's quote request limit.",
-    "phone_required": "A phone number is required on your account for this."
+    "phone_required": "A phone number is required on your account for this.",
+    "listing_required": "A registration document must belong to a listing.",
+    "request_pending": "You already have a request waiting for review."
   },
   "login": {
     "title": "Log in",
@@ -745,7 +747,15 @@
     "whatsapp": "Message on WhatsApp",
     "sharePhone": "Share my number",
     "sharePhoneConfirm": "Your phone number will be shown to this person only.",
-    "phoneShared": "Your phone number is shared in this conversation."
+    "phoneShared": "Your phone number is shared in this conversation.",
+    "markSold": "Mark as sold",
+    "withdraw": "Withdraw",
+    "soldConfirm": "The listing will be marked as sold; this cannot be undone.",
+    "withdrawConfirm": "The listing will be withdrawn; this cannot be undone.",
+    "promoWarn": "Remaining promotion time is not refunded.",
+    "rejectNote": "Moderator note: {{note}}",
+    "docPending": "Registration document under review.",
+    "docRejected": "Registration document not approved. {{reason}}"
   },
   "pay": {
     "devTitle": "Trial payment",
@@ -1002,7 +1012,8 @@
     "forward": "Mark as forwarded",
     "close": "Close",
     "noLeads": "No requests.",
-    "revealPhone": "Show number"
+    "revealPhone": "Show number",
+    "rejectNote": "Note to the seller (optional): what to fix?"
   },
   "audit": {
     "listingApproved": "Listing approved: {{title}}",

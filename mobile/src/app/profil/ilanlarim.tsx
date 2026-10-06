@@ -8,6 +8,7 @@ import { actions, formatPrice, isApiMode, useListings, type Listing, type Listin
 import { attempt } from '@/services/errors';
 import { digitsOnly, groupThousands } from '@/features/listingForm';
 import { currentLang } from '@/i18n';
+import { priceNeedsReview } from '@tms/shared';
 import { daysLeft } from '@/features/promo';
 
 export default function Ilanlarim() {
@@ -34,11 +35,12 @@ export default function Ilanlarim() {
           <View key={l.id} style={{ gap: space(2) }}>
             <ListingCard listing={l} />
             {l.status === 'reddedildi' ? <T variant="caption" color={colors.danger}>{t(`mine.rejectReasons.${l.rejectReason ?? 'rules'}`)}</T> : null}
+            {l.status === 'reddedildi' && l.rejectNote ? <T variant="caption">{t('mine.rejectNote', { note: l.rejectNote })}</T> : null}
             {l.status === 'kaldirildi' && l.removedReason ? <T variant="caption" color={colors.danger}>{t(`mine.removedReasons.${l.removedReason}`)}</T> : null}
             {l.status === 'suresi-doldu' || (l.status === 'yayinda' && expiringIn(l) !== null) ? <RenewRow listing={l} /> : null}
             {l.stats ? <StatsRow stats={l.stats} /> : null}
             {l.status === 'yayinda' && isApiMode() ? <PromoRow listing={l} /> : null}
-            {l.status === 'yayinda' || l.status === 'onay-bekliyor' || l.status === 'reddedildi' ? <ManageRow listing={l} /> : null}
+            {l.status === 'yayinda' || l.status === 'onay-bekliyor' || l.status === 'reddedildi' || l.status === 'suresi-doldu' ? <ManageRow listing={l} /> : null}
           </View>
         ))}
     </Screen>
@@ -65,7 +67,7 @@ function ManageRow({ listing: l }: { listing: Listing }) {
     return (
       <View style={{ gap: space(2) }}>
         <Field label={`${t('wizard.price')} (${l.currency})`} value={groupThousands(price, currentLang())} onChangeText={(v) => setPrice(digitsOnly(v).slice(0, 10))}
-          keyboardType="numeric" hint={l.status === 'yayinda' ? t('mine.priceHint') : undefined} />
+          keyboardType="numeric" hint={l.status === 'yayinda' ? t(n > 0 && priceNeedsReview(l.price, n) ? 'mine.priceReviewHint' : 'mine.priceHint') : undefined} />
         <View style={{ flexDirection: 'row', gap: space(2) }}>
           <View style={{ flex: 1 }}><Button small variant="secondary" title={t('common.cancel')} onPress={() => setMode(null)} /></View>
           <View style={{ flex: 1 }}><Button small title={t('mine.priceSave')} loading={busy} disabled={!(n > 0) || n === Math.round(l.price)}

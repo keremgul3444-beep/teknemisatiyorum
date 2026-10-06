@@ -213,6 +213,8 @@ model VerificationRequest {
   listingId    String?
   status       ReviewStatus     @default(pending)
   rejectReason String?
+  /// Moderatörün serbest notu (neyi düzeltmeli).
+  rejectNote   String?
   reviewedById String?
   createdAt    DateTime         @default(now())
   decidedAt    DateTime?
@@ -254,6 +256,8 @@ model Listing {
   status        ListingStatus  @default(draft)
   badges        String[]
   rejectReason  String?
+  /// Moderatörün serbest red notu; yalnızca sahibine gösterilir.
+  rejectNote    String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   publishedAt   DateTime?

@@ -87,10 +87,15 @@ export class VerificationController {
   @Post('requests')
   async request(@CurrentUser() u: AuthUser, @Body(new ZodPipe(requestBody)) b: z.infer<typeof requestBody>) {
     await this.media.assertOwnPrivate(u.id, b.fileIds);
+    // Ruhsat bir ilana aittir; onayı o ilana rozet verir.
+    if (b.kind === 'ruhsat' && !b.listingId) throw Errors.bad('LISTING_REQUIRED');
     if (b.listingId) {
       const own = await this.prisma.listing.count({ where: { id: b.listingId, ownerId: u.id } });
       if (!own) throw Errors.notFound();
     }
+    // Aynı konuda bekleyen başvuru varken ikincisi açılmaz (kuyruğu şişirmesin).
+    const open = await this.prisma.verificationRequest.count({ where: { userId: u.id, kind: b.kind, status: 'pending', ...(b.listingId ? { listingId: b.listingId } : {}) } });
+    if (open) throw Errors.conflict('REQUEST_PENDING');
     const r = await this.prisma.verificationRequest.create({ data: { userId: u.id, kind: b.kind, fileIds: b.fileIds, listingId: b.listingId, details: b.details } });
     return { id: r.id, kind: r.kind, status: r.status, createdAt: r.createdAt };
   }
@@ -99,6 +104,6 @@ export class VerificationController {
   @Get('requests/mine')
   async mine(@CurrentUser() u: AuthUser) {
     const rows = await this.prisma.verificationRequest.findMany({ where: { userId: u.id }, orderBy: { createdAt: 'desc' } });
-    return rows.map((r) => ({ id: r.id, kind: r.kind, status: r.status, rejectReason: r.rejectReason, createdAt: r.createdAt }));
+    return rows.map((r) => ({ id: r.id, kind: r.kind, status: r.status, listingId: r.listingId, rejectReason: r.rejectReason, rejectNote: r.rejectNote, createdAt: r.createdAt, decidedAt: r.decidedAt }));
   }
 }

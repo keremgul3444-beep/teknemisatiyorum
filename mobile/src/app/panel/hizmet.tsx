@@ -101,6 +101,7 @@ export default function Hizmet() {
 function ApiPanel() {
   const { t } = useTranslation();
   const { data, reload } = useRemote(() => actions.myProviders());
+  const { data: reqs } = useRemote(() => actions.myVerificationRequests());
   const [editing, setEditing] = useState<'usta' | 'kaptan' | null>(null);
   if (!data) return <Screen><Header title={t('panel.title')} /></Screen>;
   const usta = data.find((p) => p.kind === 'usta');
@@ -129,12 +130,19 @@ function ApiPanel() {
             </View>
             <Button small variant="ghost" title={t('panel.edit')} onPress={() => setEditing(p.kind)} />
           </View>
-          {p.status === 'pending' ? (
-            <View style={{ gap: space(2) }}>
-              <T variant="caption" color={colors.muted}>{t('panel.pendingNote')}</T>
-              <Button small variant="secondary" icon="doc" title={t('panel.uploadDocs')} onPress={() => router.push('/verify/professional')} />
-            </View>
-          ) : null}
+          {p.status === 'pending' ? (() => {
+            // En yeni belge başvurusu: incelemedeyse bekler, reddedildiyse gerekçe ve yeniden yükleme.
+            const r = reqs?.find((x) => x.kind === p.kind);
+            if (r?.status === 'pending') return <T variant="caption" color={colors.muted}>{t('panel.docInReview')}</T>;
+            return (
+              <View style={{ gap: space(2) }}>
+                {r?.status === 'rejected'
+                  ? <T variant="caption" color={colors.danger}>{t('panel.docRejected', { reason: t(`mine.rejectReasons.${r.rejectReason ?? 'rules'}`) })}{r.rejectNote ? ` · ${r.rejectNote}` : ''}</T>
+                  : <T variant="caption" color={colors.muted}>{t('panel.pendingNote')}</T>}
+                <Button small variant="secondary" icon="doc" title={t('panel.uploadDocs')} onPress={() => router.push('/verify/professional')} />
+              </View>
+            );
+          })() : null}
         </Card>
       )) : null}
       {!editing && data.length && !usta ? <Button variant="ghost" title={t('panel.becomeUsta')} onPress={() => setEditing('usta')} /> : null}

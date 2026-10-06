@@ -8,7 +8,7 @@ export type ListingView = {
   photos: { id: string; url: string }[];
   seller: { id: string; name: string | null; since: number; companyName: string | null; verified?: boolean };
   /** Yalnızca ilan sahibine: red ve moderatörün kaldırma gerekçesi. */
-  rejectReason?: string | null; removedReason?: string | null; expiresAt?: string | null;
+  rejectReason?: string | null; rejectNote?: string | null; removedReason?: string | null; expiresAt?: string | null;
   logbook?: { count: number; latest: { id: string; title: string; date: string; kind: string; verified: boolean }[] } | null;
   promo: { featured: boolean; urgent: boolean; featuredUntil?: string; urgentUntil?: string };
   /** Son 30 günde indirim yapıldıysa önceki fiyat ve indirim anı. */

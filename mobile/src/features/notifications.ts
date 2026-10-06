@@ -11,7 +11,8 @@ export function notifTarget(key: string, params: Record<string, string> | null):
     case 'notif.reportReady': return '/ekspertiz';
     case 'notif.brokerAdvanced': return '/broker';
     case 'notif.listingExpiring': case 'notif.listingExpired': return '/profil/ilanlarim';
-    case 'notif.docApproved': case 'notif.docRejected': return '/profil';
+    case 'notif.docApproved': case 'notif.docRejected':
+      return p.kind === 'ruhsat' ? '/profil/ilanlarim' : p.kind === 'usta' || p.kind === 'kaptan' ? '/panel/hizmet' : '/profil';
     // 2. dalga: iş sahibi işi görür; usta ve kaptan hizmet paneline gider.
     case 'notif.newQuote': case 'notif.jobDelivered': case 'notif.autoReleased':
       return p.jobId ? `/is/${p.jobId}` : p.kind === 'job' && p.id ? `/is/${p.id}` : '/profil/islerim';

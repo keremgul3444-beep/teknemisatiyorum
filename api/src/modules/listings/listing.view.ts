@@ -41,12 +41,8 @@ export function priceDropOf(l: Pick<ListingRow, 'price' | 'currency' | 'priceHis
   return { previousPrice, at: h.at.toISOString() };
 }
 
-/**
- * Yalnızca fiyat değişikliği yayındaki ilanı onaya düşürmez, ama ölçüsüz değişiklik düşürür: onaydan sonra
- * fiyatı 1 TL'ye çekip yem ilan yapmak ya da iki katına çıkarıp sonra "indirim" göstermek denetimsiz olmasın.
- */
-export const PRICE_ONLY_RANGE = { min: 0.5, max: 1.5 } as const;
-export const priceNeedsReview = (from: number, to: number) => to < from * PRICE_ONLY_RANGE.min || to > from * PRICE_ONLY_RANGE.max;
+/** Ölçüsüz fiyat değişikliği onaya düşer; kural istemcilerle ortak (`shared/filter.ts`). */
+export { PRICE_ONLY_RANGE, priceNeedsReview } from '@tms/shared';
 
 /** İstemciye dönen ilan görünümü. Satıcının iletişim bilgisi bilerek yoktur; iletişim uygulama içi mesajla. */
 export type ListingStats = { views: number; favorites: number; messages: number };
@@ -61,6 +57,7 @@ export function listingView(l: ListingRow, viewerId?: string, companyName?: stri
     cabins: l.cabins, engine: l.engine, description: l.description, descriptionEn: l.descriptionEn ?? null, videoUrl: l.videoUrl ?? null,
     engineHours: l.engineHours, flag: l.flag, tradeIn: l.tradeIn, negotiable: l.negotiable,
     status: l.status, badges: l.badges, rejectReason: viewerId === l.ownerId ? l.rejectReason : undefined,
+    rejectNote: viewerId === l.ownerId ? l.rejectNote : undefined,
     removedReason: viewerId === l.ownerId ? l.removedReason : undefined,
     /** Yayın bitişi yalnızca sahibine (ne zaman yenileyeceğini bilsin). */
     expiresAt: viewerId === l.ownerId ? l.expiresAt?.toISOString() ?? null : undefined,

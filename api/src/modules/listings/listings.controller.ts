@@ -68,7 +68,8 @@ const patchSchema = draftSchema.partial().extend({
   companyId: z.string().nullable().optional(),
 });
 /** Onaydan geçmiş (ya da reddedilmiş) içerik: değişirse ilan yeniden onaya düşer. Süresi dolan da onaylıdır; düzenlenip yenilenirse denetimsiz yayına çıkmasın. */
-const REVIEWED: string[] = ['published', 'rejected', 'expired'];
+// Reddedilen ilan düzenlenince reddedilmiş kalır; satıcı /submit ile gönderir (seviye ve fotoğraf denetimi orada).
+const REVIEWED: string[] = ['published', 'expired'];
 /** Bu alanlardan biri değişirse ilan başka bir tekneyi anlatıyor olabilir. */
 const IDENTITY_FIELDS = ['brand', 'model', 'year', 'lengthM', 'boatId'] as const;
 /** Tekneye bağlı (belge/ekspertizle kazanılan) rozetler; satıcının kendi beyanına dayananlar değil. */
@@ -293,7 +294,7 @@ export class ListingsController {
     const l = await this.listings.getOwn(id, u.id);
     if (!['draft', 'rejected'].includes(l.status)) throw Errors.conflict('LISTING_NOT_DRAFT');
     if (l.photos.length === 0) throw Errors.bad('PHOTO_REQUIRED');
-    const updated = await this.prisma.listing.update({ where: { id }, data: { status: 'pending', rejectReason: null }, include: listingInclude });
+    const updated = await this.prisma.listing.update({ where: { id }, data: { status: 'pending', rejectReason: null, rejectNote: null }, include: listingInclude });
     await this.audit.log(u.id, 'audit.listingSubmitted', { title: `${l.brand} ${l.model}` }, 'listing', id);
     return this.listings.view(updated, u.id);
   }
@@ -303,7 +304,8 @@ export class ListingsController {
   @HttpCode(200)
   async sold(@CurrentUser() u: AuthUser, @Param('id') id: string) {
     const l = await this.listings.getOwn(id, u.id);
-    if (l.status !== 'published') throw Errors.conflict('LISTING_NOT_PUBLISHED');
+    // Süresi dolmuş ilan da satıldı işaretlenebilir (tekne yayın bittikten sonra satılmış olabilir).
+    if (!['published', 'expired'].includes(l.status)) throw Errors.conflict('LISTING_NOT_PUBLISHED');
     const updated = await this.prisma.listing.update({ where: { id }, data: { status: 'sold' }, include: listingInclude });
     await this.audit.log(u.id, 'audit.listingSold', { title: `${l.brand} ${l.model}` }, 'listing', id);
     return this.listings.view(updated, u.id);

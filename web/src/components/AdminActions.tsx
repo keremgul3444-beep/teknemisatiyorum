@@ -27,14 +27,18 @@ const Err = ({ text }: { text: string }) => (text ? <p className="small" role="a
 export function ListingDecision({ id, version, L, reasons, errors }: { id: string; version: string; L: Dict; reasons: Dict; errors: Dict }) {
   const a = useAction(errors);
   const [rejecting, setRejecting] = useState(false);
+  const [note, setNote] = useState('');
   return (
     <div style={{ display: 'grid', gap: 8 }}>
       {rejecting ? (
-        <div className="row">
-          {Object.entries(reasons).map(([k, label]) => (
-            <button key={k} type="button" className="btn ghost" disabled={a.busy} onClick={() => void a.run(`listings/${id}/decision`, { decision: 'reject', reason: k, version })}>{label}</button>
-          ))}
-          <button type="button" className="linklike" onClick={() => setRejecting(false)}>{L.cancel}</button>
+        <div style={{ display: 'grid', gap: 8 }}>
+          <input className="input" aria-label={L.rejectNote} placeholder={L.rejectNote} value={note} maxLength={300} onChange={(e) => setNote(e.target.value)} />
+          <div className="row">
+            {Object.entries(reasons).map(([k, label]) => (
+              <button key={k} type="button" className="btn ghost" disabled={a.busy} onClick={() => void a.run(`listings/${id}/decision`, { decision: 'reject', reason: k, version, note })}>{label}</button>
+            ))}
+            <button type="button" className="linklike" onClick={() => setRejecting(false)}>{L.cancel}</button>
+          </div>
         </div>
       ) : (
         <div className="row">
@@ -51,12 +55,14 @@ export function ListingDecision({ id, version, L, reasons, errors }: { id: strin
 export function DocDecision({ id, L, reasons, errors }: { id: string; L: Dict; reasons: Dict; errors: Dict }) {
   const a = useAction(errors);
   const [rejecting, setRejecting] = useState(false);
+  const [note, setNote] = useState('');
   return (
     <div style={{ display: 'grid', gap: 8 }}>
+      {rejecting ? <input className="input" aria-label={L.rejectNote} placeholder={L.rejectNote} value={note} maxLength={300} onChange={(e) => setNote(e.target.value)} /> : null}
       <div className="row">
         {rejecting
           ? Object.entries(reasons).map(([k, label]) => (
-            <button key={k} type="button" className="btn ghost" disabled={a.busy} onClick={() => void a.run(`verifications/${id}/decision`, { decision: 'reject', reason: k })}>{label}</button>
+            <button key={k} type="button" className="btn ghost" disabled={a.busy} onClick={() => void a.run(`verifications/${id}/decision`, { decision: 'reject', reason: k, note })}>{label}</button>
           ))
           : <>
             <button type="button" className="btn" disabled={a.busy} onClick={() => void a.run(`verifications/${id}/decision`, { decision: 'approve' })}>{L.approve}</button>

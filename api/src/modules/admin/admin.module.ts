@@ -20,9 +20,11 @@ import { reportError } from '../../adapters/error-report';
 import { ModerationController } from './moderation.controller';
 
 const STAFF = { roles: ['moderator', 'admin'] as ('moderator' | 'admin')[] };
+/** Red notu: satıcıya neyi düzelteceğini söyleyen serbest metin (gerekçe koduna ek). */
+const rejectNote = z.string().trim().max(300).optional().transform((s) => s || undefined);
 const decisionBody = z.discriminatedUnion('decision', [
   z.object({ decision: z.literal('approve') }),
-  z.object({ decision: z.literal('reject'), reason: z.enum(['blurry', 'mismatch', 'rules']) }),
+  z.object({ decision: z.literal('reject'), reason: z.enum(['blurry', 'mismatch', 'rules']), note: rejectNote }),
 ]);
 /**
  * İlan kararı, moderatörün gördüğü sürüme bağlanır (`version` = kuyruktaki `updatedAt`). Satıcı o arada ilanı
@@ -30,7 +32,7 @@ const decisionBody = z.discriminatedUnion('decision', [
  */
 const listingDecisionBody = z.discriminatedUnion('decision', [
   z.object({ decision: z.literal('approve'), version: z.string().max(40).optional() }),
-  z.object({ decision: z.literal('reject'), reason: z.enum(['blurry', 'mismatch', 'rules']), version: z.string().max(40).optional() }),
+  z.object({ decision: z.literal('reject'), reason: z.enum(['blurry', 'mismatch', 'rules']), note: rejectNote, version: z.string().max(40).optional() }),
 ]);
 const listingChanged = () => new AppError('LISTING_CHANGED', 'errors.listing_changed', 409);
 const versionRequired = () => new AppError('VERSION_REQUIRED', 'errors.version_required', 400);
@@ -113,9 +115,14 @@ class AdminController {
     if (b.version !== l.updatedAt.toISOString()) throw listingChanged();
     // Yarış güvenliği: yalnızca hâlâ bekleyen ve moderatörün gördüğü sürümdeki ilan için karar yazılır.
     const approve = b.decision === 'approve';
+    // Düzenleme sonrası yeniden onay: ilk yayın tarihi ve süresi korunur (düzenleme ücretsiz "üste taşı" ya da yenileme olmasın).
+    const now = new Date();
+    const keep = !!l.publishedAt && !!l.expiresAt && l.expiresAt > now;
     const r = await this.prisma.listing.updateMany({
       where: { id, status: 'pending', updatedAt: l.updatedAt },
-      data: approve ? { status: 'published', publishedAt: new Date(), expiresAt: nextExpiry(), expiryWarnedAt: null, rejectReason: null } : { status: 'rejected', rejectReason: b.reason },
+      data: approve
+        ? { status: 'published', publishedAt: keep ? l.publishedAt : now, expiresAt: keep ? l.expiresAt : nextExpiry(), ...(keep ? {} : { expiryWarnedAt: null }), rejectReason: null, rejectNote: null }
+        : { status: 'rejected', rejectReason: b.reason, rejectNote: b.note ?? null },
     });
     if (!r.count) {
       // Başka moderatör aynı anda karar verdiyse "zaten karar verildi", satıcı değiştirdiyse "ilan değişti".
@@ -147,7 +154,7 @@ class AdminController {
     await this.prisma.$transaction(async (tx) => {
       const r = await tx.verificationRequest.updateMany({
         where: { id, status: 'pending' },
-        data: { status: approve ? 'approved' : 'rejected', rejectReason: approve ? null : b.reason, reviewedById: u.id, decidedAt: new Date() },
+        data: { status: approve ? 'approved' : 'rejected', rejectReason: approve ? null : b.reason, rejectNote: approve ? null : b.note ?? null, reviewedById: u.id, decidedAt: new Date() },
       });
       if (!r.count) throw alreadyDecided();
       if (!approve) return;

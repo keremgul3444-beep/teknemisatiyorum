@@ -142,8 +142,8 @@ export function SellWizard({ L, err, errors, types, equipment, verified, doneHre
         const ids = await uploadAll();
         setProgress(L.sending);
         if (JSON.stringify(ids) !== JSON.stringify(edit.photos.map((p) => p.id))) await post(`/api/sell/${edit.id}/photos`, json({ fileIds: ids }, 'PUT'));
-        // Reddedilmiş ilan düzeltildi: yeniden onaya gönderilir (zaten onaydaysa sunucu 409 döner, sorun değil).
-        if (edit.status === 'rejected') await post(`/api/sell/${edit.id}/submit`, { method: 'POST' }).catch(() => null);
+        // Reddedilmiş ilan düzeltildi ya da yarım kalmış taslak tamamlandı: onaya gönderilir (zaten onaydaysa sunucu 409 döner, sorun değil).
+        if (edit.status === 'rejected' || edit.status === 'draft') await post(`/api/sell/${edit.id}/submit`, { method: 'POST' }).catch(() => null);
         setDone(true);
         return;
       }

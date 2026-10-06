@@ -635,7 +635,9 @@
     "import_limit": "Bugünlük toplu yükleme sınırına ulaştın.",
     "import_too_many": "Tek seferde en fazla {{max}} satır yüklenebilir.",
     "lead_limit": "Bugünlük teklif talebi sınırına ulaştın.",
-    "phone_required": "Bu işlem için hesabında telefon numarası olmalı."
+    "phone_required": "Bu işlem için hesabında telefon numarası olmalı.",
+    "listing_required": "Ruhsat bir ilana bağlı yüklenir.",
+    "request_pending": "Bu konuda incelenmeyi bekleyen bir başvurun var."
   },
   "login": {
     "title": "Giriş yap",
@@ -745,7 +747,15 @@
     "whatsapp": "WhatsApp'tan yaz",
     "sharePhone": "Numaramı paylaş",
     "sharePhoneConfirm": "Telefon numaran yalnızca bu kişiye gösterilecek.",
-    "phoneShared": "Telefon numaran bu sohbette paylaşıldı."
+    "phoneShared": "Telefon numaran bu sohbette paylaşıldı.",
+    "markSold": "Satıldı",
+    "withdraw": "Yayından kaldır",
+    "soldConfirm": "İlan satıldı olarak işaretlenecek; bu geri alınamaz.",
+    "withdrawConfirm": "İlan yayından kaldırılacak; bu geri alınamaz.",
+    "promoWarn": "Kalan öne çıkarma süresi iade edilmez.",
+    "rejectNote": "Moderatör notu: {{note}}",
+    "docPending": "Ruhsat incelemede.",
+    "docRejected": "Ruhsat onaylanmadı. {{reason}}"
   },
   "pay": {
     "devTitle": "Deneme ödemesi",
@@ -1002,7 +1012,8 @@
     "forward": "İletildi olarak işaretle",
     "close": "Kapat",
     "noLeads": "Talep yok.",
-    "revealPhone": "Numarayı göster"
+    "revealPhone": "Numarayı göster",
+    "rejectNote": "Satıcıya not (isteğe bağlı): neyi düzeltmeli?"
   },
   "audit": {
     "listingApproved": "İlan onaylandı: {{title}}",

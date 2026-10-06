@@ -878,7 +878,9 @@
     "payBooking": "Öde",
     "completeBooking": "Kiralama tamamlandı",
     "refunded": "İade edildi",
-    "autoRelease": "Sorun bildirmezsen ödeme {{date}} tarihinde kaptana aktarılır."
+    "autoRelease": "Sorun bildirmezsen ödeme {{date}} tarihinde kaptana aktarılır.",
+    "priceReviewHint": "Bu kadar büyük fiyat değişikliği yeniden onaya gider; onaylanana kadar ilan yayında görünmez.",
+    "rejectNote": "Moderatör notu: {{note}}"
   },
   "settings": {
     "title": "Ayarlar",
@@ -993,7 +995,9 @@
       "cancelled": "İptal"
     },
     "markDelivered": "İşi bitirdim",
-    "delivered": "Bitti bildirildi; müşteri onayı ya da süre sonu bekleniyor"
+    "delivered": "Bitti bildirildi; müşteri onayı ya da süre sonu bekleniyor",
+    "docInReview": "Belgen incelemede; onaylanınca profilin listede görünür.",
+    "docRejected": "Belge onaylanmadı. {{reason}}"
   },
   "corporate": {
     "title": "Firma paneli",
@@ -1298,7 +1302,9 @@
     "import_limit": "Bugünlük toplu yükleme sınırına ulaştın.",
     "import_too_many": "Tek seferde en fazla {{max}} satır yüklenebilir.",
     "lead_limit": "Bugünlük teklif talebi sınırına ulaştın.",
-    "phone_required": "Bu işlem için hesabında telefon numarası olmalı."
+    "phone_required": "Bu işlem için hesabında telefon numarası olmalı.",
+    "listing_required": "Ruhsat bir ilana bağlı yüklenir.",
+    "request_pending": "Bu konuda incelenmeyi bekleyen bir başvurun var."
   },
   "soon": {
     "title": "Yakında",

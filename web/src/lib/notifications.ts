@@ -12,7 +12,8 @@ export function webNotifTarget(key: string, params: Record<string, string> | nul
       return p.listingId ? `/ilan/${p.listingId}` : null;
     case 'notif.listingRejected': case 'notif.listingRemoved': case 'notif.listingExpiring': case 'notif.listingExpired':
       return '/hesabim/ilanlar';
-    case 'notif.docApproved': case 'notif.docRejected': return '/hesabim/ilanlar';
+    // Ruhsat ilana bağlı; kimlik ve usta/kaptan belgesi hesabın kendisine.
+    case 'notif.docApproved': case 'notif.docRejected': return p.kind === 'ruhsat' ? '/hesabim/ilanlar' : '/hesabim';
     default: return null;
   }
 }

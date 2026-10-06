@@ -7,7 +7,7 @@ import {
   BoatImage, Button, CheckRow, Chip, Field, Header, Icon, ListingCard, NotFound, Screen, Section, Stepper, SuccessView, T, UploadBox,
 } from '@/components';
 import { actions, useListing, type BoatType, type Currency, type Equipment, type Listing } from '@/services';
-import { FLAGS, LOCATIONS, MAX_ENGINE_HOURS } from '@tms/shared';
+import { FLAGS, LOCATIONS, MAX_ENGINE_HOURS, priceNeedsReview } from '@tms/shared';
 import { requireLevel, useSession } from '@/session/role';
 import { isApiMode } from '@/services';
 import { attempt } from '@/services/errors';
@@ -159,7 +159,9 @@ export default function IlanVer() {
   // Düzenleme: yalnızca değişen alanlar; fiyat dışında değişiklik ya da fotoğraf değişikliği yayındaki ilanı onaya düşürür.
   const changes = origin ? draftChanges(toDraft(origin), draft) : {};
   const photosDirty = origin ? photosChanged(origin.photos, s.photos) : false;
-  const priceOnly = Object.keys(changes).length > 0 && Object.keys(changes).every((k) => k === 'price') && !photosDirty;
+  // Sunucuyla aynı kural: ölçüsüz fiyat değişikliği (yarısının altı, bir buçuk katının üstü) onaya düşer.
+  const priceOnly = Object.keys(changes).length > 0 && Object.keys(changes).every((k) => k === 'price') && !photosDirty
+    && !(editing && changes.price !== undefined && priceNeedsReview(editing.price, changes.price));
   const editNeedsReview = isEdit && editing?.status === 'yayinda' && (photosDirty || (Object.keys(changes).length > 0 && !priceOnly));
   const save = async () => {
     if (!editId) return;

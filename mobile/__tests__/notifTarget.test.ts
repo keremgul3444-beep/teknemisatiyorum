@@ -6,6 +6,8 @@ test('bildirim ilgili ekrana götürür', () => {
   expect(notifTarget('notif.listingRejected', { listingId: 'l1' })).toBe('/profil/ilanlarim');
   expect(notifTarget('notif.reportReady', {})).toBe('/ekspertiz');
   expect(notifTarget('notif.docApproved', null)).toBe('/profil');
+  expect(notifTarget('notif.docRejected', { kind: 'ruhsat' })).toBe('/profil/ilanlarim');
+  expect(notifTarget('notif.docRejected', { kind: 'usta' })).toBe('/panel/hizmet');
   expect(notifTarget('notif.unknown', null)).toBeNull();
 });
 

@@ -57,3 +57,10 @@ export interface MatchableListing {
   location: string; equipment: Equipment[]; status: string;
   engineHours?: number | null; flag?: string | null; tradeIn?: boolean; negotiable?: boolean;
 }
+
+/**
+ * Yalnızca fiyat değişikliği yayındaki ilanı onaya düşürmez, ama ölçüsüz değişiklik düşürür: onaydan sonra
+ * fiyatı 1 TL'ye çekip yem ilan yapmak ya da iki katına çıkarıp sonra "indirim" göstermek denetimsiz olmasın.
+ */
+export const PRICE_ONLY_RANGE = { min: 0.5, max: 1.5 } as const;
+export const priceNeedsReview = (from: number, to: number) => to < from * PRICE_ONLY_RANGE.min || to > from * PRICE_ONLY_RANGE.max;

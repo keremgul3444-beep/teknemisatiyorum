@@ -878,7 +878,9 @@
     "payBooking": "Pay",
     "completeBooking": "Charter completed",
     "refunded": "Refunded",
-    "autoRelease": "If you don’t report a problem, the payment is released to the captain on {{date}}."
+    "autoRelease": "If you don’t report a problem, the payment is released to the captain on {{date}}.",
+    "priceReviewHint": "A price change this large goes back to review; the listing is hidden until approved.",
+    "rejectNote": "Moderator note: {{note}}"
   },
   "settings": {
     "title": "Settings",
@@ -993,7 +995,9 @@
       "cancelled": "Cancelled"
     },
     "markDelivered": "Job done",
-    "delivered": "Marked done; waiting for customer confirmation or the deadline"
+    "delivered": "Marked done; waiting for customer confirmation or the deadline",
+    "docInReview": "Your document is under review; your profile goes live once approved.",
+    "docRejected": "Document not approved. {{reason}}"
   },
   "corporate": {
     "title": "Company panel",
@@ -1298,7 +1302,9 @@
     "import_limit": "You have reached today's bulk import limit.",
     "import_too_many": "At most {{max}} rows can be imported at once.",
     "lead_limit": "You have reached today's quote request limit.",
-    "phone_required": "A phone number is required on your account for this."
+    "phone_required": "A phone number is required on your account for this.",
+    "listing_required": "A registration document must belong to a listing.",
+    "request_pending": "You already have a request waiting for review."
   },
   "soon": {
     "title": "Coming soon",

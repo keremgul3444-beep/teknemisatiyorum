@@ -165,3 +165,42 @@ export function RenewButton({ listingId, label, errors }: { listingId: string; l
     </div>
   );
 }
+
+/** İlanlarım: satıldı / yayından kaldır; ikisi de geri alınamaz, ikinci dokunuşla onaylanır. Öne çıkarma süresi varsa uyarır. */
+export function ListingManage({ listingId, canSell, promoActive, labels, errors }: {
+  listingId: string; canSell: boolean; promoActive: boolean; errors: Record<string, string>;
+  labels: { sold: string; withdraw: string; soldConfirm: string; withdrawConfirm: string; promoWarn: string; cancel: string };
+}) {
+  const router = useRouter();
+  const [sure, setSure] = useState<'sold' | 'withdraw' | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const go = async (action: 'sold' | 'withdraw') => {
+    setBusy(true); setError('');
+    const r = await fetch(`/api/listings/${encodeURIComponent(listingId)}/act`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action }) }).catch(() => null);
+    const j = r ? await r.json().catch(() => ({})) : {};
+    setBusy(false);
+    if (!r?.ok) { setError(errors[String(j.messageKey ?? '').replace(/^errors\./, '')] ?? errors.generic); return; }
+    setSure(null);
+    router.refresh();
+  };
+  return (
+    <div style={{ display: 'grid', gap: 6, justifyItems: 'end' }}>
+      {sure ? (
+        <>
+          <p className="small" style={{ margin: 0, textAlign: 'right' }}>{sure === 'sold' ? labels.soldConfirm : labels.withdrawConfirm}{promoActive ? ` ${labels.promoWarn}` : ''}</p>
+          <div className="row small">
+            <button type="button" className="btn ghost" disabled={busy} onClick={() => void go(sure)}>{sure === 'sold' ? labels.sold : labels.withdraw}</button>
+            <button type="button" className="linklike" onClick={() => setSure(null)}>{labels.cancel}</button>
+          </div>
+        </>
+      ) : (
+        <div className="row small">
+          {canSell ? <button type="button" className="linklike" onClick={() => setSure('sold')}>{labels.sold}</button> : null}
+          <button type="button" className="linklike" onClick={() => setSure('withdraw')}>{labels.withdraw}</button>
+        </div>
+      )}
+      {error ? <p className="small" role="alert" style={{ color: 'var(--c-danger)', margin: 0 }}>{error}</p> : null}
+    </div>
+  );
+}

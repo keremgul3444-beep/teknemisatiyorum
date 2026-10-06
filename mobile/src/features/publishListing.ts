@@ -69,7 +69,12 @@ export function createPublisher(deps: Deps) {
       const fileIds = [await deps.upload(extra.ownershipUri, 'private')];
       if (extra.engineDocUri) fileIds.push(await deps.upload(extra.engineDocUri, 'private'));
       const details = extra.engineSerialLast4 ? { engineSerialLast4: extra.engineSerialLast4 } : undefined;
-      await deps.post('/verification/requests', { kind: 'ruhsat', fileIds, listingId: id, ...(details ? { details } : {}) });
+      try {
+        await deps.post('/verification/requests', { kind: 'ruhsat', fileIds, listingId: id, ...(details ? { details } : {}) });
+      } catch (e) {
+        // Önceki denemede başvuru ulaşmışsa (bekleyen başvuru var, 409) yeniden açılmaz.
+        if ((e as { status?: number }).status !== 409) throw e;
+      }
       st.ownership = true;
     }
     if (extra.broker && !st.broker) {
