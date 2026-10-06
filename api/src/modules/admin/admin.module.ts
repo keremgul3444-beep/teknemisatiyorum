@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, Module, Param, Post, Query } from '@nestjs/common';
 import { z } from 'zod';
-import type { Prisma } from '@prisma/client';
+import type { Listing, ListingPhoto, Prisma } from '@prisma/client';
 import { maskPhone } from '@tms/shared';
 import { Auth, CurrentUser, type AuthUser } from '../../common/decorators';
 import { ZodPipe } from '../../common/zod.pipe';
@@ -22,6 +22,8 @@ import { ModerationController } from './moderation.controller';
 import { AdminToolsController } from './admin-tools.controller';
 import { changedFields, listingSnapshot } from './snapshot';
 import { normalizePhone } from '../auth/phone';
+import { BOAT_BOUND_BADGES, CLEAR_PENDING, IDENTITY_FIELDS, effective, pendingFields, type PendingChanges } from '../listings/pending-edit';
+import { listingInclude } from '../listings/listing.view';
 
 const STAFF = { roles: ['moderator', 'admin'] as ('moderator' | 'admin')[] };
 /** Red notu: satıcıya neyi düzelteceğini söyleyen serbest metin (gerekçe koduna ek). */
@@ -64,7 +66,7 @@ class AdminController {
   async overview() {
     const [activeListings, pendingListings, pendingVerifications, openBroker, pendingReports, users7d, openListingReports, openDisputes, newLeads, oldestListing, oldestDoc, oldestReport] = await Promise.all([
       this.prisma.listing.count({ where: { status: 'published' } }),
-      this.prisma.listing.count({ where: { status: 'pending' } }),
+      this.prisma.listing.count({ where: { OR: [{ status: 'pending' }, { status: 'published', pendingAt: { not: null } }] } }),
       this.prisma.verificationRequest.count({ where: { status: 'pending' } }),
       this.prisma.brokerCase.count({ where: { step: { lt: 4 } } }),
       this.prisma.expertiseBooking.count({ where: { reportStatus: 'pending' } }),
@@ -72,7 +74,7 @@ class AdminController {
       this.prisma.listingReport.count({ where: { status: 'open' } }),
       this.prisma.servicePayment.count({ where: { status: 'held', disputedAt: { not: null } } }),
       this.prisma.leadRequest.count({ where: { status: 'new' } }),
-      this.prisma.listing.findFirst({ where: { status: 'pending' }, orderBy: { updatedAt: 'asc' }, select: { updatedAt: true } }),
+      this.prisma.listing.findFirst({ where: { OR: [{ status: 'pending' }, { status: 'published', pendingAt: { not: null } }] }, orderBy: { updatedAt: 'asc' }, select: { updatedAt: true } }),
       this.prisma.verificationRequest.findFirst({ where: { status: 'pending' }, orderBy: { createdAt: 'asc' }, select: { createdAt: true } }),
       this.prisma.listingReport.findFirst({ where: { status: 'open' }, orderBy: { createdAt: 'asc' }, select: { createdAt: true } }),
     ]);
@@ -93,9 +95,10 @@ class AdminController {
       return rows.map((r) => ({ ...r, userName: users.find((x) => x.id === r.userId)?.name ?? null }));
     }
     const rows = await this.prisma.listing.findMany({
-      where: { status: 'pending' }, orderBy: { updatedAt: 'asc' },
+      // Yeni ilanlar ve yayındaki ilanların bekleyen düzenlemeleri (ilan onaylı hâliyle yayında kalır).
+      where: { OR: [{ status: 'pending' }, { status: 'published', pendingAt: { not: null } }] }, orderBy: { updatedAt: 'asc' }, take: 200,
       include: { owner: { select: { name: true, verifyLevel: true } }, photos: true },
-    });
+    }).then((xs) => xs.map((x) => ({ ...effective(x), editOf: x.status === 'published' ? x : null })));
     // Yeniden gönderilen ilanda önceki red gerekçesi (ilanda gönderimde silinir; kayıt denetim günlüğünde kalır).
     const rejections = await this.prisma.auditLog.findMany({
       where: { action: 'audit.listingRejected', targetType: 'listing', targetId: { in: rows.map((l) => l.id) } }, orderBy: { at: 'desc' },
@@ -106,7 +109,9 @@ class AdminController {
     return rows.map((l) => ({
       previousRejectReason: previousReason(l.id),
       /** Daha önce onaylanmış ilanın düzenlemesi: değişen alanlar (null = ilk inceleme). */
-      changed: changedFields(l.approvedSnapshot, listingSnapshot(l, [...l.photos].sort((a, b) => a.order - b.order).map((p) => p.fileId))),
+      changed: l.editOf ? pendingFields(l.editOf) : changedFields(l.approvedSnapshot, listingSnapshot(l, [...l.photos].sort((a, b) => a.order - b.order).map((p) => p.fileId))),
+      /** Yayındaki ilanın düzenlemesi: onaylanana kadar eski hâli yayında. */
+      liveEdit: !!l.editOf,
       /** Aynı fotoğrafın kullanıldığı diğer ilanlar (başka satıcıda: çalıntı şüphesi; aynı satıcıda: mükerrer ilan). */
       photoDuplicates: dups.get(l.id) ?? [],
       id: l.id, title: `${l.brand} ${l.model}`, year: l.year, price: l.price, currency: l.currency, ownerName: l.owner.name,
@@ -126,9 +131,11 @@ class AdminController {
     const l = await this.prisma.listing.findUnique({ where: { id }, include: { photos: { orderBy: { order: 'asc' } } } });
     if (!l) throw Errors.notFound();
     if (l.ownerId === u.id) throw selfDecision();
-    if (l.status !== 'pending') throw alreadyDecided();
+    const liveEdit = l.status === 'published' && !!l.pendingAt;
+    if (l.status !== 'pending' && !liveEdit) throw alreadyDecided();
     if (!b.version) throw versionRequired();
     if (b.version !== l.updatedAt.toISOString()) throw listingChanged();
+    if (liveEdit) return this.decideEdit(u, l, b);
     // Yarış güvenliği: yalnızca hâlâ bekleyen ve moderatörün gördüğü sürümdeki ilan için karar yazılır.
     const approve = b.decision === 'approve';
     // Düzenleme sonrası yeniden onay: ilk yayın tarihi ve süresi korunur (düzenleme ücretsiz "üste taşı" ya da yenileme olmasın).
@@ -158,6 +165,47 @@ class AdminController {
     await this.audit.log(u.id, approve ? 'audit.listingApproved' : 'audit.listingRejected',
       { title, version: b.version, price: `${l.price} ${l.currency}`, ...(approve ? {} : { reason: b.reason ?? '' }) }, 'listing', id);
     return { id, status: approve ? 'published' : 'rejected' };
+  }
+
+  /**
+   * Yayındaki ilanın bekleyen düzenlemesi: onayda değişiklik uygulanır (fotoğraflar, fiyat geçmişi, rozet düşmesi,
+   * İngilizce çeviri), retle düzenleme atılır ve ilan onaylı hâliyle yayında kalır. İkisinde de sahibine haber gider.
+   */
+  private async decideEdit(u: AuthUser, l: Listing & { photos: ListingPhoto[] }, b: z.infer<typeof listingDecisionBody>) {
+    const approve = b.decision === 'approve';
+    const changes = (l.pendingChanges as PendingChanges | null) ?? {};
+    const title = `${l.brand} ${l.model}`;
+    const guard = { id: l.id, status: 'published' as const, updatedAt: l.updatedAt };
+    const priceChanged = changes.price !== undefined && changes.price !== l.price;
+    await this.prisma.$transaction(async (tx) => {
+      let data: Prisma.ListingUncheckedUpdateManyInput;
+      if (approve) {
+        const eff = effective(l);
+        const identityChanged = IDENTITY_FIELDS.some((k) => changes[k] !== undefined && changes[k] !== l[k]);
+        data = {
+          ...changes, ...CLEAR_PENDING, rejectReason: null, rejectNote: null,
+          ...(identityChanged ? { badges: l.badges.filter((x) => !BOAT_BOUND_BADGES.includes(x)) } : {}),
+          ...(changes.description !== undefined && changes.description !== l.description ? { descriptionEn: null } : {}),
+          approvedSnapshot: listingSnapshot(eff, eff.photos.map((p) => p.fileId)) as Prisma.InputJsonValue,
+        };
+      } else data = { ...CLEAR_PENDING, rejectReason: b.reason, rejectNote: b.note ?? null };
+      const r = await tx.listing.updateMany({ where: guard, data });
+      if (!r.count) throw listingChanged();
+      if (approve && l.pendingPhotoIds.length) {
+        await tx.listingPhoto.deleteMany({ where: { listingId: l.id } });
+        await tx.listingPhoto.createMany({ data: l.pendingPhotoIds.map((fileId, order) => ({ listingId: l.id, fileId, order })) });
+      }
+      if (approve && priceChanged) await tx.priceHistory.create({ data: { listingId: l.id, price: l.price, currency: l.currency } });
+    });
+    await this.notifications.push(l.ownerId, approve ? 'notif.editApproved' : 'notif.editRejected', { title, listingId: l.id, ...(approve ? {} : { reason: b.reason }) });
+    if (approve) {
+      const row = await this.prisma.listing.findUniqueOrThrow({ where: { id: l.id }, include: listingInclude });
+      if (priceChanged && changes.price! < l.price) await this.listings.notifyPriceDrop(row);
+      if (changes.description !== undefined) this.texts.translateListing(l.id).catch((e) => void reportError(e, { job: 'translate' }));
+    }
+    await this.audit.log(u.id, approve ? 'audit.listingApproved' : 'audit.listingRejected',
+      { title, version: b.version ?? '', price: `${l.price} ${l.currency}`, edit: '1', ...(approve ? {} : { reason: b.reason }) }, 'listing', l.id);
+    return { id: l.id, status: 'published', edit: approve ? 'applied' : 'discarded' };
   }
 
   /** Belge onayı etkileri: kimlik → seviye 2, mesleki belge → seviye 3, ruhsat → ilana "sahiplik" rozeti (+ motor seri no fotoğrafı da varsa "belge"). */

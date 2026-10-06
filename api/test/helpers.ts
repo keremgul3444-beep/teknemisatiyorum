@@ -38,3 +38,11 @@ export function randomTckn() {
   d.push(d.reduce((a, b) => a + b, 0) % 10);
   return d.join('');
 }
+
+/** Yayındaki ilanın bekleyen düzenlemesini bir moderatörle onaylar (ilan sütunları ancak onayda değişir). */
+export async function approveEdit(t: TestApp, listingId: string) {
+  const mod = await loginAs(t, { level: 3, roles: ['moderator'] });
+  const l = await t.prisma.listing.findUniqueOrThrow({ where: { id: listingId } });
+  const r = await t.http().post(`/admin/listings/${listingId}/decision`).set(mod.auth).send({ decision: 'approve', version: l.updatedAt.toISOString() });
+  if (r.status !== 200) throw new Error(`approveEdit ${r.status} ${JSON.stringify(r.body)}`);
+}

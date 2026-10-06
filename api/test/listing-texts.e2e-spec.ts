@@ -1,5 +1,5 @@
 import { createTestApp, type TestApp } from './setup';
-import { loginAs } from './helpers';
+import { approveEdit, loginAs } from './helpers';
 import { resetEnvCache } from '../src/config/env';
 import { LISTING_WRITER, type ListingFacts } from '../src/adapters/listing-writer';
 import { DESCRIBE_PER_DAY, ListingTexts } from '../src/modules/listings/listing-writer.service';
@@ -54,6 +54,10 @@ test('onaylanan ilanın İngilizce açıklaması üretilir; açıklama değişin
   await t.http().post(`/admin/listings/${l.id}/decision`).set(mod.auth).send({ decision: 'approve', version: l.updatedAt.toISOString() }).expect(200);
   await new Promise((ok) => setTimeout(ok, 300));
   expect((await t.http().get(`/listings/${l.id}`)).body.descriptionEn).toBe('EN: Bakımlı tekne.');
+  // Düzenleme onay beklerken yayındaki açıklama ve çevirisi değişmez; onayda çeviri yenilenir.
   await t.http().patch(`/listings/${l.id}`).set(seller.auth).send({ description: 'Yeni boya yapıldı.' }).expect(200);
-  expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } })).descriptionEn).toBeNull();
+  expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } })).descriptionEn).toBe('EN: Bakımlı tekne.');
+  await approveEdit(t, l.id);
+  await new Promise((ok) => setTimeout(ok, 300));
+  expect((await t.http().get(`/listings/${l.id}`)).body.descriptionEn).toBe('EN: Yeni boya yapıldı.');
 });

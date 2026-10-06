@@ -45,6 +45,30 @@ describe('satıcı akışları', () => {
     expect(after.expiresAt?.getTime()).toBe(expiresAt.getTime());
   });
 
+  test('yayındaki ilanın düzenlemesi ayrı bekler: ilan yayında kalır, retle düzenleme atılır, onayla uygulanır', async () => {
+    const s = await loginAs(t, { level: 2 });
+    const l = await t.prisma.listing.create({ data: { ...base, ownerId: s.user.id, status: 'published', publishedAt: new Date(), expiresAt: new Date(Date.now() + 60 * 864e5) } });
+    const r = await t.http().patch(`/listings/${l.id}`).set(s.auth).send({ description: 'Tel: 0532 000 00 00', cabins: 4 });
+    expect(r.body).toMatchObject({ status: 'published', pendingEdit: true, description: 'Tel: 0532 000 00 00', cabins: 4 });
+    const pub = (await t.http().get(`/listings/${l.id}`)).body;
+    expect(pub).toMatchObject({ description: 'Temiz.', cabins: 3 });
+    expect(pub.pendingEdit).toBeUndefined();
+    const m = await moderator();
+    const q = (await t.http().get('/admin/queue').set(m.auth)).body.find((x: { id: string }) => x.id === l.id);
+    expect(q).toMatchObject({ liveEdit: true, description: 'Tel: 0532 000 00 00' });
+    expect(q.changed.sort()).toEqual(['cabins', 'description']);
+    await t.http().post(`/admin/listings/${l.id}/decision`).set(m.auth).send({ decision: 'reject', reason: 'rules', note: 'Telefon yazılmaz.', version: q.version }).expect(200);
+    const after = (await t.http().get(`/listings/${l.id}`).set(s.auth)).body;
+    expect(after).toMatchObject({ status: 'published', pendingEdit: false, description: 'Temiz.', rejectReason: 'rules', rejectNote: 'Telefon yazılmaz.' });
+    expect(await t.prisma.notification.count({ where: { userId: s.user.id, key: 'notif.editRejected' } })).toBe(1);
+
+    await t.http().patch(`/listings/${l.id}`).set(s.auth).send({ cabins: 4 }).expect(200);
+    await t.http().post(`/admin/listings/${l.id}/decision`).set(m.auth).send({ decision: 'approve', version: await versionOf(l.id) }).expect(200);
+    expect((await t.http().get(`/listings/${l.id}`)).body).toMatchObject({ cabins: 4, description: 'Temiz.' });
+    expect(await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } })).toMatchObject({ pendingAt: null, rejectReason: null });
+    expect(await t.prisma.notification.count({ where: { userId: s.user.id, key: 'notif.editApproved' } })).toBe(1);
+  });
+
   test('süresi dolmuş ilan satıldı işaretlenebilir; taslak/kaldırılmış işaretlenemez', async () => {
     const s = await loginAs(t, { level: 1 });
     const l = await t.prisma.listing.create({ data: { ...base, ownerId: s.user.id, status: 'expired' } });

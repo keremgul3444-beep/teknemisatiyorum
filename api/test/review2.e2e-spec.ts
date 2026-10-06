@@ -80,12 +80,13 @@ test('I-6: yönetici tüm broker dosyalarını ve ekspertiz randevularını list
   expect((await t.http().get('/admin/broker').set(u.auth)).status).toBe(403);
 });
 
-test('I-8: yayındaki ilana fotoğraf eklenince yeniden onaya düşer', async () => {
+test('I-8: yayındaki ilana eklenen fotoğraf onay bekler; ilan yayında kalır', async () => {
   const owner = await loginAs(t, { level: 2 });
   const l = await t.prisma.listing.create({ data: { ownerId: owner.user.id, brand: 'Foto', model: 'X', year: 2018, lengthM: 10, type: 'yelkenli', price: 1, currency: 'EUR', location: 'Kaş', equipment: [], badges: [], status: 'published', publishedAt: new Date() } });
   const fid = await photo(owner.auth);
   const r = await t.http().post(`/listings/${l.id}/photos`).set(owner.auth).send({ fileIds: [fid] });
-  expect(r.body.status).toBe('pending');
+  expect(r.body).toMatchObject({ status: 'published', pendingEdit: true });
+  expect(await t.prisma.listingPhoto.count({ where: { listingId: l.id } })).toBe(0);
 });
 
 test('I-8/minor: aynı dosya iki kez eklenmez', async () => {

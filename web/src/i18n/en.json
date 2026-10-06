@@ -767,7 +767,9 @@
     "docPending": "Registration document under review.",
     "docRejected": "Registration document not approved. {{reason}}",
     "settings": "Settings",
-    "settingsBody": "Name, notifications, privacy, your data and account deletion."
+    "settingsBody": "Name, notifications, privacy, your data and account deletion.",
+    "pendingEdit": "Your edit is awaiting review; the listing stays live as it was.",
+    "editRejected": "Your last edit was not approved."
   },
   "pay": {
     "devTitle": "Trial payment",
@@ -897,7 +899,7 @@
     "seller": "Seller",
     "sellerSelf": "Individual (myself)",
     "editTitle": "Edit listing",
-    "editNote": "Only a moderate price change keeps the listing live. Other changes and photos go through a short review; the listing is hidden from search until approved, and its publish date and remaining time are kept.",
+    "editNote": "A moderate price change goes live immediately. Other changes and photos go through a short review; meanwhile the listing stays live as it was.",
     "editDoneTitle": "Changes saved",
     "editDoneBody": "If review is needed, the listing goes live again shortly; we will notify you.",
     "saveEdit": "Save changes",
@@ -1089,7 +1091,8 @@
     "clearFilters": "Clear filters",
     "openUser": "user",
     "olderRecords": "Older records",
-    "userListings": "Listings"
+    "userListings": "Listings",
+    "liveEdit": "Edit of a live listing (old version stays live until approved)"
   },
   "audit": {
     "listingApproved": "Listing approved: {{title}}",
@@ -1299,7 +1302,9 @@
     "importDone": "Bulk import finished: {{created}}/{{total}} listings sent for review.",
     "companyAdded": "You were added to {{company}}.",
     "companyRemoved": "You were removed from {{company}}; your listings there are now personal.",
-    "bookingAccepted": "The skipper accepted your charter request; you can pay now."
+    "bookingAccepted": "The skipper accepted your charter request; you can pay now.",
+    "editApproved": "Your edit was approved and is live: {{title}}",
+    "editRejected": "Your edit was not approved; the listing stays live as before: {{title}}"
   },
   "lead": {
     "title": "Get a finance, insurance or transport quote",

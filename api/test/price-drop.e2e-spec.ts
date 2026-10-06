@@ -54,8 +54,10 @@ test('fiyat yükselince ya da indirim 30 günden eskiyse rozet yok; başka alanl
   await t.prisma.priceHistory.updateMany({ where: { listingId: old.id }, data: { at: new Date(Date.now() - 40 * DAY) } });
   expect((await t.http().get(`/listings/${old.id}`)).body.priceDrop).toBeNull();
 
+  // Fiyat başka alanla birlikte değişince ikisi de onay bekler; yayındaki fiyat aynı kalır.
   const mixed = await t.http().patch(`/listings/${l.id}`).set(owner.auth).send({ price: 60000, description: 'Yeni açıklama' });
-  expect(mixed.body.status).toBe('pending');
+  expect(mixed.body).toMatchObject({ status: 'published', pendingEdit: true, price: 60000 });
+  expect((await t.http().get(`/listings/${l.id}`)).body.price).toBe(95000);
 });
 
 test('fiyat oyunu: artırıp indirmek rozet ve bildirim vermez; yem fiyat onaya düşer; haftada en fazla üç değişiklik', async () => {
@@ -77,5 +79,6 @@ test('fiyat oyunu: artırıp indirmek rozet ve bildirim vermez; yem fiyat onaya 
 
   const bait = await published(owner.user.id, { brand: 'Yem' });
   const r = await t.http().patch(`/listings/${bait.id}`).set(owner.auth).send({ price: 1 });
-  expect(r.body.status).toBe('pending');
+  expect(r.body.pendingEdit).toBe(true);
+  expect((await t.http().get(`/listings/${bait.id}`)).body.price).not.toBe(1);
 });

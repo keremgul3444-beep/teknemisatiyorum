@@ -8,7 +8,7 @@ export interface ApiListing {
   id: string; brand: string; model: string; year: number; lengthM: number; type: string; price: number; currency: Currency;
   location: string; equipment: string[]; cabins: number; engine: string; description: string; descriptionEn?: string | null; videoUrl?: string | null; status: string; badges: string[];
   engineHours?: number | null; flag?: string | null; tradeIn?: boolean; negotiable?: boolean;
-  rejectReason?: string | null; rejectNote?: string | null; removedReason?: string | null; expiresAt?: string | null; photos: { id: string; url: string }[];
+  rejectReason?: string | null; rejectNote?: string | null; pendingEdit?: boolean; removedReason?: string | null; expiresAt?: string | null; photos: { id: string; url: string }[];
   seller: { id: string; name: string | null; since: number; companyName: string | null; verified?: boolean };
   logbook: { count: number; latest: ApiEntry[]; boatId?: string } | null; isMine: boolean;
   promo?: Promo;
@@ -50,7 +50,7 @@ export function toListing(l: ApiListing): Listing {
     sellerId: l.seller.id, logbookCount: l.logbook?.count ?? 0, description: l.description, descriptionEn: l.descriptionEn ?? null, videoUrl: l.videoUrl ?? null,
     status: STATUS[l.status] ?? 'onay-bekliyor', rawStatus: l.status, photoSeed: seedOf(l.id), cabins: l.cabins, engine: l.engine,
     photoUrls: l.photos.map((p) => absolute(p.url)), photoIds: l.photos.map((p) => p.id), isMine: l.isMine, boatId: l.logbook?.boatId ?? null,
-    logbookLatest: l.logbook?.latest.map(toEntry) ?? [], rejectReason: l.rejectReason ?? null, rejectNote: l.rejectNote ?? null,
+    logbookLatest: l.logbook?.latest.map(toEntry) ?? [], rejectReason: l.rejectReason ?? null, rejectNote: l.rejectNote ?? null, pendingEdit: !!l.pendingEdit,
     removedReason: (l.removedReason as Listing['removedReason']) ?? null, expiresAt: l.expiresAt ?? null,
     promo: l.promo ?? { featured: false, urgent: false },
     priceDrop: l.priceDrop ?? null, webUrl: l.webUrl, stats: l.stats,

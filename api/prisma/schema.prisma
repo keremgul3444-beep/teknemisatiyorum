@@ -260,6 +260,12 @@ model Listing {
   rejectNote    String?
   /// Son onaylanan hâlin özeti; düzenleme sonrası onay kuyruğunda değişen alanlar buna göre gösterilir.
   approvedSnapshot Json?
+  /// Yayındaki ilanın onay bekleyen düzenlemesi: ilan eski (onaylı) hâliyle yayında kalır, değişiklik onayla uygulanır.
+  pendingChanges   Json?
+  /// Onay bekleyen yeni fotoğraf listesi (sırasıyla); boşsa fotoğraf değişikliği yok.
+  pendingPhotoIds  String[]  @default([])
+  /// Bekleyen düzenlemenin zamanı (null = bekleyen düzenleme yok).
+  pendingAt        DateTime?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   publishedAt   DateTime?
@@ -283,6 +289,7 @@ model Listing {
 
   @@index([status])
   @@index([ownerId])
+  @@index([pendingAt])
 }
 
 model ListingPhoto {

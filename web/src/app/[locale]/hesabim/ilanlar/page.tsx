@@ -52,6 +52,8 @@ export default async function HesabimIlanlar({ params }: P) {
                   <div className="muted small">{formatPrice(l.price, l.currency, locale)} · {t(locale, `account.status.${l.status}`, {})}</div>
                   {l.status === 'rejected' && l.rejectReason ? <div className="small" style={{ color: 'var(--c-danger)' }}>{t(locale, `account.rejectReasons.${l.rejectReason}`, {})}</div> : null}
                   {l.status === 'rejected' && l.rejectNote ? <div className="small">{t(locale, 'account.rejectNote', { note: l.rejectNote })}</div> : null}
+                  {l.pendingEdit ? <div className="small" style={{ color: 'var(--c-warning)' }}>{t(locale, 'account.pendingEdit')}</div> : null}
+                  {live && !l.pendingEdit && l.rejectReason ? <div className="small" style={{ color: 'var(--c-danger)' }}>{t(locale, 'account.editRejected')} {t(locale, `account.rejectReasons.${l.rejectReason}`, {})}{l.rejectNote ? ` · ${l.rejectNote}` : ''}</div> : null}
                   {doc?.status === 'pending' ? <div className="muted small">{t(locale, 'account.docPending')}</div> : null}
                   {doc?.status === 'rejected' && !l.badges.includes('sahiplik') ? <div className="small" style={{ color: 'var(--c-danger)' }}>{t(locale, 'account.docRejected', { reason: t(locale, `account.rejectReasons.${doc.rejectReason ?? 'rules'}`, {}) })}{doc.rejectNote ? ` · ${doc.rejectNote}` : ''}</div> : null}
                   {l.status === 'removed' && l.removedReason ? <div className="small" style={{ color: 'var(--c-danger)' }}>{t(locale, `account.removedReasons.${l.removedReason}`, {})}</div> : null}

@@ -767,7 +767,9 @@
     "docPending": "Ruhsat incelemede.",
     "docRejected": "Ruhsat onaylanmadı. {{reason}}",
     "settings": "Ayarlar",
-    "settingsBody": "Ad, bildirimler, gizlilik, verilerim ve hesabı silme."
+    "settingsBody": "Ad, bildirimler, gizlilik, verilerim ve hesabı silme.",
+    "pendingEdit": "Düzenlemen onay bekliyor; ilan önceki hâliyle yayında.",
+    "editRejected": "Son düzenlemen onaylanmadı."
   },
   "pay": {
     "devTitle": "Deneme ödemesi",
@@ -897,7 +899,7 @@
     "seller": "Satıcı",
     "sellerSelf": "Bireysel (kendi adıma)",
     "editTitle": "İlanı düzenle",
-    "editNote": "Yalnızca fiyatı ölçülü değiştirirsen ilan yayında kalır. Diğer değişiklikler ve fotoğraflar kısa bir onaydan geçer; onay süresince ilan aramada görünmez, yayın tarihi ve süresi korunur.",
+    "editNote": "Yalnızca fiyatı ölçülü değiştirirsen değişiklik hemen yayına girer. Diğer değişiklikler ve fotoğraflar kısa bir onaydan geçer; onay süresince ilan önceki hâliyle yayında kalır.",
     "editDoneTitle": "Değişiklikler kaydedildi",
     "editDoneBody": "Onay gerekiyorsa ilan kısa süre sonra yeniden yayına girer; sonucu bildirimle haber veririz.",
     "saveEdit": "Değişiklikleri kaydet",
@@ -1089,7 +1091,8 @@
     "clearFilters": "Süzgeci temizle",
     "openUser": "kullanıcı",
     "olderRecords": "Daha eski kayıtlar",
-    "userListings": "İlanları"
+    "userListings": "İlanları",
+    "liveEdit": "Yayındaki ilanın düzenlemesi (onaylanana kadar eski hâli yayında)"
   },
   "audit": {
     "listingApproved": "İlan onaylandı: {{title}}",
@@ -1299,7 +1302,9 @@
     "importDone": "Toplu yükleme bitti: {{created}}/{{total}} ilan onaya gönderildi.",
     "companyAdded": "{{company}} firmasına eklendin.",
     "companyRemoved": "{{company}} firmasından çıkarıldın; firmadaki ilanların bireysel ilana döndü.",
-    "bookingAccepted": "Kaptan kiralama talebini onayladı; ödemeyi yapabilirsin."
+    "bookingAccepted": "Kaptan kiralama talebini onayladı; ödemeyi yapabilirsin.",
+    "editApproved": "Düzenlemen onaylandı, yayında: {{title}}",
+    "editRejected": "Düzenlemen onaylanmadı; ilan önceki hâliyle yayında: {{title}}"
   },
   "lead": {
     "title": "Finansman, sigorta ya da nakliye teklifi al",

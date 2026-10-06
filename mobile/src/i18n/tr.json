@@ -533,7 +533,7 @@
     "editDonePrice": "Fiyat güncellendi",
     "editDoneReview": "Değişiklikler onaya gönderildi",
     "editNothing": "Değişiklik yok",
-    "editReviewNote": "Fiyat dışındaki değişiklikler onaya gider. Onaylanana kadar (genelde 2 saat) ilan yayında görünmez.",
+    "editReviewNote": "Fiyat dışındaki değişiklikler onaya gider. Onaylanana kadar ilan önceki hâliyle yayında kalır.",
     "verifyBanner": "İlanı yayınlamak için kimliğini doğrulaman gerekiyor. Şimdi doğrularsan sonda beklemezsin.",
     "verifyBannerCta": "Kimliğini doğrula",
     "photoLabelCover": "Fotoğraf {{n}} / {{total}}, kapak",
@@ -884,7 +884,9 @@
     "priceReviewHint": "Bu kadar büyük fiyat değişikliği yeniden onaya gider; onaylanana kadar ilan yayında görünmez.",
     "rejectNote": "Moderatör notu: {{note}}",
     "promoWarn": "Kalan öne çıkarma süresi iade edilmez.",
-    "awaitingCaptain": "Kaptanın onayı bekleniyor; onaylayınca ödeme açılır."
+    "awaitingCaptain": "Kaptanın onayı bekleniyor; onaylayınca ödeme açılır.",
+    "pendingEdit": "Düzenlemen onay bekliyor; ilan önceki hâliyle yayında.",
+    "editRejected": "Son düzenlemen onaylanmadı."
   },
   "settings": {
     "title": "Ayarlar",
@@ -1363,7 +1365,9 @@
     "importDone": "Toplu yükleme bitti: {{created}}/{{total}} ilan onaya gönderildi.",
     "companyAdded": "{{company}} firmasına eklendin.",
     "companyRemoved": "{{company}} firmasından çıkarıldın; firmadaki ilanların bireysel ilana döndü.",
-    "bookingAccepted": "Kaptan kiralama talebini onayladı; ödemeyi yapabilirsin."
+    "bookingAccepted": "Kaptan kiralama talebini onayladı; ödemeyi yapabilirsin.",
+    "editApproved": "Düzenlemen onaylandı, yayında: {{title}}",
+    "editRejected": "Düzenlemen onaylanmadı; ilan önceki hâliyle yayında: {{title}}"
   },
   "notifs": {
     "title": "Bildirimler",

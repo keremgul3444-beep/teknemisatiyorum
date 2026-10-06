@@ -5,7 +5,8 @@ export function notifTarget(key: string, params: Record<string, string> | null):
     case 'notif.newMessage': return p.conversationId ? `/sohbet/${p.conversationId}` : null;
     case 'notif.priceDrop': return p.listingId ? `/ilan/${p.listingId}` : null;
     case 'notif.searchMatch': return p.listingId ? `/ilan/${p.listingId}` : '/aramalar';
-    case 'notif.listingApproved': return p.listingId ? `/ilan/${p.listingId}` : null;
+    case 'notif.listingApproved': case 'notif.editApproved': return p.listingId ? `/ilan/${p.listingId}` : null;
+    case 'notif.editRejected': return '/profil/ilanlarim';
     case 'notif.listingRejected': return '/profil/ilanlarim';
     case 'notif.listingRemoved': return '/profil/ilanlarim';
     case 'notif.reportReady': return '/ekspertiz';

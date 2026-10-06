@@ -36,6 +36,8 @@ export default function Ilanlarim() {
             <ListingCard listing={l} />
             {l.status === 'reddedildi' ? <T variant="caption" color={colors.danger}>{t(`mine.rejectReasons.${l.rejectReason ?? 'rules'}`)}</T> : null}
             {l.status === 'reddedildi' && l.rejectNote ? <T variant="caption">{t('mine.rejectNote', { note: l.rejectNote })}</T> : null}
+            {l.pendingEdit ? <T variant="caption" color={colors.warning}>{t('mine.pendingEdit')}</T> : null}
+            {l.status === 'yayinda' && !l.pendingEdit && l.rejectReason ? <T variant="caption" color={colors.danger}>{t('mine.editRejected')} {t(`mine.rejectReasons.${l.rejectReason}`)}{l.rejectNote ? ` · ${l.rejectNote}` : ''}</T> : null}
             {l.status === 'kaldirildi' && l.removedReason ? <T variant="caption" color={colors.danger}>{t(`mine.removedReasons.${l.removedReason}`)}</T> : null}
             {l.status === 'suresi-doldu' || (l.status === 'yayinda' && expiringIn(l) !== null) ? <RenewRow listing={l} /> : null}
             {l.stats ? <StatsRow stats={l.stats} /> : null}

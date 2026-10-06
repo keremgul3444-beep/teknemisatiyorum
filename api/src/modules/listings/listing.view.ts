@@ -58,6 +58,8 @@ export function listingView(l: ListingRow, viewerId?: string, companyName?: stri
     engineHours: l.engineHours, flag: l.flag, tradeIn: l.tradeIn, negotiable: l.negotiable,
     status: l.status, badges: l.badges, rejectReason: viewerId === l.ownerId ? l.rejectReason : undefined,
     rejectNote: viewerId === l.ownerId ? l.rejectNote : undefined,
+    /** Sahibine: yayındaki ilanın onay bekleyen düzenlemesi var mı. */
+    pendingEdit: viewerId === l.ownerId ? !!l.pendingAt : undefined,
     removedReason: viewerId === l.ownerId ? l.removedReason : undefined,
     /** Yayın bitişi yalnızca sahibine (ne zaman yenileyeceğini bilsin). */
     expiresAt: viewerId === l.ownerId ? l.expiresAt?.toISOString() ?? null : undefined,

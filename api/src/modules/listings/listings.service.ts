@@ -7,6 +7,7 @@ import { FxService } from './fx.service';
 import { listingInclude, listingView, priceDropOf, PRICE_DROP_DAYS, PRICE_HISTORY_TAKE, type ListingRow, type ListingStats } from './listing.view';
 import { NotificationsService } from '../notifications/notifications.module';
 import { freshness, isActive } from '../promotions/promotion.rules';
+import { effective } from './pending-edit';
 
 export const MAX_PHOTOS = MAX_LISTING_PHOTOS;
 const COMPANY_NAME_TTL_MS = 60_000;
@@ -58,6 +59,8 @@ export class ListingsService {
   }
 
   async view(l: ListingRow, viewerId?: string, stats?: ListingStats) {
+    // Sahibi bekleyen düzenlemesiyle birlikte görür; diğerleri onaylı hâli.
+    if (viewerId && viewerId === l.ownerId) l = effective(l);
     return listingView(l, viewerId, l.companyId ? await this.companyName(l.companyId) : undefined, stats);
   }
 

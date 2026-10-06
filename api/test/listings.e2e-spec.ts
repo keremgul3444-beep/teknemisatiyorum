@@ -1,5 +1,5 @@
 import { createTestApp, type TestApp } from './setup';
-import { jpegWithExif, loginAs } from './helpers';
+import { approveEdit, jpegWithExif, loginAs } from './helpers';
 
 let t: TestApp;
 beforeAll(async () => { t = await createTestApp(); });
@@ -49,7 +49,7 @@ describe('taslak ve sahiplik', () => {
     expect((await t.http().post('/listings').set(a.auth).send({ ...draft, engineHours: 12.5 })).status).toBe(400);
   });
 
-  test('fotoğraf listesi tam liste ve sırayla ayarlanır; aynı liste değişiklik sayılmaz, değişirse yayındaki ilan onaya düşer', async () => {
+  test('fotoğraf listesi tam liste ve sırayla ayarlanır; aynı liste değişiklik sayılmaz; yayındaki ilanda yeni liste onayla uygulanır', async () => {
     const a = await loginAs(t, { level: 2 });
     const l = await published(a.user.id);
     const [p1, p2, p3] = [await photo(a.auth), await photo(a.auth), await photo(a.auth)];
@@ -61,8 +61,14 @@ describe('taslak ve sahiplik', () => {
     // Sıra değişir, biri çıkar, yenisi eklenir.
     const r = await t.http().put(`/listings/${l.id}/photos`).set(a.auth).send({ fileIds: [p3, p1] });
     expect(r.status).toBe(200);
+    // Yayındaki ilan eski fotoğraflarıyla kalır; sahibi yeni listeyi görür, onayda uygulanır.
+    expect(await order()).toEqual([p1, p2]);
+    expect(await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } })).toMatchObject({ status: 'published', pendingPhotoIds: [p3, p1] });
+    expect(r.body.photos.map((p: { id: string }) => p.id)).toEqual([p3, p1]);
+    expect(r.body.pendingEdit).toBe(true);
+    expect((await t.http().get(`/listings/${l.id}`)).body.photos.map((p: { id: string }) => p.id)).toEqual([p1, p2]);
+    await approveEdit(t, l.id);
     expect(await order()).toEqual([p3, p1]);
-    expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } })).status).toBe('pending');
     // Başkasının dosyası eklenemez.
     const b = await loginAs(t, { level: 2 });
     // İç içe istek atılmaz (supertest sunucuyu yeniden bağlar): dosya önce yüklenir.
@@ -93,7 +99,10 @@ describe('taslak ve sahiplik', () => {
     await t.http().patch(`/listings/${l.id}`).set(a.auth).send({ price: 170000 }).expect(200);
     await t.http().patch(`/listings/${l.id}`).set(a.auth).send({ description: 'Yeni yelken.', brand: draft.brand }).expect(200);
     expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } })).badges).toEqual(['sahiplik', 'belge', 'ekspertizli', 'broker']);
+    await approveEdit(t, l.id);
+    expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } })).badges).toEqual(['sahiplik', 'belge', 'ekspertizli', 'broker']);
     await t.http().patch(`/listings/${l.id}`).set(a.auth).send({ model: 'Oceanis 46' }).expect(200);
+    await approveEdit(t, l.id);
     expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } })).badges).toEqual(['broker']);
   });
 

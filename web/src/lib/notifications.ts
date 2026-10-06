@@ -8,9 +8,9 @@ export function webNotifTarget(key: string, params: Record<string, string> | nul
   const p = params ?? {};
   switch (key) {
     case 'notif.newMessage': return p.conversationId ? `/hesabim/mesajlar/${p.conversationId}` : '/hesabim/mesajlar';
-    case 'notif.priceDrop': case 'notif.searchMatch': case 'notif.listingApproved':
+    case 'notif.priceDrop': case 'notif.searchMatch': case 'notif.listingApproved': case 'notif.editApproved':
       return p.listingId ? `/ilan/${p.listingId}` : null;
-    case 'notif.listingRejected': case 'notif.listingRemoved': case 'notif.listingExpiring': case 'notif.listingExpired':
+    case 'notif.listingRejected': case 'notif.editRejected': case 'notif.listingRemoved': case 'notif.listingExpiring': case 'notif.listingExpired':
       return '/hesabim/ilanlar';
     // Ruhsat ilana bağlı; kimlik ve usta/kaptan belgesi hesabın kendisine.
     case 'notif.docApproved': case 'notif.docRejected': return p.kind === 'ruhsat' ? '/hesabim/ilanlar' : '/hesabim';

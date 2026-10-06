@@ -82,12 +82,16 @@ export class MediaService {
   private async publicFile(id: string) {
     const f = await this.prisma.file.findUnique({ where: { id } });
     if (!f || f.visibility !== 'public') throw Errors.notFound();
-    const [gone, attached] = await Promise.all([
+    const [gone, attached, pending] = await Promise.all([
       this.prisma.user.count({ where: { id: f.ownerId, deletedAt: { not: null } } }),
       this.prisma.listingPhoto.findMany({ where: { fileId: id }, select: { listing: { select: { status: true } } } }),
+      // Yayındaki ilanın onay bekleyen düzenlemesindeki fotoğraf (sahibi ve moderatör görür).
+      this.prisma.listing.count({ where: { pendingPhotoIds: { has: id }, status: 'published' } }),
     ]);
     if (gone) throw Errors.notFound();
-    const visible = attached.length
+    const visible = pending
+      ? true
+      : attached.length
       ? attached.some((p) => p.listing.status !== 'removed')
       : Date.now() - f.createdAt.getTime() < MEDIA_LIMITS.orphanVisibleMs;
     if (!visible) throw Errors.notFound();
@@ -158,11 +162,12 @@ export class MediaService {
     const old = await this.prisma.file.findMany({ where: { createdAt: { lt: before } }, select: { id: true, key: true } });
     if (!old.length) return 0;
     const ids = old.map((f) => f.id);
-    const [photos, requests] = await Promise.all([
+    const [photos, requests, pending] = await Promise.all([
       this.prisma.listingPhoto.findMany({ where: { fileId: { in: ids } }, select: { fileId: true } }),
       this.prisma.verificationRequest.findMany({ where: { fileIds: { hasSome: ids } }, select: { fileIds: true } }),
+      this.prisma.listing.findMany({ where: { pendingPhotoIds: { hasSome: ids } }, select: { pendingPhotoIds: true } }),
     ]);
-    const used = new Set([...photos.map((p) => p.fileId), ...requests.flatMap((r) => r.fileIds)]);
+    const used = new Set([...photos.map((p) => p.fileId), ...requests.flatMap((r) => r.fileIds), ...pending.flatMap((l) => l.pendingPhotoIds)]);
     const orphans = old.filter((f) => !used.has(f.id));
     await Promise.all(orphans.flatMap((f) => [f.key, ...MEDIA_WIDTHS.map((w) => `${f.key}.w${w}.webp`)]).map((k) => this.storage.remove(k)));
     await this.prisma.file.deleteMany({ where: { id: { in: orphans.map((f) => f.id) } } });
