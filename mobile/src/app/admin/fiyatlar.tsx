@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { colors, space } from '@/theme';
-import { AdminPage, Button, Card, Field, T } from '@/components';
+import { AdminPage, Button, Card, Field, Loading, T } from '@/components';
 import { actions } from '@/services';
 import type { ApiProduct } from '@/services/api/mappers';
 import { useRemote } from '@/services/useRemote';
@@ -14,6 +14,7 @@ export default function AdminFiyatlar() {
   const products = useRemote(() => actions.products());
   return (
     <AdminPage>
+      {products.loading ? <Loading /> : null}
       {(products.data ?? []).map((p) => <PriceRow key={p.code} product={p} onSaved={products.reload} />)}
     </AdminPage>
   );

@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { colors, fonts, space } from '@/theme';
-import { Card, EmptyState, Header, Icon, Screen, T } from '@/components';
+import { Card, EmptyState, Header, Icon, Loading, Screen, T } from '@/components';
 import { actions, formatPrice, useAllProviders, useCaptainBookings, useJobs, type Currency } from '@/services';
 import { useRemote } from '@/services/useRemote';
 import { currentLang } from '@/i18n';
@@ -13,7 +13,8 @@ export default function Odemeler() {
   const jobs = useJobs().filter((j) => j.paid);
   const caps = useCaptainBookings().filter((c) => c.paid);
   // Gerçek mod: emanet ödemelerin sunucudaki durumu (bekliyor, aktarıldı, iade edildi); tutar TL (kur çevrilmiş) + platform payı.
-  const remote = useRemote(() => actions.myServicePayments()).data;
+  const remoteState = useRemote(() => actions.myServicePayments());
+  const remote = remoteState.data;
   const titleOf = (kind: string, id: string) =>
     kind === 'job' ? jobs.find((j) => j.id === id)?.title ?? t('services.usta')
       : providers.find((p) => p.id === caps.find((c) => c.id === id)?.captainId)?.name ?? t('services.captain');
@@ -30,7 +31,7 @@ export default function Odemeler() {
   return (
     <Screen>
       <Header title={t('profile.payments')} />
-      {rows.length === 0 ? <EmptyState icon="lock" title={t('mine.paymentsEmpty')} /> : rows.map((r) => (
+      {remoteState.loading ? <Loading /> : rows.length === 0 ? <EmptyState icon="lock" title={t('mine.paymentsEmpty')} /> : rows.map((r) => (
         <Card key={r.id}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(3) }}>
             <Icon name={r.released ? 'check' : r.refunded ? 'back' : 'lock'} size={20} color={r.released ? colors.success : r.refunded ? colors.muted : colors.primary} />

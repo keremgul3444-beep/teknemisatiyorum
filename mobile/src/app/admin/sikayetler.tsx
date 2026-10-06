@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { router } from 'expo-router';
 import { colors, fonts, space } from '@/theme';
-import { AdminPage, Button, Card, Chip, EmptyState, T } from '@/components';
+import { AdminPage, Button, Card, Chip, EmptyState, Loading, T } from '@/components';
 import { actions, formatPrice, type ReportGroup, type TakedownReason } from '@/services';
 import { TAKEDOWN_REASONS } from '@tms/shared';
 import { useRemote } from '@/services/useRemote';
@@ -23,7 +23,7 @@ export default function AdminSikayetler() {
   const rows = mode === 'api' ? groups.data ?? [] : useStore.getState().reportGroups();
   return (
     <AdminPage>
-      {rows.length === 0 ? <EmptyState icon="check" title={t('admin.reportsEmpty')} />
+      {mode === 'api' && groups.loading ? <Loading /> : rows.length === 0 ? <EmptyState icon="check" title={t('admin.reportsEmpty')} />
         : rows.map((g) => <ReportCard key={g.listing.id} group={g} onDone={groups.reload} />)}
     </AdminPage>
   );

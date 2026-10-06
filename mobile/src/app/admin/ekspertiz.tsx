@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { colors, space } from '@/theme';
-import { AdminPage, Button, Card, EmptyState, Field, StatusLine, T } from '@/components';
+import { AdminPage, Button, Card, EmptyState, Field, Loading, StatusLine, T } from '@/components';
 import { actions, useExpertiseBookings, useExpertisePackages } from '@/services';
 import { useRemote } from '@/services/useRemote';
 import { attempt } from '@/services/errors';
@@ -41,7 +41,7 @@ export default function AdminEkspertiz() {
           <StatusLine text={t('admin.status.onaylandi')} />
         </Card>
       ) : null}
-      {rows.length === 0 ? <EmptyState icon="clipboard" title={t('admin.noBookings')} /> : rows.map((b) => (
+      {remote.loading ? <Loading /> : rows.length === 0 ? <EmptyState icon="clipboard" title={t('admin.noBookings')} /> : rows.map((b) => (
         <Card key={b.id}>
           <T variant="h3">{b.title}</T>
           <T variant="caption" color={colors.muted}>{b.meta}</T>

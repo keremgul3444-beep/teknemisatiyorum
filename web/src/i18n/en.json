@@ -194,7 +194,9 @@
     "saveSearch": "Save this search",
     "searchSaved": "Search saved. We will let you know when new listings arrive.",
     "searchSavedLink": "My saved searches",
-    "clear": "Clear filters"
+    "clear": "Clear filters",
+    "pageMissing": "This page does not exist; the search has {{n}} pages.",
+    "lastPage": "Go to last page"
   },
   "landing": {
     "title": "{{type}} for sale",
@@ -1412,5 +1414,31 @@
       "offensive": "Inappropriate content",
       "other": "Other"
     }
+  },
+  "compare": {
+    "title": "Compare",
+    "cta": "Compare ({{n}})",
+    "select": "Pick up to {{max}} listings.",
+    "needTwo": "Pick at least two listings to compare",
+    "hint": "Choose 2–3 favourites and see them side by side.",
+    "count": "{{n}} listings",
+    "best": "best",
+    "legend": "Green marks the best value in that row (lowest price, newest year, longest, most cabins/equipment/logbook entries).",
+    "row": {
+      "price": "Price",
+      "year": "Year",
+      "length": "Length",
+      "type": "Type",
+      "cabins": "Cabins",
+      "engine": "Engine",
+      "location": "Location",
+      "equipment": "Equipment",
+      "badges": "Trust",
+      "logbook": "Logbook entries",
+      "engineHours": "Engine hours",
+      "flag": "Flag",
+      "terms": "Terms"
+    },
+    "empty": "No listings to compare."
   }
 }

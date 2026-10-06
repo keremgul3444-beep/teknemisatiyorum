@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { colors, space } from '@/theme';
-import { AdminPage, Button, Card, EmptyState, Stepper, T } from '@/components';
+import { AdminPage, Button, Card, EmptyState, Loading, Stepper, T } from '@/components';
 import { actions, formatPrice, useBrokerCases } from '@/services';
 import { useRemote } from '@/services/useRemote';
 import { attempt } from '@/services/errors';
@@ -21,7 +21,7 @@ export default function AdminBroker() {
   });
   return (
     <AdminPage>
-      {rows.length === 0 ? <EmptyState icon="check" title={t('admin.empty')} /> : rows.map((c) => (
+      {remote.loading ? <Loading /> : rows.length === 0 ? <EmptyState icon="check" title={t('admin.empty')} /> : rows.map((c) => (
         <Card key={c.id}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
             <T variant="h3">{c.boatName}</T>

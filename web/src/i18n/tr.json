@@ -194,7 +194,9 @@
     "saveSearch": "Bu aramayı kaydet",
     "searchSaved": "Arama kaydedildi. Yeni ilan gelince haber veririz.",
     "searchSavedLink": "Kayıtlı aramalarım",
-    "clear": "Süzgeçleri temizle"
+    "clear": "Süzgeçleri temizle",
+    "pageMissing": "Bu sayfa yok; arama {{n}} sayfa.",
+    "lastPage": "Son sayfaya git"
   },
   "landing": {
     "title": "Satılık {{type}}",
@@ -1412,5 +1414,31 @@
       "offensive": "Uygunsuz içerik",
       "other": "Diğer"
     }
+  },
+  "compare": {
+    "title": "Karşılaştır",
+    "cta": "Karşılaştır ({{n}})",
+    "select": "En fazla {{max}} ilan seç.",
+    "needTwo": "Karşılaştırmak için en az iki ilan gerekir",
+    "hint": "Favorilerinden 2–3 ilan seçip yan yana gör.",
+    "count": "{{n}} ilan",
+    "best": "en iyi",
+    "legend": "Yeşil değer o satırın en iyisi (en düşük fiyat, en yeni yıl, en uzun boy, en çok kabin/donanım/karne kaydı).",
+    "row": {
+      "price": "Fiyat",
+      "year": "Yıl",
+      "length": "Boy",
+      "type": "Tip",
+      "cabins": "Kabin",
+      "engine": "Motor",
+      "location": "Konum",
+      "equipment": "Donanım",
+      "badges": "Güven",
+      "logbook": "Karne kaydı",
+      "engineHours": "Motor saati",
+      "flag": "Bayrak",
+      "terms": "Koşullar"
+    },
+    "empty": "Karşılaştırılacak ilan bulunamadı."
   }
 }

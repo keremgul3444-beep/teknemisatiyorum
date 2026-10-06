@@ -35,3 +35,4 @@ export { PromoBadges } from './PromoBadges';
 export * from './DisputeBox';
 export * from './PreinfoAccept';
 export * from './UpdateRequired';
+export * from './Loading';

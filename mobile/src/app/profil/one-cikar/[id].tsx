@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { colors, space } from '@/theme';
-import { Button, Card, EmptyState, Header, PreinfoAccept, Screen, T, showDemoToast } from '@/components';
+import { Button, Card, EmptyState, Header, Loading, PreinfoAccept, Screen, showDemoToast, T } from '@/components';
 import { actions } from '@/services';
 import type { ApiProduct } from '@/services/api/mappers';
 import { useRemote } from '@/services/useRemote';
@@ -15,7 +15,8 @@ import { formatKurus } from '@/features/promo';
 export default function OneCikar() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const products = useRemote(() => actions.products()).data ?? [];
+  const remoteProducts = useRemote(() => actions.products());
+  const products = remoteProducts.data ?? [];
   const [accepted, setAccepted] = useState(false);
   const buy = (p: ApiProduct) => attempt(async () => {
     await actions.buyInApp(id, p);
@@ -26,7 +27,7 @@ export default function OneCikar() {
     <Screen>
       <Header title={t('promo.title')} />
       <T color={colors.muted}>{t('promo.intro')}</T>
-      {products.length === 0 ? <EmptyState icon="sparkle" title={t('promo.noProducts')} /> : <PreinfoAccept checked={accepted} onToggle={() => setAccepted((v) => !v)} />}
+      {remoteProducts.loading ? <Loading /> : products.length === 0 ? <EmptyState icon="sparkle" title={t('promo.noProducts')} /> : <PreinfoAccept checked={accepted} onToggle={() => setAccepted((v) => !v)} />}
       {products.map((p) => (
         <Card key={p.code}>
           <T variant="h3">{t(`promo.product.${p.code}`, { defaultValue: p.code })}</T>

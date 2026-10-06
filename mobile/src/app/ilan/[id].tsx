@@ -244,7 +244,9 @@ export default function IlanDetay() {
 /** Fotoğraf üstündeki yuvarlak düğme: 44 px dokunma alanı. */
 function RoundBtn({ icon, onPress, filled, label }: { icon: string; onPress: () => void; filled?: boolean; label: string }) {
   return (
+    // Aç/kapa düğmesi (favori): ekran okuyucu seçili olup olmadığını da söyler.
     <Pressable onPress={onPress} hitSlop={4} accessibilityRole="button" accessibilityLabel={label}
+      accessibilityState={filled === undefined ? undefined : { selected: filled }}
       style={({ pressed }) => ({ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.85 : 1 })}>
       <Icon name={icon} size={20} color={filled ? colors.accent : colors.text} filled={filled} />
     </Pressable>

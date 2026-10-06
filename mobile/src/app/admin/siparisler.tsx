@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { colors, space } from '@/theme';
-import { AdminPage, Button, Card, Chip, EmptyState, Field, T } from '@/components';
+import { AdminPage, Button, Card, Chip, EmptyState, Field, Loading, T } from '@/components';
 import { actions } from '@/services';
 import { useRemote } from '@/services/useRemote';
 import { attempt } from '@/services/errors';
@@ -39,7 +39,7 @@ export default function AdminSiparisler() {
         <Field label={t('admin.note')} value={note} onChangeText={setNote} maxLength={200} />
         <Button small title={t('admin.create')} disabled={!listingId.trim() || note.trim().length < 3} onPress={create} />
       </Card>
-      {rows.length === 0 ? <EmptyState icon="lock" title={t('admin.noOrders')} /> : rows.map((o) => (
+      {orders.loading ? <Loading /> : rows.length === 0 ? <EmptyState icon="lock" title={t('admin.noOrders')} /> : rows.map((o) => (
         <Card key={o.id}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(3) }}>
             <View style={{ flex: 1, gap: space(0.5) }}>

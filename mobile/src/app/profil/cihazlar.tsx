@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { colors, space } from '@/theme';
-import { Button, Card, Header, Icon, Screen, T, showDemoToast } from '@/components';
+import { Button, Card, Header, Icon, Loading, Screen, showDemoToast, T } from '@/components';
 import { actions, DEMO_DEVICES } from '@/services';
 import { useRemote } from '@/services/useRemote';
 import { attempt } from '@/services/errors';
@@ -25,7 +25,8 @@ export default function Cihazlar() {
   return (
     <Screen>
       <Header title={t('devices.title')} />
-      {rows.map((d) => (
+      {remote.loading ? <Loading /> : null}
+      {(remote.loading ? [] : rows).map((d) => (
         <Card key={d.id}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(3) }}>
             <Icon name="phone" size={20} color={colors.primary} />

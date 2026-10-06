@@ -42,8 +42,11 @@ export default async function Ilanlar({ params, searchParams }: P) {
         <>
           {r.featuredTop.length ? <Section title={t(locale, 'home.showcase')}><ListingGrid items={r.featuredTop} locale={locale} priorityFirst /></Section> : null}
           <Section title={t(locale, 'listings.count', { n: r.total })}>
+            {/* Sonuç var ama istenen sayfa yok (eski bağlantı, elle yazılan numara): son sayfaya yönlendiren not. */}
             {r.items.length ? <ListingGrid items={r.items} locale={locale} priorityFirst={!r.featuredTop.length} />
-              : <p className="muted">{t(locale, 'listings.empty')} <Link href={localePath(locale, '/ilanlar')}>{t(locale, 'listings.clear')}</Link></p>}
+              : r.total > 0 && state.page > 1
+                ? <p className="muted">{t(locale, 'listings.pageMissing', { n: Math.ceil(r.total / 20) })} <Link href={`${localePath(locale, '/ilanlar')}?${new URLSearchParams(queryToSearchParams({ ...state, page: Math.ceil(r.total / 20) }))}`}>{t(locale, 'listings.lastPage')}</Link></p>
+                : <p className="muted">{t(locale, 'listings.empty')} <Link href={localePath(locale, '/ilanlar')}>{t(locale, 'listings.clear')}</Link></p>}
           </Section>
           <Pager locale={locale} state={state} total={r.total} />
         </>

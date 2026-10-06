@@ -67,3 +67,21 @@ export function MarkAllRead({ when }: { when: boolean }) {
   }, [when]);
   return null;
 }
+
+/** Favorilerden 2–3 ilan seçip karşılaştırma sayfasına git. */
+export function CompareSelect({ items, href, L }: { items: { id: string; title: string }[]; href: string; L: { cta: string; select: string; hint: string } }) {
+  const [sel, setSel] = useState<string[]>([]);
+  const toggle = (id: string) => setSel((s) => (s.includes(id) ? s.filter((x) => x !== id) : s.length >= 3 ? s : [...s, id]));
+  if (items.length < 2) return null;
+  return (
+    <fieldset className="card" style={{ display: 'grid', gap: 8, marginBottom: 16 }}>
+      <legend className="small muted">{L.hint} {L.select}</legend>
+      <div className="row small">
+        {items.map((it) => (
+          <label key={it.id} className="chip" style={{ gap: 6 }}><input type="checkbox" checked={sel.includes(it.id)} disabled={!sel.includes(it.id) && sel.length >= 3} onChange={() => toggle(it.id)} />{it.title}</label>
+        ))}
+      </div>
+      {sel.length >= 2 ? <a className="btn" href={`${href}?ids=${sel.join(',')}`} style={{ justifySelf: 'start' }}>{L.cta.replace('{{n}}', String(sel.length))}</a> : null}
+    </fieldset>
+  );
+}

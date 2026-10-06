@@ -123,3 +123,5 @@ label { display: block; font-size: 13px; font-weight: 600; color: var(--c-muted)
 }
 /* Çok dar telefonda logo tam görünsün: "İlanlar" bağlantısı gizlenir (ana sayfadaki arama aynı yere götürür). */
 @media (max-width: 380px) { .hide-xs { display: none; } }
+/* Yalnızca ekran okuyucu için metin (görsel olarak gizli). */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
