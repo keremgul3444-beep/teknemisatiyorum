@@ -38,8 +38,9 @@ test('oturumsuz mesaj 401 (sayfa girişe yönlendirir); bozuk istek ve başka si
 
 test('favori durumu: oturum yoksa hata değil "giriş yok"; ekleme PUT, çıkarma DELETE', async () => {
   expect(await (await favState(req('http://localhost:3001/api/favorites?id=clx1abcd2345', undefined, { method: 'GET' }))).json()).toEqual({ favorited: false, loggedIn: false });
-  const f = vi.spyOn(globalThis, 'fetch').mockResolvedValue(json(200, [{ id: 'clx1abcd2345' }]));
+  const f = vi.spyOn(globalThis, 'fetch').mockResolvedValue(json(200, { favorited: true }));
   expect(await (await favState(req('http://localhost:3001/api/favorites?id=clx1abcd2345', undefined, { method: 'GET', cookie: `tms_at=${VALID}` }))).json()).toEqual({ favorited: true, loggedIn: true });
+  expect(String(f.mock.calls.at(-1)![0])).toMatch(/\/favorites\/clx1abcd2345$/);
   f.mockResolvedValue(new Response(null, { status: 204 }));
   await fav(req('http://localhost:3001/api/favorites', { id: 'clx1abcd2345', on: true }, { cookie: `tms_at=${VALID}` }));
   expect(f.mock.calls.at(-1)![1]!.method).toBe('PUT');

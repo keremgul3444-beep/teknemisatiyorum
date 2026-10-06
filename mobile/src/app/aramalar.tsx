@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { colors, fonts, space } from '@/theme';
@@ -12,6 +12,7 @@ export default function Aramalar() {
   const { t } = useTranslation();
   const searches = useSavedSearches();
   const [text, setText] = useState('');
+  const [deleting, setDeleting] = useState<string | null>(null);
   const create = async () => {
     if (!requireLevel(1)) return;
     const ok = await attempt(async () => { await actions.saveSearch(text.trim()); return true; });
@@ -30,7 +31,10 @@ export default function Aramalar() {
       </Card>
       <Section title={t('saved.title')}>
         {searches.length === 0 ? <EmptyState icon="bell" title={t('saved.empty')} /> : searches.map((s) => (
-          <Card key={s.id} onPress={() => router.push({ pathname: '/asistan', params: { q: s.query } })}>
+          <Card key={s.id} onPress={() => {
+            void actions.searchSeen(s.id);
+            router.push(s.filter ? { pathname: '/ilanlar', params: { q: JSON.stringify(s.filter) } } : { pathname: '/asistan', params: { q: s.query } });
+          }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(3) }}>
               <Icon name="sparkle" size={20} color={colors.primary} />
               <View style={{ flex: 1, gap: space(0.5) }}>
@@ -40,7 +44,17 @@ export default function Aramalar() {
               <T variant="caption" color={s.newMatches ? colors.primary : colors.muted} style={{ fontFamily: fonts.bodyBold }}>
                 {s.newMatches ? t('saved.newMatches', { count: s.newMatches }) : t('saved.noMatches')}
               </T>
+              <Pressable accessibilityRole="button" accessibilityLabel={t('saved.delete')} hitSlop={10} onPress={() => setDeleting(s.id)}>
+                <Icon name="x" size={18} color={colors.muted} />
+              </Pressable>
             </View>
+            {deleting === s.id ? (
+              <View style={{ flexDirection: 'row', gap: space(2), alignItems: 'center' }}>
+                <T variant="caption" style={{ flex: 1 }}>{t('saved.deleteConfirm')}</T>
+                <Button small variant="secondary" title={t('common.cancel')} onPress={() => setDeleting(null)} />
+                <Button small title={t('saved.delete')} onPress={async () => { await attempt(() => actions.deleteSearch(s.id)); setDeleting(null); }} />
+              </View>
+            ) : null}
           </Card>
         ))}
       </Section>

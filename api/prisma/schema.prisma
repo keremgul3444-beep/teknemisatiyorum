@@ -285,6 +285,8 @@ model ListingPhoto {
   listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
   fileId    String
   order     Int
+
+  @@index([listingId])
 }
 
 /// Fiyat değişikliği kaydı: `price` değişiklikten ÖNCEKİ fiyat, `at` değişiklik anı. Son kayıt bugünkü fiyattan yüksekse "fiyat düştü".
@@ -306,6 +308,7 @@ model Favorite {
   createdAt DateTime @default(now())
 
   @@id([userId, listingId])
+  @@index([listingId])
 }
 
 model SavedSearch {
@@ -345,6 +348,8 @@ model LogbookEntry {
   verified  Boolean
   sourceRef String?
   createdAt DateTime @default(now())
+
+  @@index([boatId, date])
 }
 
 model Conversation {

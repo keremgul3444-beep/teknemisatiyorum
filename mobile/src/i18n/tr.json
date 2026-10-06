@@ -406,7 +406,8 @@
     "dropOnly": "Fiyatı düşenler",
     "fHours": "Motor saati",
     "fFlag": "Bayrak",
-    "fTerms": "Satış koşulları"
+    "fTerms": "Satış koşulları",
+    "more": "Daha fazla göster"
   },
   "valuation": {
     "title": "Teknem kaç eder?",
@@ -432,7 +433,9 @@
     "requestHint": "Ne tür bir tekne aradığını yaz. Uygun tekne gelince haber veririz.",
     "requestPlaceholder": "Örn. 10–13 m yelkenli, 2016 sonrası, €150.000'e kadar",
     "create": "Talebi kaydet",
-    "empty": "Henüz kayıtlı araman yok"
+    "empty": "Henüz kayıtlı araman yok",
+    "delete": "Sil",
+    "deleteConfirm": "Bu kayıtlı arama silinsin mi?"
   },
   "add": {
     "title": "Ne yapmak istersin?",

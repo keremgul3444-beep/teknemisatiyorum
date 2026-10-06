@@ -7,10 +7,11 @@ import { ApiError } from '@/lib/api';
 import { paymentRisk } from '@tms/shared';
 import { BlockButton, ReplyForm } from '@/components/AccountBits';
 import { whatsappUrl } from '@tms/shared';
+import { SharePhone, ThreadLive } from '@/components/ThreadBits';
 
 type P = { params: Promise<{ locale: string; id: string }> };
 type Thread = {
-  id: string; subject: { kind: string; id: string; title: string }; otherName: string | null; otherPhone: string | null;
+  id: string; subject: { kind: string; id: string; title: string }; otherName: string | null; otherPhone: string | null; iSharedPhone?: boolean;
   messages: { id: string; text: string; at: string; mine: boolean }[];
   /** `me`: ben engelledim; `them`: karşı taraf engelledi. */
   blocked?: 'me' | 'them' | null;
@@ -33,7 +34,8 @@ export default async function Sohbet({ params }: P) {
   return (
     <section className="section" style={{ maxWidth: 720 }}>
       <p className="small"><Link href={localePath(locale, '/hesabim/mesajlar')}>{t(locale, 'account.messages')}</Link></p>
-      <h1 style={{ fontSize: 26 }}>{th.subject.title}</h1>
+      <ThreadLive id={th.id} lastAt={th.messages.at(-1)?.at ?? ''} />
+      <h1 style={{ fontSize: 26 }}>{th.subject.kind === 'listing' ? <Link href={localePath(locale, `/ilan/${th.subject.id}`)}>{th.subject.title}</Link> : th.subject.title}</h1>
       <p className="muted">{th.otherName ?? '—'}{th.otherPhone ? <> · <a href={`tel:${th.otherPhone}`}>{th.otherPhone}</a></> : null}
         {th.otherPhone && whatsappUrl(th.otherPhone, th.subject.title) ? <> · <a href={whatsappUrl(th.otherPhone, th.subject.title)!} target="_blank" rel="noopener noreferrer">{t(locale, 'account.whatsapp')}</a></> : null}
       </p>
@@ -50,7 +52,12 @@ export default async function Sohbet({ params }: P) {
       {th.blocked ? (
         <p className="muted">{t(locale, th.blocked === 'me' ? 'account.blockedByMe' : 'account.blockedByThem')}</p>
       ) : (
-        <ReplyForm conversationId={th.id} errors={tDict(locale, 'errors')} labels={{ placeholder: t(locale, 'account.replyPh'), send: t(locale, 'contact.send') }} />
+        <>
+          <ReplyForm conversationId={th.id} errors={tDict(locale, 'errors')} labels={{ placeholder: t(locale, 'account.replyPh'), send: t(locale, 'contact.send') }} />
+          <div style={{ marginTop: 12 }}>
+            <SharePhone id={th.id} shared={!!th.iSharedPhone} labels={{ share: t(locale, 'account.sharePhone'), confirm: t(locale, 'account.sharePhoneConfirm'), done: t(locale, 'account.phoneShared'), cancel: t(locale, 'account.cancel') }} />
+          </div>
+        </>
       )}
       {th.blocked !== 'them' && th.messages.some((m) => !m.mine) ? (
         <div style={{ marginTop: 16 }}>

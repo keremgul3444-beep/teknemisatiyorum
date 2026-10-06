@@ -29,8 +29,8 @@ export class SavedSearchesController {
     const rows = await this.prisma.savedSearch.findMany({ where: { userId: u.id }, orderBy: { createdAt: 'desc' } });
     return Promise.all(rows.map(async (s) => {
       const filter = parsedQuerySchema.parse(s.filter) as ParsedQuery;
-      const { rows: hits } = await this.listings.match(filter, { publishedAt: { gt: s.lastCheckedAt } });
-      return { id: s.id, text: s.text, filter, createdAt: s.createdAt, newMatches: hits.length };
+      const newMatches = await this.listings.countMatches(filter, { publishedAt: { gt: s.lastCheckedAt } });
+      return { id: s.id, text: s.text, filter, createdAt: s.createdAt, newMatches };
     }));
   }
 

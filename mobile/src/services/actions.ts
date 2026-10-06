@@ -5,7 +5,7 @@ import { useStore } from './store';
 import { absolute, isApiMode } from './mode';
 import { api } from './api/instance';
 import { applyUser, syncAdmin, syncAll, syncListings, syncMine, syncServices } from './api/sync';
-import { toBoat, toListing, toThread, type AdminOrder, type ApiBoat, type ApiCaptainBooking, type ApiJob, type ApiListing, type ApiProduct, type ApiProvider, type ApiThread, type ApiUser } from './api/mappers';
+import { toBoat, toListing, toSeller, toThread, type AdminOrder, type ApiBoat, type ApiCaptainBooking, type ApiJob, type ApiListing, type ApiProduct, type ApiProvider, type ApiThread, type ApiUser } from './api/mappers';
 import { ApiError } from './api/client';
 import { devReceipt } from '@/features/promo';
 import type { AdminStatus, BoatInput, JobInput, Listing, ListingDraft, RejectReason, ReportGroup, ReportReason, SubjectKind, TakedownReason } from './types';
@@ -218,13 +218,34 @@ export const actions = {
   async loadListing(id: string) {
     if (!isApiMode()) return;
     const l = await api.get<ApiListing>(`/listings/${id}`);
-    useStore.setState({ listings: [...g().listings.filter((x) => x.id !== id), toListing(l)] });
+    // Bildirim ya da bağlantıyla açılan ilanın satıcısı depoda olmayabilir.
+    const s = toSeller(l);
+    useStore.setState({ listings: [...g().listings.filter((x) => x.id !== id), toListing(l)], sellers: [...g().sellers.filter((x) => x.id !== s.id), s] });
   },
   async toggleFavorite(id: string) {
     if (!isApiMode()) return g().toggleFavorite(id);
     const on = g().favorites.includes(id);
     await (on ? api.del(`/favorites/${id}`) : api.put(`/favorites/${id}`));
     useStore.setState({ favorites: on ? g().favorites.filter((x) => x !== id) : [id, ...g().favorites] });
+  },
+  /** Gerçek modda arama sunucuda yapılır (tüm yayındaki ilanlar, güncel kur, yeniden eskiye sıralama); sayfa başı 20. */
+  async searchListings(query: ParsedQuery, sort: 'new' | 'asc' | 'desc', page: number, dropOnly: boolean): Promise<{ items: Listing[]; total: number }> {
+    const qs = new URLSearchParams({ q: JSON.stringify(query), sort, page: String(page), ...(dropOnly ? { drop: '1' } : {}) });
+    const r = await api.get<{ items: ApiListing[]; total: number }>(`/listings?${qs}`);
+    const sellers = new Map(g().sellers.map((x) => [x.id, x]));
+    r.items.forEach((x) => sellers.set(x.seller.id, toSeller(x)));
+    useStore.setState({ sellers: [...sellers.values()] });
+    return { items: r.items.map(toListing), total: r.total };
+  },
+  async deleteSearch(id: string) {
+    if (!isApiMode()) return void useStore.setState({ savedSearches: g().savedSearches.filter((s) => s.id !== id) });
+    await api.del(`/saved-searches/${id}`);
+    useStore.setState({ savedSearches: g().savedSearches.filter((s) => s.id !== id) });
+  },
+  /** Arama açıldı: "yeni" sayacı sıfırlanır. */
+  async searchSeen(id: string) {
+    useStore.setState({ savedSearches: g().savedSearches.map((s) => (s.id === id ? { ...s, newMatches: 0 } : s)) });
+    if (isApiMode()) await api.post(`/saved-searches/${id}/seen`).catch(() => undefined);
   },
   async saveSearch(text: string, filter?: ParsedQuery) {
     if (!isApiMode()) return void g().saveSearch(text);

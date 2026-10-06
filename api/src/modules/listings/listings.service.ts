@@ -9,6 +9,7 @@ import { NotificationsService } from '../notifications/notifications.module';
 import { freshness, isActive } from '../promotions/promotion.rules';
 
 export const MAX_PHOTOS = MAX_LISTING_PHOTOS;
+const COMPANY_NAME_TTL_MS = 60_000;
 export type Sort = 'new' | 'asc' | 'desc';
 
 const shuffle = <T,>(a: T[]) => {
@@ -57,8 +58,18 @@ export class ListingsService {
   }
 
   async view(l: ListingRow, viewerId?: string, stats?: ListingStats) {
-    const company = l.companyId ? await this.prisma.company.findUnique({ where: { id: l.companyId } }) : null;
-    return listingView(l, viewerId, company?.name, stats);
+    return listingView(l, viewerId, l.companyId ? await this.companyName(l.companyId) : undefined, stats);
+  }
+
+  /** Firma adı kısa süre bellekte tutulur: arama ve vitrin sayfasında her kart için ayrı sorgu olmasın. */
+  private readonly companyNames = new Map<string, { name: string | undefined; at: number }>();
+  private async companyName(id: string, now = Date.now()) {
+    const hit = this.companyNames.get(id);
+    if (hit && now - hit.at < COMPANY_NAME_TTL_MS) return hit.name;
+    const c = await this.prisma.company.findUnique({ where: { id }, select: { name: true } });
+    if (this.companyNames.size > 5_000) this.companyNames.clear();
+    this.companyNames.set(id, { name: c?.name, at: now });
+    return c?.name;
   }
 
   /**
@@ -115,6 +126,11 @@ export class ListingsService {
     const rows = await this.prisma.listing.findMany({ where, select: MATCH_SELECT, orderBy: { year: 'desc' } });
     const rates = await this.fx.rates();
     return { rows: rows.filter((l) => failures(asMatchable(l), q, rates).length === 0), rates };
+  }
+
+  /** Kayıtlı arama listesindeki "yeni" sayısı: tam kayıt yüklenmeden sayılır. */
+  async countMatches(q: ParsedQuery, extraWhere: Prisma.ListingWhereInput = {}) {
+    return (await this.matchSlim(q, extraWhere)).rows.length;
   }
 
   /** Kayıtlı aramalar için: aramaya uyan ilanların tam kayıtları. */

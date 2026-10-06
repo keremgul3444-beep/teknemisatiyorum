@@ -347,13 +347,21 @@ export class ListingsController {
     await this.prisma.favorite.deleteMany({ where: { userId: u.id, listingId } });
   }
 
+  /** Son eklenen favori önce. */
   @Auth()
   @Get('favorites')
   async favorites(@CurrentUser() u: AuthUser) {
-    const rows = await this.prisma.listing.findMany({
-      where: { favorites: { some: { userId: u.id } }, status: { in: ['published', 'sold'] } }, include: listingInclude,
-    });
-    return Promise.all(rows.map((l) => this.listings.view(l, u.id)));
+    const favs = await this.prisma.favorite.findMany({ where: { userId: u.id }, orderBy: { createdAt: 'desc' }, take: 500, select: { listingId: true } });
+    const rows = await this.prisma.listing.findMany({ where: { id: { in: favs.map((f) => f.listingId) }, status: { in: ['published', 'sold'] } }, include: listingInclude });
+    const byId = new Map(rows.map((r) => [r.id, r]));
+    return Promise.all(favs.map((f) => byId.get(f.listingId)).filter((l): l is NonNullable<typeof l> => !!l).map((l) => this.listings.view(l, u.id)));
+  }
+
+  /** Tek ilan favoride mi (ilan sayfasındaki kalp için; tüm listeyi yüklemeden). */
+  @Auth()
+  @Get('favorites/:listingId')
+  async isFavorite(@CurrentUser() u: AuthUser, @Param('listingId') listingId: string) {
+    return { favorited: !!(await this.prisma.favorite.findUnique({ where: { userId_listingId: { userId: u.id, listingId } }, select: { listingId: true } })) };
   }
 
   private async assertOwnBoat(userId: string, boatId: string) {

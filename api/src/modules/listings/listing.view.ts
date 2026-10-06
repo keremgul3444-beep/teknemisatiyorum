@@ -1,4 +1,5 @@
 import type { Listing, ListingPhoto, LogbookEntry, PriceHistory, User } from '@prisma/client';
+import { shortName } from '@tms/shared';
 import { entryView } from '../boats/logbook.service';
 import { env } from '../../config/env';
 import { isActive } from '../promotions/promotion.rules';
@@ -66,7 +67,8 @@ export function listingView(l: ListingRow, viewerId?: string, companyName?: stri
     photos: l.photos.map((p) => ({ id: p.fileId, url: `${env().PUBLIC_URL}/media/${p.fileId}` })),
     seller: {
       id: l.owner.id,
-      name: l.owner.deletedAt ? null : l.owner.name,
+      // Başkalarına ad + soyadın baş harfi; tam ad yalnızca sahibine.
+      name: l.owner.deletedAt ? null : viewerId === l.ownerId ? l.owner.name : shortName(l.owner.name),
       since: l.owner.createdAt.getFullYear(),
       companyName: companyName ?? null,
       /** Satıcı kimliğini doğrulattı mı (seviye 2+); "Doğrulanmış" rozeti yalnızca bu durumda gösterilir. */

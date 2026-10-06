@@ -1,4 +1,4 @@
-import type { BadgeKind, BoatType, Currency, Equipment, Flag, ListingStatus, ReportReason, TakedownReason, UstaCategory } from '@tms/shared';
+import type { BadgeKind, BoatType, Currency, Equipment, Flag, ListingStatus, ParsedQuery, ReportReason, TakedownReason, UstaCategory } from '@tms/shared';
 export type { BadgeKind, BoatType, Currency, Equipment, ListingStatus, UstaCategory } from '@tms/shared';
 export { USTA_CATEGORIES } from '@tms/shared';
 
@@ -62,7 +62,11 @@ export interface Conversation {
   blocked?: 'me' | 'them' | null;
 }
 
-export interface SavedSearch { id: string; query: string; createdAt: string; newMatches: number }
+export interface SavedSearch {
+  id: string; query: string; createdAt: string; newMatches: number;
+  /** Gerçek modda kaydedilen filtre: açılınca metin yeniden yorumlanmaz, aynı filtre uygulanır. */
+  filter?: ParsedQuery;
+}
 export interface CaptainBooking {
   id: string; captainId: string; start: string; days: number; totalEUR: number; paid: boolean;
   /** Gerçek modda sunucu durumu: requested | paid | done | cancelled; `reviewed` değerlendirildi mi. */

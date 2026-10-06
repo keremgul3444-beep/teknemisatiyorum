@@ -742,7 +742,10 @@
     "unreadCount": "{{n}} new",
     "inApp": "Details in the app",
     "anyListing": "All listings",
-    "whatsapp": "Message on WhatsApp"
+    "whatsapp": "Message on WhatsApp",
+    "sharePhone": "Share my number",
+    "sharePhoneConfirm": "Your phone number will be shown to this person only.",
+    "phoneShared": "Your phone number is shared in this conversation."
   },
   "pay": {
     "devTitle": "Trial payment",

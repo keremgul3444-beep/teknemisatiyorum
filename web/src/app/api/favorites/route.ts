@@ -7,10 +7,9 @@ const ID = /^[a-z0-9]{8,40}$/i;
 export async function GET(req: Request) {
   const id = new URL(req.url).searchParams.get('id') ?? '';
   if (!ID.test(id)) return NextResponse.json({ favorited: false, loggedIn: false });
-  const r = await relay(req, '/favorites', undefined, { auth: true, method: 'GET' });
+  const r = await relay(req, `/favorites/${id}`, undefined, { auth: true, method: 'GET' });
   if (r.res) return r.res.status === 401 ? NextResponse.json({ favorited: false, loggedIn: false }) : r.res;
-  const rows = (Array.isArray(r.ok) ? r.ok : []) as { id: string }[];
-  return withFresh(NextResponse.json({ favorited: rows.some((x) => x.id === id), loggedIn: true }), r.fresh);
+  return withFresh(NextResponse.json({ favorited: !!r.ok.favorited, loggedIn: true }), r.fresh);
 }
 
 /** Favoriye ekle (`on: true`) ya da çıkar. */

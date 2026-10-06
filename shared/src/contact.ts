@@ -10,3 +10,10 @@ export function whatsappUrl(phone: string, text?: string): string | null {
   if (d.length < 10 || d.length > 15) return null;
   return `https://wa.me/${d}${text ? `?text=${encodeURIComponent(text)}` : ''}`;
 }
+
+/** Bireysel satıcının herkese açık adı: ad + soyadın baş harfi ("Deniz Y."); soyadın tamamı ilan sayfasında görünmez. */
+export function shortName(name: string | null | undefined): string | null {
+  const parts = (name ?? '').trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return null;
+  return parts.length === 1 ? parts[0] : `${parts[0]} ${parts[parts.length - 1][0].toLocaleUpperCase('tr-TR')}.`;
+}

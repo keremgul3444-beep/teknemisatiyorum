@@ -226,8 +226,14 @@ describe('favoriler ve kayıtlı aramalar', () => {
     const a = await loginAs(t);
     const l = await published(a.user.id);
     expect((await t.http().put(`/favorites/${l.id}`).set(a.auth)).status).toBe(204);
-    expect((await t.http().get('/favorites').set(a.auth)).body.map((x: { id: string }) => x.id)).toContain(l.id);
+    const l2 = await published(a.user.id);
+    expect((await t.http().put(`/favorites/${l2.id}`).set(a.auth)).status).toBe(204);
+    // Son eklenen önce.
+    expect((await t.http().get('/favorites').set(a.auth)).body.map((x: { id: string }) => x.id)).toEqual([l2.id, l.id]);
+    expect((await t.http().get(`/favorites/${l.id}`).set(a.auth)).body).toEqual({ favorited: true });
     expect((await t.http().delete(`/favorites/${l.id}`).set(a.auth)).status).toBe(204);
+    await t.http().delete(`/favorites/${l2.id}`).set(a.auth);
+    expect((await t.http().get(`/favorites/${l.id}`).set(a.auth)).body).toEqual({ favorited: false });
     expect((await t.http().get('/favorites').set(a.auth)).body).toHaveLength(0);
   });
 

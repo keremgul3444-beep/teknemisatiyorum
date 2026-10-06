@@ -1,5 +1,5 @@
 import type { Prefs } from '@/session/role';
-import type { BadgeKind, BoatType, Currency, Equipment, Flag } from '@tms/shared';
+import type { BadgeKind, BoatType, Currency, Equipment, Flag, ParsedQuery } from '@tms/shared';
 import { absolute } from '../mode';
 import type { AdminItem, AuditEntry, Boat, BrokerCase, CaptainBooking, Conversation, ExpertiseBooking, ExpertisePackage, Job, Listing, LogEntry, Promo, Provider, SavedSearch, Seller } from '../types';
 
@@ -76,8 +76,8 @@ export const toThread = (t: ApiThread, prev?: Conversation): Conversation => ({
   messages: t.messages.map((m) => ({ id: m.id, from: m.mine ? 'me' : 'them', text: m.text, at: hm(m.at) })),
 });
 
-export const toSaved = (s: { id: string; text: string; createdAt: string; newMatches: number }): SavedSearch =>
-  ({ id: s.id, query: s.text, createdAt: s.createdAt.slice(0, 10), newMatches: s.newMatches });
+export const toSaved = (s: { id: string; text: string; createdAt: string; newMatches: number; filter?: ParsedQuery }): SavedSearch =>
+  ({ id: s.id, query: s.text, createdAt: s.createdAt.slice(0, 10), newMatches: s.newMatches, filter: s.filter });
 export const toPackage = (p: { id: string; name: string; priceTry: number; items: string[] }): ExpertisePackage =>
   ({ id: p.id, name: p.name, priceTRY: p.priceTry, items: p.items });
 export const toBooking = (b: { id: string; packageId: string; listingId: string | null; date: string; slot: string; reportStatus: string; score: number | null }): ExpertiseBooking =>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FlatList, Linking, Pressable, ScrollView, Share, View, useWindowDimensions } from 'react-native';
+import { ActivityIndicator, FlatList, Linking, Pressable, ScrollView, Share, View, useWindowDimensions } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -18,10 +18,13 @@ export default function IlanDetay() {
   const l = useListing(id);
   const seller = useSeller(l?.sellerId);
   // Gerçek modda ilanın güncel hali (fotoğraflar, karne özeti) sayfa açılınca çekilir.
-  useEffect(() => { if (id) attempt(() => actions.loadListing(id)); }, [id]);
+  // Bildirim ya da bağlantıyla açılan ilan depoda yoksa yüklenene kadar "bulunamadı" gösterilmez.
+  const [loading, setLoading] = useState(true);
+  useEffect(() => { if (id) void attempt(() => actions.loadListing(id)).finally(() => setLoading(false)); }, [id]);
   const fav = useFavorites().includes(id ?? '');
   const { width } = useWindowDimensions();
   const [page, setPage] = useState(0);
+  if (!l && loading) return <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.bg }}><ActivityIndicator color={colors.primary} /></View>;
   if (!l) return <NotFound />;
   const lang = currentLang();
   const galleryW = Math.min(width, 600);
@@ -40,8 +43,8 @@ export default function IlanDetay() {
   };
   const toggleFav = async () => {
     if (!requireLevel(1)) return;
-    await attempt(() => actions.toggleFavorite(l.id));
-    showDemoToast(fav ? t('listing.favRemoved') : t('listing.favAdded'));
+    const ok = await attempt(async () => { await actions.toggleFavorite(l.id); return true; });
+    if (ok) showDemoToast(fav ? t('listing.favRemoved') : t('listing.favAdded'));
   };
   // Üç büyük rakam: alıcının ilk baktığı ölçüler.
   const facts: [string, string][] = [
@@ -182,14 +185,9 @@ export default function IlanDetay() {
                   {l.logbookCount ? (
                     <>
                       <T variant="h3">{t('listing.logbookCount', { count: l.logbookCount })}</T>
-                      {l.logbookLatest?.length ? l.logbookLatest.map((e) => (
+                      {l.logbookLatest?.map((e) => (
                         <T key={e.id} variant="caption" color={colors.muted}>{tx(t, e.title)} · {e.date.slice(0, 4)}</T>
-                      )) : (
-                        <>
-                          <T variant="caption" color={colors.muted}>{t('listing.logbookSample1')}</T>
-                          <T variant="caption" color={colors.muted}>{t('listing.logbookSample2')}</T>
-                        </>
-                      )}
+                      ))}
                     </>
                   ) : <T color={colors.muted}>{t('listing.logbookEmpty')}</T>}
                 </View>
@@ -201,10 +199,10 @@ export default function IlanDetay() {
           <Section title={t('listing.seller')}>
             <Card>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(3) }}>
-                <Avatar name={seller?.name ?? '?'} />
+                <Avatar name={seller?.companyName ?? seller?.name ?? '?'} />
                 <View style={{ flex: 1, gap: space(0.5) }}>
-                  <T variant="h3">{seller?.name ?? '—'}</T>
-                  <T variant="caption" color={colors.muted}>{seller?.companyId ? t('listing.company') : t('listing.memberSince', { year: seller?.since ?? 2024 })}</T>
+                  <T variant="h3">{seller?.companyName ?? seller?.name ?? '—'}</T>
+                  <T variant="caption" color={colors.muted}>{seller?.companyName || seller?.companyId ? t('listing.company') : t('listing.memberSince', { year: seller?.since ?? 2024 })}</T>
                 </View>
                 {seller?.verified ? <Badge kind="dogrulanmis" /> : null}
               </View>

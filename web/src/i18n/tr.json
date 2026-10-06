@@ -742,7 +742,10 @@
     "unreadCount": "{{n}} yeni",
     "inApp": "Ayrıntısı uygulamada",
     "anyListing": "Tüm ilanlar",
-    "whatsapp": "WhatsApp'tan yaz"
+    "whatsapp": "WhatsApp'tan yaz",
+    "sharePhone": "Numaramı paylaş",
+    "sharePhoneConfirm": "Telefon numaran yalnızca bu kişiye gösterilecek.",
+    "phoneShared": "Telefon numaran bu sohbette paylaşıldı."
   },
   "pay": {
     "devTitle": "Deneme ödemesi",

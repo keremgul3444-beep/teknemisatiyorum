@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound, permanentRedirect } from 'next/navigation';
-import { toTRY, type Currency, type Rates } from '@tms/shared';
+import { shortName, toTRY, type Currency, type Rates } from '@tms/shared';
 import { localePath, t, tDict, type Locale } from '@/i18n';
 import { ApiError, apiGet } from '@/lib/api';
 import { formatPrice, idFromSlug, listingSlug } from '@/lib/format';
@@ -159,12 +159,6 @@ export default async function IlanDetay({ params }: P) {
   );
 }
 
-/** Bireysel satıcının adı kısaltılır (ör. "Deniz Y."); soyadın tamamı sayfada ve arama motorlarında görünmez. */
-function shortName(name: string | null): string | null {
-  const parts = (name ?? '').trim().split(/\s+/).filter(Boolean);
-  if (!parts.length) return null;
-  return parts.length === 1 ? parts[0] : `${parts[0]} ${parts[parts.length - 1][0].toLocaleUpperCase('tr-TR')}.`;
-}
 const initials = (name: string | null) => (name ?? '?').trim().split(/\s+/).slice(0, 2).map((w) => w[0]?.toLocaleUpperCase('tr-TR') ?? '').join('') || '?';
 
 /** Sunucunun yazdığı karne başlıkları yalnızca "logbook." anahtarları olabilir; geri kalan her şey kullanıcı metni olarak gösterilir. */

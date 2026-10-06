@@ -406,7 +406,8 @@
     "dropOnly": "Price drops",
     "fHours": "Engine hours",
     "fFlag": "Flag",
-    "fTerms": "Sale terms"
+    "fTerms": "Sale terms",
+    "more": "Show more"
   },
   "valuation": {
     "title": "What's my boat worth?",
@@ -432,7 +433,9 @@
     "requestHint": "Describe the boat you're looking for. We'll notify you when a match arrives.",
     "requestPlaceholder": "E.g. 10–13 m sailboat, after 2016, up to €150,000",
     "create": "Save request",
-    "empty": "You have no saved searches yet"
+    "empty": "You have no saved searches yet",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this saved search?"
   },
   "add": {
     "title": "What would you like to do?",
