@@ -647,7 +647,9 @@
     "owner_suspended": "The owner is suspended; lift the suspension first.",
     "already_done": "This has already been done.",
     "booking_not_accepted": "You can pay once the skipper accepts the request.",
-    "staff_rate": "Too many actions in a short time; try again in a minute."
+    "staff_rate": "Too many actions in a short time; try again in a minute.",
+    "listing_not_sold": "This listing is not marked as sold.",
+    "unsold_window": "\"Sold\" can only be undone within 7 days."
   },
   "login": {
     "title": "Log in",
@@ -770,7 +772,8 @@
     "settings": "Settings",
     "settingsBody": "Name, notifications, privacy, your data and account deletion.",
     "pendingEdit": "Your edit is awaiting review; the listing stays live as it was.",
-    "editRejected": "Your last edit was not approved."
+    "editRejected": "Your last edit was not approved.",
+    "unsold": "Undo \"sold\""
   },
   "pay": {
     "devTitle": "Trial payment",
@@ -1189,7 +1192,8 @@
     "providerSuspended": "Service profile paused: {{name}}",
     "providerActivated": "Service profile activated: {{name}}",
     "memberLeft": "Left the company",
-    "disputeChatViewed": "Dispute messages viewed"
+    "disputeChatViewed": "Dispute messages viewed",
+    "listingUnsold": "Sold mark undone: {{title}}"
   },
   "firm": {
     "title": "Company panel",

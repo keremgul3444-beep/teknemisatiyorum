@@ -886,7 +886,8 @@
     "promoWarn": "Remaining promotion time is not refunded.",
     "awaitingCaptain": "Waiting for the skipper to accept; payment opens after that.",
     "pendingEdit": "Your edit is awaiting review; the listing stays live as it was.",
-    "editRejected": "Your last edit was not approved."
+    "editRejected": "Your last edit was not approved.",
+    "unsold": "Undo \"sold\""
   },
   "settings": {
     "title": "Settings",
@@ -1229,7 +1230,8 @@
     "providerSuspended": "Service profile paused: {{name}}",
     "providerActivated": "Service profile activated: {{name}}",
     "memberLeft": "Left the company",
-    "disputeChatViewed": "Dispute messages viewed"
+    "disputeChatViewed": "Dispute messages viewed",
+    "listingUnsold": "Sold mark undone: {{title}}"
   },
   "errors": {
     "generic": "Something went wrong, please try again.",
@@ -1330,7 +1332,9 @@
     "owner_suspended": "The owner is suspended; lift the suspension first.",
     "already_done": "This has already been done.",
     "booking_not_accepted": "You can pay once the skipper accepts the request.",
-    "staff_rate": "Too many actions in a short time; try again in a minute."
+    "staff_rate": "Too many actions in a short time; try again in a minute.",
+    "listing_not_sold": "This listing is not marked as sold.",
+    "unsold_window": "\"Sold\" can only be undone within 7 days."
   },
   "soon": {
     "title": "Coming soon",
@@ -1475,5 +1479,66 @@
     "send": "Request a quote",
     "sentTitle": "Request received",
     "sent": "Our partner will call you shortly."
+  },
+  "bulk": {
+    "title": "Bulk upload",
+    "intro": "Upload all your boats with one file: each row is a listing. Photos are taken from links on your own site; listings go live after review.",
+    "step1": "Download the sample file and fill it in Excel.",
+    "template": "Share template",
+    "step2": "In the photos column, list https photo links for each listing separated by | (first is the cover, at most 20).",
+    "step3": "In Excel choose \"Save as → CSV UTF-8\" and upload the file here. At most 100 rows.",
+    "choose": "Choose file (.csv)",
+    "checking": "Checking the file…",
+    "tooLarge": "The file is too large; split it into 100 rows.",
+    "missing": "Required columns are missing: {{cols}}",
+    "valid": "{{n}} listings ready to upload",
+    "invalidRows": "{{n}} rows have errors (skipped)",
+    "row": "Row {{n}}",
+    "start": "Upload {{n}} listings",
+    "runningTitle": "Uploading",
+    "doneTitle": "Upload complete",
+    "progress": "{{processed}}/{{total}} rows processed · {{created}} listings",
+    "failedTitle": "Rows that could not be uploaded",
+    "doneNote": "Listings go live after review; we will notify you.",
+    "toListings": "Back to company listings",
+    "err_required": "empty",
+    "err_invalid": "invalid",
+    "err_tooMany": "at most 20 photos",
+    "photo_failed": "photo could not be downloaded",
+    "photo_status": "photo link did not open",
+    "photo_type": "link is not a photo",
+    "photo_size": "photo too large",
+    "photo_timeout": "photo server did not respond",
+    "photo_private": "link points to a disallowed address",
+    "photo_url": "photo links must start with https",
+    "photo_network": "could not reach the photo server",
+    "notMember": "you are no longer in the company",
+    "pick": "Choose CSV file",
+    "fileName": "Selected file: {{name}}",
+    "open": "Bulk upload",
+    "history": "Recent uploads"
+  },
+  "bulkFields": {
+    "brand": "Brand",
+    "model": "Model",
+    "year": "Year",
+    "lengthM": "Length",
+    "type": "Type",
+    "price": "Price",
+    "currency": "Currency",
+    "location": "Location",
+    "cabins": "Cabins",
+    "engine": "Engine",
+    "engineHours": "Engine hours",
+    "flag": "Flag",
+    "tradeIn": "Trade-in",
+    "negotiable": "Negotiable",
+    "equipment": "Equipment",
+    "description": "Description",
+    "photos": "Photos",
+    "header": "Header row",
+    "row": "Row",
+    "field": "Field",
+    "companyId": "Company"
   }
 }

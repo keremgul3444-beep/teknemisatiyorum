@@ -25,6 +25,7 @@ import { changedFields, listingSnapshot } from './snapshot';
 import { normalizePhone } from '../auth/phone';
 import { BOAT_BOUND_BADGES, CLEAR_PENDING, IDENTITY_FIELDS, effective, pendingFields, type PendingChanges } from '../listings/pending-edit';
 import { listingInclude } from '../listings/listing.view';
+import { resumePromo } from '../promotions/promotion.rules';
 
 const STAFF = { roles: ['moderator', 'admin'] as ('moderator' | 'admin')[] };
 /** Red notu: satıcıya neyi düzelteceğini söyleyen serbest metin (gerekçe koduna ek). */
@@ -156,6 +157,8 @@ class AdminController {
       data: approve
         ? {
           status: 'published', publishedAt: keep ? l.publishedAt : now, expiresAt: keep ? l.expiresAt : nextExpiry(), ...(keep ? {} : { expiryWarnedAt: null }),
+          // Süresi dolup düzenlenerek yeniden onaya gelen ilanda vitrin/acil süresi, yayında olmadığı süre kadar uzar.
+          ...resumePromo(l, l.publishedAt ? l.expiresAt : null, now),
           rejectReason: null, rejectNote: null, approvedSnapshot: listingSnapshot(l, l.photos.map((p) => p.fileId)) as Prisma.InputJsonValue,
         }
         : { status: 'rejected', rejectReason: b.reason, rejectNote: b.note ?? null },

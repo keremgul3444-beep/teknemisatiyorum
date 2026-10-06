@@ -76,6 +76,13 @@ export default async function Firma({ params, searchParams }: P) {
                 <div className="muted small">{formatPrice(l.price, l.currency, locale)} · {t(locale, `admin.status.${l.status}`)} · {l.ownerName ?? '—'}</div>
                 {l.stats ? <div className="muted small">{t(locale, 'account.stats', { v: l.stats.views, f: l.stats.favorites, m: l.stats.messages })}</div> : null}
               </div>
+              {/* Firma sahibi/yöneticisi personelin ilanını da düzenler ve öne çıkarır. */}
+              {manager && !['sold', 'removed'].includes(l.status) ? (
+                <div className="row small">
+                  <Link href={localePath(locale, `/hesabim/ilanlar/${l.id}/duzenle`)}>{t(locale, 'account.edit')}</Link>
+                  {l.status === 'published' ? <Link href={localePath(locale, `/hesabim/ilanlar/${l.id}/one-cikar`)}>{t(locale, 'account.promote')}</Link> : null}
+                </div>
+              ) : null}
             </div>
           ))}
           <p className="muted small">{t(locale, 'firm.listingHint')}</p>

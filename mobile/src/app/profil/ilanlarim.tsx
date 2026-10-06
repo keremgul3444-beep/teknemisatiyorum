@@ -41,6 +41,7 @@ export default function Ilanlarim() {
             {l.status === 'kaldirildi' && l.removedReason ? <T variant="caption" color={colors.danger}>{t(`mine.removedReasons.${l.removedReason}`)}</T> : null}
             {l.status === 'suresi-doldu' || (l.status === 'yayinda' && expiringIn(l) !== null) ? <RenewRow listing={l} /> : null}
             {l.stats ? <StatsRow stats={l.stats} /> : null}
+            {l.status === 'satildi' && isApiMode() ? <Button small variant="ghost" title={t('mine.unsold')} onPress={() => attempt(() => actions.unsoldListing(l.id))} /> : null}
             {l.status === 'yayinda' && isApiMode() ? <PromoRow listing={l} /> : null}
             {l.status === 'yayinda' || l.status === 'onay-bekliyor' || l.status === 'reddedildi' || l.status === 'suresi-doldu' ? <ManageRow listing={l} /> : null}
           </View>

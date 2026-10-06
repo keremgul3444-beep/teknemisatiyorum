@@ -22,7 +22,11 @@ export class OrdersService {
   /** Satın alınabilirlik: ilan var, sahibi bu kullanıcı (değilse 404) ve yayında (değilse 409). */
   async assertBuyable(userId: string, listingId: string) {
     const l = await this.prisma.listing.findUnique({ where: { id: listingId } });
-    if (!l || l.ownerId !== userId) throw Errors.notFound();
+    // İlan sahibi ya da ilanın firmasının sahibi/yöneticisi öne çıkarabilir.
+    const manager = l?.companyId && l.ownerId !== userId
+      ? ['owner', 'admin'].includes((await this.prisma.companyMember.findUnique({ where: { companyId_userId: { companyId: l.companyId, userId } }, select: { role: true } }))?.role ?? '')
+      : false;
+    if (!l || (l.ownerId !== userId && !manager)) throw Errors.notFound();
     if (l.status !== 'published') throw notPublished();
     return l;
   }

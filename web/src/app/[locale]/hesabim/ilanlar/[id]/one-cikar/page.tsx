@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { localePath, t, tDict, type Locale } from '@/i18n';
 import { apiGet } from '@/lib/api';
 import { authedGet } from '@/lib/auth-server';
+import { ApiError } from '@/lib/api';
 import type { ListingView } from '@/lib/types';
 import { AcceptGate, BuyButton } from '@/components/AccountBits';
 import { formatKurus } from '@/lib/format';
@@ -20,9 +21,10 @@ const tl = formatKurus;
 /** Öne çıkar: ürün seçimi (site fiyatı). Yalnızca kendi yayındaki ilanı için. */
 export default async function OneCikar({ params }: P) {
   const { locale, id } = (await params) as { locale: Locale; id: string };
-  const mine = await authedGet<ListingView[]>(locale, '/me/listings?status=published', `/hesabim/ilanlar/${id}/one-cikar`);
-  const l = mine.find((x) => x.id === id);
-  if (!l) notFound();
+  // Kendi ilanı ya da yönettiği firmanın personel ilanı (API yetkiyi denetler).
+  if (!/^[a-z0-9]{8,40}$/i.test(id)) notFound();
+  const l = await authedGet<ListingView>(locale, `/me/listings/${id}`, `/hesabim/ilanlar/${id}/one-cikar`).catch(notFoundOnly);
+  if (!l || l.status !== 'published') notFound();
   const products = await apiGet<Product[]>('/products', { revalidate: 60 }).catch(() => null);
   const errors = tDict(locale, 'errors');
   return (
@@ -50,4 +52,10 @@ export default async function OneCikar({ params }: P) {
       </AcceptGate>
     </section>
   );
+}
+
+/** Yetkisiz ya da olmayan ilan 404; oturum yönlendirmesi ve diğer hatalar olduğu gibi geçer. */
+function notFoundOnly(e: unknown): null {
+  if (e instanceof ApiError && (e.status === 404 || e.status === 403)) return null;
+  throw e;
 }

@@ -35,3 +35,15 @@ test('aktiflik ve tazelik', () => {
   expect(freshness({ publishedAt: p, bumpedAt: b })).toBe(b.getTime());
   expect(freshness({ publishedAt: p, bumpedAt: null })).toBe(p.getTime());
 });
+
+import { resumePromo } from './promotion.rules';
+test('süresi dolan ilan yeniden yayına girince geçerli vitrin/acil süresi aradaki gün kadar uzar', () => {
+  const d = (s: string) => new Date(s);
+  const expiredAt = d('2026-10-01T00:00:00Z');
+  const now = d('2026-10-04T00:00:00Z');
+  const r = resumePromo({ featuredUntil: d('2026-10-05T00:00:00Z'), urgentUntil: d('2026-09-30T00:00:00Z') }, expiredAt, now);
+  expect(r.featuredUntil).toEqual(d('2026-10-08T00:00:00Z'));
+  expect(r.urgentUntil).toBeUndefined();
+  expect(resumePromo({ featuredUntil: d('2026-10-05T00:00:00Z'), urgentUntil: null }, d('2026-10-10T00:00:00Z'), now)).toEqual({});
+  expect(resumePromo({ featuredUntil: null, urgentUntil: null }, null, now)).toEqual({});
+});

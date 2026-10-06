@@ -69,11 +69,32 @@ describe('satıcı akışları', () => {
     expect(await t.prisma.notification.count({ where: { userId: s.user.id, key: 'notif.editApproved' } })).toBe(1);
   });
 
+  test('süresi dolan ilan yenilenince kalan vitrin süresi yayında olmadığı gün kadar uzar', async () => {
+    const s = await loginAs(t, { level: 2 });
+    const expiredAt = new Date(Date.now() - 5 * 864e5);
+    const featuredUntil = new Date(Date.now() + 2 * 864e5);
+    const l = await t.prisma.listing.create({ data: { ...base, ownerId: s.user.id, status: 'expired', publishedAt: new Date(Date.now() - 95 * 864e5), expiresAt: expiredAt, featuredUntil } });
+    await t.http().post(`/listings/${l.id}/renew`).set(s.auth).expect(200);
+    const after = await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } });
+    expect(after.status).toBe('published');
+    expect(after.featuredUntil!.getTime() - featuredUntil.getTime()).toBeGreaterThan(5 * 864e5 - 60_000);
+  });
+
   test('süresi dolmuş ilan satıldı işaretlenebilir; taslak/kaldırılmış işaretlenemez', async () => {
     const s = await loginAs(t, { level: 1 });
     const l = await t.prisma.listing.create({ data: { ...base, ownerId: s.user.id, status: 'expired' } });
     await t.http().post(`/listings/${l.id}/sold`).set(s.auth).expect(200);
     expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } })).status).toBe('sold');
+    // Geri alınabilir: yayın süresi bitmiş ilan "süresi doldu"ya döner.
+    await t.http().post(`/listings/${l.id}/unsold`).set(s.auth).expect(200);
+    expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } })).status).toBe('expired');
+    const live = await t.prisma.listing.create({ data: { ...base, ownerId: s.user.id, status: 'published', publishedAt: new Date(), expiresAt: new Date(Date.now() + 30 * 864e5) } });
+    await t.http().post(`/listings/${live.id}/sold`).set(s.auth).expect(200);
+    await t.http().post(`/listings/${live.id}/unsold`).set(s.auth).expect(200);
+    expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: live.id } })).status).toBe('published');
+    await t.http().post(`/listings/${live.id}/sold`).set(s.auth).expect(200);
+    await t.prisma.auditLog.updateMany({ where: { action: 'audit.listingSold', targetId: live.id }, data: { at: new Date(Date.now() - 8 * 864e5) } });
+    expect((await t.http().post(`/listings/${live.id}/unsold`).set(s.auth)).body.code).toBe('UNSOLD_WINDOW');
     const d = await t.prisma.listing.create({ data: { ...base, ownerId: s.user.id, status: 'draft' } });
     expect((await t.http().post(`/listings/${d.id}/sold`).set(s.auth)).status).toBe(409);
   });

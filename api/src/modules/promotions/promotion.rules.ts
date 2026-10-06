@@ -28,3 +28,18 @@ export function revertProduct(s: PromoState, p: PromoProduct, now: Date): PromoS
 /** "En yeni" sıralamasının anahtarı. */
 export const freshness = (l: { publishedAt: Date | null; bumpedAt: Date | null }) =>
   Math.max(l.publishedAt?.getTime() ?? 0, l.bumpedAt?.getTime() ?? 0);
+
+/**
+ * Süresi dolan ilan yeniden yayına girince: süresi dolduğu anda hâlâ geçerli olan vitrin/acil süresi, ilanın
+ * yayında olmadığı süre kadar uzatılır (satıcının ödediği gün görünmeden harcanmasın).
+ */
+export function resumePromo(s: Pick<PromoState, 'featuredUntil' | 'urgentUntil'>, expiredAt: Date | null, now: Date): Partial<PromoState> {
+  if (!expiredAt || expiredAt.getTime() >= now.getTime()) return {};
+  const gap = now.getTime() - expiredAt.getTime();
+  const out: Partial<PromoState> = {};
+  for (const f of ['featuredUntil', 'urgentUntil'] as const) {
+    const u = s[f];
+    if (u && u.getTime() > expiredAt.getTime()) out[f] = new Date(u.getTime() + gap);
+  }
+  return out;
+}

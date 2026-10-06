@@ -886,7 +886,8 @@
     "promoWarn": "Kalan öne çıkarma süresi iade edilmez.",
     "awaitingCaptain": "Kaptanın onayı bekleniyor; onaylayınca ödeme açılır.",
     "pendingEdit": "Düzenlemen onay bekliyor; ilan önceki hâliyle yayında.",
-    "editRejected": "Son düzenlemen onaylanmadı."
+    "editRejected": "Son düzenlemen onaylanmadı.",
+    "unsold": "Satıldı işaretini geri al"
   },
   "settings": {
     "title": "Ayarlar",
@@ -1229,7 +1230,8 @@
     "providerSuspended": "Hizmet profili durduruldu: {{name}}",
     "providerActivated": "Hizmet profili açıldı: {{name}}",
     "memberLeft": "Firmadan ayrıldı",
-    "disputeChatViewed": "Anlaşmazlık yazışması görüntülendi"
+    "disputeChatViewed": "Anlaşmazlık yazışması görüntülendi",
+    "listingUnsold": "Satıldı işareti geri alındı: {{title}}"
   },
   "errors": {
     "generic": "Bir şeyler ters gitti, tekrar dene.",
@@ -1330,7 +1332,9 @@
     "owner_suspended": "İlan sahibinin hesabı askıda; önce askıyı kaldır.",
     "already_done": "Bu işlem zaten yapılmış.",
     "booking_not_accepted": "Kaptan talebi onayladıktan sonra ödeme yapılabilir.",
-    "staff_rate": "Çok hızlı işlem yapıldı; bir dakika sonra yeniden dene."
+    "staff_rate": "Çok hızlı işlem yapıldı; bir dakika sonra yeniden dene.",
+    "listing_not_sold": "Bu ilan satıldı olarak işaretli değil.",
+    "unsold_window": "Satıldı işareti yalnızca 7 gün içinde geri alınabilir."
   },
   "soon": {
     "title": "Yakında",
@@ -1475,5 +1479,66 @@
     "send": "Teklif iste",
     "sentTitle": "Talebin alındı",
     "sent": "İş ortağımız kısa süre içinde seni arayacak."
+  },
+  "bulk": {
+    "title": "Toplu ilan yükle",
+    "intro": "Tüm teknelerini tek dosyayla yükle: her satır bir ilan. Fotoğraflar kendi sitendeki bağlantılardan alınır; ilanlar ekip onayından sonra yayına girer.",
+    "step1": "Örnek dosyayı indir, Excel'de doldur.",
+    "template": "Şablonu paylaş",
+    "step2": "Fotoğraflar sütununa her ilan için https ile başlayan fotoğraf bağlantılarını | ile ayırarak yaz (ilk fotoğraf kapak, en fazla 20).",
+    "step3": "Excel'de \"Farklı kaydet → CSV UTF-8\" seç ve dosyayı buraya yükle. En fazla 100 satır.",
+    "choose": "Dosya seç (.csv)",
+    "checking": "Dosya denetleniyor…",
+    "tooLarge": "Dosya çok büyük; 100 satıra böl.",
+    "missing": "Zorunlu sütunlar eksik: {{cols}}",
+    "valid": "{{n}} ilan yüklenmeye hazır",
+    "invalidRows": "{{n}} satırda hata var (yüklenmez)",
+    "row": "Satır {{n}}",
+    "start": "{{n}} ilanı yükle",
+    "runningTitle": "Yükleniyor",
+    "doneTitle": "Yükleme tamamlandı",
+    "progress": "{{processed}}/{{total}} satır işlendi · {{created}} ilan",
+    "failedTitle": "Yüklenemeyen satırlar",
+    "doneNote": "İlanlar ekip onayından sonra yayına girer; sonucu bildirimle haber veririz.",
+    "toListings": "Firma ilanlarına dön",
+    "err_required": "boş",
+    "err_invalid": "geçersiz",
+    "err_tooMany": "en fazla 20 fotoğraf",
+    "photo_failed": "fotoğraf indirilemedi",
+    "photo_status": "fotoğraf bağlantısı açılmadı",
+    "photo_type": "bağlantı bir fotoğraf değil",
+    "photo_size": "fotoğraf çok büyük",
+    "photo_timeout": "fotoğraf sunucusu yanıt vermedi",
+    "photo_private": "bağlantı izin verilmeyen bir adrese gidiyor",
+    "photo_url": "fotoğraf bağlantısı https ile başlamalı",
+    "photo_network": "fotoğraf sunucusuna ulaşılamadı",
+    "notMember": "artık firmada değilsin",
+    "pick": "CSV dosyası seç",
+    "fileName": "Seçilen dosya: {{name}}",
+    "open": "Toplu yükleme",
+    "history": "Son yüklemeler"
+  },
+  "bulkFields": {
+    "brand": "Marka",
+    "model": "Model",
+    "year": "Yıl",
+    "lengthM": "Boy",
+    "type": "Tip",
+    "price": "Fiyat",
+    "currency": "Para birimi",
+    "location": "Konum",
+    "cabins": "Kabin",
+    "engine": "Motor",
+    "engineHours": "Motor saati",
+    "flag": "Bayrak",
+    "tradeIn": "Takas",
+    "negotiable": "Pazarlık",
+    "equipment": "Donanım",
+    "description": "Açıklama",
+    "photos": "Fotoğraflar",
+    "header": "Başlık satırı",
+    "row": "Satır",
+    "field": "Alan",
+    "companyId": "Firma"
   }
 }

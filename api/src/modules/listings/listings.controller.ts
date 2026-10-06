@@ -14,6 +14,7 @@ import { ListingTexts } from './listing-writer.service';
 import { NotificationsService } from '../notifications/notifications.module';
 import { Prisma } from '@prisma/client';
 import { BOAT_BOUND_BADGES, CLEAR_PENDING, IDENTITY_FIELDS, mergePending, pendingPhotos } from './pending-edit';
+import { resumePromo } from '../promotions/promotion.rules';
 
 /** Kullanıcı başına açık (gönderilmemiş) taslak sınırı. */
 const MAX_OPEN_DRAFTS = 5;
@@ -73,6 +74,8 @@ const patchSchema = draftSchema.partial().extend({
 /** Onaydan geçmiş (ya da reddedilmiş) içerik: değişirse ilan yeniden onaya düşer. Süresi dolan da onaylıdır; düzenlenip yenilenirse denetimsiz yayına çıkmasın. */
 // Reddedilen ilan düzenlenince reddedilmiş kalır; satıcı /submit ile gönderir (seviye ve fotoğraf denetimi orada).
 const REVIEWED: string[] = ['published', 'expired'];
+/** "Satıldı" işareti bu süre içinde geri alınabilir. */
+const UNSOLD_WINDOW_MS = 7 * 864e5;
 /** Bu başlıkla gelen okuma görüntülenme sayılmaz (sitenin ara katmanı ve sayfa önbelleği). */
 export const NO_COUNT_HEADER = 'x-tms-no-count';
 const reportSchema = z.object({ reason: z.enum(REPORT_REASONS), note: z.string().trim().max(500).default('') });
@@ -185,6 +188,13 @@ export class ListingsController {
     return Promise.all(rows.map((l) => this.listings.view(l, u.id, stats.get(l.id))));
   }
 
+  /** Tek ilan, sahibinin görünümüyle: kendi ilanı ya da yönettiği firmanın personel ilanı (düzenleme ve öne çıkarma sayfaları). */
+  @Auth()
+  @Get('me/listings/:id')
+  async mineOne(@CurrentUser() u: AuthUser, @Param('id') id: string) {
+    return this.listings.ownerView(await this.listings.getOwn(id, u.id));
+  }
+
   /** Sihirbazda "açıklamayı benim için yaz": girilen bilgilerden taslak (modelle, yoksa kural tabanlı). Kaydetmez. */
   @Auth({ level: 1 })
   @Post('listings/describe')
@@ -239,7 +249,7 @@ export class ListingsController {
         },
       });
       await this.audit.log(u.id, 'audit.listingEdited', { fields: Object.keys(b).sort().join(','), status: 'pendingEdit' }, 'listing', id);
-      return this.listings.view(await this.listings.getOwn(id, u.id), u.id);
+      return this.listings.ownerView(await this.listings.getOwn(id, u.id));
     }
     const status = priceOnly ? l.status : REVIEWED.includes(l.status) ? 'pending' : l.status;
     // Ölçülü fiyat değişikliği anında yazılır; bekleyen düzenlemedeki eski fiyat önerisi düşer.
@@ -257,7 +267,7 @@ export class ListingsController {
     await this.audit.log(u.id, 'audit.listingEdited', { fields: Object.keys(b).sort().join(','), status }, 'listing', id);
     const updated = await this.prisma.listing.findUniqueOrThrow({ where: { id }, include: listingInclude });
     if (priceChanged && b.price! < l.price && updated.status === 'published') await this.listings.notifyPriceDrop(updated);
-    return this.listings.view(updated, u.id);
+    return this.listings.ownerView(updated);
   }
 
   @Auth({ level: 1 })
@@ -276,7 +286,7 @@ export class ListingsController {
       if (current.length + fresh.length > MAX_PHOTOS) throw Errors.bad('TOO_MANY_PHOTOS', { max: MAX_PHOTOS });
       await this.setPendingPhotos(l, columns, [...current, ...fresh]);
       if (fresh.length) await this.audit.log(u.id, 'audit.listingPhotosChanged', { added: String(fresh.length) }, 'listing', id);
-      return this.listings.view(await this.listings.getOwn(id, u.id), u.id);
+      return this.listings.ownerView(await this.listings.getOwn(id, u.id));
     }
     const added = await this.prisma.$transaction(async (tx) => {
       await tx.$queryRaw`SELECT id FROM "Listing" WHERE id = ${id} FOR UPDATE`;
@@ -290,7 +300,7 @@ export class ListingsController {
       return fresh.length;
     });
     if (added) await this.audit.log(u.id, 'audit.listingPhotosChanged', { added: String(added) }, 'listing', id);
-    return this.listings.view(await this.listings.getOwn(id, u.id), u.id);
+    return this.listings.ownerView(await this.listings.getOwn(id, u.id));
   }
 
   /**
@@ -312,7 +322,7 @@ export class ListingsController {
       const before = l.pendingPhotoIds.length ? l.pendingPhotoIds : current;
       await this.setPendingPhotos(l, current, b.fileIds);
       if (JSON.stringify(before) !== JSON.stringify(b.fileIds)) await this.audit.log(u.id, 'audit.listingPhotosChanged', { count: String(b.fileIds.length) }, 'listing', id);
-      return this.listings.view(await this.listings.getOwn(id, u.id), u.id);
+      return this.listings.ownerView(await this.listings.getOwn(id, u.id));
     }
     const changed = current.length !== b.fileIds.length || current.some((f, i) => f !== b.fileIds[i]);
     if (changed) {
@@ -324,7 +334,7 @@ export class ListingsController {
       });
       await this.audit.log(u.id, 'audit.listingPhotosChanged', { count: String(b.fileIds.length) }, 'listing', id);
     }
-    return this.listings.view(await this.listings.getOwn(id, u.id), u.id);
+    return this.listings.ownerView(await this.listings.getOwn(id, u.id));
   }
 
   @Auth({ level: 2 })
@@ -336,7 +346,7 @@ export class ListingsController {
     if (l.photos.length === 0) throw Errors.bad('PHOTO_REQUIRED');
     const updated = await this.prisma.listing.update({ where: { id }, data: { status: 'pending', rejectReason: null, rejectNote: null }, include: listingInclude });
     await this.audit.log(u.id, 'audit.listingSubmitted', { title: `${l.brand} ${l.model}` }, 'listing', id);
-    return this.listings.view(updated, u.id);
+    return this.listings.ownerView(updated);
   }
 
   @Auth({ level: 1 })
@@ -348,7 +358,25 @@ export class ListingsController {
     if (!['published', 'expired'].includes(l.status)) throw Errors.conflict('LISTING_NOT_PUBLISHED');
     const updated = await this.prisma.listing.update({ where: { id }, data: { status: 'sold', ...CLEAR_PENDING }, include: listingInclude });
     await this.audit.log(u.id, 'audit.listingSold', { title: `${l.brand} ${l.model}` }, 'listing', id);
-    return this.listings.view(updated, u.id);
+    return this.listings.ownerView(updated);
+  }
+
+  /**
+   * "Satıldı" işaretini geri al (yanlışlıkla ya da satış bozulduysa): işaretten sonraki 7 gün içinde. İlan yayın süresi
+   * sürüyorsa yayına, bitmişse "süresi doldu"ya döner; içerik değişmediği için onaya düşmez.
+   */
+  @Auth({ level: 1 })
+  @Post('listings/:id/unsold')
+  @HttpCode(200)
+  async unsold(@CurrentUser() u: AuthUser, @Param('id') id: string) {
+    const l = await this.listings.getOwn(id, u.id);
+    if (l.status !== 'sold') throw Errors.conflict('LISTING_NOT_SOLD');
+    const soldAt = (await this.prisma.auditLog.findFirst({ where: { action: 'audit.listingSold', targetId: id }, orderBy: { at: 'desc' }, select: { at: true } }))?.at ?? l.updatedAt;
+    if (Date.now() - soldAt.getTime() > UNSOLD_WINDOW_MS) throw Errors.conflict('UNSOLD_WINDOW');
+    const status = l.expiresAt && l.expiresAt > new Date() ? 'published' : 'expired';
+    const updated = await this.prisma.listing.update({ where: { id }, data: { status }, include: listingInclude });
+    await this.audit.log(u.id, 'audit.listingUnsold', { title: `${l.brand} ${l.model}` }, 'listing', id);
+    return this.listings.ownerView(updated);
   }
 
   /** Süresi dolan ya da dolmak üzere olan ilanı 90 gün daha yayında tutar; içerik değişmediği için onaya düşmez. */
@@ -359,10 +387,10 @@ export class ListingsController {
     const l = await this.listings.getOwn(id, u.id);
     if (!canRenew(l)) throw Errors.conflict('NOT_RENEWABLE');
     const updated = await this.prisma.listing.update({
-      where: { id }, data: { status: 'published', expiresAt: nextExpiry(), expiryWarnedAt: null }, include: listingInclude,
+      where: { id }, data: { status: 'published', expiresAt: nextExpiry(), expiryWarnedAt: null, ...resumePromo(l, l.status === 'expired' ? l.expiresAt : null, new Date()) }, include: listingInclude,
     });
     await this.audit.log(u.id, 'audit.listingRenewed', { title: `${l.brand} ${l.model}` }, 'listing', id);
-    return this.listings.view(updated, u.id);
+    return this.listings.ownerView(updated);
   }
 
   @Auth({ level: 1 })

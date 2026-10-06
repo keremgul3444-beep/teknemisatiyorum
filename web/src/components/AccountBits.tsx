@@ -204,3 +204,23 @@ export function ListingManage({ listingId, canSell, promoActive, labels, errors 
     </div>
   );
 }
+
+/** Satıldı işaretini geri al (7 gün içinde; süre geçtiyse sunucu söyler). */
+export function UnsoldButton({ listingId, label, errors }: { listingId: string; label: string; errors: Record<string, string> }) {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  return (
+    <div style={{ display: 'grid', gap: 6, justifyItems: 'end' }}>
+      <button type="button" className="linklike small" disabled={busy} onClick={async () => {
+        setBusy(true); setError('');
+        const r = await fetch(`/api/listings/${encodeURIComponent(listingId)}/act`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'unsold' }) }).catch(() => null);
+        const j = r ? await r.json().catch(() => ({})) : {};
+        setBusy(false);
+        if (!r?.ok) { setError(errors[String(j.messageKey ?? '').replace(/^errors\./, '')] ?? errors.generic); return; }
+        router.refresh();
+      }}>{label}</button>
+      {error ? <p className="small" role="alert" style={{ color: 'var(--c-danger)', margin: 0 }}>{error}</p> : null}
+    </div>
+  );
+}

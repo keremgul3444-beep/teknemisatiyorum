@@ -52,10 +52,23 @@ export class ListingsService {
     return l;
   }
 
+  /** Kendi ilanı ya da yönettiği firmanın (sahip/yönetici) personel ilanı; ikisi de ilan sahibi gibi işlem yapar. */
   async getOwn(id: string, userId: string) {
     const l = await this.prisma.listing.findUnique({ where: { id }, include: listingInclude });
-    if (!l || l.ownerId !== userId) throw Errors.notFound();
+    if (!l || !(await this.canManage(l, userId))) throw Errors.notFound();
     return l;
+  }
+
+  async canManage(l: { ownerId: string; companyId: string | null }, userId: string) {
+    if (l.ownerId === userId) return true;
+    if (!l.companyId) return false;
+    const m = await this.prisma.companyMember.findUnique({ where: { companyId_userId: { companyId: l.companyId, userId } }, select: { role: true } });
+    return m?.role === 'owner' || m?.role === 'admin';
+  }
+
+  /** Sahibin göreceği görünüm (firma yöneticisi de aynısını görür: bekleyen düzenleme, süre, red gerekçesi). */
+  ownerView(l: ListingRow) {
+    return this.view(l, l.ownerId);
   }
 
   async view(l: ListingRow, viewerId?: string, stats?: ListingStats) {

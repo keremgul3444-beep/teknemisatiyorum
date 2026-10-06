@@ -5,7 +5,7 @@ import { authedGet } from '@/lib/auth-server';
 import { formatPrice, listingSlug } from '@/lib/format';
 import type { ListingView } from '@/lib/types';
 import { PromoBadges } from '@/components/PromoBadges';
-import { ListingManage, RenewButton } from '@/components/AccountBits';
+import { ListingManage, RenewButton, UnsoldButton } from '@/components/AccountBits';
 
 type P = { params: Promise<{ locale: string }> };
 type DocRequest = { kind: string; status: 'pending' | 'approved' | 'rejected'; listingId: string | null; rejectReason: string | null; rejectNote: string | null };
@@ -77,6 +77,7 @@ export default async function HesabimIlanlar({ params }: P) {
                       {l.badges.includes('sahiplik') || doc?.status === 'pending' ? null : <Link href={localePath(locale, `/hesabim/ilanlar/${l.id}/belge`)}>{t(locale, 'account.document')}</Link>}
                     </div>
                   )}
+                  {l.status === 'sold' ? <UnsoldButton listingId={l.id} label={t(locale, 'account.unsold')} errors={tDict(locale, 'errors')} /> : null}
                   {l.status === 'sold' || l.status === 'removed' ? null : (
                     <ListingManage listingId={l.id} canSell={live || l.status === 'expired'} promoActive={!!(f || u)} labels={manageLabels} errors={tDict(locale, 'errors')} />
                   )}

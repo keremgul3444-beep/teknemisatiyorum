@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { colors, radius, space } from '@/theme';
@@ -62,18 +62,29 @@ function KurumsalPanel() {
   );
 }
 
-/** Gerçek mod: sunucudaki firma (yoksa açma formu), personel ve firmanın ilanları. */
+/** Gerçek mod: sunucudaki firma (yoksa açma formu), personel ve firmanın ilanları. Birden çok firmada üstte seçim. */
 function ApiPanel() {
   const { t } = useTranslation();
+  const [selected, setSelected] = useState<string | null>(null);
   const { data, reload } = useRemote(async () => {
     const mine = await actions.myCompanies();
     // Sarmalanır: `null` yükleniyor demek, `{ company: null }` firma yok demek.
-    return { company: mine.length ? await actions.companyDetail(mine[0].id) : null };
+    return { mine, company: mine.length ? await actions.companyDetail(mine[0].id) : null };
   });
+  // Seçilen firma ayrıca yüklenir (ilk firma listeyle birlikte gelir).
+  const other = useRemote(async () => (selected ? actions.companyDetail(selected) : null));
+  const { reload: reloadOther } = other;
+  useEffect(() => { if (selected) void reloadOther(); }, [selected, reloadOther]);
+  const company = selected && other.data?.id === selected ? other.data : data?.company ?? null;
   return (
     <Screen>
       <Header title={t('corporate.title')} />
-      {!data ? null : data.company ? <CompanyView d={data.company} reload={reload} /> : <CreateCompany onCreated={reload} />}
+      {data && data.mine.length > 1 ? (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space(2) }}>
+          {data.mine.map((c) => <Chip key={c.id} label={c.name} selected={(company?.id ?? data.mine[0].id) === c.id} onPress={() => setSelected(c.id)} />)}
+        </View>
+      ) : null}
+      {!data ? null : company ? <CompanyView d={company} reload={() => { void reload(); if (selected) void reloadOther(); }} /> : <CreateCompany onCreated={reload} />}
     </Screen>
   );
 }
@@ -164,12 +175,20 @@ function CompanyView({ d, reload }: { d: CompanyDetail; reload: () => void }) {
         </Card>
       </Section>
 
+      {isApiMode() ? <Button variant="secondary" icon="doc" title={t('bulk.open')} onPress={() => router.push({ pathname: '/panel/toplu', params: { id: d.id } })} /> : null}
       <Section title={t('corporate.listings')}>
         {d.listings.length === 0 ? <EmptyState icon="anchor" title={t('corporate.noListings')} actionLabel={t('mine.post')} onAction={() => router.push('/ilan-ver')} /> : d.listings.map((l) => (
           <Card key={l.id}>
             <T variant="h3">{l.title} · {l.year}</T>
             <T variant="caption" color={colors.muted}>{formatPrice(l.price, l.currency, currentLang())} · {t(`corporate.status.${l.status}`, { defaultValue: l.status })} · {l.ownerName ?? '—'}</T>
             {l.stats ? <T variant="caption" color={colors.muted}>{t('corporate.stats', { v: l.stats.views, f: l.stats.favorites, m: l.stats.messages })}</T> : null}
+            {/* Firma sahibi/yöneticisi personelin ilanını da düzenler ve öne çıkarır. */}
+            {isManager(d) && !['sold', 'removed'].includes(l.status) ? (
+              <View style={{ flexDirection: 'row', gap: space(2) }}>
+                <View style={{ flex: 1 }}><Button small variant="secondary" title={t('mine.edit')} onPress={async () => { if (await attempt(async () => { await actions.loadOwnListing(l.id); return true; })) router.push({ pathname: '/ilan-ver', params: { id: l.id } }); }} /></View>
+                {l.status === 'published' ? <View style={{ flex: 1 }}><Button small variant="ghost" title={t('promo.cta')} onPress={async () => { if (await attempt(async () => { await actions.loadOwnListing(l.id); return true; })) router.push(`/profil/one-cikar/${l.id}`); }} /></View> : null}
+              </View>
+            ) : null}
           </Card>
         ))}
       </Section>

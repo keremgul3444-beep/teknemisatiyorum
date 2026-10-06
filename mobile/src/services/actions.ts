@@ -210,6 +210,16 @@ export const actions = {
   addCompanyMember: (id: string, phone: string, role: 'admin' | 'staff') => api.post(`/companies/${id}/members`, { phone, role }),
   removeCompanyMember: (id: string, userId: string) => api.del(`/companies/${id}/members/${userId}`),
   leaveCompany: (id: string) => api.post(`/companies/${id}/leave`),
+  /** Satıldı işaretini geri al (7 gün içinde); ilanlarım yenilenir. */
+  async unsoldListing(id: string) {
+    await api.post(`/listings/${id}/unsold`);
+    await syncMine();
+  },
+  importTemplate: (id: string) => api.get<{ filename: string; csv: string }>(`/companies/${id}/imports/template`),
+  importPreview: (id: string, csv: string) => api.post<ImportPreview>(`/companies/${id}/imports/preview`, { csv }),
+  importStart: (id: string, csv: string) => api.post<ImportJob>(`/companies/${id}/imports`, { csv }),
+  importJobs: (id: string) => api.get<ImportJob[]>(`/companies/${id}/imports`),
+  importJob: (id: string, jobId: string) => api.get<ImportJob>(`/companies/${id}/imports/${jobId}`),
   /** Süresi dolan ya da dolmak üzere olan ilanı 90 gün uzatır (onaya düşmez). */
   async renewListing(id: string) {
     if (!isApiMode()) return g().renewListing(id);
@@ -220,6 +230,12 @@ export const actions = {
     if (!isApiMode()) return g().markSold(id);
     await api.post(`/listings/${id}/sold`);
     await syncMine();
+  },
+  /** Sahibinin görünümüyle tek ilan (kendi ilanı ya da yönettiği firmanın personel ilanı): düzenleme ve öne çıkarma için. */
+  async loadOwnListing(id: string) {
+    if (!isApiMode()) return;
+    const l = await api.get<ApiListing>(`/me/listings/${id}`);
+    useStore.setState({ listings: [...g().listings.filter((x) => x.id !== id), toListing(l)] });
   },
   async loadListing(id: string) {
     if (!isApiMode()) return;
@@ -545,3 +561,7 @@ export const actions = {
   markRead: async (convId: string) => (isApiMode() ? actions.openConversation(convId) : g().markRead(convId)),
   resetDemo: async () => { resetRates(); g().resetDemo(); },
 };
+
+/** Toplu yükleme önizlemesi ve işi (firma paneli). */
+export type ImportPreview = { valid: number; errors: { row: number; field: string; code: string }[]; missing: string[] };
+export type ImportJob = { id: string; status: string; total: number; created: number; processed: number; failed: { row: number; error?: string }[]; createdAt: string };

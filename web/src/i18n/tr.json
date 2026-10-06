@@ -647,7 +647,9 @@
     "owner_suspended": "İlan sahibinin hesabı askıda; önce askıyı kaldır.",
     "already_done": "Bu işlem zaten yapılmış.",
     "booking_not_accepted": "Kaptan talebi onayladıktan sonra ödeme yapılabilir.",
-    "staff_rate": "Çok hızlı işlem yapıldı; bir dakika sonra yeniden dene."
+    "staff_rate": "Çok hızlı işlem yapıldı; bir dakika sonra yeniden dene.",
+    "listing_not_sold": "Bu ilan satıldı olarak işaretli değil.",
+    "unsold_window": "Satıldı işareti yalnızca 7 gün içinde geri alınabilir."
   },
   "login": {
     "title": "Giriş yap",
@@ -770,7 +772,8 @@
     "settings": "Ayarlar",
     "settingsBody": "Ad, bildirimler, gizlilik, verilerim ve hesabı silme.",
     "pendingEdit": "Düzenlemen onay bekliyor; ilan önceki hâliyle yayında.",
-    "editRejected": "Son düzenlemen onaylanmadı."
+    "editRejected": "Son düzenlemen onaylanmadı.",
+    "unsold": "Satıldı işaretini geri al"
   },
   "pay": {
     "devTitle": "Deneme ödemesi",
@@ -1189,7 +1192,8 @@
     "providerSuspended": "Hizmet profili durduruldu: {{name}}",
     "providerActivated": "Hizmet profili açıldı: {{name}}",
     "memberLeft": "Firmadan ayrıldı",
-    "disputeChatViewed": "Anlaşmazlık yazışması görüntülendi"
+    "disputeChatViewed": "Anlaşmazlık yazışması görüntülendi",
+    "listingUnsold": "Satıldı işareti geri alındı: {{title}}"
   },
   "firm": {
     "title": "Firma paneli",

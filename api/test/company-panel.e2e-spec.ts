@@ -30,6 +30,19 @@ test('firma paneli: üyeler görür, istatistik yalnız yöneticiye; personel ç
   expect((await t.http().delete(`/companies/${c.id}/members/${owner.user.id}`).set(owner.auth)).body.code).toBe('OWNER_LOCKED');
   expect((await t.http().delete(`/companies/${c.id}/members/${owner.user.id}`).set(staff.auth)).status).toBe(404);
   await t.http().delete(`/companies/${c.id}/members/${staff.user.id}`).set(owner.auth).expect(204);
+  // Firma sahibi personelin ilanını sahibi gibi görür ve düzenler; diğer personel ve dışarıdan biri dokunamaz.
+  expect((await t.http().get(`/me/listings/${l.id}`).set(owner.auth)).body).toMatchObject({ id: l.id, isMine: true });
+  await t.http().patch(`/listings/${l.id}`).set(owner.auth).send({ description: 'Firma düzenledi' }).expect(200);
+  expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } })).pendingChanges).toMatchObject({ description: 'Firma düzenledi' });
+  expect((await t.http().get(`/me/listings/${l.id}`).set(outsider.auth)).status).toBe(404);
+  const s3 = await loginAs(t, { level: 2 });
+  await t.http().post(`/companies/${c.id}/members`).set(owner.auth).send({ phone: s3.user.phone, role: 'staff' }).expect(201);
+  expect((await t.http().patch(`/listings/${l.id}`).set(s3.auth).send({ description: 'x' })).status).toBe(404);
+  await t.prisma.product.upsert({ where: { code: 'vitrin_7' }, create: { code: 'vitrin_7', kind: 'vitrin', days: 7, priceWebKurus: 100, priceAppKurus: 100 }, update: {} });
+  const order = await t.http().post('/orders').set(owner.auth).send({ listingId: l.id, productCode: 'vitrin_7', accept: true });
+  expect(order.status).toBeLessThan(400);
+  expect((await t.http().post('/orders').set(s3.auth).send({ listingId: l.id, productCode: 'vitrin_7', accept: true })).status).toBe(404);
+
   // Envanter firmanın: ilan firmada kalır, firma sahibine geçer; personele bildirim gider.
   expect(await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } })).toMatchObject({ companyId: c.id, ownerId: owner.user.id });
   expect(await t.prisma.notification.count({ where: { userId: staff.user.id, key: 'notif.companyRemoved' } })).toBe(1);
