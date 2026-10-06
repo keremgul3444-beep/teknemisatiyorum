@@ -95,6 +95,32 @@ describe('yönetici araçları', () => {
     expect(await t.prisma.notification.count({ where: { userId: m.user.id, key: 'notif.staffReport' } })).toBe(1);
   });
 
+  test('kuyruk firmaya ve türe göre süzülür; firma ilanları toplu onaylanır', async () => {
+    const m = await mod();
+    const s = await loginAs(t, { level: 2 });
+    const c = (await t.http().post('/companies').set(s.auth).send({ name: 'Toplu Yat', kind: 'galeri', city: 'Bodrum' })).body;
+    const a = await t.prisma.listing.create({ data: { ...base, ownerId: s.user.id, companyId: c.id, status: 'pending' } });
+    const b = await t.prisma.listing.create({ data: { ...base, ownerId: s.user.id, companyId: c.id, status: 'pending' } });
+    const q = (await t.http().get(`/admin/queue?kind=listing&company=${c.id}&scope=new`).set(m.auth)).body;
+    expect(q.map((x: { id: string }) => x.id).sort()).toEqual([a.id, b.id].sort());
+    expect(q[0].company).toMatchObject({ id: c.id, name: 'Toplu Yat' });
+    expect((await t.http().get(`/admin/queue?kind=listing&company=${c.id}&scope=edit`).set(m.auth)).body).toHaveLength(0);
+    const items = q.map((x: { id: string; version: string }) => ({ id: x.id, version: x.version }));
+    items.push({ id: a.id, version: 'eski' });
+    const r = (await t.http().post('/admin/listings/bulk-approve').set(m.auth).send({ items })).body;
+    expect(r.approved).toBe(2);
+    expect(r.results.filter((x: { ok: boolean }) => !x.ok)).toHaveLength(1);
+    expect(await t.prisma.listing.count({ where: { id: { in: [a.id, b.id] }, status: 'published' } })).toBe(2);
+  });
+
+  test('ekip yazma işlemleri kişi başı dakikada 60 ile sınırlı; okuma etkilenmez', async () => {
+    const m = await mod();
+    for (let i = 0; i < 60; i++) expect((await t.http().post('/admin/listings/yokilan0001/reports/dismiss').set(m.auth)).status).toBe(404);
+    expect((await t.http().post('/admin/listings/yokilan0001/reports/dismiss').set(m.auth)).body.code).toBe('STAFF_RATE');
+    expect((await t.http().get('/admin/overview').set(m.auth)).status).toBe(200);
+    expect((await t.http().post('/admin/listings/yokilan0001/reports/dismiss').set((await mod()).auth)).status).toBe(404);
+  });
+
   test('düzenlenen ilan kuyrukta değişen alanlarıyla gelir', async () => {
     const m = await mod();
     const s = await loginAs(t, { level: 2 });

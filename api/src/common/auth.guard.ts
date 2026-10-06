@@ -5,6 +5,9 @@ import { PrismaService } from './prisma.service';
 import { Errors } from './errors';
 import { AUTH_KEY, PUBLIC_KEY, type AuthRule, type AuthUser } from './decorators';
 
+/** Ekip yazma işlemleri (karar, askı, iade…) kişi başı dakikada en fazla bu kadar: çalınan bir ekip oturumu sınırlı zarar verir. */
+export const STAFF_WRITES_PER_MIN = 60;
+
 /**
  * Varsayılanı kapalı yetki kapısı.
  * Seviye ve roller anahtardan değil her istekte veritabanından okunur: kimlik doğrulanınca
@@ -28,7 +31,18 @@ export class AuthGuard implements CanActivate {
     if (!rule || !user) throw Errors.unauthenticated();
     if (rule.roles?.length && !rule.roles.some((r) => user.roles.includes(r))) throw Errors.forbidden();
     if (rule.level && user.level < rule.level) throw Errors.levelRequired(rule.level);
+    if (rule.roles?.length && req.method !== 'GET' && !this.staffWriteAllowed(user.id)) throw Errors.tooMany('STAFF_RATE');
     req.user = user;
+    return true;
+  }
+
+  private readonly staffWrites = new Map<string, number[]>();
+  private staffWriteAllowed(userId: string, now = Date.now()) {
+    const recent = (this.staffWrites.get(userId) ?? []).filter((t) => now - t < 60_000);
+    if (recent.length >= STAFF_WRITES_PER_MIN) return false;
+    recent.push(now);
+    if (this.staffWrites.size > 1000) this.staffWrites.clear();
+    this.staffWrites.set(userId, recent);
     return true;
   }
 

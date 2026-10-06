@@ -129,12 +129,17 @@ export class ModerationController {
     return { suspended: false, restoredListings: restored };
   }
 
+  /** Açık bildirimleri kapatır; bildirenlere sonuç haber verilir (kişi başı ilan başına bir bildirim). */
   private async resolveReports(listingIds: string[], status: 'actioned' | 'dismissed', by: string) {
     if (!listingIds.length) return 0;
+    const open = await this.prisma.listingReport.findMany({ where: { listingId: { in: listingIds }, status: 'open' }, select: { reporterId: true, listingId: true, listing: { select: { brand: true, model: true } } } });
     const r = await this.prisma.listingReport.updateMany({
       where: { listingId: { in: listingIds }, status: 'open' },
       data: { status, resolvedAt: new Date(), resolvedBy: by },
     });
+    for (const x of open) {
+      await this.notifications.push(x.reporterId, status === 'actioned' ? 'notif.reportActioned' : 'notif.reportDismissed', { title: `${x.listing.brand} ${x.listing.model}`, listingId: x.listingId });
+    }
     return r.count;
   }
 }

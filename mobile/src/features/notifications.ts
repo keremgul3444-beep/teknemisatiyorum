@@ -26,6 +26,8 @@ export function notifTarget(key: string, params: Record<string, string> | null):
     case 'notif.companyAdded': case 'notif.importDone': return '/panel/kurumsal';
     case 'notif.companyRemoved': return '/profil/ilanlarim';
     case 'notif.staffReport': return '/admin/sikayetler';
+    case 'notif.staffDigest': return '/admin';
+    case 'notif.reportActioned': case 'notif.reportDismissed': return '/profil/bildirimler';
     case 'notif.staffDispute': return '/admin/odemeler';
     case 'notif.providerSuspended': return '/panel/hizmet';
     default: return null;

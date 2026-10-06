@@ -1228,7 +1228,8 @@
     "reviewShown": "Yorum yeniden açıldı ({{stars}} yıldız)",
     "providerSuspended": "Hizmet profili durduruldu: {{name}}",
     "providerActivated": "Hizmet profili açıldı: {{name}}",
-    "memberLeft": "Firmadan ayrıldı"
+    "memberLeft": "Firmadan ayrıldı",
+    "disputeChatViewed": "Anlaşmazlık yazışması görüntülendi"
   },
   "errors": {
     "generic": "Bir şeyler ters gitti, tekrar dene.",
@@ -1328,7 +1329,8 @@
     "not_restorable": "Bu ilan geri alınamaz (sahibi kaldırmış ya da kaldırılmamış).",
     "owner_suspended": "İlan sahibinin hesabı askıda; önce askıyı kaldır.",
     "already_done": "Bu işlem zaten yapılmış.",
-    "booking_not_accepted": "Kaptan talebi onayladıktan sonra ödeme yapılabilir."
+    "booking_not_accepted": "Kaptan talebi onayladıktan sonra ödeme yapılabilir.",
+    "staff_rate": "Çok hızlı işlem yapıldı; bir dakika sonra yeniden dene."
   },
   "soon": {
     "title": "Yakında",
@@ -1370,7 +1372,10 @@
     "companyRemoved": "{{company}} firmasından çıkarıldın; firma adına verdiğin ilanlar firmada kaldı.",
     "bookingAccepted": "Kaptan kiralama talebini onayladı; ödemeyi yapabilirsin.",
     "editApproved": "Düzenlemen onaylandı, yayında: {{title}}",
-    "editRejected": "Düzenlemen onaylanmadı; ilan önceki hâliyle yayında: {{title}}"
+    "editRejected": "Düzenlemen onaylanmadı; ilan önceki hâliyle yayında: {{title}}",
+    "staffDigest": "Bekleyen işler: {{listings}} ilan, {{docs}} belge, {{reports}} şikâyet, {{disputes}} sorunlu ödeme, {{leads}} teklif talebi.",
+    "reportActioned": "Bildirdiğin ilan incelendi ve yayından kaldırıldı: {{title}}. Teşekkürler.",
+    "reportDismissed": "Bildirdiğin ilan incelendi; kurallara aykırı bir durum bulunmadı: {{title}}."
   },
   "notifs": {
     "title": "Bildirimler",

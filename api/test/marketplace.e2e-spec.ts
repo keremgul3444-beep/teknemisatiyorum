@@ -212,13 +212,21 @@ describe('emanet: otomatik aktarım, itiraz, askı ve hesap silme', () => {
 
   test('sorun bildirilirse otomatik aktarım durur, ekip kuyruğunda en üstte görünür', async () => {
     const { owner, usta, job, pay } = await paidJob('yelken');
+    const m0 = await moderator();
+    // Yazışma: sorun bildirilmeden ekip okuyamaz.
+    const conv = (await t.http().post('/conversations').set(owner.auth).send({ subjectKind: 'provider', subjectId: usta.profileId })).body;
+    await t.http().post(`/conversations/${conv.id}/messages`).set(owner.auth).send({ text: 'Yelken dikişi ne zaman biter?' }).expect(201);
+    expect((await t.http().get(`/admin/service-payments/${pay.paymentId}/messages`).set(m0.auth)).status).toBe(404);
     await t.http().post(`/jobs/${job.id}/delivered`).set(usta.auth).expect(200);
     await t.http().post(`/jobs/${job.id}/dispute`).set(owner.auth).send({ note: 'Yelken hâlâ yırtık' }).expect(200);
     expect((await t.http().post(`/jobs/${job.id}/dispute`).set(owner.auth).send({ note: 'tekrar deneme' })).body.code).toBe('ALREADY_DISPUTED');
     await sweep(30);
     expect((await t.prisma.servicePayment.findUniqueOrThrow({ where: { id: pay.paymentId } })).status).toBe('held');
     const list = (await t.http().get('/admin/service-payments').set((await moderator()).auth)).body;
-    expect(list[0]).toMatchObject({ id: pay.paymentId, disputeNote: 'Yelken hâlâ yırtık' });
+    expect(list[0]).toMatchObject({ id: pay.paymentId, disputeNote: 'Yelken hâlâ yırtık', payerId: owner.user.id, providerUserId: usta.user.id, subject: { title: 'Akü şarj etmiyor' } });
+    const chat = (await t.http().get(`/admin/service-payments/${pay.paymentId}/messages`).set(m0.auth)).body;
+    expect(chat[0].messages[0]).toMatchObject({ text: 'Yelken dikişi ne zaman biter?', from: 'payer' });
+    expect(await t.prisma.auditLog.count({ where: { action: 'audit.disputeChatViewed', actorId: m0.user.id } })).toBe(1);
   });
 
   test('askıya alınan usta listeden kalkar, ödenmemiş işteki teklifi düşer; askı kalkınca geri gelir', async () => {

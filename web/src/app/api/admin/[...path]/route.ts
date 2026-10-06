@@ -7,10 +7,10 @@ const ALLOWED = [
   new RegExp(`^listings/${ID}/decision$`), new RegExp(`^listings/${ID}/takedown$`), new RegExp(`^listings/${ID}/reports/dismiss$`),
   new RegExp(`^users/${ID}/suspend$`), new RegExp(`^users/${ID}/unsuspend$`), new RegExp(`^verifications/${ID}/decision$`),
   new RegExp(`^service-payments/${ID}/refund$`), new RegExp(`^service-payments/${ID}/release$`), new RegExp(`^leads/${ID}/status$`), new RegExp(`^leads/${ID}/reveal$`),
-  new RegExp(`^users/${ID}/roles$`), new RegExp(`^listings/${ID}/restore$`), new RegExp(`^reviews/${ID}/(hide|show)$`), new RegExp(`^providers/${ID}/status$`),
+  /^listings\/bulk-approve$/, /^orders\/manual$/, new RegExp(`^orders/${ID}/refund$`), new RegExp(`^broker/${ID}/advance$`), new RegExp(`^expertise/${ID}/report$`), new RegExp(`^users/${ID}/roles$`), new RegExp(`^listings/${ID}/restore$`), new RegExp(`^reviews/${ID}/(hide|show)$`), new RegExp(`^providers/${ID}/status$`),
 ];
 /** PUT ile çağrılabilenler (kur girişi). */
-const PUT_ALLOWED = [/^fx\/(EUR|USD)$/];
+const PUT_ALLOWED = [/^fx\/(EUR|USD)$/, /^products\/[a-z0-9_]{2,30}$/];
 
 export async function PUT(req: Request, ctx: { params: Promise<{ path: string[] }> }) {
   const path = (await ctx.params).path.join('/');

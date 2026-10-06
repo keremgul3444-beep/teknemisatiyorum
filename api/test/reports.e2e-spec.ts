@@ -97,9 +97,16 @@ describe('moderatör: bildirimler, kaldırma, yoksayma', () => {
   test('yoksayma: ilan yayında kalır, bildirimler kapanır', async () => {
     const owner = await loginAs(t, { level: 2 });
     const l = await listing(owner.user.id);
-    await t.http().post(`/listings/${l.id}/report`).set((await loginAs(t)).auth).send({ reason: 'other' }).expect(201);
+    const reporter = await loginAs(t);
+    await t.http().post(`/listings/${l.id}/report`).set(reporter.auth).send({ reason: 'other' }).expect(201);
     const m = await moderator();
     expect((await t.http().post(`/admin/listings/${l.id}/reports/dismiss`).set(m.auth)).body).toEqual({ dismissed: 1 });
+    // Bildirene sonuç haber verilir.
+    expect(await t.prisma.notification.count({ where: { userId: reporter.user.id, key: 'notif.reportDismissed' } })).toBe(1);
+    const l2 = await listing(owner.user.id);
+    await t.http().post(`/listings/${l2.id}/report`).set(reporter.auth).send({ reason: 'scam' }).expect(201);
+    await t.http().post(`/admin/listings/${l2.id}/takedown`).set(m.auth).send({ reason: 'scam' }).expect(200);
+    expect(await t.prisma.notification.count({ where: { userId: reporter.user.id, key: 'notif.reportActioned' } })).toBe(1);
     expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: l.id } })).status).toBe('published');
     expect((await t.http().get('/admin/reports').set(m.auth)).body.some((g: { listing: { id: string } }) => g.listing.id === l.id)).toBe(false);
   });

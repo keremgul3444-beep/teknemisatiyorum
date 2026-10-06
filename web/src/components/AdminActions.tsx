@@ -1,6 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type Dict = Record<string, string>;
 
@@ -42,8 +42,8 @@ export function ListingDecision({ id, version, L, reasons, errors }: { id: strin
         </div>
       ) : (
         <div className="row">
-          <button type="button" className="btn" disabled={a.busy} onClick={() => void a.run(`listings/${id}/decision`, { decision: 'approve', version })}>{L.approve}</button>
-          <button type="button" className="btn ghost" disabled={a.busy} onClick={() => setRejecting(true)}>{L.reject}</button>
+          <button type="button" className="btn" data-act="approve" disabled={a.busy} onClick={() => void a.run(`listings/${id}/decision`, { decision: 'approve', version })}>{L.approve}</button>
+          <button type="button" className="btn ghost" data-act="reject" disabled={a.busy} onClick={() => setRejecting(true)}>{L.reject}</button>
         </div>
       )}
       <Err text={a.error} />
@@ -230,5 +230,131 @@ export function FxRate({ currency, rate, L, errors }: { currency: string; rate: 
       </div>
       <Err text={error} />
     </div>
+  );
+}
+
+/** Toplu onay: listedeki ilanların hepsi kendi sürümüyle onaylanır (ikinci dokunuşla). Onaylanamayanlar sayıyla bildirilir. */
+export function BulkApprove({ items, L, errors }: { items: { id: string; version: string }[]; L: Dict; errors: Dict }) {
+  const router = useRouter();
+  const [sure, setSure] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState('');
+  const go = async () => {
+    setBusy(true); setMsg('');
+    const r = await fetch('/api/admin/listings/bulk-approve', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items }) }).catch(() => null);
+    const j = r ? await r.json().catch(() => ({})) : {};
+    setBusy(false); setSure(false);
+    if (!r?.ok) { setMsg(errors[String(j.messageKey ?? '').replace(/^errors\./, '')] ?? errors.generic); return; }
+    setMsg(L.bulkDone.replace('{{n}}', String(j.approved)).replace('{{total}}', String(items.length)));
+    router.refresh();
+  };
+  if (!items.length) return null;
+  return (
+    <div className="row small" style={{ alignItems: 'center' }}>
+      {sure
+        ? <><span>{L.bulkConfirm.replace('{{n}}', String(items.length))}</span><button type="button" className="btn" disabled={busy} onClick={() => void go()}>{L.bulkApprove}</button><button type="button" className="linklike" onClick={() => setSure(false)}>{L.cancel}</button></>
+        : <button type="button" className="btn ghost" onClick={() => setSure(true)}>{L.bulkApprove} ({items.length})</button>}
+      {msg ? <span role="status">{msg}</span> : null}
+    </div>
+  );
+}
+
+/**
+ * Kuyrukta klavye: J/K sonraki/önceki ilan, A onayla, R reddet (gerekçe seçimi açılır). Yazı alanındayken çalışmaz.
+ * İlan kartları `data-queue-item`, düğmeler `data-act` taşır.
+ */
+export function QueueKeys() {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement;
+      if (e.metaKey || e.ctrlKey || e.altKey || /INPUT|TEXTAREA|SELECT/.test(el.tagName)) return;
+      const items = [...document.querySelectorAll<HTMLElement>('[data-queue-item]')];
+      if (!items.length) return;
+      const cur = items.findIndex((x) => x.contains(document.activeElement));
+      const k = e.key.toLowerCase();
+      if (k === 'j' || k === 'k') {
+        e.preventDefault();
+        const next = items[Math.min(items.length - 1, Math.max(0, cur + (k === 'j' ? 1 : -1)))] ?? items[0];
+        next.focus(); next.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      } else if ((k === 'a' || k === 'r') && cur >= 0) {
+        e.preventDefault();
+        items[cur].querySelector<HTMLButtonElement>(`[data-act="${k === 'a' ? 'approve' : 'reject'}"]`)?.click();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
+  return null;
+}
+
+/** Tek tıkla yönetim işlemi (ikinci dokunuşla onay): sipariş iadesi, broker adımı ilerletme. */
+export function ConfirmAction({ path, label, confirm, L, errors }: { path: string; label: string; confirm?: string; L: Dict; errors: Dict }) {
+  const a = useAction(errors);
+  const [sure, setSure] = useState(false);
+  return (
+    <span className="row small" style={{ alignItems: 'center' }}>
+      {sure || !confirm
+        ? <>{confirm ? <span>{confirm}</span> : null}<button type="button" className="btn ghost" disabled={a.busy} onClick={async () => { if (await a.run(path)) setSure(false); }}>{label}</button>
+          {confirm ? <button type="button" className="linklike" onClick={() => setSure(false)}>{L.cancel}</button> : null}</>
+        : <button type="button" className="linklike" onClick={() => setSure(true)}>{label}</button>}
+      <Err text={a.error} />
+    </span>
+  );
+}
+
+/** Ekspertiz raporu puanı (0-100): kaydedilince rapor tamamlanır, uygunsa ilana rozet ve karneye kayıt düşer. */
+export function ExpertiseReport({ id, L, errors }: { id: string; L: Dict; errors: Dict }) {
+  const a = useAction(errors);
+  const [score, setScore] = useState('');
+  const n = Number(score);
+  return (
+    <span className="row small" style={{ alignItems: 'center', flexWrap: 'nowrap' }}>
+      <input className="input" inputMode="numeric" aria-label={L.score} placeholder={L.score} value={score} onChange={(e) => setScore(e.target.value.replace(/\D/g, '').slice(0, 3))} style={{ width: 90 }} />
+      <button type="button" className="btn ghost" disabled={a.busy || score === '' || n > 100} onClick={() => void a.run(`expertise/${id}/report`, { score: n })}>{L.saveReport}</button>
+      <Err text={a.error} />
+    </span>
+  );
+}
+
+/** Havale/EFT ile alınan öne çıkarma: ilan kimliği, ürün ve açıklama (ör. dekont no) ile sipariş açılır ve ödenmiş sayılır. */
+export function ManualOrder({ products, L, errors }: { products: { code: string; label: string }[]; L: Dict; errors: Dict }) {
+  const a = useAction(errors);
+  const [f, setF] = useState({ listingId: '', productCode: products[0]?.code ?? '', note: '' });
+  return (
+    <form className="card" style={{ display: 'grid', gap: 8, maxWidth: 520 }} onSubmit={async (e) => { e.preventDefault(); if (await a.run('orders/manual', f)) setF({ ...f, listingId: '', note: '' }); }}>
+      <strong>{L.manualOrder}</strong>
+      <input className="input" aria-label={L.listingId} placeholder={L.listingId} value={f.listingId} onChange={(e) => setF({ ...f, listingId: e.target.value.trim() })} />
+      <select className="input" aria-label={L.product} value={f.productCode} onChange={(e) => setF({ ...f, productCode: e.target.value })}>
+        {products.map((p) => <option key={p.code} value={p.code}>{p.label}</option>)}
+      </select>
+      <input className="input" aria-label={L.orderNote} placeholder={L.orderNote} value={f.note} maxLength={200} onChange={(e) => setF({ ...f, note: e.target.value })} />
+      <button className="btn" type="submit" disabled={a.busy || f.listingId.length < 8 || f.note.trim().length < 3}>{L.createOrder}</button>
+      <Err text={a.error} />
+    </form>
+  );
+}
+
+/** Ürün fiyatı (TL; site ve uygulama ayrı). Kaydedilince "deneme fiyatı" işareti kalkar. */
+export function ProductPrice({ code, web, app, L, errors }: { code: string; web: number; app: number; L: Dict; errors: Dict }) {
+  const router = useRouter();
+  const [v, setV] = useState({ web: String(web / 100), app: String(app / 100) });
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const kurus = (s: string) => Math.round(Number(s.replace(',', '.')) * 100);
+  const save = async () => {
+    setBusy(true); setError('');
+    const r = await fetch(`/api/admin/products/${code}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ priceWebKurus: kurus(v.web), priceAppKurus: kurus(v.app) }) }).catch(() => null);
+    const j = r ? await r.json().catch(() => ({})) : {};
+    setBusy(false);
+    if (!r?.ok) { setError(errors[String(j.messageKey ?? '').replace(/^errors\./, '')] ?? errors.generic); return; }
+    router.refresh();
+  };
+  return (
+    <span className="row small" style={{ alignItems: 'center' }}>
+      <label>{L.priceWeb} <input className="input" inputMode="decimal" value={v.web} onChange={(e) => setV({ ...v, web: e.target.value })} style={{ width: 110 }} /></label>
+      <label>{L.priceApp} <input className="input" inputMode="decimal" value={v.app} onChange={(e) => setV({ ...v, app: e.target.value })} style={{ width: 110 }} /></label>
+      <button type="button" className="btn ghost" disabled={busy || !(kurus(v.web) > 0) || !(kurus(v.app) > 0)} onClick={() => void save()}>{L.save}</button>
+      <Err text={error} />
+    </span>
   );
 }

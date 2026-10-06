@@ -532,7 +532,7 @@ class BookingsController {
 
 @Controller()
 class ServicePaymentsController {
-  constructor(private readonly prisma: PrismaService, private readonly escrow: EscrowService, private readonly logbook: LogbookService) {}
+  constructor(private readonly prisma: PrismaService, private readonly escrow: EscrowService, private readonly logbook: LogbookService, private readonly audit: AuditService) {}
 
   /** Ödeyenin ödemeleri (Profil > Ödemelerim). */
   @Auth()
@@ -560,8 +560,45 @@ class ServicePaymentsController {
     });
     // Sorun bildirilmiş ve hâlâ emanette olanlar en üstte (ekibin kararını bekliyor).
     rows.sort((a, b) => Number(!!b.disputedAt && b.status === 'held') - Number(!!a.disputedAt && a.status === 'held'));
-    const provs = await this.prisma.providerProfile.findMany({ where: { id: { in: rows.map((r) => r.providerId) } }, select: { id: true, displayName: true } });
-    return rows.map((p) => ({ ...p, providerName: provs.find((x) => x.id === p.providerId)?.displayName ?? null }));
+    const [provs, payers, jobs, bookings] = await Promise.all([
+      this.prisma.providerProfile.findMany({ where: { id: { in: rows.map((r) => r.providerId) } }, select: { id: true, displayName: true, userId: true } }),
+      this.prisma.user.findMany({ where: { id: { in: rows.map((r) => r.payerId) } }, select: { id: true, name: true } }),
+      this.prisma.job.findMany({ where: { id: { in: rows.filter((r) => r.subjectKind === 'job').map((r) => r.subjectId) } }, select: { id: true, title: true, status: true } }),
+      this.prisma.captainBooking.findMany({ where: { id: { in: rows.filter((r) => r.subjectKind === 'captain').map((r) => r.subjectId) } }, select: { id: true, start: true, days: true, status: true } }),
+    ]);
+    // Karar için bağlam: ödeyen, hizmet veren (kullanıcı sayfalarına bağlantı), işin başlığı ya da kiralama tarihleri.
+    return rows.map((p) => {
+      const prov = provs.find((x) => x.id === p.providerId);
+      const job = jobs.find((j) => j.id === p.subjectId);
+      const bk = bookings.find((b) => b.id === p.subjectId);
+      return {
+        ...p, providerName: prov?.displayName ?? null, providerUserId: prov?.userId ?? null, payerName: payers.find((x) => x.id === p.payerId)?.name ?? null,
+        subject: job ? { title: job.title, status: job.status } : bk ? { start: bk.start.toISOString().slice(0, 10), days: bk.days, status: bk.status } : null,
+      };
+    });
+  }
+
+  /**
+   * Sorun bildirilen ödemede taraflar arasındaki yazışma (karar için). Yalnızca anlaşmazlıkta açılır ve her açılış
+   * işlem kaydına yazılır; başka hiçbir durumda ekip mesaj okuyamaz.
+   */
+  @Auth(STAFF)
+  @Get('admin/service-payments/:id/messages')
+  async disputeMessages(@CurrentUser() u: AuthUser, @Param('id') id: string) {
+    const p = await this.prisma.servicePayment.findUnique({ where: { id } });
+    if (!p || !p.disputedAt) throw Errors.notFound();
+    const prov = await this.prisma.providerProfile.findUnique({ where: { id: p.providerId }, select: { userId: true } });
+    if (!prov) throw Errors.notFound();
+    const key = [p.payerId, prov.userId].sort().join(':');
+    const convs = await this.prisma.conversation.findMany({
+      where: { memberKey: key }, orderBy: { updatedAt: 'desc' }, take: 5,
+      include: { messages: { orderBy: { createdAt: 'asc' }, take: 300 } },
+    });
+    await this.audit.log(u.id, 'audit.disputeChatViewed', { ref: p.id }, 'payment', p.id);
+    return convs.map((c) => ({
+      id: c.id, subjectTitle: c.subjectTitle,
+      messages: c.messages.map((m) => ({ at: m.createdAt, text: m.text, from: m.senderId === p.payerId ? 'payer' : 'provider' })),
+    }));
   }
 
   @Auth(ADMIN)

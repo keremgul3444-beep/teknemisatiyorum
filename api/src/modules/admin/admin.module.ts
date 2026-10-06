@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Module, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpException, Module, Param, Post, Query } from '@nestjs/common';
 import { z } from 'zod';
 import type { Listing, ListingPhoto, Prisma } from '@prisma/client';
 import { maskPhone } from '@tms/shared';
@@ -20,6 +20,7 @@ import { ListingTexts } from '../listings/listing-writer.service';
 import { reportError } from '../../adapters/error-report';
 import { ModerationController } from './moderation.controller';
 import { AdminToolsController } from './admin-tools.controller';
+import { StaffDigest } from './staff-digest';
 import { changedFields, listingSnapshot } from './snapshot';
 import { normalizePhone } from '../auth/phone';
 import { BOAT_BOUND_BADGES, CLEAR_PENDING, IDENTITY_FIELDS, effective, pendingFields, type PendingChanges } from '../listings/pending-edit';
@@ -40,6 +41,8 @@ const listingDecisionBody = z.discriminatedUnion('decision', [
   z.object({ decision: z.literal('approve'), version: z.string().max(40).optional() }),
   z.object({ decision: z.literal('reject'), reason: z.enum(['blurry', 'mismatch', 'rules']), note: rejectNote, version: z.string().max(40).optional() }),
 ]);
+const bulkBody = z.object({ items: z.array(z.object({ id: z.string().max(40), version: z.string().max(40) })).min(1).max(50) });
+const QUEUE_PAGE = 50;
 const listingChanged = () => new AppError('LISTING_CHANGED', 'errors.listing_changed', 409);
 const versionRequired = () => new AppError('VERSION_REQUIRED', 'errors.version_required', 400);
 const reportBody = z.object({ score: z.number().int().min(0).max(100) });
@@ -88,7 +91,7 @@ class AdminController {
 
   @Auth(STAFF)
   @Get('queue')
-  async queue(@Query('kind') kind: string) {
+  async queue(@Query('kind') kind: string, @Query('scope') scope?: string, @Query('company') company?: string, @Query('page') pageQ?: string) {
     if (kind === 'verification') {
       const rows = await this.prisma.verificationRequest.findMany({ where: { status: 'pending' }, orderBy: { createdAt: 'asc' } });
       const users = await this.prisma.user.findMany({ where: { id: { in: rows.map((r) => r.userId) } }, select: { id: true, name: true } });
@@ -96,7 +99,12 @@ class AdminController {
     }
     const rows = await this.prisma.listing.findMany({
       // Yeni ilanlar ve yayındaki ilanların bekleyen düzenlemeleri (ilan onaylı hâliyle yayında kalır).
-      where: { OR: [{ status: 'pending' }, { status: 'published', pendingAt: { not: null } }] }, orderBy: { updatedAt: 'asc' }, take: 200,
+      // Süzgeç: yalnız yeni / yalnız düzenleme, firma; 50'şerli sayfa (en eski önce).
+      where: {
+        ...(scope === 'new' ? { status: 'pending' as const } : scope === 'edit' ? { status: 'published' as const, pendingAt: { not: null } } : { OR: [{ status: 'pending' as const }, { status: 'published' as const, pendingAt: { not: null } }] }),
+        ...(company ? { companyId: company.slice(0, 40) } : {}),
+      },
+      orderBy: { updatedAt: 'asc' }, take: QUEUE_PAGE, skip: (Math.min(Math.max(Number(pageQ) || 1, 1), 100) - 1) * QUEUE_PAGE,
       include: { owner: { select: { name: true, verifyLevel: true } }, photos: true },
     }).then((xs) => xs.map((x) => ({ ...effective(x), editOf: x.status === 'published' ? x : null })));
     // Yeniden gönderilen ilanda önceki red gerekçesi (ilanda gönderimde silinir; kayıt denetim günlüğünde kalır).
@@ -104,6 +112,7 @@ class AdminController {
       where: { action: 'audit.listingRejected', targetType: 'listing', targetId: { in: rows.map((l) => l.id) } }, orderBy: { at: 'desc' },
     });
     const dups = await photoDuplicates(this.prisma, rows.map((l) => l.id));
+    const companies = await this.prisma.company.findMany({ where: { id: { in: [...new Set(rows.map((l) => l.companyId).filter((x): x is string => !!x))] } }, select: { id: true, name: true } });
     const previousReason = (id: string) => (rejections.find((x) => x.targetId === id)?.params as { reason?: string } | null)?.reason ?? null;
     // Moderatör ilanın yayına çıkacak her şeyini görür: açıklama, konum, özellikler ve yeni alanlar dahil.
     return rows.map((l) => ({
@@ -114,7 +123,8 @@ class AdminController {
       liveEdit: !!l.editOf,
       /** Aynı fotoğrafın kullanıldığı diğer ilanlar (başka satıcıda: çalıntı şüphesi; aynı satıcıda: mükerrer ilan). */
       photoDuplicates: dups.get(l.id) ?? [],
-      id: l.id, title: `${l.brand} ${l.model}`, year: l.year, price: l.price, currency: l.currency, ownerName: l.owner.name,
+      company: companies.find((c) => c.id === l.companyId) ?? null,
+      id: l.id, title: `${l.brand} ${l.model}`, year: l.year, price: l.price, currency: l.currency, ownerName: l.owner.name, ownerId: l.ownerId,
       ownerVerifyLevel: l.owner.verifyLevel,
       photoCount: l.photos.length, photos: [...l.photos].sort((a, b) => a.order - b.order).map((p) => `/media/${p.fileId}`), updatedAt: l.updatedAt,
       version: l.updatedAt.toISOString(),
@@ -165,6 +175,23 @@ class AdminController {
     await this.audit.log(u.id, approve ? 'audit.listingApproved' : 'audit.listingRejected',
       { title, version: b.version, price: `${l.price} ${l.currency}`, ...(approve ? {} : { reason: b.reason ?? '' }) }, 'listing', id);
     return { id, status: approve ? 'published' : 'rejected' };
+  }
+
+  /** Toplu onay (ör. bir firmanın toplu yüklemesi): her ilan kendi sürümüyle ayrı ayrı onaylanır, sonuçlar tek tek döner. */
+  @Auth(STAFF)
+  @Post('listings/bulk-approve')
+  @HttpCode(200)
+  async bulkApprove(@CurrentUser() u: AuthUser, @Body(new ZodPipe(bulkBody)) b: z.infer<typeof bulkBody>) {
+    const results: { id: string; ok: boolean; code?: string }[] = [];
+    for (const it of b.items) {
+      try {
+        await this.decideListing(u, it.id, { decision: 'approve', version: it.version });
+        results.push({ id: it.id, ok: true });
+      } catch (e) {
+        results.push({ id: it.id, ok: false, code: e instanceof HttpException ? String((e.getResponse() as { code?: string }).code ?? e.getStatus()) : 'INTERNAL' });
+      }
+    }
+    return { approved: results.filter((r) => r.ok).length, results };
   }
 
   /**
@@ -350,5 +377,5 @@ class AdminController {
   }
 }
 
-@Module({ imports: [BoatsModule, ListingsModule], controllers: [AdminController, ModerationController, AdminToolsController] })
+@Module({ imports: [BoatsModule, ListingsModule], controllers: [AdminController, ModerationController, AdminToolsController], providers: [StaffDigest] })
 export class AdminModule {}

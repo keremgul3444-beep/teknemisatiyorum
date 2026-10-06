@@ -646,7 +646,8 @@
     "not_restorable": "Bu ilan geri alınamaz (sahibi kaldırmış ya da kaldırılmamış).",
     "owner_suspended": "İlan sahibinin hesabı askıda; önce askıyı kaldır.",
     "already_done": "Bu işlem zaten yapılmış.",
-    "booking_not_accepted": "Kaptan talebi onayladıktan sonra ödeme yapılabilir."
+    "booking_not_accepted": "Kaptan talebi onayladıktan sonra ödeme yapılabilir.",
+    "staff_rate": "Çok hızlı işlem yapıldı; bir dakika sonra yeniden dene."
   },
   "login": {
     "title": "Giriş yap",
@@ -1092,7 +1093,49 @@
     "openUser": "kullanıcı",
     "olderRecords": "Daha eski kayıtlar",
     "userListings": "İlanları",
-    "liveEdit": "Yayındaki ilanın düzenlemesi (onaylanana kadar eski hâli yayında)"
+    "liveEdit": "Yayındaki ilanın düzenlemesi (onaylanana kadar eski hâli yayında)",
+    "queueFilter": "Kuyruk süzgeci",
+    "qAll": "Tümü",
+    "qNew": "Yeni ilanlar",
+    "qEdit": "Düzenlemeler",
+    "qCompanyClear": "Firma: {{name}} ×",
+    "queueKeys": "Klavye: J/K sonraki/önceki ilan, A onayla, R reddet.",
+    "bulkApprove": "Bu sayfadakilerin hepsini onayla",
+    "bulkConfirm": "{{n}} ilan onaylanacak. Emin misin?",
+    "bulkDone": "{{total}} ilandan {{n}} tanesi onaylandı.",
+    "navOrders": "Siparişler",
+    "navPrices": "Fiyatlar",
+    "navBroker": "Broker",
+    "navExpertise": "Ekspertiz",
+    "orderStatus": {
+      "pending": "Bekliyor",
+      "paid": "Ödendi",
+      "refunded": "İade edildi",
+      "failed": "Başarısız"
+    },
+    "noOrders": "Sipariş yok.",
+    "refundConfirm": "Sipariş iade edilecek ve öne çıkarma kalkacak.",
+    "manualOrder": "Havale/EFT ile sipariş",
+    "listingId": "İlan kimliği",
+    "product": "Ürün",
+    "orderNote": "Açıklama (ör. dekont no)",
+    "createOrder": "Siparişi oluştur ve ödendi say",
+    "priceWeb": "Site (₺)",
+    "priceApp": "Uygulama (₺)",
+    "trialPrice": "deneme fiyatı",
+    "brokerStep": "Adım {{n}} / 4",
+    "advance": "Sonraki adıma geçir",
+    "advanceConfirm": "Dosya bir sonraki adıma geçecek; sahibine bildirim gider.",
+    "score": "Puan (0-100)",
+    "saveReport": "Raporu kaydet",
+    "reportDone": "Rapor tamam · {{score}}/100",
+    "reportPending": "Rapor bekleniyor",
+    "payer": "Ödeyen",
+    "provider": "Hizmet veren",
+    "disputeChat": "Yazışmalar",
+    "disputeChatNote": "Bu yazışma yalnızca sorun bildirilen ödemede ve karar vermek için açılır; açılması işlem kaydına yazılır.",
+    "noChat": "Taraflar arasında yazışma yok.",
+    "bookingDates": "{{start}} · {{days}} gün"
   },
   "audit": {
     "listingApproved": "İlan onaylandı: {{title}}",
@@ -1145,7 +1188,8 @@
     "reviewShown": "Yorum yeniden açıldı ({{stars}} yıldız)",
     "providerSuspended": "Hizmet profili durduruldu: {{name}}",
     "providerActivated": "Hizmet profili açıldı: {{name}}",
-    "memberLeft": "Firmadan ayrıldı"
+    "memberLeft": "Firmadan ayrıldı",
+    "disputeChatViewed": "Anlaşmazlık yazışması görüntülendi"
   },
   "firm": {
     "title": "Firma paneli",
@@ -1307,7 +1351,10 @@
     "companyRemoved": "{{company}} firmasından çıkarıldın; firma adına verdiğin ilanlar firmada kaldı.",
     "bookingAccepted": "Kaptan kiralama talebini onayladı; ödemeyi yapabilirsin.",
     "editApproved": "Düzenlemen onaylandı, yayında: {{title}}",
-    "editRejected": "Düzenlemen onaylanmadı; ilan önceki hâliyle yayında: {{title}}"
+    "editRejected": "Düzenlemen onaylanmadı; ilan önceki hâliyle yayında: {{title}}",
+    "staffDigest": "Bekleyen işler: {{listings}} ilan, {{docs}} belge, {{reports}} şikâyet, {{disputes}} sorunlu ödeme, {{leads}} teklif talebi.",
+    "reportActioned": "Bildirdiğin ilan incelendi ve yayından kaldırıldı: {{title}}. Teşekkürler.",
+    "reportDismissed": "Bildirdiğin ilan incelendi; kurallara aykırı bir durum bulunmadı: {{title}}."
   },
   "lead": {
     "title": "Finansman, sigorta ya da nakliye teklifi al",

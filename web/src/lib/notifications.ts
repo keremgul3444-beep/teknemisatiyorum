@@ -17,6 +17,8 @@ export function webNotifTarget(key: string, params: Record<string, string> | nul
     case 'notif.importDone': return '/firma/toplu';
     case 'notif.companyAdded': return '/firma';
     case 'notif.staffReport': return '/yonetim/bildirimler';
+    case 'notif.staffDigest': return '/yonetim';
+    case 'notif.reportActioned': case 'notif.reportDismissed': return '/hesabim/bildirimler';
     case 'notif.staffDispute': return '/yonetim/odemeler';
     default: return null;
   }

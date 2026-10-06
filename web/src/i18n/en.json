@@ -646,7 +646,8 @@
     "not_restorable": "This listing cannot be restored (withdrawn by its owner or not removed).",
     "owner_suspended": "The owner is suspended; lift the suspension first.",
     "already_done": "This has already been done.",
-    "booking_not_accepted": "You can pay once the skipper accepts the request."
+    "booking_not_accepted": "You can pay once the skipper accepts the request.",
+    "staff_rate": "Too many actions in a short time; try again in a minute."
   },
   "login": {
     "title": "Log in",
@@ -1092,7 +1093,49 @@
     "openUser": "user",
     "olderRecords": "Older records",
     "userListings": "Listings",
-    "liveEdit": "Edit of a live listing (old version stays live until approved)"
+    "liveEdit": "Edit of a live listing (old version stays live until approved)",
+    "queueFilter": "Queue filter",
+    "qAll": "All",
+    "qNew": "New listings",
+    "qEdit": "Edits",
+    "qCompanyClear": "Company: {{name}} ×",
+    "queueKeys": "Keyboard: J/K next/previous, A approve, R reject.",
+    "bulkApprove": "Approve all on this page",
+    "bulkConfirm": "{{n}} listings will be approved. Sure?",
+    "bulkDone": "{{n}} of {{total}} listings approved.",
+    "navOrders": "Orders",
+    "navPrices": "Prices",
+    "navBroker": "Broker",
+    "navExpertise": "Surveys",
+    "orderStatus": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "refunded": "Refunded",
+      "failed": "Failed"
+    },
+    "noOrders": "No orders.",
+    "refundConfirm": "The order will be refunded and the promotion removed.",
+    "manualOrder": "Order paid by bank transfer",
+    "listingId": "Listing id",
+    "product": "Product",
+    "orderNote": "Note (e.g. receipt no)",
+    "createOrder": "Create order and mark paid",
+    "priceWeb": "Web (₺)",
+    "priceApp": "App (₺)",
+    "trialPrice": "trial price",
+    "brokerStep": "Step {{n}} / 4",
+    "advance": "Move to next step",
+    "advanceConfirm": "The case moves to the next step; the owner is notified.",
+    "score": "Score (0-100)",
+    "saveReport": "Save report",
+    "reportDone": "Report done · {{score}}/100",
+    "reportPending": "Report pending",
+    "payer": "Payer",
+    "provider": "Provider",
+    "disputeChat": "Messages",
+    "disputeChatNote": "These messages are only available for a disputed payment to make a decision; opening them is logged.",
+    "noChat": "No messages between the parties.",
+    "bookingDates": "{{start}} · {{days}} days"
   },
   "audit": {
     "listingApproved": "Listing approved: {{title}}",
@@ -1145,7 +1188,8 @@
     "reviewShown": "Review shown again ({{stars}} stars)",
     "providerSuspended": "Service profile paused: {{name}}",
     "providerActivated": "Service profile activated: {{name}}",
-    "memberLeft": "Left the company"
+    "memberLeft": "Left the company",
+    "disputeChatViewed": "Dispute messages viewed"
   },
   "firm": {
     "title": "Company panel",
@@ -1307,7 +1351,10 @@
     "companyRemoved": "You were removed from {{company}}; listings you posted for the company stay with it.",
     "bookingAccepted": "The skipper accepted your charter request; you can pay now.",
     "editApproved": "Your edit was approved and is live: {{title}}",
-    "editRejected": "Your edit was not approved; the listing stays live as before: {{title}}"
+    "editRejected": "Your edit was not approved; the listing stays live as before: {{title}}",
+    "staffDigest": "Waiting: {{listings}} listings, {{docs}} documents, {{reports}} reports, {{disputes}} disputed payments, {{leads}} quote requests.",
+    "reportActioned": "The listing you reported was reviewed and taken down: {{title}}. Thank you.",
+    "reportDismissed": "The listing you reported was reviewed; no rule violation was found: {{title}}."
   },
   "lead": {
     "title": "Get a finance, insurance or transport quote",

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { localePath, t, type Locale } from '@/i18n';
 
-const ITEMS = [['/yonetim/ilanlar', 'admin.navListings'], ['/yonetim/bildirimler', 'admin.navReports'], ['/yonetim/belgeler', 'admin.navDocs'], ['/yonetim/odemeler', 'admin.navPayments'], ['/yonetim/talepler', 'admin.navLeads'], ['/yonetim/kullanicilar', 'admin.navUsers'], ['/yonetim/yorumlar', 'admin.navReviews'], ['/yonetim/kurlar', 'admin.navFx'], ['/yonetim/kayitlar', 'admin.navAudit']] as const;
+const ITEMS = [['/yonetim/ilanlar', 'admin.navListings'], ['/yonetim/bildirimler', 'admin.navReports'], ['/yonetim/belgeler', 'admin.navDocs'], ['/yonetim/odemeler', 'admin.navPayments'], ['/yonetim/talepler', 'admin.navLeads'], ['/yonetim/broker', 'admin.navBroker'], ['/yonetim/ekspertiz', 'admin.navExpertise'], ['/yonetim/siparisler', 'admin.navOrders'], ['/yonetim/fiyatlar', 'admin.navPrices'], ['/yonetim/kullanicilar', 'admin.navUsers'], ['/yonetim/yorumlar', 'admin.navReviews'], ['/yonetim/kurlar', 'admin.navFx'], ['/yonetim/kayitlar', 'admin.navAudit']] as const;
 
 /** Yönetim alt menüsü; bulunulan sayfa işaretli. */
 export function AdminNav({ locale, current }: { locale: Locale; current?: string }) {
