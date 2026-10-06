@@ -534,6 +534,7 @@ export const actions = {
   sendQuote: (jobId: string, b: { priceTry: number; days: number; note: string }) => api.post(`/jobs/${jobId}/quotes`, b),
   providerBookings: () => api.get<ApiCaptainBooking[]>('/provider/bookings'),
   declineBooking: (id: string) => api.post(`/captain-bookings/${id}/decline`),
+  acceptBooking: (id: string) => api.post(`/captain-bookings/${id}/accept`),
   myServicePayments: () => api.get<{ id: string; subjectKind: string; subjectId: string; amountKurus: number; feeKurus: number; status: string; paidAt: string | null }[]>('/me/service-payments'),
   adminServicePayments: (status?: string) => api.get<AdminServicePayment[]>(`/admin/service-payments${status ? `?status=${status}` : ''}`),
   adminRefundService: (id: string) => api.post(`/admin/service-payments/${id}/refund`),

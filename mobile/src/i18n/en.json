@@ -883,7 +883,8 @@
     "autoRelease": "If you don’t report a problem, the payment is released to the captain on {{date}}.",
     "priceReviewHint": "A price change this large goes back to review; the listing is hidden until approved.",
     "rejectNote": "Moderator note: {{note}}",
-    "promoWarn": "Remaining promotion time is not refunded."
+    "promoWarn": "Remaining promotion time is not refunded.",
+    "awaitingCaptain": "Waiting for the skipper to accept; payment opens after that."
   },
   "settings": {
     "title": "Settings",
@@ -995,14 +996,16 @@
       "requested": "Awaiting payment",
       "paid": "Paid (in escrow)",
       "done": "Completed",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "accepted": "Accepted, awaiting payment"
     },
     "markDelivered": "Job done",
     "delivered": "Marked done; waiting for customer confirmation or the deadline",
     "docInReview": "Your document is under review; your profile goes live once approved.",
     "docRejected": "Document not approved. {{reason}}",
     "withdraw": "Withdraw",
-    "withdrawConfirm": "The owner has not paid yet. If you withdraw, your quote is removed and the job reopens for quotes."
+    "withdrawConfirm": "The owner has not paid yet. If you withdraw, your quote is removed and the job reopens for quotes.",
+    "accept": "Accept"
   },
   "corporate": {
     "title": "Company panel",
@@ -1319,7 +1322,8 @@
     "last_admin": "The last admin cannot lose admin rights.",
     "not_restorable": "This listing cannot be restored (withdrawn by its owner or not removed).",
     "owner_suspended": "The owner is suspended; lift the suspension first.",
-    "already_done": "This has already been done."
+    "already_done": "This has already been done.",
+    "booking_not_accepted": "You can pay once the skipper accepts the request."
   },
   "soon": {
     "title": "Coming soon",
@@ -1358,7 +1362,8 @@
     "bookingCancelled": "The customer cancelled the charter request.",
     "importDone": "Bulk import finished: {{created}}/{{total}} listings sent for review.",
     "companyAdded": "You were added to {{company}}.",
-    "companyRemoved": "You were removed from {{company}}; your listings there are now personal."
+    "companyRemoved": "You were removed from {{company}}; your listings there are now personal.",
+    "bookingAccepted": "The skipper accepted your charter request; you can pay now."
   },
   "notifs": {
     "title": "Notifications",

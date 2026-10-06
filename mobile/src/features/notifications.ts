@@ -18,7 +18,7 @@ export function notifTarget(key: string, params: Record<string, string> | null):
       return p.jobId ? `/is/${p.jobId}` : p.kind === 'job' && p.id ? `/is/${p.id}` : '/profil/islerim';
     case 'notif.newJob': case 'notif.quoteAccepted': case 'notif.servicePaid': case 'notif.paymentReleased':
     case 'notif.paymentDisputed': case 'notif.bookingRequested': return '/panel/hizmet';
-    case 'notif.bookingDeclined': return '/profil/islerim';
+    case 'notif.bookingDeclined': case 'notif.bookingAccepted': return '/profil/islerim';
     case 'notif.paymentRefunded': return '/profil/odemeler';
     case 'notif.quoteDeclined': case 'notif.jobCancelled': case 'notif.bookingCancelled': return '/panel/hizmet';
     case 'notif.quoteWithdrawn': return p.jobId ? `/is/${p.jobId}` : '/profil/islerim';

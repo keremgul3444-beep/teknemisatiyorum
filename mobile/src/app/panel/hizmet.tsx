@@ -280,7 +280,12 @@ function CaptainInbox() {
         <Card key={b.id}>
           <T variant="h3">{t('captain.selected', { start: b.start, count: b.days })}</T>
           <T variant="caption" color={colors.muted}>{t(`panel.bookingStatus.${b.status}`)} · {formatPrice(b.totalEur, 'EUR', lang)}</T>
-          {b.status === 'requested' ? <Button small variant="ghost" title={t('panel.decline')} onPress={async () => { await attempt(() => actions.declineBooking(b.id)); reload(); }} /> : null}
+          {b.status === 'requested' || b.status === 'accepted' ? (
+            <View style={{ flexDirection: 'row', gap: space(2) }}>
+              {b.status === 'requested' ? <View style={{ flex: 1 }}><Button small title={t('panel.accept')} onPress={async () => { await attempt(() => actions.acceptBooking(b.id)); reload(); }} /></View> : null}
+              <View style={{ flex: 1 }}><Button small variant="ghost" title={t('panel.decline')} onPress={async () => { await attempt(() => actions.declineBooking(b.id)); reload(); }} /></View>
+            </View>
+          ) : null}
         </Card>
       ))}
     </Section>

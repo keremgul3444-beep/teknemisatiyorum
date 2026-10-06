@@ -146,7 +146,7 @@ export const toJob = (j: ApiJob): Job => ({
 });
 
 export interface ApiCaptainBooking {
-  id: string; start: string; days: number; totalEur: number; status: 'requested' | 'paid' | 'done' | 'cancelled'; captain: ApiProvider; reviewed?: boolean;
+  id: string; start: string; days: number; totalEur: number; status: 'requested' | 'accepted' | 'paid' | 'done' | 'cancelled'; captain: ApiProvider; reviewed?: boolean;
   autoReleaseAt?: string | null; disputed?: boolean;
 }
 export const toCaptainBooking = (b: ApiCaptainBooking): CaptainBooking => ({

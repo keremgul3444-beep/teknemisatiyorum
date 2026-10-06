@@ -396,8 +396,8 @@ class BookingsController {
     const start = parseDateOnly(b.start);
     if (start.getTime() < parseDateOnly(dateOnly(new Date())).getTime()) throw Errors.bad('PAST_DATE');
     const end = new Date(start.getTime() + b.days * 864e5);
-    // Ödenmiş başka bir rezervasyonla çakışan tarih alınamaz.
-    const busy = await this.prisma.captainBooking.findMany({ where: { providerId: p.id, status: 'paid', start: { lt: end } } });
+    // Ödenmiş ya da kaptanın onayladığı başka bir rezervasyonla çakışan tarih alınamaz.
+    const busy = await this.prisma.captainBooking.findMany({ where: { providerId: p.id, status: { in: ['accepted', 'paid'] }, start: { lt: end } } });
     if (busy.some((x) => x.start.getTime() + x.days * 864e5 > start.getTime())) throw notAllowed('CAPTAIN_BUSY');
     const row = await this.prisma.captainBooking.create({ data: { userId: u.id, providerId: p.id, start, days: b.days, totalEur: captainTotal(p, b.days) }, include: { provider: true } });
     await this.notifications.push(p.userId, 'notif.bookingRequested', { bookingId: row.id, start: b.start, days: String(b.days) });
@@ -434,7 +434,9 @@ class BookingsController {
     assertAccepted(body.accept);
     const b = await this.own(id, u.id);
     if (b.status === 'paid' || b.status === 'done') throw new AppError('ALREADY_PAID', 'errors.already_paid', 409);
-    if (b.status !== 'requested') throw notAllowed('BOOKING_CLOSED');
+    // Ödeme kaptan talebi onayladıktan sonra: kaptanın müsait olmadığı tarihe para alınmaz.
+    if (b.status === 'requested') throw notAllowed('BOOKING_NOT_ACCEPTED');
+    if (b.status !== 'accepted') throw notAllowed('BOOKING_CLOSED');
     const rate = (await this.fx.rates()).EUR;
     return this.escrow.checkout({ payerId: u.id, providerId: b.providerId, subjectKind: 'captain', subjectId: id, amountKurus: Math.round(b.totalEur * rate * 100) });
   }
@@ -459,7 +461,7 @@ class BookingsController {
   @HttpCode(200)
   async cancel(@CurrentUser() u: AuthUser, @Param('id') id: string) {
     const b = await this.own(id, u.id);
-    const r = await this.prisma.captainBooking.updateMany({ where: { id, status: 'requested' }, data: { status: 'cancelled' } });
+    const r = await this.prisma.captainBooking.updateMany({ where: { id, status: { in: ['requested', 'accepted'] } }, data: { status: 'cancelled' } });
     if (!r.count) throw notAllowed('BOOKING_CLOSED');
     const cap = await this.prisma.providerProfile.findUnique({ where: { id: b.providerId }, select: { userId: true } });
     if (cap) await this.notifications.push(cap.userId, 'notif.bookingCancelled', { bookingId: id });
@@ -479,14 +481,33 @@ class BookingsController {
     return { id, disputed: true };
   }
 
-  /** Kaptan ödenmemiş talebi geri çevirir. */
+  /** Kaptan talebi onaylar: tarih boşsa müşteri ödeyebilir (onaylı ve ödenmiş rezervasyonlarla çakışma denetlenir). */
+  @Auth()
+  @Post('captain-bookings/:id/accept')
+  @HttpCode(200)
+  async acceptBooking(@CurrentUser() u: AuthUser, @Param('id') id: string) {
+    const b = await this.prisma.captainBooking.findUnique({ where: { id }, include: { provider: true } });
+    if (!b || b.provider.userId !== u.id) throw Errors.notFound();
+    const end = new Date(b.start.getTime() + b.days * 864e5);
+    const ok = await this.prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM "ProviderProfile" WHERE id = ${b.providerId} FOR UPDATE`;
+      const busy = await tx.captainBooking.findMany({ where: { providerId: b.providerId, id: { not: id }, status: { in: ['accepted', 'paid'] }, start: { lt: end } } });
+      if (busy.some((x) => x.start.getTime() + x.days * 864e5 > b.start.getTime())) throw notAllowed('CAPTAIN_BUSY');
+      return (await tx.captainBooking.updateMany({ where: { id, status: 'requested' }, data: { status: 'accepted' } })).count;
+    });
+    if (!ok) throw notAllowed('BOOKING_CLOSED');
+    await this.notifications.push(b.userId, 'notif.bookingAccepted', { bookingId: id });
+    return { id, status: 'accepted' };
+  }
+
+  /** Kaptan ödenmemiş (bekleyen ya da onayladığı) talebi geri çevirir. */
   @Auth()
   @Post('captain-bookings/:id/decline')
   @HttpCode(200)
   async decline(@CurrentUser() u: AuthUser, @Param('id') id: string) {
     const b = await this.prisma.captainBooking.findUnique({ where: { id }, include: { provider: true } });
     if (!b || b.provider.userId !== u.id) throw Errors.notFound();
-    const r = await this.prisma.captainBooking.updateMany({ where: { id, status: 'requested' }, data: { status: 'cancelled' } });
+    const r = await this.prisma.captainBooking.updateMany({ where: { id, status: { in: ['requested', 'accepted'] } }, data: { status: 'cancelled' } });
     if (!r.count) throw notAllowed('BOOKING_CLOSED');
     await this.notifications.push(b.userId, 'notif.bookingDeclined', { bookingId: id });
     return { id, status: 'cancelled' };

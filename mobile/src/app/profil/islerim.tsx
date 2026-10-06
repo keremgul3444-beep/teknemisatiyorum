@@ -57,7 +57,8 @@ function BookingActions({ b }: { b: CaptainBooking }) {
   // Çizim sırasında saat okunmaz (saf bileşen): başlangıç günü bugünün takvim gününe göre karşılaştırılır, ilk çizimde sabitlenir.
   const [today] = useState(() => new Date().toISOString().slice(0, 10));
   const started = b.start <= today;
-  if (b.status === 'requested') return <Button small icon="lock" title={t('mine.payBooking')} onPress={() => router.push({ pathname: '/odeme', params: { tur: 'kaptan', id: b.id } })} />;
+  if (b.status === 'requested') return <T variant="caption" color={colors.muted}>{t('mine.awaitingCaptain')}</T>;
+  if (b.status === 'accepted') return <Button small icon="lock" title={t('mine.payBooking')} onPress={() => router.push({ pathname: '/odeme', params: { tur: 'kaptan', id: b.id } })} />;
   if (b.status === 'paid') {
     return (
       <View style={{ gap: space(2) }}>

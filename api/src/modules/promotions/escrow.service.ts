@@ -66,7 +66,7 @@ export class EscrowService {
         const end = b ? new Date(b.start.getTime() + b.days * DAY_MS) : null;
         const busy = b && end ? await tx.captainBooking.findMany({ where: { providerId: b.providerId, status: 'paid', id: { not: b.id }, start: { lt: end } } }) : [];
         const clash = b ? busy.some((x) => x.start.getTime() + x.days * DAY_MS > b.start.getTime()) : true;
-        ok = !clash && (await tx.captainBooking.updateMany({ where: { id: p.subjectId, status: 'requested' }, data: { status: 'paid' } })).count === 1;
+        ok = !clash && (await tx.captainBooking.updateMany({ where: { id: p.subjectId, status: 'accepted' }, data: { status: 'paid' } })).count === 1;
         // Kiralama bitişinden sonra kendiliğinden aktarılır (müşteri sorun bildirmediyse).
         if (ok && b) await tx.servicePayment.update({ where: { id: p.id }, data: { autoReleaseAt: new Date(b.start.getTime() + (b.days + CAPTAIN_AUTO_RELEASE_DAYS) * DAY_MS) } });
       }

@@ -70,7 +70,7 @@ export interface SavedSearch {
 export interface CaptainBooking {
   id: string; captainId: string; start: string; days: number; totalEUR: number; paid: boolean;
   /** Gerçek modda sunucu durumu: requested | paid | done | cancelled; `reviewed` değerlendirildi mi. */
-  status?: 'requested' | 'paid' | 'done' | 'cancelled'; reviewed?: boolean; autoReleaseAt?: string | null; disputed?: boolean;
+  status?: 'requested' | 'accepted' | 'paid' | 'done' | 'cancelled'; reviewed?: boolean; autoReleaseAt?: string | null; disputed?: boolean;
 }
 export interface ExpertiseBooking { id: string; packageId: string; listingId?: string; date: string; slot: string; reportStatus?: string; score?: number | null }
 export interface ExpertisePackage { id: string; name: string; priceTRY: number; items: string[] }

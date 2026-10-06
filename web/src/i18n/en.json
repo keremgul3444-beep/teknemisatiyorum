@@ -645,7 +645,8 @@
     "last_admin": "The last admin cannot lose admin rights.",
     "not_restorable": "This listing cannot be restored (withdrawn by its owner or not removed).",
     "owner_suspended": "The owner is suspended; lift the suspension first.",
-    "already_done": "This has already been done."
+    "already_done": "This has already been done.",
+    "booking_not_accepted": "You can pay once the skipper accepts the request."
   },
   "login": {
     "title": "Log in",
@@ -1297,7 +1298,8 @@
     "bookingCancelled": "The customer cancelled the charter request.",
     "importDone": "Bulk import finished: {{created}}/{{total}} listings sent for review.",
     "companyAdded": "You were added to {{company}}.",
-    "companyRemoved": "You were removed from {{company}}; your listings there are now personal."
+    "companyRemoved": "You were removed from {{company}}; your listings there are now personal.",
+    "bookingAccepted": "The skipper accepted your charter request; you can pay now."
   },
   "lead": {
     "title": "Get a finance, insurance or transport quote",

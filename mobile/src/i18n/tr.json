@@ -883,7 +883,8 @@
     "autoRelease": "Sorun bildirmezsen ödeme {{date}} tarihinde kaptana aktarılır.",
     "priceReviewHint": "Bu kadar büyük fiyat değişikliği yeniden onaya gider; onaylanana kadar ilan yayında görünmez.",
     "rejectNote": "Moderatör notu: {{note}}",
-    "promoWarn": "Kalan öne çıkarma süresi iade edilmez."
+    "promoWarn": "Kalan öne çıkarma süresi iade edilmez.",
+    "awaitingCaptain": "Kaptanın onayı bekleniyor; onaylayınca ödeme açılır."
   },
   "settings": {
     "title": "Ayarlar",
@@ -995,14 +996,16 @@
       "requested": "Ödeme bekleniyor",
       "paid": "Ödendi (emanette)",
       "done": "Tamamlandı",
-      "cancelled": "İptal"
+      "cancelled": "İptal",
+      "accepted": "Onaylandı, ödeme bekleniyor"
     },
     "markDelivered": "İşi bitirdim",
     "delivered": "Bitti bildirildi; müşteri onayı ya da süre sonu bekleniyor",
     "docInReview": "Belgen incelemede; onaylanınca profilin listede görünür.",
     "docRejected": "Belge onaylanmadı. {{reason}}",
     "withdraw": "İşten çekil",
-    "withdrawConfirm": "İş sahibi henüz ödeme yapmadı. Çekilirsen teklifin silinir ve iş yeniden teklife açılır."
+    "withdrawConfirm": "İş sahibi henüz ödeme yapmadı. Çekilirsen teklifin silinir ve iş yeniden teklife açılır.",
+    "accept": "Onayla"
   },
   "corporate": {
     "title": "Firma paneli",
@@ -1319,7 +1322,8 @@
     "last_admin": "Son yöneticinin yetkisi kaldırılamaz.",
     "not_restorable": "Bu ilan geri alınamaz (sahibi kaldırmış ya da kaldırılmamış).",
     "owner_suspended": "İlan sahibinin hesabı askıda; önce askıyı kaldır.",
-    "already_done": "Bu işlem zaten yapılmış."
+    "already_done": "Bu işlem zaten yapılmış.",
+    "booking_not_accepted": "Kaptan talebi onayladıktan sonra ödeme yapılabilir."
   },
   "soon": {
     "title": "Yakında",
@@ -1358,7 +1362,8 @@
     "bookingCancelled": "Müşteri kiralama talebini iptal etti.",
     "importDone": "Toplu yükleme bitti: {{created}}/{{total}} ilan onaya gönderildi.",
     "companyAdded": "{{company}} firmasına eklendin.",
-    "companyRemoved": "{{company}} firmasından çıkarıldın; firmadaki ilanların bireysel ilana döndü."
+    "companyRemoved": "{{company}} firmasından çıkarıldın; firmadaki ilanların bireysel ilana döndü.",
+    "bookingAccepted": "Kaptan kiralama talebini onayladı; ödemeyi yapabilirsin."
   },
   "notifs": {
     "title": "Bildirimler",

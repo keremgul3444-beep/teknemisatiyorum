@@ -656,6 +656,8 @@ model Quote {
 
 enum BookingStatus {
   requested
+  /// Kaptan onayladı; müşteri ödeyebilir.
+  accepted
   paid
   done
   cancelled

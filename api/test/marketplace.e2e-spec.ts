@@ -97,6 +97,11 @@ describe('kaptan rezervasyonu ve ekip iadesi', () => {
     const start = new Date(Date.now() + 10 * 864e5).toISOString().slice(0, 10);
     const b = (await t.http().post('/captain-bookings').set(guest.auth).send({ providerId: cap.profileId, start, days: 7 })).body;
     expect(b).toMatchObject({ totalEur: 1600, status: 'requested' });
+    // Kaptan onaylamadan ödeme açılmaz; onayda müşteriye haber gider.
+    expect((await t.http().post(`/captain-bookings/${b.id}/pay`).set(guest.auth).send({ accept: true })).body.code).toBe('BOOKING_NOT_ACCEPTED');
+    expect((await t.http().post(`/captain-bookings/${b.id}/accept`).set(guest.auth)).status).toBe(404);
+    await t.http().post(`/captain-bookings/${b.id}/accept`).set(cap.auth).expect(200);
+    expect(await t.prisma.notification.count({ where: { userId: guest.user.id, key: 'notif.bookingAccepted' } })).toBe(1);
     const pay = (await t.http().post(`/captain-bookings/${b.id}/pay`).set(guest.auth).send({ accept: true })).body;
     const rate = (await t.http().get('/fx')).body.EUR;
     expect(pay.amountKurus).toBe(Math.round(1600 * rate * 100));
@@ -118,25 +123,30 @@ describe('kaptan rezervasyonu ve ekip iadesi', () => {
     expect((await t.http().get('/admin/service-payments').set(guest.auth)).status).toBe(403);
   });
 
-  test('aynı tarihe iki ödeme: ikincisi emanete alınmaz, iade edilir; geri çevrilen talebin ödemesi de iade', async () => {
+  test('kaptan aynı tarihe iki talebi onaylayamaz; yine de çakışan ödeme emanete alınmaz; geri çevrilen talebin ödemesi iade', async () => {
     const cap = await provider('kaptan', { dayRateEur: 200 });
     const start = new Date(Date.now() + 20 * 864e5).toISOString().slice(0, 10);
     const g1 = await loginAs(t, { level: 1 });
     const g2 = await loginAs(t, { level: 1 });
     const b1 = (await t.http().post('/captain-bookings').set(g1.auth).send({ providerId: cap.profileId, start, days: 2 })).body;
     const b2 = (await t.http().post('/captain-bookings').set(g2.auth).send({ providerId: cap.profileId, start, days: 2 })).body;
+    await t.http().post(`/captain-bookings/${b1.id}/accept`).set(cap.auth).expect(200);
+    expect((await t.http().post(`/captain-bookings/${b2.id}/accept`).set(cap.auth)).body.code).toBe('CAPTAIN_BUSY');
+    // Eski sürümden kalmış onaylı ikinci talep: ödeme gelse de çakışma emanette yakalanır.
+    await t.prisma.captainBooking.update({ where: { id: b2.id }, data: { status: 'accepted' } });
     const p1 = (await t.http().post(`/captain-bookings/${b1.id}/pay`).set(g1.auth).send({ accept: true })).body;
     const p2 = (await t.http().post(`/captain-bookings/${b2.id}/pay`).set(g2.auth).send({ accept: true })).body;
     await devPay(g1.auth, p1.paymentId);
     await devPay(g2.auth, p2.paymentId);
     expect((await t.prisma.servicePayment.findUniqueOrThrow({ where: { id: p1.paymentId } })).status).toBe('held');
     expect((await t.prisma.servicePayment.findUniqueOrThrow({ where: { id: p2.paymentId } })).status).toBe('refunded');
-    expect((await t.prisma.captainBooking.findUniqueOrThrow({ where: { id: b2.id } })).status).toBe('requested');
+    expect((await t.prisma.captainBooking.findUniqueOrThrow({ where: { id: b2.id } })).status).toBe('accepted');
     expect(await t.prisma.notification.count({ where: { userId: g2.user.id, key: 'notif.paymentRefunded' } })).toBe(1);
 
     const g3 = await loginAs(t, { level: 1 });
     const later = new Date(Date.now() + 40 * 864e5).toISOString().slice(0, 10);
     const b3 = (await t.http().post('/captain-bookings').set(g3.auth).send({ providerId: cap.profileId, start: later, days: 1 })).body;
+    await t.http().post(`/captain-bookings/${b3.id}/accept`).set(cap.auth).expect(200);
     const p3 = (await t.http().post(`/captain-bookings/${b3.id}/pay`).set(g3.auth).send({ accept: true })).body;
     await t.http().post(`/captain-bookings/${b3.id}/decline`).set(cap.auth).expect(200);
     await devPay(g3.auth, p3.paymentId);

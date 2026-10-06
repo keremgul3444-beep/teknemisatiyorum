@@ -645,7 +645,8 @@
     "last_admin": "Son yöneticinin yetkisi kaldırılamaz.",
     "not_restorable": "Bu ilan geri alınamaz (sahibi kaldırmış ya da kaldırılmamış).",
     "owner_suspended": "İlan sahibinin hesabı askıda; önce askıyı kaldır.",
-    "already_done": "Bu işlem zaten yapılmış."
+    "already_done": "Bu işlem zaten yapılmış.",
+    "booking_not_accepted": "Kaptan talebi onayladıktan sonra ödeme yapılabilir."
   },
   "login": {
     "title": "Giriş yap",
@@ -1297,7 +1298,8 @@
     "bookingCancelled": "Müşteri kiralama talebini iptal etti.",
     "importDone": "Toplu yükleme bitti: {{created}}/{{total}} ilan onaya gönderildi.",
     "companyAdded": "{{company}} firmasına eklendin.",
-    "companyRemoved": "{{company}} firmasından çıkarıldın; firmadaki ilanların bireysel ilana döndü."
+    "companyRemoved": "{{company}} firmasından çıkarıldın; firmadaki ilanların bireysel ilana döndü.",
+    "bookingAccepted": "Kaptan kiralama talebini onayladı; ödemeyi yapabilirsin."
   },
   "lead": {
     "title": "Finansman, sigorta ya da nakliye teklifi al",

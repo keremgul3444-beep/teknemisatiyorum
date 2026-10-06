@@ -18,7 +18,7 @@ export async function retireServices(db: Db, userId: string, o: { anonymize: boo
     data: { status: 'suspended', ...(o.anonymize ? { displayName: '—', bio: '', priceNote: '', areas: [], languages: [] } : {}) },
   });
   const ownJobs = await db.job.updateMany({ where: { ownerId: userId, status: { in: ['open', 'accepted'] } }, data: { status: 'cancelled' } });
-  await db.captainBooking.updateMany({ where: { OR: [{ userId }, { providerId: { in: ids } }], status: 'requested' }, data: { status: 'cancelled' } });
+  await db.captainBooking.updateMany({ where: { OR: [{ userId }, { providerId: { in: ids } }], status: { in: ['requested', 'accepted'] } }, data: { status: 'cancelled' } });
   if (ids.length) {
     // Bu ustanın teklifi kabul edilmiş ama ödenmemiş işler yeniden teklif almaya açılır.
     const quotes = await db.quote.findMany({ where: { providerId: { in: ids } }, select: { id: true } });
