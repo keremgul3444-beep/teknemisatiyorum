@@ -54,19 +54,32 @@ export class EscrowService {
       return true;
     }
     // Aynı bildirim iki kez gelirse ikincisi bir şey değiştirmez.
+    // Ödeme sayfası açıkken iş iptal edildiyse, rezervasyon geri çevrildiyse ya da tarih başka ödenmiş
+    // rezervasyonla çakışıyorsa para emanete alınmaz, iade edilir ('void').
     const done = await this.prisma.$transaction(async (tx) => {
       const r = await tx.servicePayment.updateMany({ where: { id: p.id, status: 'pending' }, data: { status: 'held', paidAt: new Date() } });
       if (!r.count) return false;
-      if (p.subjectKind === 'job') await tx.job.updateMany({ where: { id: p.subjectId, status: 'accepted' }, data: { status: 'paid' } });
+      let ok: boolean;
+      if (p.subjectKind === 'job') ok = (await tx.job.updateMany({ where: { id: p.subjectId, status: 'accepted' }, data: { status: 'paid' } })).count === 1;
       else {
-        await tx.captainBooking.updateMany({ where: { id: p.subjectId, status: 'requested' }, data: { status: 'paid' } });
-        // Kiralama bitişinden sonra kendiliğinden aktarılır (müşteri sorun bildirmediyse).
         const b = await tx.captainBooking.findUnique({ where: { id: p.subjectId } });
-        if (b) await tx.servicePayment.update({ where: { id: p.id }, data: { autoReleaseAt: new Date(b.start.getTime() + (b.days + CAPTAIN_AUTO_RELEASE_DAYS) * DAY_MS) } });
+        const end = b ? new Date(b.start.getTime() + b.days * DAY_MS) : null;
+        const busy = b && end ? await tx.captainBooking.findMany({ where: { providerId: b.providerId, status: 'paid', id: { not: b.id }, start: { lt: end } } }) : [];
+        const clash = b ? busy.some((x) => x.start.getTime() + x.days * DAY_MS > b.start.getTime()) : true;
+        ok = !clash && (await tx.captainBooking.updateMany({ where: { id: p.subjectId, status: 'requested' }, data: { status: 'paid' } })).count === 1;
+        // Kiralama bitişinden sonra kendiliğinden aktarılır (müşteri sorun bildirmediyse).
+        if (ok && b) await tx.servicePayment.update({ where: { id: p.id }, data: { autoReleaseAt: new Date(b.start.getTime() + (b.days + CAPTAIN_AUTO_RELEASE_DAYS) * DAY_MS) } });
+      }
+      if (!ok) {
+        await tx.servicePayment.update({ where: { id: p.id }, data: { status: 'refunded', refundedAt: new Date() } });
+        return 'void' as const;
       }
       return true;
     });
-    if (done) {
+    if (done === 'void') {
+      await this.notifications.push(p.payerId, 'notif.paymentRefunded', { amount: String(Math.round((p.amountKurus + p.feeKurus) / 100)) });
+      await this.audit.log(null, 'audit.paymentRefunded', { ref: p.id }, 'payment', p.id);
+    } else if (done) {
       const prov = await this.prisma.providerProfile.findUnique({ where: { id: p.providerId } });
       if (prov) await this.notifications.push(prov.userId, 'notif.servicePaid', { kind: p.subjectKind, id: p.subjectId });
       await this.audit.log(p.payerId, 'audit.servicePaid', { kind: p.subjectKind, amount: String(Math.round((p.amountKurus + p.feeKurus) / 100)) }, 'payment', p.id);
@@ -111,6 +124,7 @@ export class EscrowService {
   async refund(id: string, staffId: string) {
     const p = await this.prisma.servicePayment.findUnique({ where: { id } });
     if (!p) throw Errors.notFound();
+    await this.assertNotParty(p, staffId);
     await this.prisma.$transaction(async (tx) => {
       const r = await tx.servicePayment.updateMany({ where: { id, status: 'held' }, data: { status: 'refunded', refundedAt: new Date(), decidedById: staffId } });
       if (!r.count) throw Errors.conflict('PAYMENT_NOT_HELD');
@@ -120,6 +134,12 @@ export class EscrowService {
     await this.notifications.push(p.payerId, 'notif.paymentRefunded', { amount: String(Math.round((p.amountKurus + p.feeKurus) / 100)) });
     await this.audit.log(staffId, 'audit.paymentRefunded', { ref: p.id }, 'payment', p.id);
     return { id, status: 'refunded' };
+  }
+
+  /** Ekip üyesi kendi taraf olduğu ödemede (ödeyen ya da hizmet veren) karar veremez. */
+  async assertNotParty(p: ServicePayment, staffId: string) {
+    const prov = await this.prisma.providerProfile.findUnique({ where: { id: p.providerId }, select: { userId: true } });
+    if (p.payerId === staffId || prov?.userId === staffId) throw new AppError('SELF_DECISION', 'errors.self_decision', 403);
   }
 
   /** Yalnızca deneme modu: ödeyenin deneme sayfasındaki düğmesi; imzalı bildirim sunucuda üretilip aynı yoldan işlenir. */

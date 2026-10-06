@@ -19,6 +19,8 @@ import { reportError } from '../../adapters/error-report';
 import { bookingView, captainTotal, jobView, providerView } from './views';
 
 const STAFF = { roles: ['moderator', 'admin'] as ('moderator' | 'admin')[] };
+/** Para kararları (iade, aktarım) yalnızca yöneticide. */
+const ADMIN = { roles: ['admin'] as ('moderator' | 'admin')[] };
 /** Kullanıcı metni sistem çeviri anahtarı gibi görünemez (karneye düşen başlık). */
 const userText = (min: number, max: number) => z.string().trim().min(min).max(max).refine((s) => !s.startsWith(I18N_PREFIX), 'reserved');
 const kindParam = z.enum(['usta', 'kaptan']);
@@ -513,7 +515,7 @@ class ServicePaymentsController {
     return rows.map((p) => ({ ...p, providerName: provs.find((x) => x.id === p.providerId)?.displayName ?? null }));
   }
 
-  @Auth(STAFF)
+  @Auth(ADMIN)
   @Post('admin/service-payments/:id/refund')
   @HttpCode(200)
   refund(@CurrentUser() u: AuthUser, @Param('id') id: string) {
@@ -521,13 +523,13 @@ class ServicePaymentsController {
   }
 
   /** Anlaşmazlıkta ekip parayı hizmet verene aktarır (iş/rezervasyon tamamlanmış sayılır). */
-  @Auth(STAFF)
+  @Auth(ADMIN)
   @Post('admin/service-payments/:id/release')
   @HttpCode(200)
   async release(@CurrentUser() u: AuthUser, @Param('id') id: string) {
     const p = await this.prisma.servicePayment.findUnique({ where: { id } });
     if (!p) throw Errors.notFound();
-    if (p.payerId === u.id) throw new AppError('SELF_DECISION', 'errors.self_decision', 403);
+    await this.escrow.assertNotParty(p, u.id);
     await this.escrow.release(p, u.id);
     await finishSubject(this.prisma, this.logbook, p.subjectKind, p.subjectId);
     return { id, status: 'released' };

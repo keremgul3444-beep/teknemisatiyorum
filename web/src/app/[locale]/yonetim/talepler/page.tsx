@@ -4,11 +4,11 @@ import { t, tDict, type Locale } from '@/i18n';
 import { staffGet } from '@/lib/auth-server';
 import { formatPrice } from '@/lib/format';
 import { AdminNav } from '@/components/AdminNav';
-import { LeadStatus } from '@/components/AdminActions';
+import { LeadPhone, LeadStatus } from '@/components/AdminActions';
 
 type P = { params: Promise<{ locale: string }> };
 type Lead = {
-  id: string; kind: string; status: string; note: string; name: string | null; phone: string | null; createdAt: string;
+  id: string; kind: string; status: string; note: string; name: string | null; phoneMasked: string | null; createdAt: string;
   listing: { id: string; brand: string; model: string; year: number; price: number; currency: Currency } | null;
 };
 
@@ -33,7 +33,7 @@ export default async function Talepler({ params }: P) {
             <div key={r.id} className="card spread" style={{ gap: 12, opacity: r.status === 'closed' ? 0.6 : 1 }}>
               <div style={{ display: 'grid', gap: 4 }}>
                 <strong>{t(locale, `admin.leadKind.${r.kind}`)} · {t(locale, `admin.leadStatus.${r.status}`)}</strong>
-                <span>{r.name ?? '—'} · {r.phone ? <a href={`tel:${r.phone}`}>{r.phone}</a> : '—'}</span>
+                <span>{r.name ?? '—'} · <LeadPhone id={r.id} masked={r.phoneMasked} L={L} errors={tDict(locale, 'errors')} /></span>
                 {r.listing ? <span className="small">{r.listing.brand} {r.listing.model} · {r.listing.year} · {formatPrice(r.listing.price, r.listing.currency, locale)}</span> : null}
                 {r.note ? <span className="small muted">{r.note}</span> : null}
                 <span className="small muted">{fmt.format(new Date(r.createdAt))}</span>

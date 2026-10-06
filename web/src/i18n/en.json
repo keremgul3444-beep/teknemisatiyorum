@@ -11,7 +11,7 @@
     "usta": "Service",
     "kaptan": "Skipper",
     "login": "Log in",
-    "account": "My account",
+    "account": "Account",
     "lang": "Türkçe",
     "menu": "Menu",
     "sell": "Sell"
@@ -998,7 +998,8 @@
     },
     "forward": "Mark as forwarded",
     "close": "Close",
-    "noLeads": "No requests."
+    "noLeads": "No requests.",
+    "revealPhone": "Show number"
   },
   "audit": {
     "listingApproved": "Listing approved: {{title}}",
@@ -1043,7 +1044,8 @@
     "reregistered": "Matched a deleted problem account ({{via}})",
     "listingsImported": "Bulk import: {{created}}/{{total}} listings sent for review",
     "leadRequested": "Quote request: {{kind}}",
-    "leadHandled": "Quote request handled: {{status}}"
+    "leadHandled": "Quote request handled: {{status}}",
+    "leadRevealed": "Quote request phone viewed"
   },
   "firm": {
     "title": "Company panel",

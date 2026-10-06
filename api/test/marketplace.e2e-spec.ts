@@ -89,10 +89,39 @@ describe('kaptan rezervasyonu ve ekip iadesi', () => {
 
     const m = await moderator();
     expect((await t.http().get('/admin/service-payments?status=held').set(m.auth)).body.some((p: { id: string }) => p.id === pay.paymentId)).toBe(true);
-    await t.http().post(`/admin/service-payments/${pay.paymentId}/refund`).set(m.auth).expect(200);
+    // Para kararı yalnızca yöneticide.
+    expect((await t.http().post(`/admin/service-payments/${pay.paymentId}/refund`).set(m.auth)).status).toBe(403);
+    const admin = await loginAs(t, { level: 3, roles: ['admin'] });
+    await t.http().post(`/admin/service-payments/${pay.paymentId}/refund`).set(admin.auth).expect(200);
     expect((await t.prisma.captainBooking.findUniqueOrThrow({ where: { id: b.id } })).status).toBe('cancelled');
     expect((await t.http().get('/me/service-payments').set(guest.auth)).body[0]).toMatchObject({ id: pay.paymentId, status: 'refunded' });
     expect((await t.http().get('/admin/service-payments').set(guest.auth)).status).toBe(403);
+  });
+
+  test('aynı tarihe iki ödeme: ikincisi emanete alınmaz, iade edilir; geri çevrilen talebin ödemesi de iade', async () => {
+    const cap = await provider('kaptan', { dayRateEur: 200 });
+    const start = new Date(Date.now() + 20 * 864e5).toISOString().slice(0, 10);
+    const g1 = await loginAs(t, { level: 1 });
+    const g2 = await loginAs(t, { level: 1 });
+    const b1 = (await t.http().post('/captain-bookings').set(g1.auth).send({ providerId: cap.profileId, start, days: 2 })).body;
+    const b2 = (await t.http().post('/captain-bookings').set(g2.auth).send({ providerId: cap.profileId, start, days: 2 })).body;
+    const p1 = (await t.http().post(`/captain-bookings/${b1.id}/pay`).set(g1.auth).send({ accept: true })).body;
+    const p2 = (await t.http().post(`/captain-bookings/${b2.id}/pay`).set(g2.auth).send({ accept: true })).body;
+    await devPay(g1.auth, p1.paymentId);
+    await devPay(g2.auth, p2.paymentId);
+    expect((await t.prisma.servicePayment.findUniqueOrThrow({ where: { id: p1.paymentId } })).status).toBe('held');
+    expect((await t.prisma.servicePayment.findUniqueOrThrow({ where: { id: p2.paymentId } })).status).toBe('refunded');
+    expect((await t.prisma.captainBooking.findUniqueOrThrow({ where: { id: b2.id } })).status).toBe('requested');
+    expect(await t.prisma.notification.count({ where: { userId: g2.user.id, key: 'notif.paymentRefunded' } })).toBe(1);
+
+    const g3 = await loginAs(t, { level: 1 });
+    const later = new Date(Date.now() + 40 * 864e5).toISOString().slice(0, 10);
+    const b3 = (await t.http().post('/captain-bookings').set(g3.auth).send({ providerId: cap.profileId, start: later, days: 1 })).body;
+    const p3 = (await t.http().post(`/captain-bookings/${b3.id}/pay`).set(g3.auth).send({ accept: true })).body;
+    await t.http().post(`/captain-bookings/${b3.id}/decline`).set(cap.auth).expect(200);
+    await devPay(g3.auth, p3.paymentId);
+    const s3 = await t.prisma.servicePayment.findUniqueOrThrow({ where: { id: p3.paymentId } });
+    expect(s3).toMatchObject({ status: 'refunded', autoReleaseAt: null });
   });
 
   test('profil ve teklif üzerinden mesajlaşma açılır', async () => {
@@ -131,6 +160,24 @@ describe('emanet: otomatik aktarım, itiraz, askı ve hesap silme', () => {
     expect((await t.prisma.servicePayment.findUniqueOrThrow({ where: { id: pay.paymentId } })).status).toBe('released');
     expect((await t.prisma.job.findUniqueOrThrow({ where: { id: job.id } })).status).toBe('done');
     expect(await t.prisma.notification.count({ where: { userId: owner.user.id, key: 'notif.autoReleased' } })).toBe(1);
+  });
+
+  test('ödeme sayfası açıkken iş iptal edilirse para emanete alınmaz; ekip kendi ödemesinde karar veremez', async () => {
+    const owner = await loginAs(t, { level: 2 });
+    const usta = await provider('usta', { categories: ['elektronik'] });
+    const job = (await t.http().post('/jobs').set(owner.auth).send({ category: 'elektronik', title: 'Pompa arızası', description: 'Sintine pompası çalışmıyor, bakılacak.' })).body;
+    const q = (await t.http().post(`/jobs/${job.id}/quotes`).set(usta.auth).send({ priceTry: 2000, days: 1 })).body;
+    await t.http().post(`/jobs/${job.id}/accept`).set(owner.auth).send({ quoteId: q.id }).expect(200);
+    const pay = (await t.http().post(`/jobs/${job.id}/pay`).set(owner.auth).send({ accept: true })).body;
+    await t.http().post(`/jobs/${job.id}/cancel`).set(owner.auth).expect(200);
+    await devPay(owner.auth, pay.paymentId);
+    expect((await t.prisma.servicePayment.findUniqueOrThrow({ where: { id: pay.paymentId } })).status).toBe('refunded');
+    expect(await t.prisma.notification.count({ where: { userId: usta.user.id, key: 'notif.servicePaid' } })).toBe(0);
+
+    const { pay: p2, usta: u2 } = await paidJob('motor');
+    await t.prisma.user.update({ where: { id: u2.user.id }, data: { roles: ['admin'] } });
+    expect((await t.http().post(`/admin/service-payments/${p2.paymentId}/release`).set(u2.auth)).body.code).toBe('SELF_DECISION');
+    expect((await t.http().post(`/admin/service-payments/${p2.paymentId}/refund`).set(u2.auth)).body.code).toBe('SELF_DECISION');
   });
 
   test('sorun bildirilirse otomatik aktarım durur, ekip kuyruğunda en üstte görünür', async () => {

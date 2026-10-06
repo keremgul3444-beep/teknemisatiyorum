@@ -1201,7 +1201,8 @@
     "reregistered": "Silinmiş sorunlu hesabın izi eşleşti ({{via}})",
     "listingsImported": "Toplu yükleme: {{created}}/{{total}} ilan onaya gönderildi",
     "leadRequested": "Teklif talebi: {{kind}}",
-    "leadHandled": "Teklif talebi işlendi: {{status}}"
+    "leadHandled": "Teklif talebi işlendi: {{status}}",
+    "leadRevealed": "Teklif talebinin numarası görüntülendi"
   },
   "errors": {
     "generic": "Bir şeyler ters gitti, tekrar dene.",

@@ -31,10 +31,14 @@ test('teklif talebi: açık izin zorunlu; ad ve telefon hesaptan; günlük sın�
 
   const mod = await loginAs(t, { level: 3, roles: ['moderator'] });
   expect((await t.http().get('/admin/leads').set(u.auth)).status).toBe(403);
-  const list = (await t.http().get('/admin/leads?status=new').set(mod.auth)).body as { id: string; listing: { brand: string } | null; phone: string }[];
+  const list = (await t.http().get('/admin/leads?status=new').set(mod.auth)).body as { id: string; listing: { brand: string } | null; phone?: string; phoneMasked: string }[];
   const mine = list.find((x) => x.id === r.body.id)!;
   expect(mine.listing?.brand).toBe('Bavaria');
-  expect(mine.phone).toBe(u.user.phone);
+  // Listede numara maskeli; tam numara "göster" ile açılır ve kayda geçer.
+  expect(mine.phone).toBeUndefined();
+  expect(mine.phoneMasked).not.toBe(u.user.phone);
+  expect((await t.http().post(`/admin/leads/${r.body.id}/reveal`).set(mod.auth).expect(200)).body.phone).toBe(u.user.phone);
+  expect(await t.prisma.auditLog.count({ where: { action: 'audit.leadRevealed', targetId: r.body.id, actorId: mod.user.id } })).toBe(1);
   await t.http().post(`/admin/leads/${r.body.id}/status`).set(mod.auth).send({ status: 'forwarded' }).expect(200);
   expect((await t.http().get('/admin/leads?status=forwarded').set(mod.auth)).body.some((x: { id: string }) => x.id === r.body.id)).toBe(true);
 

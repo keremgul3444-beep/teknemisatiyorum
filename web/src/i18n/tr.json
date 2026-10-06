@@ -998,7 +998,8 @@
     },
     "forward": "İletildi olarak işaretle",
     "close": "Kapat",
-    "noLeads": "Talep yok."
+    "noLeads": "Talep yok.",
+    "revealPhone": "Numarayı göster"
   },
   "audit": {
     "listingApproved": "İlan onaylandı: {{title}}",
@@ -1043,7 +1044,8 @@
     "reregistered": "Silinmiş sorunlu hesabın izi eşleşti ({{via}})",
     "listingsImported": "Toplu yükleme: {{created}}/{{total}} ilan onaya gönderildi",
     "leadRequested": "Teklif talebi: {{kind}}",
-    "leadHandled": "Teklif talebi işlendi: {{status}}"
+    "leadHandled": "Teklif talebi işlendi: {{status}}",
+    "leadRevealed": "Teklif talebinin numarası görüntülendi"
   },
   "firm": {
     "title": "Firma paneli",

@@ -53,11 +53,22 @@ class LeadsController {
     const listings = await this.prisma.listing.findMany({
       where: { id: { in: rows.map((r) => r.listingId).filter((x): x is string => !!x) } }, select: { id: true, brand: true, model: true, year: true, price: true, currency: true },
     });
-    // Ekip iletmek için tam numarayı görür (iletme işinin kendisi bu); liste görüntüleme işlem kaydına yazılır.
+    // Listede numara maskeli; tam numara talep başına "göster" ile açılır ve işlem kaydına yazılır.
     return rows.map((r) => ({
-      id: r.id, kind: r.kind, status: r.status, note: r.note, name: r.name, phone: r.phone, phoneMasked: r.phone ? maskPhone(r.phone) : null,
+      id: r.id, kind: r.kind, status: r.status, note: r.note, name: r.name, phoneMasked: r.phone ? maskPhone(r.phone) : null,
       createdAt: r.createdAt, handledAt: r.handledAt, listing: listings.find((l) => l.id === r.listingId) ?? null,
     }));
+  }
+
+  /** İş ortağına iletmek için tam numara; her açılış kayda geçer. */
+  @Auth(STAFF)
+  @Post('admin/leads/:id/reveal')
+  @HttpCode(200)
+  async reveal(@CurrentUser() u: AuthUser, @Param('id') id: string) {
+    const l = await this.prisma.leadRequest.findUnique({ where: { id }, select: { id: true, phone: true } });
+    if (!l) throw Errors.notFound();
+    await this.audit.log(u.id, 'audit.leadRevealed', {}, 'lead', id);
+    return { id, phone: l.phone };
   }
 
   @Auth(STAFF)

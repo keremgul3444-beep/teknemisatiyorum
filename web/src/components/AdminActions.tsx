@@ -9,14 +9,14 @@ function useAction(errors: Dict) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const run = async (path: string, body?: unknown) => {
+  const run = async (path: string, body?: unknown, refresh = true): Promise<false | Record<string, unknown>> => {
     setBusy(true); setError('');
     const r = await fetch(`/api/admin/${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body ?? {}) }).catch(() => null);
     const j = r ? await r.json().catch(() => ({})) : {};
     setBusy(false);
     if (!r?.ok) { setError(errors[String(j.messageKey ?? '').replace(/^errors\./, '')] ?? errors.generic); return false; }
-    router.refresh();
-    return true;
+    if (refresh) router.refresh();
+    return j;
   };
   return { busy, error, run };
 }
@@ -121,21 +121,32 @@ export function UserSuspend({ id, suspended, L, errors }: { id: string; suspende
   );
 }
 
-/** Emanet ödeme: iade ya da hizmet verene aktarma (anlaşmazlık kararı). İade ikinci dokunuşla onaylanır. */
+/** Emanet ödeme: iade ya da hizmet verene aktarma (anlaşmazlık kararı). İkisi de geri alınamaz, ikinci dokunuşla onaylanır. */
 export function PaymentDecision({ id, L, errors }: { id: string; L: Dict; errors: Dict }) {
   const a = useAction(errors);
-  const [sure, setSure] = useState(false);
+  const [sure, setSure] = useState<'refund' | 'release' | null>(null);
   return (
     <div style={{ display: 'grid', gap: 8 }}>
       <div className="row">
         {sure
-          ? <><button type="button" className="btn" disabled={a.busy} onClick={() => void a.run(`service-payments/${id}/refund`)}>{L.refund}</button>
-            <button type="button" className="linklike" onClick={() => setSure(false)}>{L.cancel}</button></>
-          : <><button type="button" className="btn ghost" onClick={() => setSure(true)}>{L.refund}</button>
-            <button type="button" className="btn ghost" disabled={a.busy} onClick={() => void a.run(`service-payments/${id}/release`)}>{L.release}</button></>}
+          ? <><button type="button" className="btn" disabled={a.busy} onClick={() => void a.run(`service-payments/${id}/${sure}`)}>{sure === 'refund' ? L.refund : L.release}</button>
+            <button type="button" className="linklike" onClick={() => setSure(null)}>{L.cancel}</button></>
+          : <><button type="button" className="btn ghost" onClick={() => setSure('refund')}>{L.refund}</button>
+            <button type="button" className="btn ghost" onClick={() => setSure('release')}>{L.release}</button></>}
       </div>
       <Err text={a.error} />
     </div>
+  );
+}
+
+/** Teklif talebinin numarası: maskeli gelir, "göster" tam numarayı açar (kayda geçer). */
+export function LeadPhone({ id, masked, L, errors }: { id: string; masked: string | null; L: Dict; errors: Dict }) {
+  const a = useAction(errors);
+  const [phone, setPhone] = useState<string | null>(null);
+  if (!masked) return <span>—</span>;
+  if (phone) return <a href={`tel:${phone}`}>{phone}</a>;
+  return (
+    <span>{masked} <button type="button" className="linklike" disabled={a.busy} onClick={async () => { const j = await a.run(`leads/${id}/reveal`, undefined, false); if (j) setPhone(String(j.phone ?? '')); }}>{L.revealPhone}</button><Err text={a.error} /></span>
   );
 }
 

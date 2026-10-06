@@ -1201,7 +1201,8 @@
     "reregistered": "Matched a deleted problem account ({{via}})",
     "listingsImported": "Bulk import: {{created}}/{{total}} listings sent for review",
     "leadRequested": "Quote request: {{kind}}",
-    "leadHandled": "Quote request handled: {{status}}"
+    "leadHandled": "Quote request handled: {{status}}",
+    "leadRevealed": "Quote request phone viewed"
   },
   "errors": {
     "generic": "Something went wrong, please try again.",
