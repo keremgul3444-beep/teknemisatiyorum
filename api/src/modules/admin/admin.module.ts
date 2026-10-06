@@ -1,5 +1,6 @@
 import { Body, Controller, Get, HttpCode, Module, Param, Post, Query } from '@nestjs/common';
 import { z } from 'zod';
+import type { Prisma } from '@prisma/client';
 import { maskPhone } from '@tms/shared';
 import { Auth, CurrentUser, type AuthUser } from '../../common/decorators';
 import { ZodPipe } from '../../common/zod.pipe';
@@ -18,6 +19,9 @@ import { ListingsService } from '../listings/listings.service';
 import { ListingTexts } from '../listings/listing-writer.service';
 import { reportError } from '../../adapters/error-report';
 import { ModerationController } from './moderation.controller';
+import { AdminToolsController } from './admin-tools.controller';
+import { changedFields, listingSnapshot } from './snapshot';
+import { normalizePhone } from '../auth/phone';
 
 const STAFF = { roles: ['moderator', 'admin'] as ('moderator' | 'admin')[] };
 /** Red notu: satıcıya neyi düzelteceğini söyleyen serbest metin (gerekçe koduna ek). */
@@ -58,7 +62,7 @@ class AdminController {
   @Auth(STAFF)
   @Get('overview')
   async overview() {
-    const [activeListings, pendingListings, pendingVerifications, openBroker, pendingReports, users7d, openListingReports] = await Promise.all([
+    const [activeListings, pendingListings, pendingVerifications, openBroker, pendingReports, users7d, openListingReports, openDisputes, newLeads, oldestListing, oldestDoc, oldestReport] = await Promise.all([
       this.prisma.listing.count({ where: { status: 'published' } }),
       this.prisma.listing.count({ where: { status: 'pending' } }),
       this.prisma.verificationRequest.count({ where: { status: 'pending' } }),
@@ -66,8 +70,18 @@ class AdminController {
       this.prisma.expertiseBooking.count({ where: { reportStatus: 'pending' } }),
       this.prisma.user.count({ where: { createdAt: { gt: new Date(Date.now() - 7 * 864e5) }, deletedAt: null } }),
       this.prisma.listingReport.count({ where: { status: 'open' } }),
+      this.prisma.servicePayment.count({ where: { status: 'held', disputedAt: { not: null } } }),
+      this.prisma.leadRequest.count({ where: { status: 'new' } }),
+      this.prisma.listing.findFirst({ where: { status: 'pending' }, orderBy: { updatedAt: 'asc' }, select: { updatedAt: true } }),
+      this.prisma.verificationRequest.findFirst({ where: { status: 'pending' }, orderBy: { createdAt: 'asc' }, select: { createdAt: true } }),
+      this.prisma.listingReport.findFirst({ where: { status: 'open' }, orderBy: { createdAt: 'asc' }, select: { createdAt: true } }),
     ]);
-    return { activeListings, pendingListings, pendingVerifications, openBroker, pendingReports, users7d, openListingReports };
+    // En eski bekleyen işin yaşı (saat): kuyruk ne kadar geride.
+    const hours = (d?: Date) => (d ? Math.floor((Date.now() - d.getTime()) / 3600e3) : null);
+    return {
+      activeListings, pendingListings, pendingVerifications, openBroker, pendingReports, users7d, openListingReports, openDisputes, newLeads,
+      oldestHours: { listing: hours(oldestListing?.updatedAt), verification: hours(oldestDoc?.createdAt), report: hours(oldestReport?.createdAt) },
+    };
   }
 
   @Auth(STAFF)
@@ -91,6 +105,8 @@ class AdminController {
     // Moderatör ilanın yayına çıkacak her şeyini görür: açıklama, konum, özellikler ve yeni alanlar dahil.
     return rows.map((l) => ({
       previousRejectReason: previousReason(l.id),
+      /** Daha önce onaylanmış ilanın düzenlemesi: değişen alanlar (null = ilk inceleme). */
+      changed: changedFields(l.approvedSnapshot, listingSnapshot(l, [...l.photos].sort((a, b) => a.order - b.order).map((p) => p.fileId))),
       /** Aynı fotoğrafın kullanıldığı diğer ilanlar (başka satıcıda: çalıntı şüphesi; aynı satıcıda: mükerrer ilan). */
       photoDuplicates: dups.get(l.id) ?? [],
       id: l.id, title: `${l.brand} ${l.model}`, year: l.year, price: l.price, currency: l.currency, ownerName: l.owner.name,
@@ -107,7 +123,7 @@ class AdminController {
   @Post('listings/:id/decision')
   @HttpCode(200)
   async decideListing(@CurrentUser() u: AuthUser, @Param('id') id: string, @Body(new ZodPipe(listingDecisionBody)) b: z.infer<typeof listingDecisionBody>) {
-    const l = await this.prisma.listing.findUnique({ where: { id } });
+    const l = await this.prisma.listing.findUnique({ where: { id }, include: { photos: { orderBy: { order: 'asc' } } } });
     if (!l) throw Errors.notFound();
     if (l.ownerId === u.id) throw selfDecision();
     if (l.status !== 'pending') throw alreadyDecided();
@@ -121,7 +137,10 @@ class AdminController {
     const r = await this.prisma.listing.updateMany({
       where: { id, status: 'pending', updatedAt: l.updatedAt },
       data: approve
-        ? { status: 'published', publishedAt: keep ? l.publishedAt : now, expiresAt: keep ? l.expiresAt : nextExpiry(), ...(keep ? {} : { expiryWarnedAt: null }), rejectReason: null, rejectNote: null }
+        ? {
+          status: 'published', publishedAt: keep ? l.publishedAt : now, expiresAt: keep ? l.expiresAt : nextExpiry(), ...(keep ? {} : { expiryWarnedAt: null }),
+          rejectReason: null, rejectNote: null, approvedSnapshot: listingSnapshot(l, l.photos.map((p) => p.fileId)) as Prisma.InputJsonValue,
+        }
         : { status: 'rejected', rejectReason: b.reason, rejectNote: b.note ?? null },
     });
     if (!r.count) {
@@ -197,10 +216,16 @@ class AdminController {
     }));
   }
 
+  /** Kullanıcılar (en yeni 200); `q` telefon (tam numara) ya da ad parçasıyla arar. */
   @Auth(STAFF)
   @Get('users')
-  async users() {
-    const rows = await this.prisma.user.findMany({ where: { deletedAt: null }, orderBy: { createdAt: 'desc' }, take: 200 });
+  async users(@Query('q') q?: string) {
+    const term = (q ?? '').trim().slice(0, 60);
+    const phone = /\d{7,}/.test(term.replace(/\D/g, '')) ? normalizePhone(term) : null;
+    const rows = await this.prisma.user.findMany({
+      where: { deletedAt: null, ...(phone ? { phone } : term.length >= 2 ? { name: { contains: term, mode: 'insensitive' as const } } : {}) },
+      orderBy: { createdAt: 'desc' }, take: 200,
+    });
     // Kişisel veriler maskeli; tam görüntüleme bu turda yok.
     return rows.map((x) => ({
       id: x.id, name: x.name, roles: x.roles, verifyLevel: x.verifyLevel, createdAt: x.createdAt,
@@ -210,10 +235,27 @@ class AdminController {
     }));
   }
 
+  /**
+   * İşlem kaydı: en yeni 100; işlemi yapan, işlem türü, hedef ve tarihe göre süzülür (`before` ile önceki sayfa).
+   * `staff=1` yalnızca ekip işlemleri (kullanıcıların kendi işlemleri hariç). Yapanın adı eklenir.
+   */
   @Auth(STAFF)
   @Get('audit')
-  audit_() {
-    return this.prisma.auditLog.findMany({ orderBy: { at: 'desc' }, take: 100 });
+  async audit_(@Query() q: Record<string, string | undefined>) {
+    const before = q.before && !Number.isNaN(Date.parse(q.before)) ? new Date(q.before) : undefined;
+    const staffIds = q.staff === '1'
+      ? (await this.prisma.user.findMany({ where: { roles: { hasSome: ['moderator', 'admin'] } }, select: { id: true } })).map((x) => x.id) : undefined;
+    const rows = await this.prisma.auditLog.findMany({
+      where: {
+        ...(q.actor ? { actorId: q.actor.slice(0, 40) } : staffIds ? { actorId: { in: staffIds } } : {}),
+        ...(q.action ? { action: { contains: q.action.slice(0, 40) } } : {}),
+        ...(q.target ? { targetId: q.target.slice(0, 40) } : {}),
+        ...(before ? { at: { lt: before } } : {}),
+      },
+      orderBy: { at: 'desc' }, take: 100,
+    });
+    const actors = await this.prisma.user.findMany({ where: { id: { in: [...new Set(rows.map((r) => r.actorId).filter((x): x is string => !!x))] } }, select: { id: true, name: true } });
+    return rows.map((r) => ({ ...r, actorName: actors.find((a) => a.id === r.actorId)?.name ?? null }));
   }
 
   @Auth(STAFF)
@@ -260,5 +302,5 @@ class AdminController {
   }
 }
 
-@Module({ imports: [BoatsModule, ListingsModule], controllers: [AdminController, ModerationController] })
+@Module({ imports: [BoatsModule, ListingsModule], controllers: [AdminController, ModerationController, AdminToolsController] })
 export class AdminModule {}

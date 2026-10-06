@@ -169,3 +169,66 @@ export function LeadStatus({ id, status, L, errors }: { id: string; status: stri
     </div>
   );
 }
+
+/** Ekip rolleri (yalnızca yöneticiye gösterilir): moderatör / yönetici aç-kapa. */
+export function UserRoles({ id, roles, L, errors }: { id: string; roles: string[]; L: Dict; errors: Dict }) {
+  const a = useAction(errors);
+  const staff: string[] = roles.filter((r) => r === 'moderator' || r === 'admin');
+  const toggle = (r: string) => a.run(`users/${id}/roles`, { roles: staff.includes(r) ? staff.filter((x) => x !== r) : [...staff, r] });
+  return (
+    <div style={{ display: 'grid', gap: 8 }}>
+      <div className="row">
+        {(['moderator', 'admin'] as const).map((r) => (
+          <button key={r} type="button" className={staff.includes(r) ? 'btn' : 'btn ghost'} aria-pressed={staff.includes(r)} disabled={a.busy} onClick={() => void toggle(r)}>{L[`role_${r}`]}</button>
+        ))}
+      </div>
+      <Err text={a.error} />
+    </div>
+  );
+}
+
+/** Ekibin kaldırdığı ilanı yeniden onaya al. */
+export function ListingRestore({ id, L, errors }: { id: string; L: Dict; errors: Dict }) {
+  const a = useAction(errors);
+  return <span><button type="button" className="linklike" disabled={a.busy} onClick={() => void a.run(`listings/${id}/restore`)}>{L.restore}</button><Err text={a.error} /></span>;
+}
+
+/** Yorumu gizle / geri aç. */
+export function ReviewToggle({ id, hidden, L, errors }: { id: string; hidden: boolean; L: Dict; errors: Dict }) {
+  const a = useAction(errors);
+  return <span><button type="button" className="btn ghost" disabled={a.busy} onClick={() => void a.run(`reviews/${id}/${hidden ? 'show' : 'hide'}`)}>{hidden ? L.showReview : L.hideReview}</button><Err text={a.error} /></span>;
+}
+
+/** Hizmet profilini durdur / aç. */
+export function ProviderToggle({ id, status, L, errors }: { id: string; status: string; L: Dict; errors: Dict }) {
+  const a = useAction(errors);
+  if (status === 'pending') return null;
+  const next = status === 'active' ? 'suspended' : 'active';
+  return <span><button type="button" className="linklike" disabled={a.busy} onClick={() => void a.run(`providers/${id}/status`, { status: next })}>{next === 'suspended' ? L.pauseProvider : L.activateProvider}</button><Err text={a.error} /></span>;
+}
+
+/** Döviz kuru (yalnızca yönetici): 1 birim = ? TL. */
+export function FxRate({ currency, rate, L, errors }: { currency: string; rate: number; L: Dict; errors: Dict }) {
+  const router = useRouter();
+  const [v, setV] = useState(String(rate));
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const save = async () => {
+    setBusy(true); setError('');
+    const r = await fetch(`/api/admin/fx/${currency}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rateToTry: Number(v.replace(',', '.')) }) }).catch(() => null);
+    const j = r ? await r.json().catch(() => ({})) : {};
+    setBusy(false);
+    if (!r?.ok) { setError(errors[String(j.messageKey ?? '').replace(/^errors\./, '')] ?? errors.generic); return; }
+    router.refresh();
+  };
+  return (
+    <div style={{ display: 'grid', gap: 6 }}>
+      <div className="row" style={{ alignItems: 'center' }}>
+        <label htmlFor={`fx-${currency}`} style={{ minWidth: 48, fontWeight: 700 }}>{currency}</label>
+        <input id={`fx-${currency}`} className="input" inputMode="decimal" value={v} onChange={(e) => setV(e.target.value)} style={{ maxWidth: 160 }} />
+        <button type="button" className="btn" disabled={busy || !(Number(v.replace(',', '.')) > 0)} onClick={() => void save()}>{L.save}</button>
+      </div>
+      <Err text={error} />
+    </div>
+  );
+}

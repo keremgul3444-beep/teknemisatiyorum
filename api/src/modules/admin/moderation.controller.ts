@@ -87,7 +87,7 @@ export class ModerationController {
 
   /**
    * Hesabı askıya alır: tüm oturumlar kapanır, yeniden giriş engellenir, yayındaki/bekleyen ilanları kaldırılır
-   * (gerekçe "account_suspended") ve bu ilanların açık bildirimleri kapanır. Askı kaldırılınca ilanlar kendiliğinden geri gelmez.
+   * (gerekçe "account_suspended") ve bu ilanların açık bildirimleri kapanır. Askı kalkınca bu ilanlar yeniden onaya düşer.
    */
   @Auth(STAFF)
   @Post('users/:id/suspend')
@@ -119,12 +119,14 @@ export class ModerationController {
     const target = await this.prisma.user.findUnique({ where: { id } });
     if (!target || target.deletedAt) throw Errors.notFound();
     if (!target.suspendedAt) throw Errors.conflict('NOT_SUSPENDED');
-    await this.prisma.$transaction(async (tx) => {
+    const restored = await this.prisma.$transaction(async (tx) => {
       await tx.user.update({ where: { id }, data: { suspendedAt: null, suspendReason: null } });
       await restoreServices(tx, id);
+      // Askı yüzünden kaldırılan ilanlar doğrudan yayına dönmez; ekip yeniden bakar.
+      return (await tx.listing.updateMany({ where: { ownerId: id, status: 'removed', removedReason: 'account_suspended' }, data: { status: 'pending', removedReason: null } })).count;
     });
     await this.audit.log(u.id, 'audit.userUnsuspended', { name: target.name ?? '—' }, 'user', id);
-    return { suspended: false };
+    return { suspended: false, restoredListings: restored };
   }
 
   private async resolveReports(listingIds: string[], status: 'actioned' | 'dismissed', by: string) {

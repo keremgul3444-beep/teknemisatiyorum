@@ -258,6 +258,8 @@ model Listing {
   rejectReason  String?
   /// Moderatörün serbest red notu; yalnızca sahibine gösterilir.
   rejectNote    String?
+  /// Son onaylanan hâlin özeti; düzenleme sonrası onay kuyruğunda değişen alanlar buna göre gösterilir.
+  approvedSnapshot Json?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   publishedAt   DateTime?
@@ -721,6 +723,8 @@ model Review {
   stars       Int
   text        String   @default("")
   createdAt   DateTime @default(now())
+  /// Ekip gizlediyse (hakaret, kişisel veri); puan ortalamasına sayılmaz, profilde görünmez.
+  hiddenAt    DateTime?
 
   @@unique([subjectKind, subjectId])
   @@index([providerId, createdAt])

@@ -11,7 +11,7 @@ type P = { params: Promise<{ locale: string }> };
 type Item = {
   id: string; title: string; year: number; price: number; currency: Currency; ownerName: string | null; ownerVerifyLevel: number; photos: string[]; version: string;
   lengthM: number; type: string; location: string; cabins: number; engine: string; engineHours: number | null; flag: string | null; tradeIn: boolean; negotiable: boolean;
-  equipment: string[]; description: string; previousRejectReason: string | null; photoDuplicates: { listingId: string; title: string; status: string; sameOwner: boolean }[];
+  equipment: string[]; description: string; previousRejectReason: string | null; changed?: string[] | null; photoDuplicates: { listingId: string; title: string; status: string; sameOwner: boolean }[];
 };
 
 export async function generateMetadata({ params }: P): Promise<Metadata> {
@@ -55,6 +55,7 @@ export default async function IlanOnaylari({ params }: P) {
                   {t(locale, d.sameOwner ? 'admin.duplicateSame' : 'admin.duplicateOther', { title: d.title })} · <Link href={localePath(locale, `/ilan/${d.listingId}`)}>{t(locale, 'admin.openListing')}</Link>
                 </p>
               ))}
+              {l.changed ? <p className="small" style={{ margin: 0, color: 'var(--c-warning)' }}>{l.changed.length ? t(locale, 'admin.changedFields', { fields: l.changed.map((f) => t(locale, `admin.field.${f}`, {})).join(', ') }) : t(locale, 'admin.noChanges')}</p> : null}
               {l.previousRejectReason ? <p className="small" style={{ margin: 0, color: 'var(--c-danger)' }}>{t(locale, 'admin.previousReject')}: {t(locale, `admin.reasons.${l.previousRejectReason}`)}</p> : null}
               <ListingDecision id={l.id} version={l.version} L={L} reasons={tDict(locale, 'admin.reasons')} errors={tDict(locale, 'errors')} />
             </article>

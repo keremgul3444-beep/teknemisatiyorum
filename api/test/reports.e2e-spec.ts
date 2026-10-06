@@ -132,8 +132,8 @@ describe('hesap askıya alma', () => {
     const s = await t.prisma.session.create({ data: { userId: seller.user.id, familyId: crypto.randomUUID(), deviceName: 'yeni', refreshHash: crypto.randomBytes(16).toString('hex') } });
     const token = await t.app.get(JwtService).signAsync({ sub: seller.user.id, sid: s.id });
     expect((await t.http().get('/me/listings').set({ Authorization: `Bearer ${token}` })).status).toBe(200);
-    // Askı kaldırılınca ilanlar kendiliğinden geri gelmez.
-    expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: live.id } })).status).toBe('removed');
+    // Askı kaldırılınca askı yüzünden kalkan ilanlar doğrudan yayına dönmez, yeniden onaya düşer.
+    expect((await t.prisma.listing.findUniqueOrThrow({ where: { id: live.id } })).status).toBe('pending');
     expect(await t.prisma.auditLog.count({ where: { action: 'audit.userSuspended', targetId: seller.user.id } })).toBe(1);
   });
 

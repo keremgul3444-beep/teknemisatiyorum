@@ -1209,7 +1209,13 @@
     "listingsImported": "Bulk import: {{created}}/{{total}} listings sent for review",
     "leadRequested": "Quote request: {{kind}}",
     "leadHandled": "Quote request handled: {{status}}",
-    "leadRevealed": "Quote request phone viewed"
+    "leadRevealed": "Quote request phone viewed",
+    "rolesChanged": "Roles changed: {{name}} → {{roles}}",
+    "listingRestored": "Listing sent back to review: {{title}}",
+    "reviewHidden": "Review hidden ({{stars}} stars)",
+    "reviewShown": "Review shown again ({{stars}} stars)",
+    "providerSuspended": "Service profile paused: {{name}}",
+    "providerActivated": "Service profile activated: {{name}}"
   },
   "errors": {
     "generic": "Something went wrong, please try again.",
@@ -1304,7 +1310,11 @@
     "lead_limit": "You have reached today's quote request limit.",
     "phone_required": "A phone number is required on your account for this.",
     "listing_required": "A registration document must belong to a listing.",
-    "request_pending": "You already have a request waiting for review."
+    "request_pending": "You already have a request waiting for review.",
+    "last_admin": "The last admin cannot lose admin rights.",
+    "not_restorable": "This listing cannot be restored (withdrawn by its owner or not removed).",
+    "owner_suspended": "The owner is suspended; lift the suspension first.",
+    "already_done": "This has already been done."
   },
   "soon": {
     "title": "Coming soon",
@@ -1333,7 +1343,10 @@
     "bookingDeclined": "The captain declined your booking request",
     "jobDelivered": "The technician marked the job done: {{title}}. If you don’t confirm or report a problem within {{days}} days, the payment is released.",
     "paymentDisputed": "The customer reported a problem; the payment is under team review.",
-    "autoReleased": "The held payment was released to the provider after the waiting period."
+    "autoReleased": "The held payment was released to the provider after the waiting period.",
+    "staffReport": "New report: {{title}}",
+    "staffDispute": "A payment was disputed and needs a decision (₺{{amount}}).",
+    "providerSuspended": "Your service profile was paused by the team: {{name}}"
   },
   "notifs": {
     "title": "Notifications",

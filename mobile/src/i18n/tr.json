@@ -1209,7 +1209,13 @@
     "listingsImported": "Toplu yükleme: {{created}}/{{total}} ilan onaya gönderildi",
     "leadRequested": "Teklif talebi: {{kind}}",
     "leadHandled": "Teklif talebi işlendi: {{status}}",
-    "leadRevealed": "Teklif talebinin numarası görüntülendi"
+    "leadRevealed": "Teklif talebinin numarası görüntülendi",
+    "rolesChanged": "Roller değişti: {{name}} → {{roles}}",
+    "listingRestored": "İlan yeniden onaya alındı: {{title}}",
+    "reviewHidden": "Yorum gizlendi ({{stars}} yıldız)",
+    "reviewShown": "Yorum yeniden açıldı ({{stars}} yıldız)",
+    "providerSuspended": "Hizmet profili durduruldu: {{name}}",
+    "providerActivated": "Hizmet profili açıldı: {{name}}"
   },
   "errors": {
     "generic": "Bir şeyler ters gitti, tekrar dene.",
@@ -1304,7 +1310,11 @@
     "lead_limit": "Bugünlük teklif talebi sınırına ulaştın.",
     "phone_required": "Bu işlem için hesabında telefon numarası olmalı.",
     "listing_required": "Ruhsat bir ilana bağlı yüklenir.",
-    "request_pending": "Bu konuda incelenmeyi bekleyen bir başvurun var."
+    "request_pending": "Bu konuda incelenmeyi bekleyen bir başvurun var.",
+    "last_admin": "Son yöneticinin yetkisi kaldırılamaz.",
+    "not_restorable": "Bu ilan geri alınamaz (sahibi kaldırmış ya da kaldırılmamış).",
+    "owner_suspended": "İlan sahibinin hesabı askıda; önce askıyı kaldır.",
+    "already_done": "Bu işlem zaten yapılmış."
   },
   "soon": {
     "title": "Yakında",
@@ -1333,7 +1343,10 @@
     "bookingDeclined": "Kaptan rezervasyon talebini geri çevirdi",
     "jobDelivered": "Usta işi bitirdiğini bildirdi: {{title}}. {{days}} gün içinde onaylamaz ya da sorun bildirmezsen ödeme ustaya aktarılır.",
     "paymentDisputed": "Müşteri bir sorun bildirdi; ödeme ekip incelemesine alındı.",
-    "autoReleased": "Süre dolduğu için emanetteki ödeme hizmet verene aktarıldı."
+    "autoReleased": "Süre dolduğu için emanetteki ödeme hizmet verene aktarıldı.",
+    "staffReport": "Yeni şikâyet: {{title}}",
+    "staffDispute": "Bir ödemede sorun bildirildi; karar bekliyor (₺{{amount}}).",
+    "providerSuspended": "Hizmet profilin ekip tarafından durduruldu: {{name}}"
   },
   "notifs": {
     "title": "Bildirimler",

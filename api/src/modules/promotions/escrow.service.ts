@@ -103,6 +103,8 @@ export class EscrowService {
     if (!r.count) throw Errors.conflict('ALREADY_DISPUTED');
     const prov = await this.prisma.providerProfile.findUnique({ where: { id: p.providerId } });
     if (prov) await this.notifications.push(prov.userId, 'notif.paymentDisputed', { kind: p.subjectKind, id: p.subjectId });
+    // Karar ekipte: ekibe hemen haber verilir (para otomatik aktarılmayı bekliyor).
+    await this.notifications.pushStaff('notif.staffDispute', { amount: String(Math.round((p.amountKurus + p.feeKurus) / 100)) });
     await this.audit.log(p.payerId, 'audit.paymentDisputed', { ref: p.id }, 'payment', p.id);
   }
 

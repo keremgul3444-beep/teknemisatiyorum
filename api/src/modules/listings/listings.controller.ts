@@ -11,6 +11,7 @@ import { ListingsService, MAX_PHOTOS } from './listings.service';
 import { listingInclude, priceNeedsReview, PRICE_CHANGES_PER_WEEK, type ListingRow } from './listing.view';
 import { canRenew, nextExpiry } from './expiry';
 import { ListingTexts } from './listing-writer.service';
+import { NotificationsService } from '../notifications/notifications.module';
 
 /** Kullanıcı başına açık (gönderilmemiş) taslak sınırı. */
 const MAX_OPEN_DRAFTS = 5;
@@ -103,6 +104,7 @@ export class ListingsController {
     private readonly media: MediaService,
     private readonly audit: AuditService,
     private readonly texts: ListingTexts,
+    private readonly notifications: NotificationsService,
   ) {}
 
   @Public()
@@ -157,6 +159,10 @@ export class ListingsController {
     if (existing) throw Errors.conflict('ALREADY_REPORTED');
     const r = await this.prisma.listingReport.create({ data: { listingId: id, reporterId: u.id, reason: b.reason, note: b.note } });
     await this.audit.log(u.id, 'audit.listingReported', { title: `${l.brand} ${l.model}`, reason: b.reason }, 'listing', id);
+    // Ekibe haber: ilanın ilk açık bildirimi geldiğinde (aynı ilan için her bildirimde değil).
+    if ((await this.prisma.listingReport.count({ where: { listingId: id, status: 'open' } })) === 1) {
+      await this.notifications.pushStaff('notif.staffReport', { title: `${l.brand} ${l.model}`, reason: b.reason }, l.ownerId);
+    }
     return { id: r.id, status: r.status };
   }
 

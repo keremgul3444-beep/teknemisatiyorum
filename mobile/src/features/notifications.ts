@@ -20,6 +20,9 @@ export function notifTarget(key: string, params: Record<string, string> | null):
     case 'notif.paymentDisputed': case 'notif.bookingRequested': return '/panel/hizmet';
     case 'notif.bookingDeclined': return '/profil/islerim';
     case 'notif.paymentRefunded': return '/profil/odemeler';
+    case 'notif.staffReport': return '/admin/sikayetler';
+    case 'notif.staffDispute': return '/admin/odemeler';
+    case 'notif.providerSuspended': return '/panel/hizmet';
     default: return null;
   }
 }

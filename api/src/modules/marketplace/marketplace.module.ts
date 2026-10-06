@@ -103,7 +103,7 @@ class ProvidersController {
   async one(@Param('id') id: string) {
     const p = await this.prisma.providerProfile.findUnique({ where: { id } });
     if (!p || p.status !== 'active') throw Errors.notFound();
-    const reviews = await this.prisma.review.findMany({ where: { providerId: id }, orderBy: { createdAt: 'desc' }, take: 20 });
+    const reviews = await this.prisma.review.findMany({ where: { providerId: id, hiddenAt: null }, orderBy: { createdAt: 'desc' }, take: 20 });
     return providerView(p, reviews);
   }
 }

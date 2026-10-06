@@ -27,6 +27,9 @@ const TEXTS: Record<'tr' | 'en', Record<string, string>> = {
     'notif.docRejected': 'Belgen reddedildi',
     'notif.reportReady': 'Ekspertiz raporun hazır · {{score}}/100',
     'notif.brokerAdvanced': '{{boat}} broker dosyası {{step}}. adıma geçti',
+    'notif.staffReport': 'Yeni şikâyet: {{title}}',
+    'notif.staffDispute': 'Bir ödemede sorun bildirildi; karar bekliyor (₺{{amount}}).',
+    'notif.providerSuspended': 'Hizmet profilin ekip tarafından durduruldu: {{name}}',
   },
   en: {
     'notif.newMessage': 'New message: {{title}}',
@@ -52,6 +55,9 @@ const TEXTS: Record<'tr' | 'en', Record<string, string>> = {
     'notif.docRejected': 'Your document was rejected',
     'notif.reportReady': 'Your survey report is ready · {{score}}/100',
     'notif.brokerAdvanced': '{{boat}} broker case moved to step {{step}}',
+    'notif.staffReport': 'New report: {{title}}',
+    'notif.staffDispute': 'A payment was disputed and needs a decision (₺{{amount}}).',
+    'notif.providerSuspended': 'Your service profile was paused by the team: {{name}}',
   },
 };
 const TITLE: Record<'tr' | 'en', string> = { tr: 'teknemisatıyorum', en: 'teknemisatıyorum' };

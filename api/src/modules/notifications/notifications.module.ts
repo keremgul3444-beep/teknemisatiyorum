@@ -31,6 +31,12 @@ export class NotificationsService {
     return n;
   }
 
+  /** Ekibe (moderatör ve yönetici) haber: yeni şikâyet, sorunlu ödeme. Askıdaki ve silinmiş hesaplar hariç. */
+  async pushStaff(key: string, params?: Record<string, string>, exceptUserId?: string) {
+    const staff = await this.prisma.user.findMany({ where: { roles: { hasSome: ['moderator', 'admin'] }, deletedAt: null, suspendedAt: null, ...(exceptUserId ? { id: { not: exceptUserId } } : {}) }, select: { id: true } });
+    await Promise.all(staff.map((s) => this.push(s.id, key, params)));
+  }
+
   /** Kullanıcının kayıtlı cihazlarına, kendi dilinde. Kayıtsız (uygulaması silinmiş) cihazın jetonu temizlenir. */
   private async deliver(userId: string, key: string, params?: Record<string, string>) {
     const tokens = await this.prisma.pushToken.findMany({ where: { userId }, select: { token: true } });
